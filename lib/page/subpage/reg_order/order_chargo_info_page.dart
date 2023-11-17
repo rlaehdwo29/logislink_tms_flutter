@@ -86,9 +86,43 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
 
   final etSellCharge = "".obs;
 
+  late TextEditingController unitPriceController;
+  late TextEditingController sellChargeController;
+  late TextEditingController sellFeeController;
+  late TextEditingController sellWeightController;
+  late TextEditingController rpaValueController;
+  late TextEditingController sellWayPointChargeController;
+  late TextEditingController sellWayPointController;
+  late TextEditingController sellStayChargeController;
+  late TextEditingController sellStayMemoController;
+  late TextEditingController sellHandWorkChargeController;
+  late TextEditingController sellHandWorkMemoController;
+  late TextEditingController sellRoundChargeController;
+  late TextEditingController sellRoundMemoController;
+  late TextEditingController sellOtherAddChargeController;
+  late TextEditingController sellOtherAddMemoController;
+
+
   @override
   void initState() {
     super.initState();
+
+    unitPriceController = TextEditingController();
+    sellChargeController = TextEditingController();
+    sellFeeController = TextEditingController();
+    sellWeightController = TextEditingController();
+    rpaValueController = TextEditingController();
+    sellWayPointChargeController = TextEditingController();
+    sellWayPointController = TextEditingController();
+    sellStayChargeController = TextEditingController();
+    sellStayMemoController = TextEditingController();
+    sellHandWorkChargeController = TextEditingController();
+    sellHandWorkMemoController = TextEditingController();
+    sellRoundChargeController = TextEditingController();
+    sellRoundMemoController = TextEditingController();
+    sellOtherAddChargeController = TextEditingController();
+    sellOtherAddMemoController = TextEditingController();
+
     Future.delayed(Duration.zero, () async {
 
       var order = widget.order_vo;
@@ -280,6 +314,21 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   @override
   void dispose() {
     super.dispose();
+    unitPriceController.dispose();
+    sellChargeController.dispose();
+    sellFeeController.dispose();
+    sellWeightController.dispose();
+    rpaValueController.dispose();
+    sellWayPointChargeController.dispose();
+    sellWayPointController.dispose();
+    sellStayChargeController.dispose();
+    sellStayMemoController.dispose();
+    sellHandWorkChargeController.dispose();
+    sellHandWorkMemoController.dispose();
+    sellRoundChargeController.dispose();
+    sellRoundMemoController.dispose();
+    sellOtherAddChargeController.dispose();
+    sellOtherAddMemoController.dispose();
   }
 
   Future<void> initView() async {
@@ -384,8 +433,10 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     int sellRoundCharge = mData.value.sellRoundCharge?.isEmpty == true || mData.value.sellRoundCharge == null ? 0 : int.parse(mData.value.sellRoundCharge!);
     int sellOtherAddCharge = mData.value.sellOtherAddCharge?.isEmpty == true || mData.value.sellOtherAddCharge == null ? 0 : int.parse(mData.value.sellOtherAddCharge!);
 
-    int total = sellCharge + sellWayPointCharge + sellStayCharge + sellHandWorkCharge + sellRoundCharge + sellOtherAddCharge - sellFee;
+    print("토탈 값 보자 =>$sellCharge // $sellFee // $sellWayPointCharge // $sellStayCharge // $sellHandWorkCharge // $sellRoundCharge // $sellOtherAddCharge");
 
+    int total = sellCharge + sellWayPointCharge + sellStayCharge + sellHandWorkCharge + sellRoundCharge + sellOtherAddCharge - sellFee;
+    print("토탈 값 보자111 =>$total");
     tvTotal.value = Util.getInCodeCommaWon(total.toString());
 
   }
@@ -736,7 +787,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
           )
         ),
-        // 인수증/선불/착불
+        // 인수증/선불/착불 버튼
         Row(
           children: [
             Expanded(
@@ -807,7 +858,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 )),
           ],
         ),
-        // 대당단가/톤당단가
+        // 대당단가/톤당단가 탭 버튼
     Container(
       padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
         child: Row(
@@ -866,8 +917,83 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
           style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
         ),
         Container(
-          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-          child: ,
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+            height: CustomStyle.getHeight(40.h),
+            child: TextFormField(
+              style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+              textAlign: TextAlign.start,
+              keyboardType: TextInputType.number,
+              controller: unitPriceController,
+              readOnly: true,
+              maxLines: 1,
+              decoration: unitPriceController.text.isNotEmpty
+                  ? InputDecoration(
+                counterText: '',
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                    borderRadius: BorderRadius.circular(5.h)
+                ),
+                disabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
+                ),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                    borderRadius: BorderRadius.circular(5.h)
+                ),
+                suffix: Text(
+                    "원",
+                  textAlign: TextAlign.center,
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    unitPriceController.clear();
+                    mData.value.unitPrice = "0";
+                  },
+                  icon: const Icon(
+                    Icons.clear,
+                    size: 18,
+                    color: Colors.black,
+                  ),
+                ),
+              )
+                  : InputDecoration(
+                counterText: '',
+                hintText: Strings.of(context)?.get("order_charge_info_unit_price_hint")??"Not Found",
+                hintStyle:CustomStyle.greyDefFont(),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                    borderRadius: BorderRadius.circular(5.h)
+                ),
+                disabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
+                ),
+                focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                    borderRadius: BorderRadius.circular(5.h)
+                ),
+              ),
+              onChanged: (value) async {
+                if(value.length > 0) {
+                  mData.value.unitPrice = value.replaceAll(",","");
+                }else{
+                  mData.value.unitPrice = "0";
+                }
+                if(mData.value.unitPriceType == UNIT_PRICE_TYPE_02) {
+                  if(Const.RESULT_SETTING_CHARGE == code) {
+                    mData.value.buyCharge = rBuyCharge.value;
+                  }else{
+                    var _value = await makeCharge();
+                    mData.value.sellCharge = _value;
+                  }
+                }
+                await setTotal();
+
+              },
+              maxLength: 50,
+            )
         )
         ],
       )
