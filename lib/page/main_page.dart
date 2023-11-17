@@ -1,0 +1,1291 @@
+import 'dart:async';
+import 'dart:io';
+import 'package:fbroadcast/fbroadcast.dart' as fbroad;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:logislink_tms_flutter/common/app.dart';
+import 'package:logislink_tms_flutter/common/common_main_widget.dart';
+import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/model/code_model.dart';
+import 'package:logislink_tms_flutter/common/model/order_model.dart';
+import 'package:logislink_tms_flutter/common/model/user_model.dart';
+import 'package:logislink_tms_flutter/common/strings.dart';
+import 'package:logislink_tms_flutter/common/style_theme.dart';
+import 'package:logislink_tms_flutter/constants/const.dart';
+import 'package:logislink_tms_flutter/db/appdatabase.dart';
+import 'package:logislink_tms_flutter/page/subpage/appbar_mypage.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
+import 'package:logislink_tms_flutter/provider/order_service.dart';
+import 'package:logislink_tms_flutter/utils/util.dart';
+import 'package:logislink_tms_flutter/widget/show_select_dialog_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter/rendering.dart';
+
+class MainPage extends StatefulWidget {
+  final String? allocId;
+  const MainPage({Key? key, this.allocId}):super(key:key);
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindingObserver {
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final isExpanded = [].obs;
+  final isSelected = [].obs;
+  final controller = Get.find<App>();
+  final mUser = UserModel().obs;
+
+  final GlobalKey webViewKey = GlobalKey();
+  late final InAppWebViewController webViewController;
+  late final PullToRefreshController pullToRefreshController;
+  final orderList = List.empty(growable: true).obs;
+  final myOrder = "N".obs;
+  final orderState = "".obs;
+  final allocState = "".obs;
+  final searchValue = "".obs;
+  late String startDate, endDate, nowDate;
+
+  DateTime mCalendarNowDate = DateTime.now();
+  final mCalendarStartDate = DateTime.now().add(const Duration(days: -30)).obs;
+  final mCalendarEndDate = DateTime.now().obs;
+  CalendarFormat _calendarFormat = CalendarFormat.month;
+  RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOn;
+
+  final myOrderSelect = false.obs;
+  final categoryOrderCode = "".obs;
+  final categoryOrderState = "전체".obs;
+  final categoryVehicCode = "".obs;
+  final categoryVehicState = "전체".obs;
+  List<CodeModel>? dropDownList = List.empty(growable: true);
+  final select_value = CodeModel().obs;
+
+  var scrollController = ScrollController();
+  final page = 1.obs;
+  final totalPage = 1.obs;
+
+  late AppDataBase db;
+
+  @override
+  void initState() {
+    super.initState();
+    fbroad.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
+      await getOrderMethod(true);
+    },context: this);
+    fbroad.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+    pullToRefreshController = (kIsWeb
+        ? null
+        : PullToRefreshController(
+      options: PullToRefreshOptions(color: Colors.blue),
+      onRefresh: () async {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          webViewController.reload();
+        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+          webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));}
+      },
+    ))!;
+    handleDeepLink();
+    Future.delayed(Duration.zero, () async {
+      if(widget.allocId != null) {
+        //Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailPage(allocId: widget.allocId)));
+      }
+      scrollController.addListener(() async {
+        var now_scroll = scrollController.position.pixels;
+        var max_scroll = scrollController.position.maxScrollExtent;
+        if((max_scroll - now_scroll) <= 300){
+          if(page.value < totalPage.value){
+            page.value++;
+          }
+        }
+      });
+      db = controller.getRepository();
+      db.deleteAll();
+      await initView();
+      dropDownList?.add(CodeModel(code: "carNum",codeName: "차량번호"));
+      dropDownList?.add(CodeModel(code: "driverName",codeName: "차주명"));
+      dropDownList?.add(CodeModel(code: "sellCustName",codeName: "거래처명"));
+    });
+  }
+
+  void selectItem(CodeModel? codeModel,{codeType = "",value = 0}) {
+    if(codeType != ""){
+      switch(codeType) {
+        case 'ORDER_STATE_CD':
+          categoryOrderCode.value = codeModel?.code??"";
+          categoryOrderState.value = codeModel?.codeName??"-";
+          page.value = 1;
+          scrollController.jumpTo(0);
+          break;
+        case 'ALLOC_STATE_CD':
+         categoryVehicCode.value = codeModel?.code??"";
+         categoryVehicState.value = codeModel?.codeName??"-";
+         page.value = 1;
+         scrollController.jumpTo(0);
+          break;
+      }
+    }
+  }
+
+  Future<void> initView() async {
+    UserModel? user = await controller.getUserInfo();
+    mUser.value = user;
+    List<OrderModel> list = await db.getOrderList(context);
+    if(list != null && list.length != 0) {
+      if(orderList.isNotEmpty) orderList.clear();
+      for(var data in list) {
+        orderList?.add(data);
+      }
+    }
+  }
+
+  void handleDeepLink() async {
+    
+    /*FirebaseDynamicLinks.instance.getInitialLink().then(
+          (PendingDynamicLinkData? dynamicLinkData) {
+        // Set up the `onLink` event listener next as it may be received here
+        if (dynamicLinkData != null) {
+          final Uri deepLink = dynamicLinkData.link;
+          String? code = deepLink.pathSegments.last;
+          String? allocId = deepLink.queryParameters["allocId"];
+          String? orderId = deepLink.queryParameters["orderId"];
+          if(allocId == null) return;
+          switch(code) {
+            case Const.DEEP_LINK_ORDER:
+              //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId,orderId: orderId)));
+              break;
+            case Const.DEEP_LINK_TAX:
+            case Const.DEEP_LINK_RECEIPT:
+              //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId,orderId: orderId,code: code)));
+              break;
+          }
+        }
+      });*/
+
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void exited(){
+    Future.delayed(const Duration(milliseconds: 300), () {
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      exit(0);
+      //SystemNavigator.pop();
+    });
+  }
+
+  Future<void> goToExit() async {
+    openCommonConfirmBox(
+        context,
+        "퇴근하시겠습니까?",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await logout();
+        }
+    );
+  }
+
+  Future<void> logout() async {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+      exit(0);
+      //SystemNavigator.pop();
+    });
+  }
+
+  Future<void> getOrderMethod(bool flag) async {
+    bool data = flag;
+    //await getOrder(data);
+  }
+
+  Drawer getAppBarMenu() {
+    return Drawer(
+        backgroundColor: styleWhiteCol,
+        width: CustomStyle.getWidth(350.w),
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+                decoration: BoxDecoration(
+                  color: main_color,
+                ),
+                child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Obx(()=>
+                              Text(
+                                "${mUser.value.bizName}",
+                                style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                              )),
+                          CustomStyle.sizedBoxHeight(10.0.h),
+                          Obx(()=>Text(
+                            "${mUser.value.deptName}",
+                            style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
+                          )
+                          )
+                        ]
+                    )
+            ),
+
+            ListTile(
+              title: Text(
+                "내정보",
+                style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+              ),
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (BuildContext context) => AppBarMyPage()));
+              },
+            ),
+            ListTile(
+              title: Text(
+                "공지사항",
+                style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+              ),
+              onTap: (){
+                //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarNoticePage()));
+              },
+            ),
+            ListTile(
+              title: Text(
+                "설정",
+                style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+              ),
+              onTap: (){
+                //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarSettingPage()));
+              },
+            ),ListTile(
+              title: Text(
+                "도움말",
+                style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+              ),
+              onTap: () async {
+                /*var url = Uri.parse(URL_MANUAL);
+                if (await canLaunchUrl(url)) {
+                  launchUrl(url);
+                }*/
+              },
+            ),ListTile(
+              title: Text(
+                "로그아웃",
+                style: CustomStyle.CustomFont(styleFontSize14, order_state_09),
+              ),
+              onTap: () async {
+                await goToExit();
+              },
+            )
+          ],
+        )
+    );
+  }
+
+  Widget getListCardView(OrderModel item) {
+    return Container(
+        padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w),right: CustomStyle.getWidth(10.0.w),top: CustomStyle.getHeight(10.0.h)),
+        child: InkWell(
+            onTap: () {
+              //goToOrderDetail(item);
+            },
+            child: Card(
+                elevation: 2.0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0.0)),
+                color: styleWhiteCol,
+                child: Column(children: [
+                  Container(
+                      padding: EdgeInsets.all(10.0.h),
+                      color: Colors.white,
+                      child: Column(children: [
+                        Row(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                                flex: 3,
+                                child: Row(children: [
+                                  item.orderState == "09" ? Container(
+                                      decoration: CustomStyle
+                                          .baseBoxDecoWhite(),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical:
+                                          CustomStyle.getHeight(
+                                              5.0.h),
+                                          horizontal:
+                                          CustomStyle.getWidth(
+                                              10.0.w)),
+                                      child: Text(
+                                        "${item.orderStateName}",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize12,
+                                            Util.getOrderStateColor(
+                                                item.orderStateName)),
+                                      )) : const SizedBox(),
+                                  Container(
+                                      padding: EdgeInsets.only(
+                                          left: CustomStyle.getWidth(
+                                              10.0.w),
+                                          right: CustomStyle.getWidth(
+                                              5.0.w)),
+                                      child: Text(
+                                        "${item.sellCustName}",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize12,
+                                            main_color),
+                                      )),
+                                  Text(
+                                    "${item.sellDeptName}",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize10, main_color),
+                                  )
+                                ])),
+                            Flexible(
+                                flex: 1,
+                                child: Container(
+                                  alignment:
+                                  Alignment.centerRight,
+                                  child: Text(
+                                    "${Util.getInCodeCommaWon(item.sellCharge.toString())}원",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize14,
+                                        text_color_01,
+                                    font_weight: FontWeight.w700),
+                                  ),
+                                ))
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                                flex: 3,
+                                child: Row(children: [
+                                  item.orderState != "09" && item.driverState == null ? Container(
+                                      decoration: CustomStyle
+                                          .baseBoxDecoWhite(),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical:
+                                          CustomStyle.getHeight(
+                                              5.0.h),
+                                          horizontal:
+                                          CustomStyle.getWidth(
+                                              10.0.w)),
+                                      child: Text(
+                                        "${item.allocStateName}",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize14,
+                                            order_state_01),
+                                      )) : const SizedBox(),
+                                  Container(
+                                      padding: EdgeInsets.only(
+                                          right: CustomStyle.getWidth(
+                                              5.0.w)),
+                                      child: Text(
+                                        item.linkName??"",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize12,
+                                            text_color_01),
+                                      )),
+                                  Text(
+                                    item.buyCustName??"",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize12, text_color_01),
+                                  ),
+                                  Text(
+                                    item.buyDeptName??"",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize10, text_color_01),
+                                  )
+                                ])),
+                            Flexible(
+                                flex: 1,
+                                child: Container(
+                                  alignment:
+                                  Alignment.centerRight,
+                                  child: Text(
+                                    "${Util.getInCodeCommaWon(item.buyCharge.toString())}원",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize14,
+                                        text_color_01,
+                                        font_weight: FontWeight.w700),
+                                  ),
+                                ))
+                          ],
+                        ),
+                        item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h):const SizedBox(),
+                        item.orderState != "09" && item.driverState != null? CustomStyle.getDivider1():const SizedBox(),
+                        item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h):const SizedBox(),
+                        item.orderState != "09" && item.driverState != null? Container(
+                            decoration: CustomStyle
+                                .baseBoxDecoWhite(),
+                            padding: EdgeInsets.symmetric(
+                                vertical:
+                                CustomStyle.getHeight(
+                                    5.0.h),
+                                horizontal:
+                                CustomStyle.getWidth(
+                                    10.0.w)),
+                          child: Row(children: [
+                                  Flexible(
+                                      flex: 9,
+                                      child: Row(children: [
+                                        Container(
+                                            padding: EdgeInsets.only(
+                                                right: CustomStyle.getWidth(
+                                                    10.0.w)),
+                                            child: Text(
+                                                item.driverStateName ?? "",
+                                                style: CustomStyle.CustomFont(
+                                                    styleFontSize14,
+                                                    order_state_01,
+                                                    font_weight:
+                                                        FontWeight.w700))),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "${item.driverName} 차주님",
+                                              style: CustomStyle.CustomFont(
+                                                  styleFontSize14,
+                                                  text_color_01),
+                                            ),
+                                            Text(
+                                              "${item.carNum}",
+                                              style: CustomStyle.CustomFont(
+                                                  styleFontSize12,
+                                                  text_color_01),
+                                            )
+                                          ],
+                                        )
+                                      ])),
+                            Flexible(
+                                      flex: 1,
+                                      child: InkWell(
+                                        onTap: (){
+                                          Util.call(item.driverTel);
+                                        },
+                                          child: Container(
+                                              padding: EdgeInsets.all(4.0.h),
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Color(0xff3535b2),
+                                              ),
+                                              child: Icon(Icons.call_rounded,
+                                                  size: 24.h,
+                                                  color: Colors.white)
+                                          )
+                                      )
+                                  )
+                                ])
+                        ):const SizedBox(),
+                        item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h):const SizedBox(),
+                        item.orderState != "09" && item.driverState != null? CustomStyle.getDivider1(): const SizedBox(),
+                        item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h): const SizedBox(),
+                        Container(
+                            padding: EdgeInsets.all(8.0.h),
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(topLeft: Radius.circular(5.0),topRight: Radius.circular(5.0)),
+                              color: sub_color
+                            ),
+                            child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                          Util.ynToBoolean(item.payType)?
+                               Text(
+                                "빠른지급",
+                                style: CustomStyle.CustomFont(styleFontSize12, order_state_09,font_weight: FontWeight.w700),
+                              ):const SizedBox(),
+                          Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 4,
+                              child: Container(
+                                height: 150.h,
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
+                                 padding: EdgeInsets.all(5.0.h),
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    color: light_gray1
+                                  ),
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                Text(
+                                  "${Util.splitSDate(item.sDate)} 상차",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize14, text_box_color_01,
+                                      font_weight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                ),
+                                Text(
+                                  item.sComName??"",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize16, main_color,
+                                      font_weight: FontWeight.w600),
+                                  textAlign: TextAlign.center,
+                                ),
+                                CustomStyle.sizedBoxHeight(15.0.h),
+                                Text(
+                                  item.sAddr??"",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize12, main_color),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ])),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Icon(Icons.arrow_right_alt,size: 21.w,color: const Color(0xff6d7780)),
+                            ),
+                            Expanded(
+                                flex: 4,
+                                child: Container(
+                                    height: 150.h,
+                                    margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
+                                    padding: EdgeInsets.all(5.0.h),
+                                    decoration: const BoxDecoration(
+                                        borderRadius:  BorderRadius.all(Radius.circular(10)),
+                                        color: light_gray1
+                                    ),
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                  Text(
+                                    "${Util.splitSDate(item.eDate)} 하차",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize14, text_box_color_01,
+                                        font_weight: FontWeight.w400),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  Text(
+                                    item.eComName??"",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize16, main_color,
+                                        font_weight: FontWeight.w600),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  CustomStyle.sizedBoxHeight(15.0.h),
+                                  Text(
+                                    item.eAddr??"",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize12, main_color),
+                                    textAlign: TextAlign.center,
+                                  )
+                                ])))
+                          ],
+                        )
+                        ])),
+                        Container(
+                          color: sub_color,
+                        padding: EdgeInsets.symmetric(horizontal:CustomStyle.getWidth(5.0.w),vertical:CustomStyle.getHeight(15.0.h),),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                          decoration: BoxDecoration(
+                            color: light_gray1,
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                          ),
+                          child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(children: [
+                              Container(
+                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
+                                  child: Icon(Icons.social_distance,size: 24.w,color: text_color_01)
+                              ),
+                              Container(
+                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
+                                  child: Text(
+                                    "${Util.makeDistance(item.distance)} ${Util.makeTime(item.time)}",
+                                    style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                  )
+                              )
+                            ]),
+                            item.stopCount!=0? Container(
+                                padding: EdgeInsets.only(right: CustomStyle.getWidth(10.0.w)),
+                                child: Text(
+                                  "경유지 ${item.stopCount}곳",
+                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                )
+                            ):const SizedBox()
+                          ],
+                        )
+                        )
+                      ),
+                        Container(
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w), right: CustomStyle.getWidth(10.0.w), bottom: CustomStyle.getHeight(10.0.h)),
+                            decoration: BoxDecoration(
+                              color: sub_color,
+                              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(5.0),bottomRight:  Radius.circular(5.0)),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "${item.carTonName}  ${item.carTypeName} ",
+                                ),
+                                Row(children: [
+                                  Text(
+                                    item.truckTypeName == null?"":"${item.truckTypeName}  |  ",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize12, text_color_02),
+                                  ),
+                                  Text(
+                                    "${item.mixYn == "Y" ? "혼적" : "독차"}  |  ",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize12, text_color_02),
+                                  ),
+                                  Text(
+                                    item.returnYn == "Y" ? "왕복" : "편도",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize12, text_color_02),
+                                  ),
+                                ])
+                              ],
+                            ))
+                      ])),
+                ]
+                )
+            )
+        )
+    );
+  }
+
+  Future openCalendarDialog() {
+    mCalendarNowDate = DateTime.now();
+    DateTime? _tempSelectedDay = null;
+    DateTime? _tempRangeStart = mCalendarStartDate.value;
+    DateTime? _tempRangeEnd = mCalendarEndDate.value;
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return AlertDialog(
+                    contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+                    titlePadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(0.0))
+                    ),
+                    title: Container(
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15.0),horizontal: CustomStyle.getWidth(15.0)),
+                        color: main_color,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "시작 날짜 : ${_tempRangeStart == null?"-":"${_tempRangeStart?.year}년 ${_tempRangeStart?.month}월 ${_tempRangeStart?.day}일"}",
+                                style: CustomStyle.CustomFont(
+                                    styleFontSize16, styleWhiteCol),
+                              ),
+                              CustomStyle.sizedBoxHeight(5.0),
+                              Text(
+                                "종료 날짜 : ${_tempRangeEnd == null?"-":"${_tempRangeEnd?.year}년 ${_tempRangeEnd?.month}월 ${_tempRangeEnd?.day}일"}",
+                                style: CustomStyle.CustomFont(
+                                    styleFontSize16, styleWhiteCol),
+                              ),
+                            ]
+                        )
+                    ),
+                    content: SingleChildScrollView(
+                        child: SizedBox(
+                            child: Column(
+                                children: [
+                                  TableCalendar(
+                                    firstDay: DateTime.utc(2010, 1, 1),
+                                    lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
+                                    headerStyle: const HeaderStyle(
+                                      // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
+                                      formatButtonVisible: false,
+                                      // 달력 타이틀을 센터로
+                                      titleCentered: true,
+                                      // 말 그대로 타이틀 텍스트 스타일링
+                                      titleTextStyle: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16.0,
+                                      ),
+                                    ),
+                                    calendarStyle: CalendarStyle(
+                                      // 오늘 날짜에 하이라이팅의 유무
+                                      isTodayHighlighted: false,
+                                      // 캘린더의 평일 배경 스타일링(default면 평일을 의미)
+                                      defaultDecoration: BoxDecoration(
+                                        color: order_item_background,
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                      // 캘린더의 주말 배경 스타일링
+                                      weekendDecoration:  BoxDecoration(
+                                        color: order_item_background,
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                      // 선택한 날짜 배경 스타일링
+                                      selectedDecoration: BoxDecoration(
+                                          color: styleWhiteCol,
+                                          shape: BoxShape.rectangle,
+                                          border: Border.all(color: sub_color)
+                                      ),
+                                      defaultTextStyle: CustomStyle.CustomFont(
+                                          styleFontSize14, Colors.black),
+                                      weekendTextStyle:
+                                      CustomStyle.CustomFont(styleFontSize14, Colors.red),
+                                      selectedTextStyle: CustomStyle.CustomFont(
+                                          styleFontSize14, Colors.black),
+                                      // range 크기 조절
+                                      rangeHighlightScale: 1.0,
+
+                                      // range 색상 조정
+                                      rangeHighlightColor: const Color(0xFFBBDDFF),
+
+                                      // rangeStartDay 글자 조정
+                                      rangeStartTextStyle: CustomStyle.CustomFont(
+                                          styleFontSize14, Colors.black),
+
+                                      // rangeStartDay 모양 조정
+                                      rangeStartDecoration: BoxDecoration(
+                                          color: styleWhiteCol,
+                                          shape: BoxShape.rectangle,
+                                          border: Border.all(color: sub_color)
+                                      ),
+
+                                      // rangeEndDay 글자 조정
+                                      rangeEndTextStyle: CustomStyle.CustomFont(
+                                          styleFontSize14, Colors.black),
+
+                                      // rangeEndDay 모양 조정
+                                      rangeEndDecoration: BoxDecoration(
+                                          color: styleWhiteCol,
+                                          shape: BoxShape.rectangle,
+                                          border: Border.all(color: sub_color)
+                                      ),
+
+                                      // startDay, endDay 사이의 글자 조정
+                                      withinRangeTextStyle: const TextStyle(),
+
+                                      // startDay, endDay 사이의 모양 조정
+                                      withinRangeDecoration:
+                                      const BoxDecoration(),
+                                    ),
+                                    //locale: 'ko_KR',
+                                    focusedDay: mCalendarNowDate,
+                                    selectedDayPredicate: (day) {
+                                      return isSameDay(_tempSelectedDay, day);
+                                    },
+                                    rangeStartDay: _tempRangeStart,
+                                    rangeEndDay: _tempRangeEnd,
+                                    calendarFormat: _calendarFormat,
+                                    rangeSelectionMode: _rangeSelectionMode,
+                                    onDaySelected: (selectedDay, focusedDay) {
+                                      if (!isSameDay(_tempSelectedDay, selectedDay)) {
+                                        setState(() {
+                                          _tempSelectedDay = selectedDay;
+                                          mCalendarNowDate = focusedDay;
+                                          _rangeSelectionMode = RangeSelectionMode.toggledOff;
+                                        });
+                                      }
+                                    },
+                                    onRangeSelected: (start, end, focusedDay) {
+                                      //print("onRangeSelected => ${start} // $end // ${focusedDay}");
+                                      setState(() {
+                                        _tempSelectedDay = start;
+                                        mCalendarNowDate = focusedDay;
+                                        _tempRangeStart = start;
+                                        _tempRangeEnd = end;
+                                        _rangeSelectionMode = RangeSelectionMode.toggledOn;
+                                      });
+                                    },
+
+                                    onFormatChanged: (format) {
+                                      if (_calendarFormat != format) {
+                                        setState(() {
+                                          _calendarFormat = format;
+                                        });
+                                      }
+                                    },
+                                    onPageChanged: (focusedDay) {
+                                      mCalendarNowDate = focusedDay;
+                                    },
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.0)),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                            onPressed: (){
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text(
+                                              Strings.of(context)?.get("cancel")??"Not Found",
+                                              style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+                                            )
+                                        ),
+                                        CustomStyle.sizedBoxWidth(CustomStyle.getWidth(15.0)),
+                                        TextButton(
+                                            onPressed: () async {
+                                              int? diff_day = _tempRangeEnd?.difference(_tempRangeStart!).inDays;
+                                              if(_tempRangeStart == null || _tempRangeEnd == null){
+                                                if(_tempRangeStart == null && _tempRangeEnd != null) {
+                                                  _tempRangeStart = _tempRangeEnd?.add(const Duration(days: -30));
+                                                }else if(_tempRangeStart != null &&_tempRangeEnd == null) {
+                                                  DateTime? _tempDate = _tempRangeStart?.add(const Duration(days: 30));
+                                                  int start_diff_day = _tempDate!.difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)).inDays;
+                                                  if(start_diff_day > 0) {
+                                                    _tempRangeEnd = _tempRangeStart;
+                                                    _tempRangeStart = _tempRangeEnd?.add(const Duration(days: -30));
+                                                  }else{
+                                                    _tempRangeEnd = _tempRangeStart?.add(const Duration(days: 30));
+                                                  }
+                                                }else{
+                                                  return Util.toast("시작 날짜 또는 종료 날짜를 선택해주세요.");
+                                                }
+                                              }
+                                              mCalendarStartDate.value = _tempRangeStart!;
+                                              mCalendarEndDate.value = _tempRangeEnd!;
+                                              page.value = 1;
+                                              Navigator.of(context).pop(false);
+                                            },
+                                            child: Text(
+                                              Strings.of(context)?.get("confirm")??"Not Found",
+                                              style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+                                            )
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ]
+                            )
+                        )
+                    )
+                );
+              });
+        });
+  }
+
+  Widget calendarPanelWidget() {
+    isExpanded.value = List.filled(1, true);
+    return SingleChildScrollView(
+        child: Flex(
+          direction: Axis.vertical,
+          children: List.generate(1, (index) {
+            return ExpansionPanelList.radio(
+              animationDuration: const Duration(milliseconds: 500),
+              expandedHeaderPadding: EdgeInsets.zero,
+              elevation: 0,
+              initialOpenPanelValue: 0,
+              children: [
+                ExpansionPanelRadio(
+                  value: index,
+                  backgroundColor: text_color_03,
+                  headerBuilder: (BuildContext context, bool isExpanded) {
+                    return Container(
+                        padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.calendar_today_rounded,size: 20,color: styleWhiteCol,),
+                            CustomStyle.sizedBoxWidth(5.0),
+                            Text("날짜 설정",style: CustomStyle.CustomFont(styleFontSize14, styleWhiteCol))
+                          ],
+                        ));
+                  },
+                  body: Obx((){
+                    return InkWell(
+                        onTap: () {
+                          openCalendarDialog();
+                        },
+                        child: Container(
+                            decoration: BoxDecoration(
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: line,
+                                        width: CustomStyle.getWidth(1.0)
+                                    )
+                                ),
+                                color: const Color(0xfffafafa)
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                vertical: CustomStyle.getHeight(15.0),horizontal: CustomStyle.getWidth(15.0)),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      mCalendarStartDate.value == null?"-":"${mCalendarStartDate.value?.year}년 ${mCalendarStartDate.value?.month}월 ${mCalendarStartDate.value?.day}일",
+                                      textAlign: TextAlign.center,
+                                    )
+                                ),
+                                const Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      "~",
+                                      textAlign: TextAlign.center,
+                                    )
+                                ),
+                                Expanded(
+                                    flex: 1,
+                                    child: Text(
+                                      mCalendarEndDate.value == null?"-":"${mCalendarEndDate.value?.year}년 ${mCalendarEndDate.value?.month}월 ${mCalendarEndDate.value?.day}일",
+                                      textAlign: TextAlign.center,
+                                    )
+                                )
+                              ],
+                            )
+                        )
+                    );
+                  }),
+                  canTapOnHeader: true,
+                )
+              ],
+              expansionCallback: (int _index, bool status) {
+                isExpanded[index] = !isExpanded[index];
+                //for (int i = 0; i < isExpanded.length; i++)
+                //  if (i != index) isExpanded[i] = false;
+              },
+            );
+          }),
+        )
+    );
+  }
+
+  Widget orderCategoryWidget() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w), vertical: CustomStyle.getHeight(5.h)),
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(children: [
+            InkWell(
+              onTap: () {
+                ShowSelectDialogWidget(context:context, mTitle: Strings.of(context)?.get("order_state")??"", codeType: Const.ORDER_STATE_CD, value: 0, callback: selectItem).showDialog();
+              },
+              child: Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: CustomStyle.getHeight(5.h),
+                      horizontal: CustomStyle.getWidth(10.w)),
+                  decoration: CustomStyle.customBoxDeco(sub_color,
+                      radius: 5.0, border_color: Colors.white),
+                  child: Text(
+                    categoryOrderState.value,
+                    style:
+                        CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                  )),
+            ),
+            CustomStyle.sizedBoxWidth(5.0),
+            InkWell(
+              onTap: () {
+                ShowSelectDialogWidget(context:context, mTitle: Strings.of(context)?.get("alloc_state")??"", codeType: Const.ALLOC_STATE_CD, value: 0, callback: selectItem).showDialog();
+              },
+              child: Container(
+                  padding: EdgeInsets.symmetric(
+                      vertical: CustomStyle.getHeight(5.h),
+                      horizontal: CustomStyle.getWidth(10.w)),
+                  decoration: CustomStyle.customBoxDeco(sub_color,
+                      radius: 5.0, border_color: Colors.white),
+                  child: Text(
+                    categoryVehicState.value,
+                    style:
+                        CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                  )),
+            )
+          ]),
+          Row(
+            children: [
+              InkWell(
+                onTap: (){
+                  page.value = 1;
+                  myOrderSelect.value = !myOrderSelect.value;
+                  scrollController.jumpTo(0);
+                },
+              child: Container(
+                decoration: CustomStyle.customBoxDeco(Colors.white,
+                    radius: 5.0, border_color: myOrderSelect.value?text_box_color_01:text_box_color_02),
+                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                child: Text(
+                  "내오더",
+                  style: CustomStyle.CustomFont(styleFontSize12, myOrderSelect.value?text_box_color_01:text_box_color_02),
+                ),
+              )
+              ),
+              IconButton(
+                  onPressed: (){
+                    showSearchDialog();
+                  },
+                  icon: Icon(Icons.search,size: 28.w,color: text_box_color_02)
+              )
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> showSearchDialog() async {
+    select_value.value = dropDownList![0];
+    return showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(0.0))),
+                insetPadding: EdgeInsets.all(CustomStyle.getHeight(10.0)),
+                contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+                content: SingleChildScrollView(
+                  child: Obx((){
+                    return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                    Container(
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                    color: main_color,
+                    child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                    Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                    "오더 검색",
+                    style: CustomStyle.CustomFont(styleFontSize18, Colors.white),
+                                textAlign: TextAlign.center,
+                              )),
+                              Positioned(
+                                right: 5.w,
+                                child: IconButton(
+                                    onPressed: (){
+                                      Navigator.of(context).pop(false);
+                                    },
+                                    icon: Icon(Icons.close,size: 24.h,color: Colors.white)
+                                ),
+                              )
+                            ],
+                          )),
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30.h),horizontal: CustomStyle.getWidth(15.w)),
+                        child: Row(
+                           children: [
+                             DropdownButton(
+                                 value: select_value.value,
+                                 items: dropDownList?.map((value) {
+                                   return DropdownMenuItem(
+                                     value: value,
+                                     child: Text("${value.codeName}"),
+                                   );
+                                 }).toList(),
+                                 onChanged: (value) {
+                                   setState(() {
+                                     select_value.value = value!;
+                                   });
+                                 }
+                             )
+                           ],
+                        )
+                      ),
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop(false);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: CustomStyle.getHeight(14.0)),
+                          decoration: BoxDecoration(
+                            color: text_color_02,
+                            border: CustomStyle.borderAllBase(),
+                          ),
+                          child: Text(
+                            Strings.of(context)?.get("confirm") ?? "Not Found",
+                            style: CustomStyle.whiteFont15B(),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                  })
+                )),
+          );
+        });
+  }
+
+  Widget orderItemFuture() {
+    final orderService = Provider.of<OrderService>(context);
+    return FutureBuilder(
+        future: orderService.getOrder(
+            context,
+            Util.getTextDate(mCalendarStartDate.value),
+            Util.getTextDate(mCalendarEndDate.value),
+            categoryOrderCode.value,
+            categoryVehicCode.value,
+            myOrderSelect.value == true? "Y":"N",
+            page.value,
+            select_value.value.code??"",
+            select_value.value.codeName
+        ),
+        builder: (context, snapshot) {
+          if(snapshot.hasData) {
+            if(orderList.isNotEmpty) orderList.clear();
+            orderList.addAll(snapshot.data["list"]);
+            totalPage.value = snapshot.data?["total"];
+            return orderListWidget();
+          }else if(snapshot.hasError) {
+            return  Container(
+              padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
+              alignment: Alignment.center,
+              child: Text(
+                  "${Strings.of(context)?.get("empty_list")}",
+                  style: CustomStyle.baseFont()),
+            );
+          }
+          return Container(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              backgroundColor: styleGreyCol1,
+            ),
+          );
+        }
+    );
+  }
+
+  Widget orderListWidget() {
+    return orderList.isNotEmpty
+        ? Expanded(child: ListView.builder(
+      scrollDirection: Axis.vertical,
+      controller: scrollController,
+      shrinkWrap: true,
+      itemCount: orderList.length,
+      itemBuilder: (context, index) {
+        var item = orderList[index];
+        return getListCardView(item);
+      },
+    ))
+        : Expanded(
+        child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              Strings.of(context)?.get("empty_list") ?? "Not Found",
+              style: CustomStyle.baseFont(),
+            )));
+  }
+
+  Future goToRegOrder() async {
+    Map<String,int> results = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistOrderPage()));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: order_item_background,
+      resizeToAvoidBottomInset:false,
+      appBar: AppBar(
+        backgroundColor: main_color,
+        title: Center(
+          child: Text(
+            "로지스링크 주선사/운송사용",
+            style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
+          )
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+              onPressed: () {
+                /*Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => NotificationPage()));*/
+              },
+              icon: Icon(
+                Icons.notifications,
+                size: 24.0.w,
+                color: Colors.white,
+              )),
+        ],
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Image.asset("assets/image/menu.png",
+                width: CustomStyle.getWidth(20.0.w),
+                height: CustomStyle.getHeight(20.0.h)),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+            tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+          ),
+        ),
+      ),
+      drawer: getAppBarMenu(),
+      body: SafeArea(
+          child: Obx(() {
+        return Column(
+            children :[
+              calendarPanelWidget(),
+              orderCategoryWidget(),
+              orderItemFuture()
+        ]);
+      })),
+      bottomNavigationBar: SizedBox(
+          height: CustomStyle.getHeight(60.0.h),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                  flex: 1,
+                  child: InkWell(
+                      onTap: () async {
+                        await goToRegOrder();
+                      },
+                      child: Container(
+                          height: CustomStyle.getHeight(60.0.h),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: main_color),
+                          child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.app_registration_rounded,
+                                    size: 20, color: styleWhiteCol),
+                                CustomStyle.sizedBoxWidth(5.0.w),
+                                Text(
+                                  textAlign: TextAlign.center,
+                                  Strings.of(context)?.get("order_reg_title") ??
+                                      "Not Found",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize16, styleWhiteCol),
+                                ),
+                              ])))),
+            ],
+          )),
+    );
+  }
+}
