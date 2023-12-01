@@ -245,7 +245,7 @@
   "order_addr_reg_addr_hint" : "주소를 검색해 주세요.",
   "order_addr_reg_addr_detail_hint" : "상세주소를 입력해 주세요.",
   "order_addr_reg_staff_hint" : "담당자를 입력해 주세요.",
-  "order_addr_reg_tel_hint" : "담당자 연락처를 입력해 주세요.",
+  "`order_addr_reg_tel_hint`" : "담당자 연락처를 입력해 주세요.",
   "order_addr_reg_memo_hint" : "주소지 관련하여 기본으로 저장되는 메모입니다.",
 
   "order_addr_confirm_title" : "주소지 확인",
@@ -296,6 +296,7 @@
   "order_trans_info_sub_title_03" : "추가운임",
   "order_trans_info_sub_title_04" : "알림톡여부",
   "order_trans_info_sub_title_05" : "카카오톡 수신여부",
+  "order_trans_info_sub_title_06" : "정보망 전송",
   "order_trans_info_type_01" : "운송사",
   "order_trans_info_type_02" : "차량",
   "order_trans_info_type_non" : "선택안함",
@@ -320,6 +321,9 @@
   "order_trans_info_total_charge" : "지불운임(소계)",
   "order_trans_info_pay" : "빠른지급여부",
   "order_trans_info_regist" : "운전자 주민번호",
+  "order_trans_info_rpa_24call" : "24시콜",
+  "order_trans_info_rpa_Hwamul" : "화물맨",
+  "order_trans_info_rpa_onecall" : "원콜",
 
   "order_trans_info_way_point_charge" : "경유비(지불)",
   "order_trans_info_stay_charge" : "대기료(지불)",
@@ -393,6 +397,7 @@
   "send_link_pay_date_hint" : "결제일을 선택해 주세요.",
   "send_link_charge_type_hint" : "결제방법을 선택해 주세요.",
   "send_link_btn" : "전송",
+  "send_link_pay" : "지불운임",
 
   "kakao_app_key" : "0dc715be40338af9d54eb84eb9e2ef3c",
   "kakao_rest_app_key" : "41749fb10820961bf51f9d5931f3864c",

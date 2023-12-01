@@ -15,6 +15,7 @@ import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/db/appdatabase.dart';
 import 'package:logislink_tms_flutter/page/bridge_page.dart';
+import 'package:logislink_tms_flutter/provider/appbar_service.dart';
 import 'package:logislink_tms_flutter/provider/notification_service.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:provider/provider.dart';
@@ -102,6 +103,8 @@ class _MyAppState extends State<MyApp> {
             create:(_) => NotificationService()),
         ChangeNotifierProvider<OrderService>(
             create:(_) => OrderService()),
+        ChangeNotifierProvider<AppbarService>(
+            create: (_) => AppbarService())
       ],
       child: GestureDetector(
         onTap: () {

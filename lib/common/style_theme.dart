@@ -6,11 +6,19 @@ const bool screenUtilUse = true;
 
 const Color main_color = Color(0xff191962);
 const Color sub_color = Color(0xffF6F6FF);
+const Color sub_color2 = Color(0xffD5C6BB);
 const Color main_btn = Color(0xff191962);
 const Color sub_btn = Color(0xff65656D);
 const Color copy_btn = Color(0xff31363A);
 
+const Color terms_text = Color(0xff141420);
+const Color swipe_edit_btn = Color(0xff3535B2);
+const Color swipe_delete_btn = Color(0xffEF5350);
+
 const Color line = Color(0xffe0e0e0);
+
+const Color main_background = Color(0xffE2E2E2);
+
 const Color cancel_btn = Color(0xff31363A);
 const Color text_color_01 = Color(0xff00002A);
 const Color text_color_02 = Color(0xff404057);
@@ -623,6 +631,12 @@ class CustomStyle {
     return SizedBox(
         height: CustomStyle.getHeight(4.0),
         child: Divider(color: styleDefaultGrey));
+  }
+
+  static Widget getDivider10() {
+    return SizedBox(
+        height: CustomStyle.getHeight(10.h),
+        child: const Divider(color: styleDefaultGrey));
   }
 
   static Widget getDivider_verti() {

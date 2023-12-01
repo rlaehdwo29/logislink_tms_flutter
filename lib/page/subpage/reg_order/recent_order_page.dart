@@ -187,7 +187,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                             ),
                           ),
                           Text(
-                            Util.makeTime(item?.time),
+                            Util.makeTime(item?.time??0),
                             style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                           )
                         ],

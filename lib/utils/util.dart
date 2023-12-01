@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
@@ -12,6 +14,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:encrypt/encrypt.dart' as enc;
 
 class Util {
 
@@ -119,6 +122,31 @@ class Util {
     return hexString.toString();
   }
 
+  static Future<String> dataEncryption(String value) async {
+
+    String file = await rootBundle.loadString('assets/raw/key.txt');
+    var b = utf8.encode(file);
+    var keyBytes = Uint8List(16);
+    String mIv = "";
+
+    for(var i in keyBytes){
+      mIv = mIv + i.toString();
+    }
+
+    var len = b.length;
+
+    if(len > keyBytes.lengthInBytes) len = keyBytes.length;
+    List.copyRange(b,0, keyBytes, 0, len);
+
+    final key = enc.Key.fromUtf8(file);
+    final iv = enc.IV.fromUtf8(mIv);
+
+    final encrypter = enc.Encrypter(enc.AES(key,mode: enc.AESMode.cbc,padding: 'PKCS7'));
+    final encrypted = encrypter.encrypt(value, iv: iv);
+    //var result = await Aespack.encrypt(value, file, mIv);
+    return encrypted.base64;
+  }
+
   static String? makeString(String? _string){
     if(_string == null || _string == ""){
       return "-";
@@ -137,6 +165,9 @@ class Util {
   }
 
   static String makeTime(int? min) {
+    if(min == 0) {
+      return "0분";
+    }
     int hour = Duration(minutes: min!).inHours;
     int minute = Duration(minutes: min).inMinutes - Duration(hours: hour).inMinutes;
     String time = "";
@@ -326,6 +357,25 @@ class Util {
       }
     }
     return phone;
+  }
+
+  static bool equalsCharge(String text) {
+    if(text != null) {
+      return !(text == "0");
+    }else{
+      return false;
+    }
+  }
+
+  static bool checkTonOver(String carTon, String goodsWeight) {
+    double car = (((double.parse(carTon) * 1.1) * 10) / 10.0).roundToDouble();
+    double goods = double.parse(goodsWeight);
+    return car >= goods;
+  }
+
+  static bool regexCarNumber(String num) {
+    RegExp regExp = RegExp(r'^[가-힣ㄱ-ㅎㅏ-ㅣ\x20]{2}\d{2}[아,바,사,자\x20]\d{4}$');
+    return regExp.hasMatch(num);
   }
 
 }

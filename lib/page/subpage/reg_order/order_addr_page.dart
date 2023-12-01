@@ -13,10 +13,13 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_confirm_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_reg_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_confirm_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class OrderAddrPage extends StatefulWidget {
 
@@ -207,8 +210,8 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
 
   Widget selfInputWidget() {
     return InkWell(
-      onTap: (){
-
+      onTap: () async {
+        await goToAddrInput();
       },
         child: Container(
             padding: EdgeInsets.symmetric(
@@ -242,7 +245,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
             itemCount: mList.length,
             itemBuilder: (context, index) {
               var item = mList[index];
-              return getListItemView(item);
+              return getListItemView(item,index);
             },
           )
       ):Expanded(
@@ -267,24 +270,44 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
       data.eLat = double.parse(addr.lat??"0");
       data.eLon = double.parse(addr.lon??"0");
 
-      /*Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointConfirmPage(addr_vo:addr)));
+      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointConfirmPage(result_work_stopPoint:data,code:"confirm")));
 
       if(results != null && results.containsKey("code")){
         if(results["code"] == 200) {
-          print("하하하하하 -> ${results[Const.ADDR_VO]}");
+          print("confirmStopPoint() -> ${results[Const.RESULT_WORK_STOP_POINT]}");
           if(results[Const.RESULT_WORK_STOP_POINT] != null) {
-            List<StopPointModel>? dataList = List.empty(growable: true);
-              for (var item in mData.value.orderStopList??[]) {
-                dataList.add(StopPointModel.fromJSON(item));
-              }
+            List<StopPointModel>? dataList = mData.value.orderStopList??List.empty(growable: true);
+            print("confirmStopPoint()222 1111=> ${dataList?.length}");
+            if(dataList?.length == 0) {
+              dataList = List.empty(growable: true);
+            }
             StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
-              dataList.add(data);
-              mData.value.orderStopList = dataList;
+            print("confirmStopPoint()222 2222=> ${data.eComName}");
+            dataList?.add(data);
+            print("confirmStopPoint()222 2222=> ${dataList?.length}");
+            mData.value.orderStopList = dataList;
+            print("confirmStopPoint()222 => ${mData.value.orderStopList?.length}");
+            Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
           }
         }
-      }*/
+      }
 
-      //Navigator.of(context).pop({'code':200,'cust':item, "nonCust":false});
+  }
+
+  Future<void> goToAddrInput() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderAddrRegPage(code:"input")));
+    if(results != null && results.containsKey("code")) {
+      if (results["code"] == 200) {
+        if(results[Const.ADDR_VO] != null) {
+          AddrModel addr = results[Const.ADDR_VO];
+          if (Const.RESULT_WORK_STOP_POINT == widget.code) {
+            await confirmStopPoint(addr);
+          }else{
+            await confirmAddr(addr);
+          }
+        }
+      }
+    }
   }
 
   Future<void> confirmAddr(AddrModel addr) async {
@@ -357,55 +380,108 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
     }
   }
 
-  Widget getListItemView(AddrModel item) {
+  void onEditAddr(AddrModel addr,int position) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => OrderAddrRegPage(addr_vo: addr,position: position)));
+  }
+
+  void dialogAddrDel(AddrModel item, int position) {
+    openCommonConfirmBox(
+        context,
+        "주소지를 삭제하시겠습니까?",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () => Navigator.of(context).pop(false),
+            () async {
+          Navigator.of(context).pop(false);
+          //carDel(item);
+        });
+  }
+
+  Widget getListItemView(AddrModel item,int position) {
     return InkWell(
         onTap: () async {
-          if(Const.RESULT_WORK_STOP_POINT == widget.code) {
+          print("응애옹애 => ${widget.code}");
+          if (Const.RESULT_WORK_STOP_POINT == widget.code) {
             await confirmStopPoint(item);
-          }else{
+          } else {
             await confirmAddr(item);
           }
         },
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children:[
-          Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
-            height: 60.h,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+        child: Slidable(
+            key: const ValueKey(0),
+            endActionPane: ActionPane(
+              motion: const ScrollMotion(),
               children: [
-                Flexible(
-                    child: RichText(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      text: TextSpan(
-                        text:item.addrName??"",
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      ),
-                    )
+                SlidableAction(
+                  // An action can be bigger than the others.
+                  onPressed: (BuildContext context) => onEditAddr(item,position),
+                  backgroundColor: main_color,
+                  foregroundColor: Colors.white,
+                  icon: Icons.edit,
+                  label: '수정하기',
                 ),
-               Flexible(
-                   child: Container(
-                       padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-                       child: RichText(
-                     overflow: TextOverflow.ellipsis,
-                     maxLines: 1,
-                     text: TextSpan(
-                       text:item.addr??"",
-                       style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                     ),
-                    )
-                 )
-               )
+                SlidableAction(
+                  onPressed: (BuildContext context) => dialogAddrDel(item,position),
+                  backgroundColor: cancel_btn,
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                  label: '삭제하기',
+                ),
               ],
-            )
-        ),
-              CustomStyle.getDivider1()
-        ])
-    );
+            ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: CustomStyle.getHeight(10.h),
+                          horizontal: CustomStyle.getWidth(20.w)),
+                      height: 60.h,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                              child: RichText(
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            text: TextSpan(
+                              text: item.addrName ?? "",
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize14, text_color_01),
+                            ),
+                          )),
+                          Flexible(
+                              child: Container(
+                                  padding: EdgeInsets.only(
+                                      top: CustomStyle.getHeight(5.h)),
+                                  child: RichText(
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    text: TextSpan(
+                                      text: item.addr ?? "",
+                                      style: CustomStyle.CustomFont(
+                                          styleFontSize12, text_color_03),
+                                    ),
+                                  )))
+                        ],
+                      )),
+                  CustomStyle.getDivider1()
+                ])));
+  }
+
+  Future<void> goToAddrReg() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderAddrRegPage()));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+        print("goToAddrReg() -> ${results[Const.RESULT_WORK]}");
+        //await addStopPointResult(results);
+        await getAddr();
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -443,13 +519,31 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
           body: SafeArea(
               child: Obx((){
                  return SizedBox(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    child: Stack(
                       children: [
-                        searchBoxWidget(),
-                        selfInputWidget(),
-                        searchListWidget()
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            searchBoxWidget(),
+                            selfInputWidget(),
+                            searchListWidget()
+                          ],
+                        ),
+                        Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: InkWell(
+                                onTap: () async {
+                                  await goToAddrReg();
+                                },
+                                child: Icon(
+                                  Icons.add_circle,
+                                  color: main_btn,
+                                  size: 52.h,
+                                )
+                            )
+                        )
                       ],
                     )
                 );

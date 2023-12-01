@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'common_util.dart';
 
 mixin CommonMainWidget {
   WillPopScope

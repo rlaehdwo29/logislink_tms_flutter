@@ -19,6 +19,7 @@ import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/db/appdatabase.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_mypage.dart';
+import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
@@ -70,6 +71,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   final page = 1.obs;
   final totalPage = 1.obs;
 
+  late TextEditingController searchOrderController;
+
   late AppDataBase db;
 
   @override
@@ -104,6 +107,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           }
         }
       });
+      searchOrderController = TextEditingController();
       db = controller.getRepository();
       db.deleteAll();
       await initView();
@@ -172,6 +176,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   @override
   void dispose() {
     super.dispose();
+    searchOrderController.dispose();
   }
 
   void exited(){
@@ -290,12 +295,23 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     );
   }
 
+  Future<void> goToOrderDetail(OrderModel item) async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(order_vo: item)));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+
+        setState(() {});
+      }
+    }
+  }
+
   Widget getListCardView(OrderModel item) {
     return Container(
         padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w),right: CustomStyle.getWidth(10.0.w),top: CustomStyle.getHeight(10.0.h)),
         child: InkWell(
-            onTap: () {
-              //goToOrderDetail(item);
+            onTap: () async {
+              await goToOrderDetail(item);
             },
             child: Card(
                 elevation: 2.0,
@@ -598,9 +614,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         padding: EdgeInsets.symmetric(horizontal:CustomStyle.getWidth(5.0.w),vertical:CustomStyle.getHeight(15.0.h),),
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: light_gray1,
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
                           ),
                           child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -614,7 +630,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               Container(
                                   padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
                                   child: Text(
-                                    "${Util.makeDistance(item.distance)} ${Util.makeTime(item.time)}",
+                                    "${Util.makeDistance(item.distance)} ${Util.makeTime(item.time??0)}",
                                     style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                                   )
                               )
@@ -632,9 +648,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                       ),
                         Container(
                             padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w), right: CustomStyle.getWidth(10.0.w), bottom: CustomStyle.getHeight(10.0.h)),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: sub_color,
-                              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(5.0),bottomRight:  Radius.circular(5.0)),
+                              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(5.0),bottomRight:  Radius.circular(5.0)),
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -1034,8 +1050,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               )
               ),
               IconButton(
-                  onPressed: (){
-                    showSearchDialog();
+                  onPressed: () async {
+                    await showSearchDialog();
                   },
                   icon: Icon(Icons.search,size: 28.w,color: text_box_color_02)
               )
@@ -1046,8 +1062,23 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     );
   }
 
+  Future<void> search(CodeModel search_value) async {
+    var mSearchValue = searchOrderController.text.trim();
+    if(mSearchValue.length != 1) {
+        select_value.value = search_value;
+        searchValue.value = mSearchValue;
+        await refresh();
+    }else{
+      Util.toast("검색어를 2글자 이상 입력해주세요.");
+    }
+  }
+
+  Future<void> refresh() async {
+    page.value = 1;
+  }
+
   Future<void> showSearchDialog() async {
-    select_value.value = dropDownList![0];
+    var temp_search_column = dropDownList![0];
     return showDialog(
         barrierDismissible: false,
         context: context,
@@ -1060,9 +1091,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 insetPadding: EdgeInsets.all(CustomStyle.getHeight(10.0)),
                 contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
                 content: SingleChildScrollView(
-                  child: Obx((){
-                    return Column(
+                  child: Column(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                     Container(
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
@@ -1092,8 +1124,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30.h),horizontal: CustomStyle.getWidth(15.w)),
                         child: Row(
                            children: [
-                             DropdownButton(
-                                 value: select_value.value,
+                             Expanded(
+                               flex: 2,
+                             child: DropdownButton(
+                                 value: temp_search_column,
                                  items: dropDownList?.map((value) {
                                    return DropdownMenuItem(
                                      value: value,
@@ -1102,22 +1136,80 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                  }).toList(),
                                  onChanged: (value) {
                                    setState(() {
-                                     select_value.value = value!;
+                                     temp_search_column = value!;
                                    });
                                  }
-                             )
+                             )),
+                             Expanded(
+                               flex: 5,
+                             child: Container(
+                               padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
+                                 height: CustomStyle.getHeight(40.h),
+                                 child: TextField(
+                                   style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                                   textAlign: TextAlign.start,
+                                   keyboardType: TextInputType.text,
+                                   controller: searchOrderController,
+                                   maxLines: null,
+                                   decoration: searchOrderController.text.isNotEmpty
+                                       ? InputDecoration(
+                                     counterText: '',
+                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                     enabledBorder: OutlineInputBorder(
+                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                         borderRadius: BorderRadius.circular(5.h)
+                                     ),
+                                     disabledBorder: UnderlineInputBorder(
+                                         borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
+                                     ),
+                                     focusedBorder: OutlineInputBorder(
+                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                         borderRadius: BorderRadius.circular(5.h)
+                                     ),
+                                     suffixIcon: IconButton(
+                                       onPressed: () {
+                                         searchOrderController.clear();
+                                       },
+                                       icon: const Icon(
+                                         Icons.clear,
+                                         size: 18,
+                                         color: Colors.black,
+                                       ),
+                                     ),
+                                   )
+                                       : InputDecoration(
+                                     counterText: '',
+                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                     enabledBorder: OutlineInputBorder(
+                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                         borderRadius: BorderRadius.circular(5.h)
+                                     ),
+                                     disabledBorder: UnderlineInputBorder(
+                                         borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
+                                     ),
+                                     focusedBorder: OutlineInputBorder(
+                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                         borderRadius: BorderRadius.circular(5.h)
+                                     ),
+                                   ),
+                                   onChanged: (value){
+
+                                   },
+                                   maxLength: 50,
+                                 )
+                             ))
                            ],
                         )
                       ),
                       InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          await search(temp_search_column);
                           Navigator.of(context).pop(false);
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: CustomStyle.getHeight(14.0)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
                           decoration: BoxDecoration(
-                            color: text_color_02,
+                            color: sub_btn,
                             border: CustomStyle.borderAllBase(),
                           ),
                           child: Text(
@@ -1128,8 +1220,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         ),
                       ),
                     ],
-                  );
-                  })
+                  )
                 )),
           );
         });
@@ -1147,7 +1238,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             myOrderSelect.value == true? "Y":"N",
             page.value,
             select_value.value.code??"",
-            select_value.value.codeName
+            searchValue.value
         ),
         builder: (context, snapshot) {
           if(snapshot.hasData) {
@@ -1166,7 +1257,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           }
           return Container(
             alignment: Alignment.center,
-            child: CircularProgressIndicator(
+            child: const CircularProgressIndicator(
               backgroundColor: styleGreyCol1,
             ),
           );
@@ -1273,7 +1364,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.app_registration_rounded,
+                                const Icon(Icons.app_registration_rounded,
                                     size: 20, color: styleWhiteCol),
                                 CustomStyle.sizedBoxWidth(5.0.w),
                                 Text(

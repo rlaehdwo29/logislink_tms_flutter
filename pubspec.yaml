@@ -61,7 +61,7 @@ dependencies:
   fluttertoast: ^8.2.2
   package_info_plus: ^4.0.2
   flutter_native_splash: ^2.3.1
-  url_launcher: ^6.1.11
+  url_launcher: ^6.2.1
   path_provider: ^2.0.15
   app_settings: ^5.0.0
   fbroadcast: ^2.0.0
@@ -74,6 +74,8 @@ dependencies:
   firebase_messaging: ^14.6.5
   floor: ^1.4.2
   time_picker_sheet: ^0.0.2+1
+  phone_call: ^0.0.1
+  flutter_slidable: ^3.0.0
 
 
 dev_dependencies:

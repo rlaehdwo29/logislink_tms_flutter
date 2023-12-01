@@ -16,9 +16,10 @@ import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_request_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cargo_info_page.dart';
-import 'package:logislink_tms_flutter/page/subpage/reg_order/order_chargo_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/order_charge_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_reg_day_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/recent_order_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -271,29 +272,37 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   Future<void> setActivityResult(Map<String,dynamic> results)async {
     switch(results[Const.RESULT_WORK]) {
       case Const.RESULT_WORK_DAY :
-        sCal.value = results["sCal"] as DateTime;
-        eCal.value = results["eCal"] as DateTime;
-        mData.value.sDate =  results["sDate"] as String;
-        mData.value.eDate = results["eDate"] as String;
-        setSDate.value = Util.splitSDate(mData.value.sDate);
-        setEDate.value = Util.splitSDate(mData.value.eDate);
+        setState(() {
+          sCal.value = results["sCal"] as DateTime;
+          eCal.value = results["eCal"] as DateTime;
+          mData.value.sDate =  results["sDate"] as String;
+          mData.value.eDate = results["eDate"] as String;
+          setSDate.value = Util.splitSDate(mData.value.sDate);
+          setEDate.value = Util.splitSDate(mData.value.eDate);
+        });
         break;
       case Const.RESULT_WORK_RECENT_ORDER :
-        mData.value = results[Const.ORDER_VO];
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+        });
         await copyData();
         break;
       case Const.RESULT_WORK_REQUEST :
-        mData.value = results[Const.ORDER_VO];
-        ChargeCheck.value = results[Const.UNIT_CHARGE_CNT];
-        llNonRequestInfo.value = false;
-        llRequestInfo.value = true;
-        isRequest.value = true;
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+          ChargeCheck.value = results[Const.UNIT_CHARGE_CNT];
+          llNonRequestInfo.value = false;
+          llRequestInfo.value = true;
+          isRequest.value = true;
+        });
         break;
       case Const.RESULT_WORK_SADDR :
-        mData.value = results[Const.ORDER_VO];
-        llNonSAddr.value = false;
-        llSAddr.value = true;
-        isSAddr.value = true;
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+          llNonSAddr.value = false;
+          llSAddr.value = true;
+          isSAddr.value = true;
+        });
         if(isEAddr.value) {
           await goToCargoInfo();
         }else{
@@ -301,10 +310,12 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         }
         break;
       case Const.RESULT_WORK_EADDR :
-        mData.value = results[Const.ORDER_VO];
-        llNonEAddr.value = false;
-        llEAddr.value = true;
-        isEAddr.value = true;
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+          llNonEAddr.value = false;
+          llEAddr.value = true;
+          isEAddr.value = true;
+        });
         if(isSAddr.value) {
           await goToCargoInfo();
         }else{
@@ -312,26 +323,33 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         }
         break;
       case Const.RESULT_WORK_STOP_POINT :
-        mData.value = results[Const.ORDER_VO];
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+        });
+        print("ㅇㅇㅇㅇ하하하하핳=->${mData.value.orderStopList?.length}");
         await setStopPoint();
         break;
       case Const.RESULT_WORK_CARGO :
-        mData.value = results[Const.ORDER_VO];
-        llNonCargoInfo.value = false;
-        llCargoInfo.value = true;
-        isCargoInfo.value = true;
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+          llNonCargoInfo.value = false;
+          llCargoInfo.value = true;
+          isCargoInfo.value = true;
+        });
         await goToChargeInfo();
         break;
       case Const.RESULT_WORK_CHARGE :
-        mData.value = results[Const.ORDER_VO];
-        m24CallYn.value = results[Const.RPA_24CALL_YN];
-        mHwamullYn.value = results[Const.RPA_HWAMULL_YN];
-        mOnecallYn.value = results[Const.RPA_ONECALL_YN];
-        mRpaSalary.value = results[Const.RPA_SALARY];
-        llNonChargeInfo.value = false;
-        llChargeInfo.value = true;
-        llRpaInfo.value = false;
-        isChargeInfo.value = true;
+        setState(() {
+          mData.value = results[Const.ORDER_VO];
+          m24CallYn.value = results[Const.RPA_24CALL_YN];
+          mHwamullYn.value = results[Const.RPA_HWAMULL_YN];
+          mOnecallYn.value = results[Const.RPA_ONECALL_YN];
+          mRpaSalary.value = results[Const.RPA_SALARY];
+          llNonChargeInfo.value = false;
+          llChargeInfo.value = true;
+          llRpaInfo.value = false;
+          isChargeInfo.value = true;
+        });
         break;
     }
   }
@@ -352,17 +370,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
 
       if(results != null && results.containsKey("code")){
         if(results["code"] == 200) {
-          print("하하하하하 -> ${results[Const.RESULT_WORK]}");
-          switch(results[Const.RESULT_WORK]){
-            case Const.RESULT_WORK_DAY:
-              sCal.value = results["sCal"] as DateTime;
-              eCal.value = results["eCal"] as DateTime;
-              mData.value.sDate =  results["sDate"] as String;
-              mData.value.eDate = results["eDate"] as String;
-              setSDate.value = Util.splitSDate(mData.value.sDate);
-              setEDate.value = Util.splitSDate(mData.value.eDate);
-              break;
-          }
+          print("addStopPoint() -> ${results[Const.RESULT_WORK]}");
+          await setActivityResult(results);
         }
       }
     //}else{
@@ -417,11 +426,18 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   }
 
   Future<void> goToStopPoint() async {
-    if(isRequest.value) {
-      //Map<String,int> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointPage(Const.ORDER_VO:mData.value)));
-    }else{
-      Util.toast(Strings.of(context)?.get("order_reg_request_info_hint")??"Not Found");
-    }
+    //if(isRequest.value) {
+      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointPage(order_vo:mData.value)));
+      if(results != null && results.containsKey("code")){
+        if(results["code"] == 200) {
+          print("goToRegSAddr() -> ${results[Const.RESULT_WORK]}");
+          await setActivityResult(results);
+        }
+        setState(() {});
+      }
+    //}else{
+    //  Util.toast(Strings.of(context)?.get("order_reg_request_info_hint")??"Not Found");
+    //}
   }
 
   Future<void> goToRegSAddr() async {
@@ -468,7 +484,11 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
 
   Future<void> goToChargeInfo() async {
     if(isCargoInfo.value) {
-      Map<String,int> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderChargeInfoPage(order_vo:mData.value,unit_charge_cnt:ChargeCheck.value,unit_buy_charge_local: mBuyChargeDummy.value, unit_price_local: mUnitPriceDummy.value, unit_sell_charge_local: mSellChargeDummy.value)));
+      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderChargeInfoPage(order_vo:mData.value,unit_charge_cnt:ChargeCheck.value,unit_buy_charge_local: mBuyChargeDummy.value, unit_price_local: mUnitPriceDummy.value, unit_sell_charge_local: mSellChargeDummy.value)));
+      if(results["code"] == 200) {
+        print("goToChargeInfo() -> ${results[Const.RESULT_WORK]}");
+        await setActivityResult(results);
+      }
     }else{
       Util.toast(Strings.of(context)?.get("order_reg_cargo_info_hint")??"Not Found");
     }
@@ -575,7 +595,11 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         // 경유지 추가
         InkWell(
           onTap: () async {
-            await addStopPoint();
+            if(mData.value.orderStopList?.length == 0 || mData.value.orderStopList?.length == null) {
+              await addStopPoint();
+            }else{
+              await goToStopPoint();
+            }
           },
           child: Container(
             padding: EdgeInsets.only(top:10.h , bottom: 10.h,right: 10.w),
@@ -593,13 +617,13 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                       margin: EdgeInsets.only(left: 5.w, right: 10.w),
                     ),
                     Text(
-                      "경유지 추가",
+                      mData.value.orderStopList?.length == 0 || mData.value.orderStopList?.length == null ? "경유지 추가" : "경유지 ${mData.value.orderStopList?.length}곳",
                       style: CustomStyle.CustomFont(
                           styleFontSize14, text_color_02),
                     ),
                   ],
                 ),
-                Icon(Icons.add_circle_outline, size: 21.h, color: Colors.black,)
+                mData.value.orderStopList?.length == 0 || mData.value.orderStopList?.length == null ? Icon(Icons.add_circle_outline, size: 21.h, color: Colors.black): Icon(Icons.keyboard_arrow_right_outlined, size: 21.h, color: Colors.black)
               ],
             ),
           ),
@@ -696,18 +720,18 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                           Row(
                             children: [
                               Text(
-                                "${mData.value.goodsName}",
+                                mData.value.goodsName??"",
                                 style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                               ),
                               Container(
                                 padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
                                 child: Text(
-                                  "${mData.value.goodsWeight}",
+                                  mData.value.goodsWeight??"",
                                   style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                                 ),
                               ),
                               Text(
-                                "${mData.value.weightUnitCode}",
+                                mData.value.weightUnitCode??"",
                                 style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                               )
                             ],
@@ -715,13 +739,13 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                           Row(
                             children: [
                               Text(
-                                "${mData.value.carTonName}",
+                                mData.value.carTonName??"",
                                 style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                               ),
                               Container(
                                 padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                                 child: Text(
-                                  "${mData.value.carTypeName}",
+                                  mData.value.carTypeName??"",
                                   style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                                 )
                               )
