@@ -39,7 +39,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
   final mData = OrderModel().obs;
   final code = "".obs;
 
-  bool isOption = false;
+  final isOption = false.obs;
   final tvTruckType = false.obs;
   final tvCarType = false.obs;
   final tvCarTon = false.obs;
@@ -227,7 +227,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
 
   @override
   Future<void> initView() async {
-    isOption = !widget.code.isNull;
+    isOption.value = !widget.code.isNull;
     if(mData.value.inOutSctn?.isEmpty == true || mData.value.inOutSctn.isNull == true) {
       await setCargoDefault();
     }
@@ -1239,6 +1239,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                             )
                         ),
                         // 혼적여부
+                        !isOption.value ?
                         Container(
                             padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                             child: Row(
@@ -1317,7 +1318,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                 )
                               ],
                             )
-                        ),
+                        ) : const SizedBox(),
                         //혼적크기
                         llMixSize.value ? Container(
                             padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
@@ -1356,6 +1357,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                             )
                         ) : const SizedBox(),
                         // 왕복여부
+                        !isOption.value ?
                         Container(
                             padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                             child: Row(
@@ -1433,20 +1435,21 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                 )
                               ],
                             )
-                        )
+                        ) : const SizedBox()
                       ],
                     )
                 ));
               })
           ),
-            bottomNavigationBar: SizedBox(
+            bottomNavigationBar: Obx((){
+              return SizedBox(
                 height: CustomStyle.getHeight(60.0.h),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     //확인 버튼
-                    !(isOption == true)? Expanded(
+                    !(isOption.value == true)? Expanded(
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
@@ -1476,7 +1479,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                         )
                     ):const SizedBox(),
                     //초기화 버튼
-                    (isOption == true)? Expanded(
+                    (isOption.value == true)? Expanded(
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
@@ -1505,7 +1508,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                         )
                     ):const SizedBox(),
                     // 저장 버튼
-                    (isOption == true)? Expanded(
+                    (isOption.value == true)? Expanded(
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
@@ -1534,7 +1537,8 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                         )
                     ):const SizedBox(),
                   ],
-                ))
+                ));
+          })
         )
     );
   }

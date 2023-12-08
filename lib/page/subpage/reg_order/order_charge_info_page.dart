@@ -20,13 +20,13 @@ import 'package:dio/dio.dart';
 class OrderChargeInfoPage extends StatefulWidget {
 
   OrderModel order_vo;
-  String unit_charge_cnt;
+  String? unit_charge_cnt;
   String unit_buy_charge_local;
   String unit_price_local;
   String unit_sell_charge_local;
   String? code;
 
-  OrderChargeInfoPage({Key? key,required this.order_vo,required this.unit_charge_cnt, required this.unit_buy_charge_local, required this.unit_price_local, required this.unit_sell_charge_local, this.code}):super(key:key);
+  OrderChargeInfoPage({Key? key,required this.order_vo, this.unit_charge_cnt, required this.unit_buy_charge_local, required this.unit_price_local, required this.unit_sell_charge_local, this.code}):super(key:key);
 
   _OrderChargeInfoPageState createState() => _OrderChargeInfoPageState();
 }
@@ -48,7 +48,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   static const String CHARGE_CAR_TYPE = "01";
   static const String CHARGE_TON_TYPE = "02";
 
-  bool isOption = false;
+  final isOption = false.obs;
   String code = "";
   final mData = OrderModel().obs;
   final isCharge = false.obs;
@@ -296,7 +296,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       rUnitPrice.value = widget.unit_price_local;
       rSellCharge.value = widget.unit_sell_charge_local;
 
-      ChargeCheck.value = widget.unit_charge_cnt;
+      if(widget.unit_charge_cnt != null) ChargeCheck.value = widget.unit_charge_cnt!;
       mHwaMullFlag.value = false;
 
       if(ChargeCheck.value == "Y") {
@@ -335,7 +335,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   }
 
   Future<void> initView() async {
-    isOption = !widget.code.isNull;
+    isOption.value = !widget.code.isNull;
     isRpaExpanded.value = List.filled(1, false);
     isTransExpanded.value = List.filled(1, false);
 
@@ -406,7 +406,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 }
               }
             }else{
-              llRpaSection.value = false;
+              //llRpaSection.value = false;
             }
             await initView();
           }
@@ -792,6 +792,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
             )
         ),
         // 인수증/선불/착불 버튼
+        !isOption.value ?
     Container(
         padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20.w)),
         child: Row(
@@ -863,7 +864,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     )
                 )),
           ],
-        )),
+        )) : const SizedBox(),
         // 대당단가/톤당단가 탭 버튼
         Container(
             padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
@@ -1014,7 +1015,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     "${Strings.of(context)?.get("order_charge_info_sell_charge")}",
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
-                  !isOption ? Container(
+                  !isOption.value ? Container(
                       padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
                       child: Text(
                         "${Strings.of(context)?.get("essential")}",
@@ -1095,14 +1096,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
             )
         ),
         //수수료
-        !isOption ? Container(
+        !isOption.value ? Container(
             padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
             child: Text(
               "${Strings.of(context)?.get("order_charge_info_sell_fee")}",
               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
             )
         ) : const SizedBox(),
-        !isOption ? Container(
+        !isOption.value ? Container(
             padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
             height: CustomStyle.getHeight(40.h),
             child: TextFormField(
@@ -1174,6 +1175,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
             )
         ) : const SizedBox(),
         //청구중량
+        !isOption.value?
         Container(
           padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h), left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w)),
           child:
@@ -1181,7 +1183,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
             "${Strings.of(context)?.get("order_charge_info_sell_wgt")}",
             style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
           ),
-        ),
+        ) : const SizedBox(),
+        !isOption.value?
         Container(
             padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w)),
             height: CustomStyle.getHeight(40.h),
@@ -1264,7 +1267,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               },
               maxLength: 50,
             )
-        )
+        ) : const SizedBox()
       ],
     );
   }
@@ -2275,8 +2278,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
           mainAxisAlignment: MainAxisAlignment.start,
       children: [
         chargeInfoWidget(),
-        llRpaSection.value ? rpaWidget():const SizedBox(),
-        !isOption ? transInfoWidget() : const SizedBox()
+        rpaWidget(),
+        !isOption.value ? transInfoWidget() : const SizedBox()
         ],
       )
     );
@@ -2340,7 +2343,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 return SingleChildScrollView(
                     child: Column(
                   children: [
-                    !isOption ? Container(
+                    !isOption.value ? Container(
                       padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
                       decoration: BoxDecoration(
                         border: Border(
@@ -2370,14 +2373,15 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 ));
               })
           ),
-            bottomNavigationBar: SizedBox(
+            bottomNavigationBar: Obx((){
+              return SizedBox(
                 height: CustomStyle.getHeight(60.0.h),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     //확인 버튼
-                    !(isOption == true)? Expanded(
+                    !(isOption.value == true)? Expanded(
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
@@ -2407,7 +2411,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                         )
                     ):const SizedBox(),
                     //초기화 버튼
-                    (isOption == true)? Expanded(
+                    (isOption.value == true)? Expanded(
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
@@ -2436,7 +2440,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                         )
                     ):const SizedBox(),
                     // 저장 버튼
-                    (isOption == true)? Expanded(
+                    (isOption.value == true)? Expanded(
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
@@ -2465,7 +2469,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                         )
                     ):const SizedBox(),
                   ],
-                ))
+                ));
+          })
         )
     );
   }

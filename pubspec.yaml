@@ -76,6 +76,7 @@ dependencies:
   time_picker_sheet: ^0.0.2+1
   phone_call: ^0.0.1
   flutter_slidable: ^3.0.0
+  wakelock_plus: ^1.1.1
 
 
 dev_dependencies:

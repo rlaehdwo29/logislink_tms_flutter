@@ -18,7 +18,10 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/db/appdatabase.dart';
+import 'package:logislink_tms_flutter/page/subpage/appbar_monitor_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_mypage.dart';
+import 'package:logislink_tms_flutter/page/subpage/appbar_notice_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/appbar_setting_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
@@ -217,12 +220,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Drawer getAppBarMenu() {
     return Drawer(
         backgroundColor: styleWhiteCol,
-        width: CustomStyle.getWidth(350.w),
+        width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: main_color,
                 ),
                 child: Column(
@@ -255,11 +258,20 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             ),
             ListTile(
               title: Text(
+                "실적현황",
+                style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
+              ),
+              onTap: (){
+                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarMonitorPage()));
+              },
+            ),
+            ListTile(
+              title: Text(
                 "공지사항",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
               ),
               onTap: (){
-                //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarNoticePage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarNoticePage()));
               },
             ),
             ListTile(
@@ -268,7 +280,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
               ),
               onTap: (){
-                //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarSettingPage()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarSettingPage()));
               },
             ),ListTile(
               title: Text(
@@ -550,20 +562,29 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                       font_weight: FontWeight.w400),
                                   textAlign: TextAlign.center,
                                 ),
-                                Text(
-                                  item.sComName??"",
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize16, main_color,
-                                      font_weight: FontWeight.w600),
-                                  textAlign: TextAlign.center,
-                                ),
+                                    Flexible(
+                                        child: RichText(
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            textAlign:TextAlign.center,
+                                            text: TextSpan(
+                                              text: item.sComName??"",
+                                              style:  CustomStyle.CustomFont(styleFontSize16, main_color, font_weight: FontWeight.w600),
+                                            )
+                                        )
+                                    ),
                                 CustomStyle.sizedBoxHeight(15.0.h),
-                                Text(
-                                  item.sAddr??"",
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize12, main_color),
-                                  textAlign: TextAlign.center,
-                                ),
+                                    Flexible(
+                                        child: RichText(
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            textAlign:TextAlign.center,
+                                            text: TextSpan(
+                                              text: item.sAddr??"",
+                                              style: CustomStyle.CustomFont(styleFontSize12, main_color),
+                                            )
+                                        )
+                                    ),
                               ])),
                             ),
                             Expanded(
@@ -591,20 +612,33 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         font_weight: FontWeight.w400),
                                     textAlign: TextAlign.center,
                                   ),
-                                  Text(
-                                    item.eComName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize16, main_color,
-                                        font_weight: FontWeight.w600),
-                                    textAlign: TextAlign.center,
+                                  Flexible(
+                                     child: RichText(
+                                         overflow: TextOverflow.ellipsis,
+                                         maxLines: 2,
+                                         textAlign: TextAlign.center,
+                                         text: TextSpan(
+                                           text:
+                                           item.eComName ?? "",
+                                           style: CustomStyle.CustomFont(
+                                               styleFontSize16,
+                                               main_color,
+                                               font_weight: FontWeight.w600),
+                                         )
+                                     )
                                   ),
                                   CustomStyle.sizedBoxHeight(15.0.h),
-                                  Text(
-                                    item.eAddr??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize12, main_color),
-                                    textAlign: TextAlign.center,
-                                  )
+                                  Flexible(
+                                     child: RichText(
+                                         overflow: TextOverflow.ellipsis,
+                                         maxLines: 2,
+                                         textAlign: TextAlign.center,
+                                         text: TextSpan(
+                                           text: item.eAddr??"",
+                                           style:CustomStyle.CustomFont(styleFontSize12, main_color)
+                                         )
+                                     )
+                                  ),
                                 ])))
                           ],
                         )
@@ -1338,6 +1372,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       body: SafeArea(
           child: Obx(() {
         return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
             children :[
               calendarPanelWidget(),
               orderCategoryWidget(),

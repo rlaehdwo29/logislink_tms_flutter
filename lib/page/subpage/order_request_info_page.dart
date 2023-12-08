@@ -920,7 +920,7 @@ Future<void> getCustUser() async {
                               padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
                               child: Text(
                                 Strings.of(context)?.get("order_request_info_sub_title_01")??"Not Found",
-                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01)
+                                style: CustomStyle.CustomFont(styleFontSize16, text_color_01,font_weight: FontWeight.w600)
                               ),
                             ),
                             CustomStyle.getDivider1(),
@@ -936,14 +936,15 @@ Future<void> getCustUser() async {
                 );
               })
           ),
-          bottomNavigationBar: SizedBox(
+          bottomNavigationBar: Obx((){
+            return SizedBox(
               height: CustomStyle.getHeight(60.0.h),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   //확인 버튼
-                  !(isOption == true)? Expanded(
+                  !(isOption.value == true)? Expanded(
                       flex: 1,
                       child: InkWell(
                           onTap: () async {
@@ -973,7 +974,7 @@ Future<void> getCustUser() async {
                       )
                   ):const SizedBox(),
                   //초기화 버튼
-                  (isOption == true)? Expanded(
+                  (isOption.value == true)? Expanded(
                       flex: 1,
                       child: InkWell(
                           onTap: () async {
@@ -1002,7 +1003,7 @@ Future<void> getCustUser() async {
                       )
                   ):const SizedBox(),
                   // 저장 버튼
-                  (isOption == true)? Expanded(
+                  (isOption.value == true)? Expanded(
                       flex: 1,
                       child: InkWell(
                           onTap: () async {
@@ -1041,7 +1042,8 @@ Future<void> getCustUser() async {
                       )
                   ):const SizedBox(),
                 ],
-              )),
+              ));
+          }),
         )
     );
   }

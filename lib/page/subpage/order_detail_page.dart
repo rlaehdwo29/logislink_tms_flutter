@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:fbroadcast/fbroadcast.dart' as BroadCast;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,13 +10,18 @@ import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/car_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
+import 'package:logislink_tms_flutter/common/model/order_link_status_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
+import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
+import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/subpage/link_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_trans_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
@@ -29,8 +35,9 @@ class OrderDetailPage extends StatefulWidget {
   OrderModel? order_vo;
   String? code;
   int? position;
+  String? allocId;
 
-  OrderDetailPage({Key? key,this.order_vo, this.code, this.position}):super(key:key);
+  OrderDetailPage({Key? key,this.order_vo, this.code, this.position, this.allocId}):super(key:key);
 
   _OrderDetailPageState createState() => _OrderDetailPageState();
 }
@@ -44,6 +51,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   final controller = Get.find<App>();
 
+  final mStopList = List.empty(growable: true).obs;
+  final mLinkStatusSub = OrderLinkStatusModel().obs;
+  final mAllocId = "".obs;
+
   final tvOrderCancel = false.obs;
   final tvReOrder = false.obs;
   final tvAlloc = false.obs;
@@ -55,6 +66,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   final llDriverInfo = false.obs;
 
   final llStopPointHeader = false.obs;
+  final llStopPointList = false.obs;
   final llBottom = false.obs;
   final mRpaUseYn = "".obs;
   final mLinkState = false.obs;
@@ -75,6 +87,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   void initState() {
     super.initState();
 
+    BroadCast.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
+      if(mData.value.orderId != null) {
+        await getOrderLinkStatusSub();
+      }
+      if(!(mAllocId.value == "") && mAllocId.value != null) {
+        await getOrderLinkStatusAlloc(mAllocId.value);
+      }
+      await rpaUseYnResume();
+    },context: this);
+
     etCarNumController = TextEditingController();
     etDriverNameController = TextEditingController();
     etTelController = TextEditingController();
@@ -82,9 +104,67 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     etCarTonController = TextEditingController();
 
     Future.delayed(Duration.zero, () async {
-      await initView();
+      if(widget.order_vo != null) {
+        mData.value = widget.order_vo!;
+      }else{
+        mData.value = OrderModel();
+      }
+
+      if(mData.value.orderId != null) {
+        await rpaUseYn();
+        await getOrderLinkStatusSub();
+      }else{
+        if(widget.allocId != null) {
+          mAllocId.value = widget.allocId!;
+          await getOrderLinkStatusAlloc(mAllocId.value);
+          await getOrderDetail(mAllocId.value);
+        }else{
+          Navigator.of(context).pop();
+        }
+      }
     });
 
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+      // 앱이 표시되고 사용자 입력에 응답합니다.
+      // 주의! 최초 앱 실행때는 해당 이벤트가 발생하지 않습니다.
+        BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+        print("resumed");
+        break;
+      case AppLifecycleState.inactive:
+      // 앱이 비활성화 상태이고 사용자의 입력을 받지 않습니다.
+      // ios에서는 포 그라운드 비활성 상태에서 실행되는 앱 또는 Flutter 호스트 뷰에 해당합니다.
+      // 안드로이드에서는 화면 분할 앱, 전화 통화, PIP 앱, 시스템 대화 상자 또는 다른 창과 같은 다른 활동이 집중되면 앱이이 상태로 전환됩니다.
+      // inactive가 발생되고 얼마후 pasued가 발생합니다.
+        print("inactive");
+        break;
+      case AppLifecycleState.paused:
+      // 앱이 현재 사용자에게 보이지 않고, 사용자의 입력을 받지 않으며, 백그라운드에서 동작 중입니다.
+      // 안드로이드의 onPause()와 동일합니다.
+      // 응용 프로그램이 이 상태에 있으면 엔진은 Window.onBeginFrame 및 Window.onDrawFrame 콜백을 호출하지 않습니다.
+        print("paused");
+        break;
+      case AppLifecycleState.detached:
+      // 응용 프로그램은 여전히 flutter 엔진에서 호스팅되지만 "호스트 View"에서 분리됩니다.
+      // 앱이 이 상태에 있으면 엔진이 "View"없이 실행됩니다.
+      // 엔진이 처음 초기화 될 때 "View" 연결 진행 중이거나 네비게이터 팝으로 인해 "View"가 파괴 된 후 일 수 있습니다.
+        print("detached");
+        break;
+      case AppLifecycleState.hidden:
+        // TODO: Handle this case.
+    }
   }
 
   @override
@@ -97,22 +177,421 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     etCarTonController.dispose();
   }
 
-  Future<void> setOrderState() async {
-    if(mData.value.orderState == "09") {
-      tvOrderState.value = true;
-      tvAllocState.value = false;
-      llDriverInfo.value = false;
+  Future<void> goToLocationControl() async {
+    //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo:mData.value)));
+  }
+
+  bool equalsCharge(String? text) {
+    if(text != null) {
+      return !(text == "0");
     }else{
-      if(mData.value.driverState != null) {
-        tvOrderState.value = false;
-        tvAllocState.value = false;
-        llDriverInfo.value = true;
-      }else{
-        tvOrderState.value = false;
-        tvAllocState.value = true;
-        llDriverInfo.value = false;
+      return false;
+    }
+  }
+
+  Future<void> copyOrder() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(order_vo:mData.value)));
+
+    if(results != null && results.containsKey("code")) {
+      if (results["code"] == 200) {
+        if(results["link"] != null) {
+          if(results["link"] != null && results["link"] == "") {
+            mAllocId.value = results["link"];
+          }
+        }
       }
     }
+
+  }
+
+  Future<void> getOrderDetail(String? allocId) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getOrderDetail(
+      user.authorization,
+      mData.value.orderId,
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              try {
+                var list = _response.resultMap?["data"] as List;
+                List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
+                if(itemsList.length > 0){
+                  mData.value = itemsList[0];
+                  await rpaUseYn();
+                }else{
+                  openOkBox(context,"삭제되었더나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
+                }
+              } catch (e) {
+                print(e);
+              }
+            }else{
+              openOkBox(context, "${_response.resultMap?["msg"]}",
+                  Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                    Navigator.of(context).pop(false);
+                  });
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("setOrderCancel() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("setOrderCancel() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("setOrderCancel() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> showNoDetail() async {
+    await openOkBox(context,"삭제되었더나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
+  }
+
+  Future<void> goToStopPoint() async {
+    if(mStopList.value.length == 0) {
+      //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointPage(code:"detail",result_work_stopPoint:mStopList.value)));
+    }else{
+      await getStopPoint();
+    }
+  }
+
+  Future<void> getStopPoint() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getStopPoint(
+        user.authorization,
+        mData.value.orderId
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getStopPoint() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["data"] != null) {
+              var list = _response.resultMap?["data"] as List;
+              List<StopPointModel> itemsList = list.map((i) => StopPointModel.fromJSON(i)).toList();
+              if (mStopList.isNotEmpty) mStopList.clear();
+              mStopList?.addAll(itemsList);
+              await goToStopPoint();
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("getStopPoint() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getStopPoint() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getStopPoint() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getOrderLinkStatusSub() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).currentNewLinkSub(
+        user.authorization,
+        mData.value.orderId
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getOrderLinkStatusSub() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["data"] != null) {
+              OrderLinkStatusModel newLinkStatusSub = OrderLinkStatusModel.fromJSON(it.response.data["data"]);
+              mLinkStatusSub.value = newLinkStatusSub;
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("getOrderLinkStatusSub() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getOrderLinkStatusSub() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getOrderLinkStatusSub() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getOrderLinkStatusAlloc(String? allocId) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).currentNewLinkAlloc(
+        user.authorization,
+        allocId
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getOrderLinkStatusAlloc() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["data"] != null) {
+              OrderLinkStatusModel newLinkStatusSub = OrderLinkStatusModel.fromJSON(it.response.data["data"]);
+              mLinkStatusSub.value = newLinkStatusSub;
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("getOrderLinkStatusAlloc() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getOrderLinkStatusAlloc() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getOrderLinkStatusAlloc() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getStopPointFore() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getStopPoint(
+        user.authorization,
+        mData.value.orderId
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getStopPointFore() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["data"] != null) {
+              var list = _response.resultMap?["data"] as List;
+              List<StopPointModel> itemsList = list.map((i) => StopPointModel.fromJSON(i)).toList();
+              if (mStopList.isNotEmpty) mStopList.clear();
+              mStopList?.addAll(itemsList);
+              await getRpaLinkFlag();
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("getStopPointFore() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getStopPointFore() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getStopPointFore() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getRpaLinkFlag() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getLinkFlag(user.authorization).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getRpaLinkFlag() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["data"] != null) {
+              var list = _response.resultMap?["data"] as List;
+              List<RpaFlagModel> itemsList = list.map((i) => RpaFlagModel.fromJSON(i)).toList();
+              if(itemsList.length != 0) {
+                mLinkState.value = true;
+              }else{
+                mLinkState.value = false;
+              }
+              await initView();
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("getRpaLinkFlag() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getRpaLinkFlag() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getRpaLinkFlag() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> rpaUseYn() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getLinkFlag(user.authorization).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("rpaUseYn() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+              mRpaUseYn.value = _response.resultMap?["msg"];
+              logger.i("cheraf ... rpaUseYn: ${mRpaUseYn.value}");
+              await getStopPointFore();
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("rpaUseYn() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("rpaUseYn() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("rpaUseYn() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> rpaUseYnResume() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    pr?.show();
+    await DioService.dioClient(header: true).rpaUseYn(user.authorization).then((it) async {
+      pr?.hide();
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("rpaUseYnResume() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            mRpaUseYn.value = _response.resultMap?["msg"];
+            logger.i("cheraf ... rpaUseYn: ${mRpaUseYn.value}");
+            if(mData != null) await initView();
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("rpaUseYnResume() Exeption =>$e");
+      }
+    }).catchError((Object obj) {
+      pr?.hide();
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("rpaUseYnResume() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("rpaUseYnResume() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> goToAlloc() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderTransInfoPage(order_vo: mData.value)));
+
+    if(results != null && results.containsKey("code")) {
+      if (results["code"] == 200) {
+        Util.toast("배차가 완료되었습니다.");
+        await getOrderDetail(mData.value.sellAllocId);
+      }
+    }
+  }
+
+  Future<void> showOrderCancel() async {
+    openCommonConfirmBox(
+        context,
+        "오더를 취소하시겠습니까?",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await setOrderCancel("09");
+        }
+    );
+  }
+
+  Future<void> showReOrder() async {
+    openCommonConfirmBox(
+        context,
+        "오더를 접수하시겠습니까?",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await _setOrderState("00");
+        }
+    );
   }
 
   Future<void> _setOrderState(String state) async {
@@ -165,97 +644,118 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   }
 
-  Future<void> setAllocState() async {
-    llBottom.value = true;
-    await setVisibilitySendLink(false);
-    print("응애옹애 = >${mData.value.allocState}");
-    switch(mData.value.allocState) {
-      case "00" :
-        if(mData.value.orderState == "09") {
-          tvReOrder.value = true;
-          await setVisibilitySendLink(false);
-          tvOrderCancel.value = false;
-          tvAlloc.value = false;
-        }else{
-          tvReOrder.value = false;
-          await setVisibilitySendLink(true);
-          tvOrderCancel.value = true;
-          tvAlloc.value = true;
+  Future<void> setOrderCancel(String state) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).cancelOrder(
+        user.authorization,
+        mData.value.orderId,
+        state,
+        mData.value.call24Cargo,
+        mData.value.oneCargo,
+        mData.value.manCargo,
+        mData.value.call24Charge,
+        mData.value.oneCharge,
+        mData.value.manCharge
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            Util.toast("오더가 취소되었습니다.");
+            //await getOr
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
         }
-        tvAllocCancel.value = false;
-        tvAllocReg.value = false;
-        break;
-      case "01" :
-      case "20" :
-        if(mData.value.buyLinkYn == "Y") {
-          await setVisibilitySendLink(true);
-        }
-        // 배차, 취소요청
-        tvReOrder.value = false;
-        tvOrderCancel.value = false;
-
-        tvAlloc.value = false;
-        tvAllocCancel.value = true;
-        tvAllocReg.value = false;
-        break;
-
-      case "04":
-      case "05":
-      case "12":
-      case "21":
-        //출발, 도착, 입차, 취소
-        llBottom.value = false;
-        break;
-      case "10":
-        //운송사지정
-        tvReOrder.value = false;
-        tvOrderCancel.value = false;
-
-        if(mData.value.orderState == "00") {
-          tvAlloc.value = false;
-          tvAllocCancel.value = true;
-          tvAllocReg.value = true;
-        }else if(mData.value.orderState == "01") {
-          tvAlloc.value = false;
-          tvAllocCancel.value = true;
-          tvAllocReg.value = false;
-        }else{
-          llBottom.value = false;
-        }
-        break;
-      case "11":
-      case "13":
-      case "23":
-      case "24":
-      case "25":
-        await setVisibilitySendLink(true);
-
-        // 정보망접수, 정보망접수 완료, 배차실패(화물맨), 배차대기(화물맨), 정보망오류
-      if(mData.value.orderState == "00" || mData.value.orderState =="01"){
-        tvReOrder.value = false;
-        tvOrderCancel.value  = false;
-        tvAlloc.value = true;
-
-        tvAllocCancel.value = false;
-        tvOrderCancel.value = true;
-        tvAllocReg.value = false;
-      }else{
-        llBottom.value = false;
+      }catch(e) {
+        print("setOrderCancel() Exeption =>$e");
       }
-      break;
-    }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("setOrderCancel() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("setOrderCancel() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> showAllocCancel() async {
+    openCommonConfirmBox(
+        context,
+        mData.value.buyLinkYn == "Y" ? "정보망 배차를 취소하시겠습니까?" : "배차를 취소하시겠습니까?",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          if(mData.value.buyLinkYn == "Y") {
+            await cancelLink();
+          }else{
+            await _setAllocState("00");
+          }
+        }
+    );
+  }
+
+  Future<void> _setAllocState(String? state) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).setAllocState(
+        user.authorization,
+        mData.value.orderId,
+        mData.value.allocId,
+        state
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("_setAllocState() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            await getOrderDetail(mData.value.sellAllocId);
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("_setAllocState() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("_setAllocState() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("_setAllocState() getOrder Default => ");
+          break;
+      }
+    });
   }
 
   Future<void> cancelLink() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).cancelLink(
-      user.authorization,
-      mData.value.orderId,
-      mData.value.allocId,
-      "CANCELALLOC",
-      mData.value.linkType,
-      "01"
+        user.authorization,
+        mData.value.orderId,
+        mData.value.allocId,
+        "CANCELALLOC",
+        mData.value.linkType,
+        "01"
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
@@ -324,22 +824,22 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               children: [
                                 // 차량번호(필수)
                                 Container(
-                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(15.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                          padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w), bottom: CustomStyle.getHeight(10.h), top: CustomStyle.getWidth(20.h)),
-                                          child: Text(
-                                            Strings.of(context)?.get("order_detail_car_num")??"차랑변호_",
-                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                          )
-                                      ),
-                                      Text(
-                                        Strings.of(context)?.get("essential")??"(필수_)",
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                                      )
-                                    ],
-                                  )
+                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(15.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                            padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w), bottom: CustomStyle.getHeight(10.h), top: CustomStyle.getWidth(20.h)),
+                                            child: Text(
+                                              Strings.of(context)?.get("order_detail_car_num")??"차랑변호_",
+                                              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                            )
+                                        ),
+                                        Text(
+                                          Strings.of(context)?.get("essential")??"(필수_)",
+                                          style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
+                                        )
+                                      ],
+                                    )
                                 ),
                                 Container(
                                     padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
@@ -402,84 +902,84 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                   child: Row(
                                     children: [
                                       Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    Strings.of(context)?.get("order_detail_driver_name")??"성명_",
-                                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                                  ),
-                                                  Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                                                    child: Text(
-                                                      Strings.of(context)?.get("essential")??"(필수_)",
-                                                      style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                                                    )
+                                          flex: 1,
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        Strings.of(context)?.get("order_detail_driver_name")??"성명_",
+                                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                                      ),
+                                                      Container(
+                                                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                                          child: Text(
+                                                            Strings.of(context)?.get("essential")??"(필수_)",
+                                                            style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
+                                                          )
+                                                      )
+                                                    ],
                                                   )
-                                                ],
-                                              )
-                                            ),
-                                            Container(
-                                                padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
-                                                height: CustomStyle.getHeight(35.h),
-                                                child: TextField(
-                                                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                                  textAlign: TextAlign.start,
-                                                  keyboardType: TextInputType.text,
-                                                  controller: etDriverNameController,
-                                                  maxLines: 1,
-                                                  decoration: etDriverNameController.text.isNotEmpty
-                                                      ? InputDecoration(
-                                                    counterText: '',
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
-                                                    enabledBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
-                                                        borderRadius: BorderRadius.circular(5.h)
-                                                    ),
-                                                    disabledBorder: UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
-                                                    ),
-                                                    focusedBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
-                                                        borderRadius: BorderRadius.circular(5.h)
-                                                    ),
-                                                    suffixIcon: IconButton(
-                                                      onPressed: () {
-                                                        etDriverNameController.clear();
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.clear,
-                                                        size: 18,
-                                                        color: Colors.black,
+                                              ),
+                                              Container(
+                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                                  height: CustomStyle.getHeight(35.h),
+                                                  child: TextField(
+                                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                                    textAlign: TextAlign.start,
+                                                    keyboardType: TextInputType.text,
+                                                    controller: etDriverNameController,
+                                                    maxLines: 1,
+                                                    decoration: etDriverNameController.text.isNotEmpty
+                                                        ? InputDecoration(
+                                                      counterText: '',
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                      enabledBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                                                          borderRadius: BorderRadius.circular(5.h)
+                                                      ),
+                                                      disabledBorder: UnderlineInputBorder(
+                                                          borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
+                                                      ),
+                                                      focusedBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                                                          borderRadius: BorderRadius.circular(5.h)
+                                                      ),
+                                                      suffixIcon: IconButton(
+                                                        onPressed: () {
+                                                          etDriverNameController.clear();
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.clear,
+                                                          size: 18,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                    )
+                                                        : InputDecoration(
+                                                      counterText: '',
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                      enabledBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                                                          borderRadius: BorderRadius.circular(5.h)
+                                                      ),
+                                                      disabledBorder: UnderlineInputBorder(
+                                                          borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
+                                                      ),
+                                                      focusedBorder: OutlineInputBorder(
+                                                          borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
+                                                          borderRadius: BorderRadius.circular(5.h)
                                                       ),
                                                     ),
+                                                    onChanged: (value){
+                                                    },
+                                                    maxLength: 50,
                                                   )
-                                                      : InputDecoration(
-                                                    counterText: '',
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
-                                                    enabledBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
-                                                        borderRadius: BorderRadius.circular(5.h)
-                                                    ),
-                                                    disabledBorder: UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
-                                                    ),
-                                                    focusedBorder: OutlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
-                                                        borderRadius: BorderRadius.circular(5.h)
-                                                    ),
-                                                  ),
-                                                  onChanged: (value){
-                                                  },
-                                                  maxLength: 50,
-                                                )
-                                            ),
-                                          ],
-                                        )
+                                              ),
+                                            ],
+                                          )
                                       ),
                                       Expanded(
                                           flex: 1,
@@ -646,57 +1146,57 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                   height: CustomStyle.getHeight(60.h),
                                   margin: EdgeInsets.only(top: CustomStyle.getHeight(20.h)),
                                   child: Row(
-                                      children: [
-                                        Expanded(
-                                            flex: 1,
-                                            child: InkWell(
-                                                onTap: () {
-                                                  Navigator.of(context).pop(false);
-                                                },
-                                                child: Container(
-                                                    color: sub_btn,
-                                                    child: Text(
-                                                      Strings.of(context)?.get(
-                                                          "cancel") ?? "취소_",
-                                                      style: CustomStyle
-                                                          .CustomFont(
-                                                          styleFontSize16,
-                                                          Colors.white),
-                                                    )
-                                                )
-                                            )
-                                        ),
-                                        Expanded(
-                                            flex: 1,
-                                            child: InkWell(
-                                                onTap: () async {
-                                                  var validation = await allocRegValid();
-                                                  if(validation){
-                                                    if(!(Util.regexCarNumber(etCarNumController.text.trim()))) {
-                                                      Util.toast("차량번호를 확인해 주세요.");
-                                                    }else{
-                                                      CarModel car = CarModel();
-                                                      car.carNum = etCarNumController.text.trim();
-                                                      car.driverName = etDriverNameController.text.trim();
-                                                      car.mobile = etTelController.text.trim();
-                                                      await setAllocReg(car);
-                                                    }
+                                    children: [
+                                      Expanded(
+                                          flex: 1,
+                                          child: InkWell(
+                                              onTap: () {
+                                                Navigator.of(context).pop(false);
+                                              },
+                                              child: Container(
+                                                  color: sub_btn,
+                                                  child: Text(
+                                                    Strings.of(context)?.get(
+                                                        "cancel") ?? "취소_",
+                                                    style: CustomStyle
+                                                        .CustomFont(
+                                                        styleFontSize16,
+                                                        Colors.white),
+                                                  )
+                                              )
+                                          )
+                                      ),
+                                      Expanded(
+                                          flex: 1,
+                                          child: InkWell(
+                                              onTap: () async {
+                                                var validation = await allocRegValid();
+                                                if(validation){
+                                                  if(!(Util.regexCarNumber(etCarNumController.text.trim()))) {
+                                                    Util.toast("차량번호를 확인해 주세요.");
+                                                  }else{
+                                                    CarModel car = CarModel();
+                                                    car.carNum = etCarNumController.text.trim();
+                                                    car.driverName = etDriverNameController.text.trim();
+                                                    car.mobile = etTelController.text.trim();
+                                                    await setAllocReg(car);
                                                   }
-                                                },
-                                                child: Container(
-                                                    color: main_btn,
-                                                    child: Text(
-                                                      Strings.of(context)?.get(
-                                                          "confirm") ?? "확인_",
-                                                      style: CustomStyle
-                                                          .CustomFont(
-                                                          styleFontSize16,
-                                                          Colors.white),
-                                                    )
-                                                )
-                                            )
-                                        )
-                                      ],
+                                                }
+                                              },
+                                              child: Container(
+                                                  color: main_btn,
+                                                  child: Text(
+                                                    Strings.of(context)?.get(
+                                                        "confirm") ?? "확인_",
+                                                    style: CustomStyle
+                                                        .CustomFont(
+                                                        styleFontSize16,
+                                                        Colors.white),
+                                                  )
+                                              )
+                                          )
+                                      )
+                                    ],
                                   ),
                                 )
 
@@ -731,19 +1231,19 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).orderAllocReg(
-      user.authorization,
-      mData.value.orderId,
-      mData.value.buyCustId,
-      mData.value.buyDeptId,
-      mData.value.buyStaff,
-      mData.value.buyStaffTel,
-      car.vehicId,
-      car.driverId,
-      car.carNum,
-      mData.value.carTonCode,
-      mData.value.carTypeCode,
-      car.driverName,
-      car.mobile
+        user.authorization,
+        mData.value.orderId,
+        mData.value.buyCustId,
+        mData.value.buyDeptId,
+        mData.value.buyStaff,
+        mData.value.buyStaffTel,
+        car.vehicId,
+        car.driverId,
+        car.carNum,
+        mData.value.carTonCode,
+        mData.value.carTypeCode,
+        car.driverName,
+        car.mobile
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
@@ -775,59 +1275,102 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     });
   }
 
-  Future<void> getOrderDetail(String? allocId) async {
-    Logger logger = Logger();
-    UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).getOrderDetail(
-        user.authorization,
-        mData.value.orderId,
-    ).then((it) async {
-      try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
-            if (_response.resultMap?["data"] != null) {
-              try {
-                var list = _response.resultMap?["data"] as List;
-                List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
-                if(itemsList.length > 0){
-                  mData.value = itemsList[0];
-                  //await rpaUseYn();
-                }else{
-                  openOkBox(context,"삭제되었더나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
-                }
-              } catch (e) {
-                print(e);
-              }
-            }else{
-              openOkBox(context, "${_response.resultMap?["msg"]}",
-                  Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                    Navigator.of(context).pop(false);
-                  });
-            }
-          } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
-                Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                  Navigator.of(context).pop(false);
-                });
-          }
+  Future<void> setOrderState() async {
+    if(mData.value.orderState == "09") {
+      tvOrderState.value = true;
+      tvAllocState.value = false;
+      llDriverInfo.value = false;
+    }else{
+      if(mData.value.driverState != null) {
+        tvOrderState.value = false;
+        tvAllocState.value = false;
+        llDriverInfo.value = true;
+      }else{
+        tvOrderState.value = false;
+        tvAllocState.value = true;
+        llDriverInfo.value = false;
+      }
+    }
+  }
+
+  Future<void> setAllocState() async {
+    llBottom.value = true;
+    await setVisibilitySendLink(false);
+    switch(mData.value.allocState) {
+      case "00" :
+        if(mData.value.orderState == "09") {
+          tvReOrder.value = true;
+          await setVisibilitySendLink(false);
+          tvOrderCancel.value = false;
+          tvAlloc.value = false;
+        }else{
+          tvReOrder.value = false;
+          await setVisibilitySendLink(true);
+          tvOrderCancel.value = true;
+          tvAlloc.value = true;
         }
-      }catch(e) {
-        print("setOrderCancel() Exeption =>$e");
+        tvAllocCancel.value = false;
+        tvAllocReg.value = false;
+        break;
+      case "01" :
+      case "20" :
+        if(mData.value.buyLinkYn == "Y") {
+          await setVisibilitySendLink(true);
+        }
+        // 배차, 취소요청
+        tvReOrder.value = false;
+        tvOrderCancel.value = false;
+
+        tvAlloc.value = false;
+        tvAllocCancel.value = true;
+        tvAllocReg.value = false;
+        break;
+
+      case "04":
+      case "05":
+      case "12":
+      case "21":
+        //출발, 도착, 입차, 취소
+        llBottom.value = false;
+        break;
+      case "10":
+        //운송사지정
+        tvReOrder.value = false;
+        tvOrderCancel.value = false;
+
+        if(mData.value.orderState == "00") {
+          tvAlloc.value = false;
+          tvAllocCancel.value = true;
+          tvAllocReg.value = true;
+        }else if(mData.value.orderState == "01") {
+          tvAlloc.value = false;
+          tvAllocCancel.value = true;
+          tvAllocReg.value = false;
+        }else{
+          llBottom.value = false;
+        }
+        break;
+      case "11":
+      case "13":
+      case "23":
+      case "24":
+      case "25":
+        await setVisibilitySendLink(true);
+
+        // 정보망접수, 정보망접수 완료, 배차실패(화물맨), 배차대기(화물맨), 정보망오류
+      if(mData.value.orderState == "00" || mData.value.orderState =="01"){
+        tvReOrder.value = false;
+        tvOrderCancel.value  = false;
+        tvAlloc.value = true;
+
+        tvAllocCancel.value = false;
+        tvOrderCancel.value = true;
+        tvAllocReg.value = false;
+      }else{
+        llBottom.value = false;
       }
-    }).catchError((Object obj){
-      switch (obj.runtimeType) {
-        case DioError:
-        // Here's the sample to get the failed response error code and message
-          final res = (obj as DioError).response;
-          print("setOrderCancel() Error => ${res?.statusCode} // ${res?.statusMessage}");
-          break;
-        default:
-          print("setOrderCancel() getOrder Default => ");
-          break;
-      }
-    });
+      break;
+    }
   }
 
   Future<void> setVisibilitySendLink(bool val) async {
@@ -861,7 +1404,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               return;
             }
           }
-          setAllocState();
+          _setAllocState(codeModel?.code);
           break;
       }
       setState(() {});
@@ -905,18 +1448,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Future<void> initView() async {
-    if(widget.order_vo != null) {
-      mData.value = widget.order_vo!;
-    }else{
-      mData.value = OrderModel();
-    }
     await setOrderState();
     await setAllocState();
 
     if(mData.value.stopCount != 0) {
       llStopPointHeader.value = true;
+      llStopPointList.value = true;
     }else{
       llStopPointHeader.value = false;
+      llStopPointList.value = false;
     }
 
     if(!(mData.value.receiptYn == "N")) {
@@ -983,7 +1523,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           child: Row(
             children: [
               Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: Container(
                       padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
                       child: Text(
@@ -992,6 +1532,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       )
                   )
               ),
+              mData.value.linkName?.isNotEmpty == true ?
               Expanded(
                   flex: 2,
                   child: Container(
@@ -1001,7 +1542,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
-              ),
+              ) : const SizedBox(),
               Expanded(
                   flex: 2,
                   child: Container(
@@ -1013,7 +1554,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   )
               ),
               Expanded(
-                  flex: 4,
+                  flex: 3,
                   child: Container(
                     padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                     child: Text(
@@ -1486,7 +2027,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                 flex: 4,
                 child: Container(
-                    height: 250.h,
                     margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
                     padding: EdgeInsets.all(5.0.h),
                     decoration: const BoxDecoration(
@@ -1574,7 +2114,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 4,
                   child: Container(
-                      height: 250.h,
                       margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
                       padding: EdgeInsets.all(5.0.h),
                       decoration: const BoxDecoration(
@@ -1713,8 +2252,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       ],
                     ));
               },
-              body: Obx((){
-                return Container(
+              body: llStopPointList.value ? Container(
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
                     color: Colors.white,
                     child: Row(
@@ -1781,8 +2319,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           )
                         ]
                     )
-                );
-              }),
+                ) : const SizedBox(),
               canTapOnHeader: true,
             )
           ],
@@ -2442,108 +2979,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 
-  Future<void> setOrderCancel(String state) async {
-    Logger logger = Logger();
-    UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).cancelOrder(
-      user.authorization,
-      mData.value.orderId,
-      state,
-      mData.value.call24Cargo,
-      mData.value.oneCargo,
-      mData.value.manCargo,
-      mData.value.call24Charge,
-      mData.value.oneCharge,
-      mData.value.manCharge
-    ).then((it) async {
-      try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
-            Util.toast("오더가 취소되었습니다.");
-            //await getOr
-          } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
-                Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                  Navigator.of(context).pop(false);
-                });
-          }
-        }
-      }catch(e) {
-        print("setOrderCancel() Exeption =>$e");
-      }
-    }).catchError((Object obj){
-      switch (obj.runtimeType) {
-        case DioError:
-        // Here's the sample to get the failed response error code and message
-          final res = (obj as DioError).response;
-          print("setOrderCancel() Error => ${res?.statusCode} // ${res?.statusMessage}");
-          break;
-        default:
-          print("setOrderCancel() getOrder Default => ");
-          break;
-      }
-    });
-  }
-
-  Future<void> showOrderCancel() async {
-      openCommonConfirmBox(
-          context,
-          "오더를 취소하시겠습니까?",
-          Strings.of(context)?.get("cancel")??"Not Found",
-          Strings.of(context)?.get("confirm")??"Not Found",
-              () {Navigator.of(context).pop(false);},
-              () async {
-            Navigator.of(context).pop(false);
-            await setOrderCancel("09");
-          }
-      );
-  }
-
-  Future<void> showReOrder() async {
-    openCommonConfirmBox(
-        context,
-        "오더를 접수하시겠습니까?",
-        Strings.of(context)?.get("cancel")??"Not Found",
-        Strings.of(context)?.get("confirm")??"Not Found",
-            () {Navigator.of(context).pop(false);},
-            () async {
-          Navigator.of(context).pop(false);
-          await _setOrderState("00");
-        }
-    );
-  }
-
-  Future<void> goToAlloc() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderTransInfoPage(order_vo: mData.value)));
-
-    if(results != null && results.containsKey("code")) {
-      if (results["code"] == 200) {
-        Util.toast("배차가 완료되었습니다.");
-        await getOrderDetail(mData.value.sellAllocId);
-      }
-    }
-  }
-
-  Future<void> showAllocCancel() async {
-    openCommonConfirmBox(
-        context,
-        mData.value.buyLinkYn == "Y" ? "정보망 배차를 취소하시겠습니까?" : "배차를 취소하시겠습니까?",
-        Strings.of(context)?.get("cancel")??"Not Found",
-        Strings.of(context)?.get("confirm")??"Not Found",
-            () {Navigator.of(context).pop(false);},
-            () async {
-          Navigator.of(context).pop(false);
-          if(mData.value.buyLinkYn == "Y") {
-            await cancelLink();
-          }else{
-            await _setOrderState("00");
-          }
-        }
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     pr = Util.networkProgress(context);
@@ -2576,22 +3011,58 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
           body: SafeArea(
               child: Obx((){
-                return SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        topWidget(),
-                        llDriverInfo.value ? driverInfoWidget() : const SizedBox(),
-                        transInfoWidget(), // 배차 정보
-                        llStopPointHeader.value ? stopPointPannelWidget() : const SizedBox(),
-                        cargoInfoWidget(), // 화물 정보
-                        Container(
-                          height: 5.h,
-                          color: line,
-                        ),
-                        etcPannelWidget()
-                      ],
+                return SizedBox(
+                    width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+                    height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
+                    child: Stack(
+                  children: [
+                    SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          topWidget(),
+                          llDriverInfo.value ? driverInfoWidget() : const SizedBox(),
+                          transInfoWidget(), // 배차 정보
+                          llStopPointHeader.value ? stopPointPannelWidget() : const SizedBox(),
+                          cargoInfoWidget(), // 화물 정보
+                          Container(
+                            height: 5.h,
+                            color: line,
+                          ),
+                          etcPannelWidget()
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                        bottom: CustomStyle.getHeight(10.h),
+                        right: CustomStyle.getWidth(15.w),
+                        child: InkWell(
+                          onTap: () async {
+                            await copyOrder();
+                          },
+                          child: Container(
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(15.w)),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(30.w),
+                              color: copy_btn
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                                child: Icon(Icons.file_copy, size: 24.h,color: Colors.white),
+                              ),
+                              Text(
+                                Strings.of(context)?.get("order_detail_copy")??"오더복사_",
+                                style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                              ),
+                              ],
+                            )
+                        )
+                      )
                     )
-                );
+                  ],
+                ));
               })
           ),
           bottomNavigationBar: Obx((){

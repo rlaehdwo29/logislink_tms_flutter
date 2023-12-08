@@ -252,6 +252,18 @@ class Util {
     return Commas.format(inValues);
   }
 
+  static String getPercent(int val1, int val2) {
+    return "${Util.getInCodePercent(val1,val2)} %";
+  }
+
+  static double getInCodePercent(int val1, int val2){
+    if(val1 == 0 || val2 == 0) {
+      return 0.0;
+    }
+    double result = ((val1 / val2 * 1000) / 10.0).roundToDouble();
+    return result;
+  }
+
   static call(String? call_Num){
     launch("tel://${call_Num}");
   }
@@ -273,6 +285,32 @@ class Util {
     }else{
       return DateFormat("MM.dd HH:mm").format(d!);
     }
+  }
+
+  static String splitEDate(String? date) {
+    DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    DateTime? d;
+    if(date == null) {
+      return "00:00:00";
+    }
+    try{
+      d = dateFormat.parse(date!);
+    }catch(e) {
+      print(e);
+    }
+
+    if(DateFormat("HH:mm:ss").format(d!) == "00:00:00") {
+      return "${DateFormat("MM.dd").format(d!)} 당일";
+    }else{
+      return DateFormat("MM.dd HH:mm").format(d!);
+    }
+  }
+
+  static String splitDate(String date) {
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss",'ko');
+    DateTime dateTime = DateTime.parse(date);
+    String d = dateFormat.format(dateTime);
+    return DateFormat("yyyy-MM-dd").format(DateTime.parse(d));
   }
 
   static String splitTime(String date) {
@@ -376,6 +414,10 @@ class Util {
   static bool regexCarNumber(String num) {
     RegExp regExp = RegExp(r'^[가-힣ㄱ-ㅎㅏ-ㅣ\x20]{2}\d{2}[아,바,사,자\x20]\d{4}$');
     return regExp.hasMatch(num);
+  }
+
+  static String getDateCalToStr(DateTime? calendar, String? newPatten){
+    return DateFormat(newPatten).format(calendar!);
   }
 
 }

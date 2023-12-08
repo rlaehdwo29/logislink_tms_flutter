@@ -637,7 +637,7 @@ class OrderModel extends ResultModel {
         manCharge: json['manCharge'],
         oneCharge: json['oneCharge']
     );
-    var list = json['orderStopList']??List.empty(growable: true); // 경유지 목록
+    var list = json['orderStopList'] ?? List.empty(growable: true); // 경유지 목록
     if(list.length > 0) {
       List<StopPointModel> itemsList = list.map((i) => StopPointModel.fromJSON(i)).toList();
       order.orderStopList = itemsList;

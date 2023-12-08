@@ -22,6 +22,7 @@ class ShowCodeDialogWidget {
   final String? mFilter;
   final void Function(CodeModel?,String) callback;
 
+
   ShowCodeDialogWidget({required this.context, required this.mTitle, required this.codeType,this.mFilter, required this.callback});
 
   List<CodeModel> getCodeList() {
@@ -105,6 +106,7 @@ class ShowCodeDialogWidget {
           if (_response.resultMap?["data"] != null) {
             var list = _response.resultMap?["data"] as List;
             List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
+            mList.add(CodeModel(code: "",codeName: "전체"));
             for(var item in itemsList) {
               mList.add(CodeModel(code: item.userId,codeName: item.userName));
             }

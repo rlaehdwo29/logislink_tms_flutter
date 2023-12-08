@@ -573,6 +573,9 @@ class AppDataBase {
       print("하아아앙=>$result // ${result?.length}");
       if (result != null && result.length > 0) {
         List<OrderModel> itemsList = result.map((i) => OrderModel.fromJSON(i)).toList();
+        for(var vv in itemsList) {
+          print("응응옹옹 => ${vv.orderStopList}");
+        }
         orderList.addAll(itemsList);
       }
     }catch(e) {

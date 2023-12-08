@@ -27,9 +27,9 @@ import 'package:dio/dio.dart';
 
 class RegistOrderPage extends StatefulWidget {
 
-  OrderModel? item;
+  OrderModel? order_vo;
 
-  RegistOrderPage({Key? key, this.item}):super(key:key);
+  RegistOrderPage({Key? key, this.order_vo}):super(key:key);
 
   _RegistOrderPageState createState() => _RegistOrderPageState();
 }
@@ -91,9 +91,9 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
     Future.delayed(Duration.zero, () async {
 
       llRpaInfo.value = false;
-      print("아씨 몬데 => ${widget.item}");
-      if(widget.item != null) {
-        mData.value = widget.item!;
+      print("아씨 몬데 => ${widget.order_vo}");
+      if(widget.order_vo != null) {
+        mData.value = widget.order_vo!;
         await copyData();
       }else{
         mData.value = OrderModel();
