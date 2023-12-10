@@ -52,6 +52,7 @@ class _AppBarMonitorPageState extends State<AppBarMonitorPage> with TickerProvid
   final mUser = UserModel().obs;
   final mMonitor = MonitorOrderModel().obs;
   final mDeptList = List.empty(growable: true).obs;
+  final mUserList = List.empty(growable: true).obs;
 
   final mDeptId = "전체".obs;
   final mDeptUserId = "전체".obs;
@@ -306,7 +307,13 @@ Widget tabBarValueWidget(String? tabValue) {
           tvDept.value = codeModel?.codeName??"";
           tvDeptUser.value = "전체";
 
-          await getMonitorOrder();
+          if(mTabCode.value == "01") {
+            await getMonitorOrder();
+          } else if(mTabCode.value == "02") {
+            await getMonitorDeptProfit();
+          }else if(mTabCode.value == "03") {
+
+          }
           break;
       }
     }
@@ -391,16 +398,12 @@ Widget tabBarValueWidget(String? tabValue) {
       logger.d("getMonitorOrder() _response -> ${response.status} // ${response.resultMap}");
       if(response.status == "200") {
         if (response.resultMap?["data"] != null) {
-          try {
             var list = response.resultMap?["data"] as List;
             if (list != null && list.length > 0) {
               MonitorOrderModel? monitorOrder = MonitorOrderModel.fromJSON(
                   list[0]);
               mMonitor.value = monitorOrder;
             }
-          }catch(e) {
-            print("응애옹애 -> $e");
-          }
         }
       }
     }).catchError((Object obj) async {
@@ -413,6 +416,52 @@ Widget tabBarValueWidget(String? tabValue) {
           break;
         default:
           print("getMonitorOrder() Error Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getMonitorDeptProfit() async {
+    Logger logger = Logger();
+    await pr?.show();
+    await DioService.dioClient(header: true).getMonitorDeptProfit(
+        mUser.value.authorization,
+        Util.getDateCalToStr(startDate.value, "yyyy-MM-dd"),
+        Util.getDateCalToStr(endDate.value, "yyyy-MM-dd"),
+        mDeptId.value
+    ).then((it) async {
+      await pr?.hide();
+      ReturnMap response = DioService.dioResponse(it);
+      logger.d("getMonitorDeptProfit() _response -> ${response.status} // ${response.resultMap}");
+      if(response.status == "200") {
+        if (response.resultMap?["data"] != null) {
+          var list = response.resultMap?["data"] as List;
+          List<UserModel> itemsList = list.map((i) => UserModel.fromJSON(i)).toList();
+          if(mUserList.isNotEmpty) mUserList.clear();
+          mUserList?.addAll(itemsList);
+
+          List<DeptModel> deptList = List.empty(growable: true);
+          if(!(mDeptId.value == "")) {
+            for(var data in mDeptList) {
+              if(data.deptId == mDeptId) {
+                deptList.add(data);
+              }
+            }
+          }else{
+            deptList.addAll(mDeptList.value);
+          }
+        }
+      }
+    }).catchError((Object obj) async {
+      await pr?.hide();
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getMonitorDeptProfit() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getMonitorDeptProfit() Error Default => ");
           break;
       }
     });
@@ -439,27 +488,6 @@ Widget tabBarValueWidget(String? tabValue) {
               )
           ),
         ),
-        InkWell(
-          onTap: (){
-            if(mDeptId.value.isEmpty) {
-              Util.toast("담당부서를 지정해 주세요.");
-              return;
-            }
-            ShowCodeDialogWidget(context:context, mTitle: "배차담당자", codeType: Const.DEPT_USER, mFilter: mDeptId.value, callback: selectDeptUserId).showDialog();
-          },
-          child: Container(
-              margin: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-              decoration: BoxDecoration(
-                  color: sub_color,
-                  borderRadius: BorderRadius.circular(3.w)
-              ),
-              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(30.w)),
-              child: Text(
-                tvDeptUser.value,
-                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-              )
-          ),
-        )
       ],
     ),
   );
@@ -772,7 +800,7 @@ Widget tabBarValueWidget(String? tabValue) {
   Widget kpiWidget() {
     return Column(
       children: [
-        // 구분 / 오더 현황
+        // 구분 / 배차 KPI
         Container(
           padding: EdgeInsets.all(10.w),
           color: main_color,
@@ -810,39 +838,7 @@ Widget tabBarValueWidget(String? tabValue) {
             ],
           ),
         ),
-        //전체 오더
-        Container(
-          padding: EdgeInsets.all(10.w),
-          decoration: BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(
-                      color: line,
-                      width: 0.5.w
-                  )
-              )
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    Strings.of(context)?.get("monitor_order_item_order_value_01")??"전체오더_",
-                    textAlign: TextAlign.center,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-              Expanded(
-                  flex: 2,
-                  child: Text(
-                    Util.getInCodeCommaWon((mMonitor.value.allocCnt??0).toString()),
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ),
-        // 사전오더
+        // 책임배차
         Container(
           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15.h),horizontal: CustomStyle.getWidth(10.w)),
           decoration: BoxDecoration(
@@ -858,7 +854,7 @@ Widget tabBarValueWidget(String? tabValue) {
               Expanded(
                   flex: 2,
                   child: Text(
-                    Strings.of(context)?.get("monitor_order_item_order_value_02")??"사전오더_",
+                    Strings.of(context)?.get("monitor_order_item_kpi_value_01")??"책임배차_",
                     textAlign: TextAlign.center,
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   )
@@ -866,7 +862,7 @@ Widget tabBarValueWidget(String? tabValue) {
               Expanded(
                   flex: 2,
                   child: Text(
-                    Strings.of(context)?.get("sub_total")??"소계_",
+                    Strings.of(context)?.get("monitor_order_item_kpi_value_01_01")??"미준수_",
                     textAlign: TextAlign.center,
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   )
@@ -878,14 +874,14 @@ Widget tabBarValueWidget(String? tabValue) {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        Util.getInCodeCommaWon((mMonitor.value.preOrder??0).toString()),
+                        Util.getInCodeCommaWon((mMonitor.value.allocDelay??0).toString()),
                         textAlign: TextAlign.right,
                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                       Container(
                           padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                           child: Text(
-                            Util.getPercent(mMonitor.value.preOrder??0, mMonitor.value.allocCnt??0),
+                            Util.getPercent(mMonitor.value.allocDelay??0, mMonitor.value.allocCnt??0),
                             textAlign: TextAlign.right,
                             style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                           )
@@ -896,8 +892,9 @@ Widget tabBarValueWidget(String? tabValue) {
             ],
           ),
         ),
-        // 당일오더
+        // 입차준수
         Container(
+          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15.h),horizontal: CustomStyle.getWidth(10.w)),
           decoration: BoxDecoration(
               border: Border(
                   bottom: BorderSide(
@@ -910,165 +907,99 @@ Widget tabBarValueWidget(String? tabValue) {
             children: [
               Expanded(
                   flex: 2,
-                  child: Container(
-                      padding: EdgeInsets.only(left:CustomStyle.getWidth(10.w),top: CustomStyle.getHeight(15.h),bottom: CustomStyle.getHeight(15.h)),
-                      child: Text(
-                        Strings.of(context)?.get("monitor_order_item_order_value_03")??"당일오더_",
-                        textAlign: TextAlign.center,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
+                  child: Text(
+                    Strings.of(context)?.get("monitor_order_item_kpi_value_02")??"입차준수_",
+                    textAlign: TextAlign.center,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   )
               ),
               Expanded(
-                  flex: 5,
-                  child: Container(
-                      decoration: BoxDecoration(
-                          border: Border(
-                              left: BorderSide(
-                                  color: line,
-                                  width: 0.5.w
-                              )
-                          )
-                      ),
-                      child:Column(
-                        children: [
-                          //당일오더 -> 소계
-                          Container(
-                              padding: EdgeInsets.only(right:CustomStyle.getWidth(10.w),bottom: CustomStyle.getHeight(5.h),top: CustomStyle.getHeight(5.h)),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: line,
-                                          width: 0.5.w
-                                      )
-                                  )
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        Strings.of(context)?.get("sub_total")??"소계_",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            Util.getInCodeCommaWon((mMonitor.value.todayOrder??0).toString()),
-                                            textAlign: TextAlign.right,
-                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                          ),
-                                          Container(
-                                              padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
-                                              child: Text(
-                                                Util.getPercent(mMonitor.value.todayOrder??0, mMonitor.value.allocCnt??0),
-                                                textAlign: TextAlign.right,
-                                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                              )
-                                          )
-                                        ],
-                                      )
-                                  ),
-                                ],
-                              )
-                          ),
-                          // 당일오더 -> 당착
-                          Container(
-                              padding: EdgeInsets.only(right:CustomStyle.getWidth(10.w),bottom: CustomStyle.getHeight(5.h),top: CustomStyle.getHeight(5.h)),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: line,
-                                          width: 0.5.w
-                                      )
-                                  )
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        Strings.of(context)?.get("monitor_order_item_order_value_03_01")??"당착_",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            Util.getInCodeCommaWon((mMonitor.value.todayFinish??0).toString()),
-                                            textAlign: TextAlign.right,
-                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                          ),
-                                          Container(
-                                              padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
-                                              child: Text(
-                                                Util.getPercent(mMonitor.value.todayFinish??0, mMonitor.value.todayOrder??0),
-                                                textAlign: TextAlign.right,
-                                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                              )
-                                          )
-                                        ],
-                                      )
-                                  ),
-                                ],
-                              )
-                          ),
-                          // 당일오더 -> 익착
-                          Container(
-                              padding: EdgeInsets.only(right:CustomStyle.getWidth(10.w),bottom: CustomStyle.getHeight(5.h),top: CustomStyle.getHeight(5.h)),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex: 2,
-                                      child: Text(
-                                        Strings.of(context)?.get("monitor_order_item_order_value_03_02")??"익착_",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex: 3,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            Util.getInCodeCommaWon((mMonitor.value.tomorrowFinish??0).toString()),
-                                            textAlign: TextAlign.right,
-                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                          ),
-                                          Container(
-                                              padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
-                                              child: Text(
-                                                Util.getPercent(mMonitor.value.tomorrowFinish??0, mMonitor.value.todayOrder??0),
-                                                textAlign: TextAlign.right,
-                                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                              )
-                                          )
-                                        ],
-                                      )
-                                  ),
-                                ],
-                              )
-                          )
-                        ],
-                      )
+                  flex: 2,
+                  child: Text(
+                    Strings.of(context)?.get("monitor_order_item_kpi_value_02_01")??"미준수_",
+                    textAlign: TextAlign.center,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   )
-              )
+              ),
+              Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        Util.getInCodeCommaWon((mMonitor.value.enterDelay??0).toString()),
+                        textAlign: TextAlign.right,
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                      ),
+                      Container(
+                          padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
+                          child: Text(
+                            Util.getPercent(mMonitor.value.enterDelay??0, mMonitor.value.allocCnt??0),
+                            textAlign: TextAlign.right,
+                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                          )
+                      )
+                    ],
+                  )
+              ),
             ],
           ),
         ),
+        // 도착준수
+        Container(
+          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15.h),horizontal: CustomStyle.getWidth(10.w)),
+          decoration: BoxDecoration(
+              border: Border(
+                  bottom: BorderSide(
+                      color: line,
+                      width: 0.5.w
+                  )
+              )
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 2,
+                  child: Text(
+                    Strings.of(context)?.get("monitor_order_item_kpi_value_03")??"도착준수_",
+                    textAlign: TextAlign.center,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                  )
+              ),
+              Expanded(
+                  flex: 2,
+                  child: Text(
+                    Strings.of(context)?.get("monitor_order_item_kpi_value_03_01")??"미준수_",
+                    textAlign: TextAlign.center,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                  )
+              ),
+              Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        Util.getInCodeCommaWon((mMonitor.value.finishDelay??0).toString()),
+                        textAlign: TextAlign.right,
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                      ),
+                      Container(
+                          padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
+                          child: Text(
+                            Util.getPercent(mMonitor.value.finishDelay??0, mMonitor.value.allocCnt??0),
+                            textAlign: TextAlign.right,
+                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                          )
+                      )
+                    ],
+                  )
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
@@ -1081,125 +1012,21 @@ Widget orderFragment(String? code) {
       CustomStyle.getDivider2(),
       deptSelectWidget(),
       orderStateWidget(),
-      //kpiWidget()
+      kpiWidget()
     ],
   )
   );
 }
 
 Widget deptProfitFragment(String? code) {
-  return Column(
-    children: [
-      calendarWidget(code),
-      Container(
-          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.0),horizontal: CustomStyle.getWidth(20.0)),
-          width: MediaQuery.of(context).size.width,
-          color: main_color,
-          child: Row(
-              children : [
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_repair_value_04")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_repair_value_02")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_repair_value_03")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                )
-              ]
-          )
-      ),
-      Expanded(
-          child: mCarBookList.isNotEmpty
-              ? SingleChildScrollView(
-              child: Flex(
-                  direction: Axis.vertical,
-                  children: List.generate(
-                    mCarBookList.length,
-                        (index) {
-                      var item = mCarBookList[index];
-                      return InkWell(
-                          onTap: (){
-                            //Navigator.push(context, MaterialPageRoute(builder: (context) => CarBookRegPage(code,item,onCallback)));
-                          },
-                          child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.0),horizontal: CustomStyle.getWidth(20.0)),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: line,
-                                          width: CustomStyle.getWidth(1.0)
-                                      )
-                                  )
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex:1,
-                                      child: Text(
-                                        "${item.bookDate}",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex:1,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "${item.memo}",
-                                            textAlign: TextAlign.center,
-                                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                          ),
-                                          Text(
-                                            "${Util.getInCodeCommaWon(item.price.toString())}원",
-                                            textAlign: TextAlign.center,
-                                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                          )
-                                        ],
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex:1,
-                                      child: Text(
-                                        "${Util.getInCodeCommaWon(item.mileage.toString())}${Strings.of(context)?.get("km")??"Not found"}",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                      )
-                                  ),
-                                ],
-                              )
-                          )
-                      );
-                    },
-                  )))
-              : SizedBox(
-            child: Center(
-                child: Text(
-                  Strings.of(context)?.get("empty_list") ?? "Not Found",
-                  style: CustomStyle.CustomFont(
-                      styleFontSize20, styleBlackCol1),
-                )),
-          ))
-    ],
+  return SingleChildScrollView(
+    child: Column(
+      children: [
+        calendarWidget(code),
+        CustomStyle.getDivider2(),
+        deptSelectWidget(),
+      ],
+    ),
   );
 }
 
