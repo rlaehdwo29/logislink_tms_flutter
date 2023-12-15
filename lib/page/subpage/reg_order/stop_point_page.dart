@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -18,7 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 class StopPointPage extends StatefulWidget {
 
   OrderModel? order_vo;
-  List<StopPointModel>? result_work_stopPoint;
+  String? result_work_stopPoint;
   String? code;
 
   StopPointPage({Key? key,this.order_vo, this.result_work_stopPoint, this.code}):super(key:key);
@@ -47,7 +48,7 @@ class _StopPointPageState extends State<StopPointPage> {
     if(widget.code != null && widget.code?.isNotEmpty == true ) {
       code = widget.code!;
       if (widget.result_work_stopPoint != null) {
-        mList.addAll(widget.result_work_stopPoint!);
+        mList.addAll(jsonDecode(widget.result_work_stopPoint!));
       }
     }else{
       if(widget.order_vo != null){

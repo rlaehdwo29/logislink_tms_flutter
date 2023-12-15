@@ -260,12 +260,27 @@ class Util {
     if(val1 == 0 || val2 == 0) {
       return 0.0;
     }
+    print("응애옹애222 =>${((val1 / val2 * 1000) / 10.0)}");
     double result = ((val1 / val2 * 1000) / 10.0).roundToDouble();
     return result;
   }
 
   static call(String? call_Num){
     launch("tel://${call_Num}");
+  }
+
+  static String pointDate(String? date) {
+    DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    DateTime? d;
+    if(date == null) {
+      return "00:00:00";
+    }
+    try{
+      d = dateFormat.parse(date!);
+    }catch(e) {
+      print(e);
+    }
+    return "${DateFormat("yy-MM-dd HH:mm:ss").format(d!)}";
   }
 
   static String splitSDate(String? date) {
@@ -368,6 +383,7 @@ class Util {
   }
 
   static int getTotalPage(int total) {
+    if(total == 0) return 0;
     int totalPage;
     int size = 20;
     totalPage = (total / size).ceil().toInt();

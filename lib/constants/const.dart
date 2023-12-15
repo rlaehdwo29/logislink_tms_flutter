@@ -75,6 +75,7 @@ class Const {
   * Intent Filter
   */
  static final String INTENT_ORDER_REFRESH = "com.logislink.tms.INTENT_ORDER_REFRESH";
+ static final String INTENT_ORDER_DETAIL_REFRESH = "com.logislink.tms.INTENT_ORDER_DETAIL_REFRESH";
 
  /**
   * SP key

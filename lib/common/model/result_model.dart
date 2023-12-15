@@ -10,8 +10,13 @@ class ResultModel {
 
   ResultModel({this.result,this.msg,this.total});
 
-  factory ResultModel.fromJSON(Map<String,dynamic> json) =>
-      _$ResultModelFromJson(json);
+  factory ResultModel.fromJSON(Map<String,dynamic> json){
+    return ResultModel(
+      result: json['result'],
+      msg: json['msg'],
+      total: json['total'].toString(),
+    );
+  }
 
   Map<String,dynamic> toJson() => _$ResultModelToJson(this);
 

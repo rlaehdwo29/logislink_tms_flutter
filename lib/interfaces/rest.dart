@@ -727,7 +727,7 @@ abstract class Rest {
 
   @POST(URL_TMS_POINT_USER_LIST)
   Future<HttpResponse> getTmsUserPointList(@Header("Authorization") String? Authorization,
-      @Field("pageNo") int pageNo);
+      @Field("pageNo") int? pageNo);
 
   /**
    * RPA 로그인 정보 Flag

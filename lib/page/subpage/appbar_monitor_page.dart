@@ -5,25 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/dept_model.dart';
 import 'package:logislink_tms_flutter/common/model/monitor_order_model.dart';
+import 'package:logislink_tms_flutter/common/model/monitor_profit_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/provider/appbar_service.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
-import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:dio/dio.dart';
 
 class AppBarMonitorPage extends StatefulWidget {
@@ -53,11 +50,24 @@ class _AppBarMonitorPageState extends State<AppBarMonitorPage> with TickerProvid
   final mMonitor = MonitorOrderModel().obs;
   final mDeptList = List.empty(growable: true).obs;
   final mUserList = List.empty(growable: true).obs;
+  final mList = List.empty(growable: true).obs;
 
-  final mDeptId = "전체".obs;
-  final mDeptUserId = "전체".obs;
+  final mDeptId = "".obs;
+  final mDeptUserId = "".obs;
   final tvDept = "전체".obs;
   final tvDeptUser = "전체".obs;
+
+  //부서별 손익 Fragment
+  final tvSellTotal = "".obs;
+  final tvBuyTotal = "".obs;
+  final tvProfitTotal = "".obs;
+  final tvProfitPercentTotal = "".obs;
+
+  final adapter01 = {}.obs;
+  final adapter02 = {}.obs;
+  final adapter03 = {}.obs;
+  final adapter04 = {}.obs;
+
 
 @override
 void initState() {
@@ -73,11 +83,10 @@ void initState() {
   _tabController.addListener(_handleTabSelection);
 
   Future.delayed(Duration.zero, () async {
-    await initView();
   });
 
   WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-    await getTabApi(mTabCode.value);
+    await initView();
   });
 
   pullToRefreshController = (kIsWeb
@@ -91,28 +100,18 @@ void initState() {
         webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));}
     },
   ))!;
-
 }
 
 Future<void> initView() async {
   mUser.value = await controller.getUserInfo();
   mDeptId.value = mUser.value.deptId??"전체";
   tvDept.value = mUser.value.deptName??"";
-  await getMonitorDeptList();
-}
-
-@override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-}
-
-Future<void> onCallback(bool? reload,String? code) async {
-  if(reload == true){
-    if(code?.isNotEmpty == true) {
-      await getTabApi(code);
-    }else{
-      await getTabApi(mTabCode.value);
-    }
+  if(mTabCode.value == "01") {
+    await getMonitorDeptList();
+  }else if(mTabCode.value == "02"){
+    await getMonitorDeptProfit();
+  }else if(mTabCode.value == "03"){
+    await getMonitorCustProfit();
   }
 }
 
@@ -120,16 +119,30 @@ Future<void> backMonth(String? code) async {
   focusDate.value = DateTime(focusDate.value.year,focusDate.value.month-1);
   startDate.value = DateTime(focusDate.value.year,focusDate.value.month,1);
   endDate.value = DateTime(focusDate.value.year,focusDate.value.month+1,0);
-  await getMonitorOrder();
-  //await getTabApi(code);
+  if(mTabCode.value == "01") {
+    await getMonitorOrder();
+  }else if(mTabCode.value == "02"){
+    await getMonitorDeptProfit();
+  }else if(mTabCode.value == "03"){
+    await getMonitorCustProfit();
+  }else if(mTabCode.value== "04"){
+
+  }
 }
 
 Future<void> nextMonth(String? code) async {
   focusDate.value = DateTime(focusDate.value.year,focusDate.value.month+1);
   startDate.value = DateTime(focusDate.value.year,focusDate.value.month,1);
   endDate.value = DateTime(focusDate.value.year,focusDate.value.month+1,0);
-  await getMonitorOrder();
-  //await getTabApi(code);
+  if(mTabCode.value == "01") {
+    await getMonitorOrder();
+  }else if(mTabCode.value == "02"){
+    await getMonitorDeptProfit();
+  }else if(mTabCode.value == "03"){
+    await getMonitorCustProfit();
+  }else if(mTabCode.value== "04"){
+
+  }
 }
 
 Future<void> _handleTabSelection() async {
@@ -140,36 +153,18 @@ Future<void> _handleTabSelection() async {
     switch(selectedTabIndex) {
       case 0 :
         mTabCode.value = "01";
+        await initView();
         break;
       case 1 :
         mTabCode.value = "02";
+        await initView();
         break;
       case 2 :
         mTabCode.value = "03";
-        break;
-      case 3 :
-        mTabCode.value = "04";
+        await initView();
         break;
     }
-    await getTabApi(mTabCode.value);
   }
-}
-
-void goToCarList() {
-  //Navigator.push(context, MaterialPageRoute(builder: (context) => CarListPage(onCallback)));
-}
-
-void goToCarReg() {
-  //Navigator.push(context, MaterialPageRoute(builder: (context) => CarRegPage(null,onCallback)));
-}
-
-void goToCarEdit() {
-  //Navigator.push(context, MaterialPageRoute(builder: (context) => CarRegPage(mCar.value,onCallback)));
-}
-
-
-void goToCarBookReg() {
-  //Navigator.push(context, MaterialPageRoute(builder: (context) => CarBookRegPage(mTabCode.value,null,onCallback)));
 }
 
 Widget calendarWidget(String? code) {
@@ -209,75 +204,6 @@ Widget calendarWidget(String? code) {
 
 Widget getTabFuture() {
   return tabBarViewWidget();
-  /*final appbarService = Provider.of<AppbarService>(context);
-  return FutureBuilder(
-      future: appbarService.getTabList(
-          mCar.value.carSeq,
-          Util.getDateCalToStr(startDate.value, "yyyy-MM-dd"),
-          Util.getDateCalToStr(endDate.value, "yyyy-MM-dd"),
-          mTabCode.value
-      ),
-      builder: (context, snapshot) {
-        if(snapshot.hasData) {
-          mCarBookList.value = snapshot.data;
-          return tabBarViewWidget();
-        }else if(snapshot.hasError) {
-          return  Container(
-            padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
-            alignment: Alignment.center,
-            child: Text(
-                "${Strings.of(context)?.get("empty_list")}",
-                style: CustomStyle.baseFont()),
-          );
-        }
-        return Container(
-          alignment: Alignment.center,
-          child: CircularProgressIndicator(
-            backgroundColor: styleGreyCol1,
-          ),
-        );
-      }
-  );*/
-}
-
-Future<void> getTabApi(String? tabValue) async {
-  /*
-  Logger logger = Logger();
-  await pr?.show();
-  await DioService.dioClient(header: true).getCarBook(
-      app.value.authorization,
-      mCar.value.carSeq,
-      Util.getDateCalToStr(startDate.value, "yyyy-MM-dd"),
-      Util.getDateCalToStr(endDate.value, "yyyy-MM-dd"),
-      tabValue
-  ).then((it) async {
-    await pr?.hide();
-    ReturnMap response = DioService.dioResponse(it);
-    logger.d("getTabApi() _response -> ${response.status} // ${response.resultMap}");
-    if(response.status == "200") {
-      if (response.resultMap?["data"] != null) {
-        var list = response.resultMap?["data"] as List;
-        List<CarBookModel> itemsList = list.map((i) => CarBookModel.fromJSON(i)).toList();
-        if(mCarBookList.isNotEmpty) mCarBookList.clear();
-        mCarBookList.value?.addAll(itemsList);
-      }else{
-        mCarBookList.value = List.empty(growable: true);
-      }
-    }
-    setState(() {});
-  }).catchError((Object obj) async {
-    await pr?.hide();
-    switch (obj.runtimeType) {
-      case DioError:
-      // Here's the sample to get the failed response error code and message
-        final res = (obj as DioError).response;
-        print("getTabApi() Error => ${res?.statusCode} // ${res?.statusMessage}");
-        break;
-      default:
-        print("getTabApi() Error Default => ");
-        break;
-    }
-  });*/
 }
 
 Widget tabBarValueWidget(String? tabValue) {
@@ -297,7 +223,6 @@ Widget tabBarValueWidget(String? tabValue) {
 }
 
   Future<void> selectDept(CodeModel? codeModel,String? codeType) async {
-    print("ㅇㅇㅇㅇㅇ=>${codeModel?.code} // ${codeModel?.codeName} // ${codeType}");
     if(codeType != "") {
       switch (codeType) {
         case 'DEPT' :
@@ -312,7 +237,7 @@ Widget tabBarValueWidget(String? tabValue) {
           } else if(mTabCode.value == "02") {
             await getMonitorDeptProfit();
           }else if(mTabCode.value == "03") {
-
+            await getMonitorCustProfit();
           }
           break;
       }
@@ -435,21 +360,36 @@ Widget tabBarValueWidget(String? tabValue) {
       logger.d("getMonitorDeptProfit() _response -> ${response.status} // ${response.resultMap}");
       if(response.status == "200") {
         if (response.resultMap?["data"] != null) {
-          var list = response.resultMap?["data"] as List;
-          List<UserModel> itemsList = list.map((i) => UserModel.fromJSON(i)).toList();
-          if(mUserList.isNotEmpty) mUserList.clear();
-          mUserList?.addAll(itemsList);
+            var list = response.resultMap?["data"] as List;
+            List<MonitorProfitModel> itemsList = list.map((i) => MonitorProfitModel.fromJSON(i)).toList();
+            mUserList.value = itemsList;
 
-          List<DeptModel> deptList = List.empty(growable: true);
-          if(!(mDeptId.value == "")) {
-            for(var data in mDeptList) {
-              if(data.deptId == mDeptId) {
-                deptList.add(data);
+            var deptList = List.empty(growable: true);
+            if (!(mDeptId.value == "" || mDeptId.value == null)) {
+              for (var data in mDeptList) {
+                if (data.deptId == mDeptId.value) {
+                  deptList.add(data);
+                }
               }
+            } else {
+              deptList.addAll(mDeptList);
             }
-          }else{
-            deptList.addAll(mDeptList.value);
-          }
+            int sellTotal = mUserList.fold(0,(value, element) => value + element.sellCharge as int);
+            tvSellTotal.value = sellTotal.toString();
+            adapter01.value = {'deptList': deptList, 'userList': mUserList.value, 'code': "01"};
+
+            int buyTotal = mUserList.fold(0, (value, element) => value + element.buyCharge as int);
+            tvBuyTotal.value = buyTotal.toString();
+            adapter02.value = {"deptList": deptList, "userList": mUserList.value, "code": "02"};
+
+            int profitTotal = mUserList.fold(0, (value, element) => value + element.profitCharge as int);
+            tvProfitTotal.value = profitTotal.toString();
+            adapter03.value = {"deptList": deptList, "userList": mUserList.value, "code": "03"};
+
+            double profitPercentTotal = Util.getInCodePercent(int.parse(tvProfitTotal.value), int.parse(tvSellTotal.value));
+            tvProfitPercentTotal.value = profitPercentTotal.toString();
+            adapter04.value = {"deptList": deptList, "userList": mUserList.value, "code": "04"};
+
         }
       }
     }).catchError((Object obj) async {
@@ -488,6 +428,28 @@ Widget tabBarValueWidget(String? tabValue) {
               )
           ),
         ),
+        mTabCode.value == "01" ?
+        InkWell(
+          onTap: (){
+            if(mDeptId.value.isEmpty) {
+              Util.toast("담당부서를 지정해 주세요.");
+              return;
+            }
+            ShowCodeDialogWidget(context:context, mTitle: "배차담당자", codeType: Const.DEPT_USER, mFilter: mDeptId.value, callback: selectDeptUserId).showDialog();
+          },
+          child: Container(
+              margin: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
+              decoration: BoxDecoration(
+                  color: sub_color,
+                  borderRadius: BorderRadius.circular(3.w)
+              ),
+              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(30.w)),
+              child: Text(
+                tvDeptUser.value,
+                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+              )
+          ),
+        ) : const SizedBox()
       ],
     ),
   );
@@ -1018,236 +980,443 @@ Widget orderFragment(String? code) {
   );
 }
 
-Widget deptProfitFragment(String? code) {
-  return SingleChildScrollView(
-    child: Column(
-      children: [
-        calendarWidget(code),
-        CustomStyle.getDivider2(),
-        deptSelectWidget(),
+  Widget deptProfitFragment(String? code) {
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+            child: Column(
+          children: [
+            calendarWidget(code),
+            CustomStyle.getDivider2(),
+            deptSelectWidget(),
+            deptProfitWidget()
+          ],
+        ))
       ],
-    ),
+    );
+  }
+
+  Widget deptProfitWidget() {
+  return Column(
+      children: [
+        // 1번째 Area
+        deptListWidget("01"),
+        // 2번째 Area
+        deptListWidget("02"),
+        // 3번째 Area
+        deptListWidget("03"),
+        // 4번째 Area
+        deptListWidget("04")
+      ],
   );
 }
+
+  Widget deptListWidget(String? code) {
+    var adapter = code == "01"
+        ? adapter01.value
+        : code == "02"
+            ? adapter02.value
+            : code == "03"
+                ? adapter03.value
+                : adapter04;
+    return Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10.w),
+            color: main_color,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    Strings.of(context)?.get("monitor_dept_value_01")??"부서_",
+                    textAlign: TextAlign.center,
+                    style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                  ),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    Strings.of(context)?.get("monitor_dept_value_02")??"담당자_",
+                    textAlign: TextAlign.center,
+                    style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                  ),
+                ),
+                Expanded(
+                    flex: 3,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          code == "01" ? Strings.of(context)?.get("monitor_dept_item_value_01")??"매출액_" :
+                          code == "02" ? Strings.of(context)?.get("monitor_dept_item_value_02")??"매입액_" :
+                          code == "03" ? Strings.of(context)?.get("monitor_dept_item_value_03")??"한계이익_" :
+                          Strings.of(context)?.get("monitor_dept_item_value_04")??"한계이익율_",
+                          textAlign: TextAlign.center,
+                          style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                        ),
+                        Text(
+                          code == "04" ? Strings.of(context)?.get("monitor_dept_item_value_unit_02")??"(%)_" : Strings.of(context)?.get("monitor_dept_item_value_unit_01")??"(원)_",
+                          textAlign: TextAlign.center,
+                          style: CustomStyle.CustomFont(styleFontSize12, Colors.white),
+                        ),
+                      ],
+                    )
+                )
+              ],
+            ),
+          ),
+      Container(
+        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
+        child: Row(
+          children: [
+            Expanded(
+                flex: 1,
+                child: Text(
+                  Strings.of(context)?.get("total") ?? "합계_",
+                  textAlign: TextAlign.center,
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                )),
+            Expanded(
+                flex: 1,
+                child: Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: CustomStyle.getWidth(20.w)),
+                    child: Text(
+                      "${Util.getInCodeCommaWon(code == "01" ? tvSellTotal.value : code == "02" ? tvBuyTotal.value : code == "03" ? tvProfitTotal.value : tvProfitPercentTotal.value )} ${code == "04" ? "%" : ""}",
+                      textAlign: TextAlign.right,
+                      style: CustomStyle.CustomFont(
+                          styleFontSize14, text_color_01),
+                    ))),
+          ],
+        ),
+      ),
+      CustomStyle.getDivider1(),
+      Container(
+          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20.w)),
+          child: adapter["deptList"] != null
+              ? Column(
+                  children: List.generate(adapter["deptList"].length, (index) {
+                    var item = adapter["deptList"][index];
+                    return deptItemView(item, code);
+                  }),
+                )
+              : const SizedBox())
+    ]);
+  }
+
+  Widget deptItemView(DeptModel item,String? code) {
+    var adapter = code == "01" ? adapter01.value : code == "02" ? adapter02.value : code == "03" ? adapter03.value : adapter04.value;
+    List<MonitorProfitModel> _userList = List.empty(growable: true);
+    for(MonitorProfitModel user in mUserList.value) {
+      if(item.deptName == user.deptName) {
+        _userList.add(user);
+      }
+    }
+    int sum = 0;
+    String subTotal = "0";
+    switch(code) {
+      case "01" :
+        sum = _userList.fold(sum, (value, element) => value + (element.sellCharge??0));
+        subTotal = Util.getInCodeCommaWon(sum.toString());
+        break;
+      case "02" :
+        sum = _userList.fold(sum, (value, element) => value + (element.buyCharge??0));
+        subTotal = Util.getInCodeCommaWon(sum.toString());
+        break;
+      case "03" :
+        sum = _userList.fold(sum, (value, element) => value + (element.profitCharge??0));
+        subTotal = Util.getInCodeCommaWon(sum.toString());
+        break;
+      case "04" :
+        sum = _userList.fold(sum, (value, element) => value + (element.sellCharge??0));
+        int sum2 = _userList.fold(0, (value, element) => value + (element.profitCharge??0));
+        subTotal = "${Util.getInCodePercent(sum2, sum)}%";
+        break;
+    }
+    _userList.add(MonitorProfitModel(userName: Strings.of(context)?.get("sub_total")??"소계_",subTotal: subTotal));
+    adapter["userList"] = _userList;
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Text(
+            item.deptName??"",
+            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: adapter["userList"] != null ? Column(
+              children: List.generate(adapter["userList"].length, (index) {
+                      var item = adapter["userList"][index];
+                      return userItemView(item,code);
+                    })
+          ) : const SizedBox()
+        )
+      ],
+    );
+  }
+
+  Widget userItemView(MonitorProfitModel item,String? code) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: line,
+            width: 0.5.w
+          )
+        )
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+          child: Text(
+            item.userName??"",
+            textAlign: TextAlign.center,
+            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+          )
+          ),
+          Expanded(
+              flex: 5,
+              child: Text(
+                code == "01" ?
+                    item.userName == Strings.of(context)?.get("sub_total") ? item.subTotal??"0" : Util.getInCodeCommaWon((item.sellCharge??0).toString()) :
+                code == "02" ?
+                  item.userName == Strings.of(context)?.get("sub_total") ? item.subTotal??"0" : Util.getInCodeCommaWon((item.buyCharge??0).toString()) :
+                code == "03" ?
+                  item.userName == Strings.of(context)?.get("sub_total") ? item.subTotal??"0" : Util.getInCodeCommaWon((item.profitCharge??0).toString()) :
+                  item.userName == Strings.of(context)?.get("sub_total") ? item.subTotal??"0" : "${item.profitPercent??0} %",
+                textAlign: TextAlign.right,
+                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+              )
+          ),
+        ],
+      )
+    );
+  }
 
 Widget custProfitFragment(String? code) {
-  return Column(
-    children: [
-      calendarWidget(code),
-      Container(
-          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.0),horizontal: CustomStyle.getWidth(20.0)),
-          width: MediaQuery.of(context).size.width,
-          color: main_color,
-          child: Row(
-              children : [
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_insurance_value_03")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_insurance_value_02")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_insurance_value_01")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                )
-              ]
-          )
-      ),
-      Expanded(
-          child: mCarBookList.isNotEmpty
-              ? SingleChildScrollView(
-              child: Flex(
-                  direction: Axis.vertical,
-                  children: List.generate(
-                    mCarBookList.length,
-                        (index) {
-                      var item = mCarBookList[index];
-                      return InkWell(
-                          onTap: (){
-                            //Navigator.push(context, MaterialPageRoute(builder: (context) => CarBookRegPage(code,item,onCallback)));
-                          },
-                          child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.0),horizontal: CustomStyle.getWidth(20.0)),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: line,
-                                          width: CustomStyle.getWidth(1.0)
-                                      )
-                                  )
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex:1,
-                                      child: Text(
-                                        "${item.bookDate}",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                      )
-                                  ),
-                                  Expanded(
-                                    flex:1,
-                                    child: Text(
-                                      "${item.memo}",
-                                      textAlign: TextAlign.center,
-                                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                    ),
-                                  ),
-                                  Expanded(
-                                      flex:1,
-                                      child: Text(
-                                        "${Util.getInCodeCommaWon(item.price.toString())}${Strings.of(context)?.get("won")??"Not found"}",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                      )
-                                  ),
-                                ],
-                              )
-                          )
-                      );
-                    },
-                  )))
-              : SizedBox(
-            child: Center(
-                child: Text(
-                  Strings.of(context)?.get("empty_list") ?? "Not Found",
-                  style: CustomStyle.CustomFont(
-                      styleFontSize20, styleBlackCol1),
-                )),
+  return CustomScrollView(
+    slivers: [
+      SliverToBoxAdapter(
+          child: Column(
+            children: [
+              calendarWidget(code),
+              CustomStyle.getDivider2(),
+              deptSelectWidget(),
+              custProfitWidget()
+            ],
           ))
     ],
   );
 }
 
-Widget etcWidget(String? code) {
+Widget custProfitWidget() {
   return Column(
     children: [
-      calendarWidget(code),
       Container(
-          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.0),horizontal: CustomStyle.getWidth(20.0)),
-          width: MediaQuery.of(context).size.width,
-          color: main_color,
-          child: Row(
-              children : [
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_etc_value_03")??"Not Found",
+        padding: EdgeInsets.all(10.w),
+        color: main_color,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 1,
+              child: Text(
+                Strings.of(context)?.get("monitor_dept_value_01")??"부서_",
+                textAlign: TextAlign.center,
+                style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                Strings.of(context)?.get("monitor_dept_value_02")??"담당자_",
+                textAlign: TextAlign.center,
+                style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+              ),
+            ),
+            Expanded(
+                flex: 1,
+                child: Text(
+                      Strings.of(context)?.get("sub_total")??"소계_",
                       textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_etc_value_02")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                ),
-                Expanded(
-                    flex: 1,
-                    child: Text(
-                      Strings.of(context)?.get("car_book_etc_value_01")??"Not Found",
-                      textAlign: TextAlign.center,
-                      style: CustomStyle.CustomFont(styleFontSize13, styleWhiteCol),
-                    )
-                )
-              ]
-          )
+                      style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                    ),
+            )
+          ],
+        ),
+      ),
+      Column(
+        children: List.generate(mList.length, (index) {
+          var item = mList[index];
+          return custItemView(item);
+        }),
+      )
+    ],
+  );
+}
+
+Future<void> getMonitorCustProfit() async {
+  Logger logger = Logger();
+  await pr?.show();
+  await DioService.dioClient(header: true).getMonitorCustProfit(
+      mUser.value.authorization,
+      Util.getDateCalToStr(startDate.value, "yyyy-MM-dd"),
+      Util.getDateCalToStr(endDate.value, "yyyy-MM-dd"),
+      mDeptId.value
+  ).then((it) async {
+    await pr?.hide();
+    ReturnMap response = DioService.dioResponse(it);
+    logger.d("getMonitorCustProfit() _response -> ${response.status} // ${response.resultMap}");
+    if(response.status == "200") {
+      if (response.resultMap?["data"] != null) {
+        var list = response.resultMap?["data"] as List;
+        List<MonitorProfitModel> itemsList = list.map((i) => MonitorProfitModel.fromJSON(i)).toList();
+        if(mList.isNotEmpty) mList.clear();
+        mList.addAll(itemsList);
+
+        MonitorProfitModel data = MonitorProfitModel();
+        if(mList.length == 0) {
+          data = MonitorProfitModel(custName: Strings.of(context)?.get("total") , profitPercent: 0.0, buyAmt: 0, sellAmt: 0, profitAmt: 0 );
+        }else{
+          int sellAmt = mList.fold(0,(value, element) => value + element.sellAmt as int);
+          int buyAmt = mList.fold(0, (value, element) => value + element.buyAmt as int);
+          int profitAmt = mList.fold(0, (value, element) => value + element.profitAmt as int);
+          print("응애옹애? =>$profitAmt // $sellAmt");
+          double profitPercent = Util.getInCodePercent(profitAmt, sellAmt);
+
+          data = MonitorProfitModel(custName: Strings.of(context)?.get("total"),profitPercent: profitPercent, buyAmt: buyAmt, sellAmt: sellAmt, profitAmt: profitAmt);
+        }
+        mList.value.insert(0, data);
+      }else{
+        mDeptList.value = List.empty(growable: true);
+      }
+    }
+    setState(() {});
+  }).catchError((Object obj) async {
+    await pr?.hide();
+    switch (obj.runtimeType) {
+      case DioError:
+      // Here's the sample to get the failed response error code and message
+        final res = (obj as DioError).response;
+        print("getMonitorCustProfit() Error => ${res?.statusCode} // ${res?.statusMessage}");
+        break;
+      default:
+        print("getMonitorCustProfit() Error Default => ");
+        break;
+    }
+  });
+}
+
+Widget custItemView(MonitorProfitModel data) {
+  return Container(
+    padding: EdgeInsets.all(5.w),
+    decoration: BoxDecoration(
+      border: Border(
+        bottom: BorderSide(
+          color: line,
+          width: 0.5.w
+        )
+      )
+    ),
+      child: Row(
+    children: [
+        Expanded(
+          flex: 1,
+          child: Text(
+            data.custName??"",
+            textAlign: TextAlign.center,
+            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+          ),
+        ),
+       Expanded(
+         flex: 1,
+           child: Column(
+         children: [
+           Container(
+             padding: EdgeInsets.all(5.w),
+             alignment: Alignment.center,
+             child: Text(
+               Strings.of(context)?.get("monitor_cust_item_value_01")??"매출_",
+               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+             ),
+           ),
+           Container(
+             padding: EdgeInsets.all(5.w),
+             alignment: Alignment.center,
+             child: Text(
+               Strings.of(context)?.get("monitor_cust_item_value_02")??"매입_",
+               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+             ),
+           ),
+           Container(
+             padding: EdgeInsets.all(5.w),
+             alignment: Alignment.center,
+             child: Text(
+               Strings.of(context)?.get("monitor_cust_item_value_03")??"이익_",
+               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+             ),
+           ),
+           Container(
+             padding: EdgeInsets.all(5.w),
+             alignment: Alignment.center,
+             child: Text(
+               Strings.of(context)?.get("monitor_cust_item_value_04")??"%_",
+               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+             ),
+           )
+         ],
+       )
       ),
       Expanded(
-          child: mCarBookList.isNotEmpty
-              ? SingleChildScrollView(
-              child: Flex(
-                  direction: Axis.vertical,
-                  children: List.generate(
-                    mCarBookList.length,
-                        (index) {
-                      var item = mCarBookList[index];
-                      return InkWell(
-                          onTap: (){
-                            //Navigator.push(context, MaterialPageRoute(builder: (context) => CarBookRegPage(code,item,onCallback)));
-                          },
-                          child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.0),horizontal: CustomStyle.getWidth(20.0)),
-                              decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: line,
-                                          width: CustomStyle.getWidth(1.0)
-                                      )
-                                  )
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                      flex:1,
-                                      child: Text(
-                                        "${item.bookDate}",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex:1,
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "${item.memo}",
-                                            textAlign: TextAlign.center,
-                                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                          ),
-                                          Text(
-                                            "${Util.getInCodeCommaWon(item.price.toString())}원",
-                                            textAlign: TextAlign.center,
-                                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                          )
-                                        ],
-                                      )
-                                  ),
-                                  Expanded(
-                                      flex:1,
-                                      child: Text(
-                                        "${Util.getInCodeCommaWon(item.mileage.toString())}${Strings.of(context)?.get("km")??"Not found"}",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                      )
-                                  ),
-                                ],
-                              )
-                          )
-                      );
-                    },
-                  )))
-              : SizedBox(
-            child: Center(
+          flex: 1,
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(5.w),
+                alignment: Alignment.centerRight,
                 child: Text(
-                  Strings.of(context)?.get("empty_list") ?? "Not Found",
-                  style: CustomStyle.CustomFont(
-                      styleFontSize20, styleBlackCol1),
-                )),
-          ))
+                  Util.getInCodeCommaWon(data.sellAmt.toString()),
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(5.w),
+                alignment: Alignment.centerRight,
+                child: Text(
+                  Util.getInCodeCommaWon(data.buyAmt.toString()),
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(5.w),
+                alignment: Alignment.centerRight,
+                child: Text(
+                  Util.getInCodeCommaWon(data.profitAmt.toString()),
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(5.w),
+                alignment: Alignment.centerRight,
+                child: Text(
+                  "${data.profitPercent}%",
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                ),
+              )
+            ],
+          )
+      ),
     ],
+  )
   );
 }
 

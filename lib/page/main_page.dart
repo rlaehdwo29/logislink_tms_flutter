@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_main_widget.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
@@ -22,14 +23,21 @@ import 'package:logislink_tms_flutter/page/subpage/appbar_monitor_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_notice_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_setting_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/notification_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/order_trans_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
+import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
+import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_select_dialog_widget.dart';
+import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/rendering.dart';
+import 'package:dio/dio.dart';
 
 class MainPage extends StatefulWidget {
   final String? allocId;
@@ -73,18 +81,20 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   var scrollController = ScrollController();
   final page = 1.obs;
   final totalPage = 1.obs;
+  final mPoint = 0.obs;
 
   late TextEditingController searchOrderController;
 
   late AppDataBase db;
 
+  ProgressDialog? pr;
+
   @override
   void initState() {
     super.initState();
     fbroad.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
-      await getOrderMethod(true);
+      await refresh();
     },context: this);
-    fbroad.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
     pullToRefreshController = (kIsWeb
         ? null
         : PullToRefreshController(
@@ -98,8 +108,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     ))!;
     handleDeepLink();
     Future.delayed(Duration.zero, () async {
+      pr = Util.networkProgress(context);
       if(widget.allocId != null) {
-        //Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailPage(allocId: widget.allocId)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailPage(allocId: widget.allocId)));
       }
       scrollController.addListener(() async {
         var now_scroll = scrollController.position.pixels;
@@ -114,6 +125,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       db = controller.getRepository();
       db.deleteAll();
       await initView();
+      await getPointResult();
       dropDownList?.add(CodeModel(code: "carNum",codeName: "차량번호"));
       dropDownList?.add(CodeModel(code: "driverName",codeName: "차주명"));
       dropDownList?.add(CodeModel(code: "sellCustName",codeName: "거래처명"));
@@ -149,6 +161,65 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         orderList?.add(data);
       }
     }
+  }
+
+  Future<void> getOrder() async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    await pr?.show();
+    await DioService.dioClient(header: true).getOrder(
+        user.authorization,
+        Util.getTextDate(mCalendarStartDate.value),
+        Util.getTextDate(mCalendarEndDate.value),
+        categoryOrderCode.value,
+        categoryVehicCode.value,
+        myOrderSelect.value == true? "Y":"N",
+        page.value,
+        select_value.value.code??"",
+        searchValue.value
+    ).then((it) async {
+      await pr?.hide();
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getOrder() _response -> ${_response.status} // ${_response.resultMap}");
+      //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+      if(_response.status == "200") {
+        if(_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["data"] != null) {
+            try {
+              var list = _response.resultMap?["data"] as List;
+              List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
+              var db = App().getRepository();
+              if(itemsList.length != 0){
+                await db.insertAll(context,itemsList);
+              }
+              int total = 0;
+              if(_response.resultMap?["total"].runtimeType.toString() == "String") {
+                total = int.parse(_response.resultMap?["total"]);
+              }else{
+                total = _response.resultMap?["total"];
+              }
+              totalPage.value = Util.getTotalPage(total);
+            } catch (e) {
+              print(e);
+            }
+          }
+        }else{
+          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+        }
+      }
+    }).catchError((Object obj) async {
+      await pr?.hide();
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getOrder() getOrder Default => ");
+          break;
+      }
+    });
   }
 
   void handleDeepLink() async {
@@ -212,9 +283,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     });
   }
 
-  Future<void> getOrderMethod(bool flag) async {
-    bool data = flag;
-    //await getOrder(data);
+  Future<void> goToPoint() async {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => PointPage()));
   }
 
   Drawer getAppBarMenu() {
@@ -228,22 +299,63 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 decoration: const BoxDecoration(
                   color: main_color,
                 ),
-                child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Obx(()=>
-                              Text(
-                                "${mUser.value.bizName}",
-                                style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
-                              )),
-                          CustomStyle.sizedBoxHeight(10.0.h),
-                          Obx(()=>Text(
-                            "${mUser.value.deptName}",
-                            style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
-                          )
-                          )
-                        ]
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex:1,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Obx(()=>
+                                Text(
+                                  "${mUser.value.bizName}",
+                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                )),
+                            CustomStyle.sizedBoxHeight(10.0.h),
+                            Obx(()=>Text(
+                              "${mUser.value.deptName}",
+                              style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
+                            )
+                            )
+                          ]
+                      )
+                    ),
+                    Expanded(
+                        flex:1,
+                        child: mPoint.value != 0 && mPoint.value != null ?
+                            Obx(()=>
+                              InkWell(
+                                onTap: () async {
+                                  await goToPoint();
+                                },
+                                child: Stack(
+                                    alignment: Alignment.centerRight,
+                                    children: [
+                                      Positioned(
+                                          child: Container(
+                                        decoration: const BoxDecoration(
+                                          image: DecorationImage(
+                                            image: AssetImage('assets/image/pointBox.png')
+                                          )
+                                        ),
+                                      )
+                                      ),
+                                      Positioned(
+                                        right: 15.w,
+                                        child: Text(
+                                          Util.getInCodeCommaWon(mPoint.value.toString()),
+                                          textAlign: TextAlign.center,
+                                          style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                            )
+                        ) : const SizedBox(),
                     )
+                  ],
+                )
             ),
 
             ListTile(
@@ -312,8 +424,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
-
-        setState(() {});
+        await setRegResult(results);
       }
     }
   }
@@ -760,9 +871,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     ),
                     content: SingleChildScrollView(
                         child: SizedBox(
+                            width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+                            height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height * 0.6,
                             child: Column(
                                 children: [
                                   TableCalendar(
+                                    locale: 'ko_KR',
                                     firstDay: DateTime.utc(2010, 1, 1),
                                     lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
                                     headerStyle: const HeaderStyle(
@@ -1108,7 +1222,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future<void> refresh() async {
+    await db.deleteAll();
     page.value = 1;
+    await getOrder();
   }
 
   Future<void> showSearchDialog() async {
@@ -1275,33 +1391,41 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             searchValue.value
         ),
         builder: (context, snapshot) {
-          if(snapshot.hasData) {
-            if(orderList.isNotEmpty) orderList.clear();
-            orderList.addAll(snapshot.data["list"]);
-            totalPage.value = snapshot.data?["total"];
-            return orderListWidget();
-          }else if(snapshot.hasError) {
-            return  Container(
-              padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
-              alignment: Alignment.center,
-              child: Text(
-                  "${Strings.of(context)?.get("empty_list")}",
-                  style: CustomStyle.baseFont()),
-            );
+          if(snapshot.connectionState != ConnectionState.done) {
+            return Expanded(child: Container(
+                alignment: Alignment.center,
+                child: Center(child: CircularProgressIndicator())
+            ));
+          }else {
+            if (snapshot.hasData) {
+              if (orderList.isNotEmpty) orderList.clear();
+              orderList.addAll(snapshot.data["list"]);
+              totalPage.value = snapshot.data?["total"];
+              return orderListWidget();
+            } else if (snapshot.hasError) {
+              return Container(
+                padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
+                alignment: Alignment.center,
+                child: Text(
+                    "${Strings.of(context)?.get("empty_list")}",
+                    style: CustomStyle.baseFont()),
+              );
+            }
           }
           return Container(
-            alignment: Alignment.center,
-            child: const CircularProgressIndicator(
-              backgroundColor: styleGreyCol1,
-            ),
+              width: CustomStyle.getWidth(30.0),
+              height: CustomStyle.getHeight(30.0),
+              child: Center(child: CircularProgressIndicator())
           );
         }
     );
   }
 
   Widget orderListWidget() {
+    print("리스트 몇개인가요? => ${orderList.length}");
     return orderList.isNotEmpty
-        ? Expanded(child: ListView.builder(
+        ? Expanded(
+      child: ListView.builder(
       scrollDirection: Axis.vertical,
       controller: scrollController,
       shrinkWrap: true,
@@ -1321,13 +1445,108 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future goToRegOrder() async {
-    Map<String,int> results = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistOrderPage()));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistOrderPage()));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
-
+        await setRegResult(results);
       }
     }
+  }
+
+  Future<void> setRegResult(Map<String,dynamic> results) async {
+    await refresh();
+    Util.toast("${Strings.of(context)?.get("order_reg_title")}${Strings.of(context)?.get("reg_success")}");
+    if(results["allocId"] != null){
+      String allocId = results["allocId"].toString();
+      await showOrderTrans(allocId);
+    }
+  }
+
+  Future<void> showOrderTrans(String allocId) async {
+    openCommonConfirmBox(
+        context,
+        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까??",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await getOrderDetail(allocId);
+        }
+    );
+  }
+
+  Future<void> getOrderDetail(String allocId) async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    await pr?.show();
+    await DioService.dioClient(header: true).getOrderDetail(
+        user.authorization,allocId
+    ).then((it) async {
+      await pr?.hide();
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getOrderDetail() _response -> ${_response.status} // ${_response.resultMap}");
+      //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+      if(_response.status == "200") {
+        if(_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["data"] != null) {
+              var list = _response.resultMap?["data"] as List;
+              List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
+              OrderModel data = itemsList[0];
+              await goToTransInfo(data);
+          }
+        }else{
+          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+        }
+      }
+    }).catchError((Object obj) async {
+      await pr?.hide();
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getOrderDetail() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getOrderDetail() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> goToTransInfo(OrderModel data) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderTransInfoPage(order_vo: data)));
+  }
+
+  Future<void> getPointResult() async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    await DioService.dioClient(header: true).getTmsPointResult(user.authorization).then((it) async {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getPointResult() _response -> ${_response.status} // ${_response.resultMap}");
+      //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+      if(_response.status == "200") {
+        if(_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["point"] != null) {
+            mPoint.value = _response.resultMap?["point"];
+          }
+        }else{
+          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+        }
+      }
+    }).catchError((Object obj) async {
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getPointResult() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getPointResult() getOrder Default => ");
+          break;
+      }
+    });
   }
 
   @override
@@ -1349,8 +1568,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         actions: [
           IconButton(
               onPressed: () {
-                /*Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => NotificationPage()));*/
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => NotificationPage()));
               },
               icon: Icon(
                 Icons.notifications,

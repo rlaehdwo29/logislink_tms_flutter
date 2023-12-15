@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/notice_model.dart';
+import 'package:logislink_tms_flutter/common/model/point_model.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
@@ -12,15 +13,18 @@ import 'package:logislink_tms_flutter/utils/util.dart';
 class AppbarService with ChangeNotifier {
   final addrList = List.empty(growable: true).obs;
   final noticeList = List.empty(growable: true).obs;
+  final pointList = List.empty(growable: true).obs;
 
   AppbarService() {
     addrList.value = List.empty(growable: true);
     noticeList.value = List.empty(growable: true);
+    pointList.value = List.empty(growable: true);
   }
 
   void init() {
     addrList.value = List.empty(growable: true);
     noticeList.value = List.empty(growable: true);
+    pointList.value = List.empty(growable: true);
   }
 
   Future getAddr(BuildContext? context, String? keyword) async {
@@ -79,6 +83,50 @@ class AppbarService with ChangeNotifier {
       }
     });
     return noticeList;
+  }
+
+  Future getUserPoint(BuildContext? context,int page) async {
+    Logger logger = Logger();
+    var app = await App().getUserInfo();
+    pointList.value = List.empty(growable: true);
+    int totalPage = 1;
+    await DioService.dioClient(header: true).getTmsUserPointList(app.authorization,page).then((it) {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("appbar_service.dart getUserPoint() _response -> ${_response.status} // ${_response.resultMap}");
+      if(_response.status == "200") {
+        if (_response.resultMap?["data"] != null) {
+          try {
+            var list = _response.resultMap?["data"] as List;
+            List<PointModel> itemsList = list.map((i) => PointModel.fromJSON(i)).toList();
+            pointList?.addAll(itemsList);
+            int total = 0;
+            if(_response.resultMap?["total"].runtimeType.toString() == "String") {
+              total = int.parse(_response.resultMap?["total"]);
+            }else{
+              total = _response.resultMap?["total"];
+            }
+            totalPage = Util.getTotalPage(total);
+          }catch(e) {
+            print("appbar_service.dart getUserPoint() Error => $e");
+          }
+        }
+      }else{
+        pointList.value = List.empty(growable: true);
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("appbar_service.dart getUserPoint() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("appbar_service.dart getUserPoint() Error Default => ");
+          break;
+      }
+    });
+    Map<String,dynamic> maps = {"total":totalPage,"list":pointList};
+    return maps;
   }
 
 }

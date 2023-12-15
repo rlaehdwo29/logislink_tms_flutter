@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -19,7 +20,9 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/subpage/link_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/location_control_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_trans_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/receipt_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
@@ -87,7 +90,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   void initState() {
     super.initState();
 
-    BroadCast.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
+    BroadCast.FBroadcast.instance().register(Const.INTENT_ORDER_DETAIL_REFRESH, (value, callback) async {
       if(mData.value.orderId != null) {
         await getOrderLinkStatusSub();
       }
@@ -125,7 +128,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+
     });
   }
 
@@ -140,7 +143,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       case AppLifecycleState.resumed:
       // 앱이 표시되고 사용자 입력에 응답합니다.
       // 주의! 최초 앱 실행때는 해당 이벤트가 발생하지 않습니다.
-        BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+        BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_DETAIL_REFRESH);
         print("resumed");
         break;
       case AppLifecycleState.inactive:
@@ -265,7 +268,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   Future<void> goToStopPoint() async {
     if(mStopList.value.length == 0) {
-      //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointPage(code:"detail",result_work_stopPoint:mStopList.value)));
+      await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointPage(code:"detail",result_work_stopPoint:jsonEncode(mStopList.value))));
     }else{
       await getStopPoint();
     }
@@ -483,7 +486,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Future<void> rpaUseYn() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).getLinkFlag(user.authorization).then((it) async {
+    await DioService.dioClient(header: true).rpaUseYn(user.authorization).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
         logger.d("rpaUseYn() _response -> ${_response.status} // ${_response.resultMap}");
@@ -519,9 +522,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Future<void> rpaUseYnResume() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    pr?.show();
     await DioService.dioClient(header: true).rpaUseYn(user.authorization).then((it) async {
-      pr?.hide();
       try {
         ReturnMap _response = DioService.dioResponse(it);
         logger.d("rpaUseYnResume() _response -> ${_response.status} // ${_response.resultMap}");
@@ -529,7 +530,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           if (_response.resultMap?["result"] == true) {
             mRpaUseYn.value = _response.resultMap?["msg"];
             logger.i("cheraf ... rpaUseYn: ${mRpaUseYn.value}");
-            if(mData != null) await initView();
+            //if(mData != null) await initView();
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -541,7 +542,6 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         print("rpaUseYnResume() Exeption =>$e");
       }
     }).catchError((Object obj) {
-      pr?.hide();
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
@@ -1444,7 +1444,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Future<void> goToReceipt() async {
-    //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ReceiptPage(order_vo: mData.value)));
+    await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ReceiptPage(order_vo: mData.value)));
   }
 
   Future<void> initView() async {
@@ -1517,11 +1517,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
         ) ,
         // 운송사 접수
-        tvAllocState.value ?
         Container(
           padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
+              tvAllocState.value ?
               Expanded(
                   flex: 3,
                   child: Container(
@@ -1531,8 +1531,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
                       )
                   )
-              ),
-              mData.value.linkName?.isNotEmpty == true ?
+              ) : const SizedBox(),
               Expanded(
                   flex: 2,
                   child: Container(
@@ -1542,7 +1541,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
-              ) : const SizedBox(),
+              ),
               Expanded(
                   flex: 2,
                   child: Container(
@@ -1573,7 +1572,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ),
             ],
           ),
-        ) : const SizedBox(),
+        ),
         // 경유비(지불)
         Util.equalsCharge(mData.value.wayPointCharge??"0")?
         Container(
@@ -1905,7 +1904,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   flex: 2,
                   child: InkWell(
                     onTap:(){
-
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo: mData.value)));
                     } ,
                     child: Icon(Icons.location_on,size: 40.h,color: swipe_edit_btn)
                   ),
@@ -2984,8 +2983,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     pr = Util.networkProgress(context);
     return WillPopScope(
         onWillPop: () async {
-          Navigator.of(context).pop({'code':100});
-          return true;
+          return Future((){
+            BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+            Navigator.of(context).pop({'code':100});
+            return true;
+          });
         } ,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
@@ -3067,7 +3069,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
           bottomNavigationBar: Obx((){
             return SizedBox(
-                height: CustomStyle.getHeight(60.0.h),
+                height: tvOrderCancel.value || tvReOrder.value || tvAlloc.value || tvAllocCancel.value || tvAllocReg.value ? CustomStyle.getHeight(60.0.h) : CustomStyle.getHeight(0.0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -3110,7 +3112,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             )
                         )
                     ) : const SizedBox(),
-                    //tvAlloc.value ?
+                    tvAlloc.value ?
                     Expanded(
                         flex: 1,
                         child: InkWell(
@@ -3129,7 +3131,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                             )
                         )
-                    ) ,//: const SizedBox(),
+                    ) : const SizedBox(),
                     tvAllocCancel.value ? Expanded(
                         flex: 1,
                         child: InkWell(

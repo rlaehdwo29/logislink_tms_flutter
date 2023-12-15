@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
+import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/model/notification_model.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 
 class NotificationService with ChangeNotifier {
@@ -16,7 +18,7 @@ class NotificationService with ChangeNotifier {
     notificationList.value = List.empty(growable: true);
   }
 
-  /*Future getNotification(BuildContext? context) async {
+  Future getNotification(BuildContext? context) async {
     Logger logger = Logger();
     notificationList.value = List.empty(growable: true);
     var app = await App().getUserInfo();
@@ -46,6 +48,6 @@ class NotificationService with ChangeNotifier {
       }
     });
     return notificationList;
-  }*/
+  }
 
 }

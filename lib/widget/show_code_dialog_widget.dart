@@ -163,7 +163,7 @@ class ShowCodeDialogWidget {
   }
 
   Future<void> showDialog() async {
-      var mList = List.empty(growable: true);
+    var mList = List.empty(growable: true);
     if(mFilter?.isEmpty == true) {
       mList.addAll(getCodeList());
     } else {
@@ -176,7 +176,7 @@ class ShowCodeDialogWidget {
       }
     }
 
-    await showGeneralDialog(
+    showGeneralDialog(
       context: context,
       pageBuilder: (BuildContext buildContext, Animation<double> animation,
           Animation<double> secondaryAnimation) {
@@ -209,7 +209,10 @@ class ShowCodeDialogWidget {
                 return InkWell(
                     onTap: () {
                       callback(mList?[index], codeType);
-                      Navigator.of(context).pop();
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        Navigator.of(context).pop();
+                        //SystemNavigator.pop();
+                      });
                     },
                     child: Container(
                         height: CustomStyle.getHeight(70.0),

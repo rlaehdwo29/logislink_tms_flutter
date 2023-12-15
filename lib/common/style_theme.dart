@@ -70,6 +70,9 @@ const Color light_gray24 = Color(0xffececec);
 const Color addr_zip_no = Color(0xfffa4256);
 const Color addr_type_text = Color(0xff008bd3);
 
+const Color point_red = Color(0xffFF5050);
+const Color point_blue = Color(0xff5050FF);
+
 const Color styleBaseCol1 = Color(0xff0C5767);
 const Color styleBaseCol2 = Color(0xff083742);
 const Color styleBaseCol3 = Color(0xff72A3AD);
@@ -115,6 +118,8 @@ final double styleRadius15 = CustomStyle.getRadius(15.0);
 final double styleRadius20 = CustomStyle.getRadius(20.0);
 final double styleRadius30 = CustomStyle.getRadius(30.0);
 final double styleRadius35 = CustomStyle.getRadius(35.0);
+
+
 
 class CustomStyle {
   static TextStyle baseFont() {

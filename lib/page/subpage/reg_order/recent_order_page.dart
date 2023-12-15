@@ -65,19 +65,26 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
             page.value
         ),
         builder: (context, snapshot) {
-          if(snapshot.hasData) {
-            if(mList.isNotEmpty) mList.clear();
-            mList.addAll(snapshot.data["list"]);
-            totalPage.value = snapshot.data?["total"];
-            return orderListWidget();
-          }else if(snapshot.hasError) {
-            return  Container(
-              padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
-              alignment: Alignment.center,
-              child: Text(
-                  "${Strings.of(context)?.get("empty_list")}",
-                  style: CustomStyle.baseFont()),
-            );
+          if(snapshot.connectionState != ConnectionState.done) {
+            return Expanded(child: Container(
+                alignment: Alignment.center,
+                child: Center(child: CircularProgressIndicator())
+            ));
+          }else {
+            if (snapshot.hasData) {
+              if (mList.isNotEmpty) mList.clear();
+              mList.addAll(snapshot.data["list"]);
+              totalPage.value = snapshot.data?["total"];
+              return orderListWidget();
+            } else if (snapshot.hasError) {
+              return Container(
+                padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
+                alignment: Alignment.center,
+                child: Text(
+                    "${Strings.of(context)?.get("empty_list")}",
+                    style: CustomStyle.baseFont()),
+              );
+            }
           }
           return Container(
             alignment: Alignment.center,
@@ -287,6 +294,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                             child: Column(
                                 children: [
                                   TableCalendar(
+                                    locale: 'ko_KR',
                                     firstDay: DateTime.utc(2010, 1, 1),
                                     lastDay: DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day),
                                     headerStyle: const HeaderStyle(

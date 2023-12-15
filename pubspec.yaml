@@ -66,7 +66,7 @@ dependencies:
   app_settings: ^5.0.0
   fbroadcast: ^2.0.0
   flutter_local_notifications: ^9.5.3+1
-  flutter_inappwebview: ^5.7.2+3
+  flutter_inappwebview: ^5.8.0
   firebase_dynamic_links: ^5.3.5
   table_calendar: ^3.0.9
   firebase_crashlytics: ^3.3.4
@@ -77,6 +77,10 @@ dependencies:
   phone_call: ^0.0.1
   flutter_slidable: ^3.0.0
   wakelock_plus: ^1.1.1
+  kakao_map_plugin: ^0.1.8
+  flutter_dotenv: ^5.0.2
+  image_picker: ^1.0.0
+  photo_view: ^0.14.0
 
 
 dev_dependencies:

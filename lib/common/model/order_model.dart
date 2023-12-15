@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 
 import 'package:get/get.dart';
@@ -637,11 +638,17 @@ class OrderModel extends ResultModel {
         manCharge: json['manCharge'],
         oneCharge: json['oneCharge']
     );
-    var list = json['orderStopList'] ?? List.empty(growable: true); // 경유지 목록
-    if(list.length > 0) {
-      List<StopPointModel> itemsList = list.map((i) => StopPointModel.fromJSON(i)).toList();
+    var list = json['orderStopList']??"[]"; // 경유지 목록
+    print("걋걋걋걋걋걋걋걋걋걋`111 => $list // ${list.runtimeType}");
+    if(list != "[]") {
+      var jsonList = jsonDecode(list);
+      print("걋걋걋걋걋걋걋걋걋걋`1112222 => $jsonList // ${jsonList.length}");
+      List<StopPointModel> itemsList = jsonList.map((i) => StopPointModel.fromJSON(i)).toList();
+      print("걋걋걋걋걋 => ${itemsList}");
+      print("걋걋걋걋걋22222 => ${jsonDecode(json['orderStopList'])}");
       order.orderStopList = itemsList;
     }else{
+      print("걋걋걋걋걋걋걋걋걋걋`222 =>");
       order.orderStopList = List.empty(growable: true);
     }
     return order;
@@ -797,7 +804,7 @@ class OrderModel extends ResultModel {
       "reqPayYN": reqPayYN,
       "reqPayDate": reqPayDate,
       "talkYn": talkYn,
-      "orderStopList": orderStopList,
+      "orderStopList": jsonEncode(orderStopList),
       "reqStaffName":reqStaffName,
       "call24Cargo": call24Cargo,
       "manCargo": manCargo,

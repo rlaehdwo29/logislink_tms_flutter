@@ -117,8 +117,10 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
     pr = Util.networkProgress(context);
     return  WillPopScope(
         onWillPop: () async {
-          FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
-      return true;
+          return Future((){
+            FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+            return true;
+          });
     } ,
       child: Scaffold(
         backgroundColor: styleWhiteCol,

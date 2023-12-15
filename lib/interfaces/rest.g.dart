@@ -2374,6 +2374,7 @@ class _Rest implements Rest {
     final _headers = <String, dynamic>{r'Authorization': Authorization};
     _headers.removeWhere((k, v) => v == null);
     final _data = {'pageNo': pageNo};
+    _data.removeWhere((k, v) => v == null);
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'POST',
