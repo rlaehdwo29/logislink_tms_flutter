@@ -400,7 +400,7 @@ class AppDataBase {
 
         print("뭐가 안되는거지 대체?? => ${maps?.length} // ${item.orderId}");
 
-        if (maps == null || maps.length == 0) {
+        if (maps == null || maps.isEmpty) {
           await db?.insert(orderTable, item.toMap());
         } else {
           await db?.update('$orderTable', <String, dynamic>{

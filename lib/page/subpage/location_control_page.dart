@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kakao_map_plugin/kakao_map_plugin.dart';
 import 'package:logger/logger.dart';
@@ -90,6 +91,11 @@ class _LocationControlPageState extends State<LocationControlPage>{
               if(itemsList.length > 0){
                 mList.addAll(itemsList);
               }
+              //await setCurrent();
+              isRefresh.value = false;
+              Future.delayed(const Duration(milliseconds: 10000),() {
+                isRefresh.value = true;
+              });
             } catch (e) {
               print("getLocation() List Add Error => $e");
               Util.toast("위치 정보를 저장시키는 중에 오류가 발생하였습니다.");
@@ -114,6 +120,99 @@ class _LocationControlPageState extends State<LocationControlPage>{
           break;
       }
     });
+  }
+
+  Widget mapWidget() {
+    return Container(
+      child: KakaoMap(
+        onMapCreated: ((controller) async {
+
+          setState(() {
+            print("응애응애 => ${widget.order_vo.sAddr} // ${widget.order_vo.sAddrDetail} // ${widget.order_vo.sDong}");
+            List<LatLng> bounds = List.empty(growable: true);
+            if(widget.order_vo.sLat.isNull != true && widget.order_vo.sLon.isNull != null) {
+              bounds.add(LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!));
+              markers.add(Marker(
+                markerId: widget.order_vo.sComName ?? "상차지",
+                markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/blue_b.png',
+                latLng: LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!),
+                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${widget.order_vo.sComName??"상차지"}</div>',
+                /*'<div class="wrap">' +
+                                      '    <div class="info">' +
+                                      '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
+                                      '            ${widget.order_vo.sComName ?? "상차지"}' +
+                                      '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' +
+                                      '        </div>' +
+                                      '        <div class="body">' +
+                                      '            <div class="desc">' +
+                                      '                <div class="ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.sAddr}</div>' +
+                                      '                <div class="jibun ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.sAddrDetail}</div>' +
+                                      '            </div>' +
+                                      '        </div>' +
+                                      '    </div>' +
+                                      '</div>'*/
+              ));
+            }
+
+            if(widget.order_vo.eLat.isNull != true && widget.order_vo.eLon.isNull != null) {
+              bounds.add(LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!));
+              markers.add(Marker(
+                markerId: widget.order_vo.eComName??"하차지",
+                markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/red_b.png',
+                latLng: LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!),
+                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${widget.order_vo.eComName??"하차지"}</div>',
+                /*
+                                * '<div class="wrap">' +
+                                    '    <div class="info">' +
+                                    '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
+                                    '            ${widget.order_vo.eComName ?? "하차지"}' +
+                                    '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' +
+                                    '        </div>' +
+                                    '        <div class="body">' +
+                                    '            <div class="desc">' +
+                                    '                <div class="ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.eAddr}</div>' +
+                                    '                <div class="jibun ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.eAddrDetail}</div>' +
+                                    '            </div>' +
+                                    '        </div>' +
+                                    '    </div>' +
+                                    '</div>'*/
+              ));
+            }
+
+            // 이동 경로 표시
+            polylines.add(
+              Polyline(
+                polylineId: 'polyline_${polylines.length}',
+                points: [
+                  LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!),
+                  LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!),
+                ],
+                strokeColor: Colors.red,
+              ),
+            );
+
+            mapController = controller;
+            //mapController?.addOverlayMapTypeId(MapType.traffic); //교통정보
+            mapController?.fitBounds(bounds);
+            mapController?.setBounds();
+          });
+
+        }),
+
+        currentLevel: 18,
+        center: LatLng(35.81588719434526, 128.10472746046923),
+        markers: markers.toList(),
+        zoomControl: false,
+        polylines: polylines.toList(),
+
+        onMarkerTap: (markerId, latLng, zoomLevel) {
+          setState(() {
+            mapController?.setLevel(zoomLevel);
+            mapController?.panTo(latLng);
+          });
+        },
+      ),
+    );
   }
 
   @override
@@ -150,96 +249,34 @@ class _LocationControlPageState extends State<LocationControlPage>{
                   child: SizedBox(
                     width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                     height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
-                    child: Container(
-                      child: KakaoMap(
-                        onMapCreated: ((controller) async {
-
-                          setState(() {
-                            print("응애응애 => ${widget.order_vo.sAddr} // ${widget.order_vo.sAddrDetail} // ${widget.order_vo.sDong}");
-                            List<LatLng> bounds = List.empty(growable: true);
-                            if(widget.order_vo.sLat.isNull != true && widget.order_vo.sLon.isNull != null) {
-                              bounds.add(LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!));
-                              markers.add(Marker(
-                                  markerId: widget.order_vo.sComName ?? "상차지",
-                                  markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/blue_b.png',
-                                  latLng: LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!),
-                                  infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${widget.order_vo.sComName??"상차지"}</div>',
-                                /*'<div class="wrap">' +
-                                      '    <div class="info">' +
-                                      '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
-                                      '            ${widget.order_vo.sComName ?? "상차지"}' +
-                                      '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' +
-                                      '        </div>' +
-                                      '        <div class="body">' +
-                                      '            <div class="desc">' +
-                                      '                <div class="ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.sAddr}</div>' +
-                                      '                <div class="jibun ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.sAddrDetail}</div>' +
-                                      '            </div>' +
-                                      '        </div>' +
-                                      '    </div>' +
-                                      '</div>'*/
-                              ));
-                            }
-
-                            if(widget.order_vo.eLat.isNull != true && widget.order_vo.eLon.isNull != null) {
-                              bounds.add(LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!));
-                              markers.add(Marker(
-                                markerId: widget.order_vo.eComName??"하차지",
-                                markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/red_b.png',
-                                latLng: LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!),
-                                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${widget.order_vo.eComName??"하차지"}</div>',
-                                /*
-                                * '<div class="wrap">' +
-                                    '    <div class="info">' +
-                                    '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
-                                    '            ${widget.order_vo.eComName ?? "하차지"}' +
-                                    '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' +
-                                    '        </div>' +
-                                    '        <div class="body">' +
-                                    '            <div class="desc">' +
-                                    '                <div class="ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.eAddr}</div>' +
-                                    '                <div class="jibun ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.eAddrDetail}</div>' +
-                                    '            </div>' +
-                                    '        </div>' +
-                                    '    </div>' +
-                                    '</div>'*/
-                              ));
-                            }
-
-                            // 이동 경로 표시
-                            polylines.add(
-                              Polyline(
-                                polylineId: 'polyline_${polylines.length}',
-                                points: [
-                                  LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!),
-                                  LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!),
-                                ],
-                                strokeColor: Colors.red,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                            child: mapWidget()
+                        ),
+                        Positioned(
+                          right: 20.w,
+                            bottom: 100.h,
+                            child: InkWell(
+                              onTap: () async {
+                                await getLocation();
+                              },
+                                child: Container(
+                              padding: EdgeInsets.all(10.w),
+                              decoration: const BoxDecoration(
+                                color: main_btn,
+                                shape: BoxShape.circle,
                               ),
-                            );
-
-                            mapController = controller;
-                            //mapController?.addOverlayMapTypeId(MapType.traffic); //교통정보
-                            mapController?.fitBounds(bounds);
-                            mapController?.setBounds();
-                          });
-
-                        }),
-
-                        currentLevel: 18,
-                        center: LatLng(35.81588719434526, 128.10472746046923),
-                        markers: markers.toList(),
-                        zoomControl: false,
-                        polylines: polylines.toList(),
-
-                        onMarkerTap: (markerId, latLng, zoomLevel) {
-                          setState(() {
-                            mapController?.setLevel(zoomLevel);
-                            mapController?.panTo(latLng);
-                          });
-                        },
-                      ),
-                    ),
+                                child: const Icon(
+                              Icons.refresh,
+                                  size: 24,
+                                  color: Colors.white,
+                            )
+                          )
+                          )
+                        )
+                      ],
+                    )
                   )
               )
           ),
