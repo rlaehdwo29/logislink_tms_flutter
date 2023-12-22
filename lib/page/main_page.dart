@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:fbroadcast/fbroadcast.dart' as fbroad;
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -97,9 +98,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       UserModel? user = await controller.getUserInfo();
       mUser.value = user;
       await getOrder();
-      //setState(() {});
-      //await handleDeepLink();
     },context: this);
+    handleDeepLink();
     Future.delayed(Duration.zero, () async {
       pr = Util.networkProgress(context);
       if(widget.allocId != null) {
@@ -226,26 +226,23 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   void handleDeepLink() async {
     
-    /*FirebaseDynamicLinks.instance.getInitialLink().then(
+    FirebaseDynamicLinks.instance.getInitialLink().then(
           (PendingDynamicLinkData? dynamicLinkData) {
         // Set up the `onLink` event listener next as it may be received here
         if (dynamicLinkData != null) {
           final Uri deepLink = dynamicLinkData.link;
           String? code = deepLink.pathSegments.last;
           String? allocId = deepLink.queryParameters["allocId"];
-          String? orderId = deepLink.queryParameters["orderId"];
           if(allocId == null) return;
           switch(code) {
-            case Const.DEEP_LINK_ORDER:
-              //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId,orderId: orderId)));
-              break;
-            case Const.DEEP_LINK_TAX:
-            case Const.DEEP_LINK_RECEIPT:
-              //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId,orderId: orderId,code: code)));
+            case "tmsOrder":
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId)));
               break;
           }
+        }else{
+          return;
         }
-      });*/
+      });
 
   }
 
