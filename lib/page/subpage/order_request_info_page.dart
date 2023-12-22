@@ -90,6 +90,7 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
           ChargeCheck.value = "N";
         }
         await setCustomer(results["cust"]);
+        setState(() {});
       }
     }
   }
@@ -538,11 +539,7 @@ Future<void> getCustUser() async {
                           style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                         ),
                       ),
-                      InkWell(
-                          onTap: (){
-
-                          },
-                          child : Container(
+                      Container(
                               height: CustomStyle.getHeight(40.h),
                               decoration: BoxDecoration(
                                   border: Border.all(color: text_box_color_02),
@@ -560,7 +557,6 @@ Future<void> getCustUser() async {
                                 ],
                               )
                           )
-                      )
                     ]))
                     ),
               ])),
@@ -584,11 +580,7 @@ Future<void> getCustUser() async {
                                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                   ),
                                 ),
-                                InkWell(
-                                    onTap: (){
-
-                                    },
-                                    child : Container(
+                                Container(
                                         height: CustomStyle.getHeight(40.h),
                                         decoration: BoxDecoration(
                                             border: Border.all(color: text_box_color_02),
@@ -606,7 +598,6 @@ Future<void> getCustUser() async {
                                           ],
                                         )
                                     )
-                                )
                               ]))
                   ),
                   // 거래처 등급사유
@@ -624,11 +615,7 @@ Future<void> getCustUser() async {
                                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                   ),
                                 ),
-                                InkWell(
-                                    onTap: () async {
-
-                                    },
-                                    child : Container(
+                               Container(
                                         height: CustomStyle.getHeight(40.h),
                                         decoration: BoxDecoration(
                                             border: Border.all(color: text_box_color_02),
@@ -646,7 +633,6 @@ Future<void> getCustUser() async {
                                           ],
                                         )
                                     )
-                                )
                               ]))
                   ),
                 ])):const SizedBox(),
@@ -793,7 +779,7 @@ Future<void> getCustUser() async {
 
   Future<void> confirm() async {
     if(validation()) {
-      Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_WORK_REQUEST,Const.ORDER_VO:mData,Const.UNIT_CHARGE_CNT:ChargeCheck});
+      Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_WORK_REQUEST,Const.ORDER_VO:mData.value,Const.UNIT_CHARGE_CNT:ChargeCheck.value});
     }
   }
 

@@ -170,22 +170,22 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                 textAlign: TextAlign.start,
                 keyboardType: TextInputType.text,
                 onChanged: (value) async {
+                  print("뭐징뭐징 =>$value");
                   search_text.value = value;
-                  if(size != 0) {
-                      for(var data in mList) {
-                        String name = data.custName;
-                        if(name.toLowerCase().contains(search_text.toLowerCase())){
-                          mList.add(data);
-                        }
-                      }
+                  if(size.value != 0) {
+                    await getFilter(search_text.value);
                     bottom_btn.value = "\"${search_text.value}\" 를 신규 거래처로 등록";
                   }
+                  mFlag.value = false;
                   String mResult = search_text.value.trim();
-                  for(int i = 0; i < mList.value.length; i++) {
+                  print("컹스컹스 -> ${mList.length}");
+                  for(int i = 0; i < mList.length; i++) {
+                    print("컹스컹스 -> ${mResult} // ${mList[i].custName} // ${mList[i].deptName}");
                     if((mResult == mList[i].custName && "물류팀(임시)" == mList[i].deptName)) {
                       mFlag.value = true;
                     }
                   }
+                  print("컹스컹스333 => ${mFlag.value}");
                   if(mFlag.value){
                     btn_visable.value = false;
                   }else{
@@ -195,7 +195,6 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                       btn_visable.value = true;
                     }
                   }
-                  await getCustomer();
                 },
                 decoration: InputDecoration(
                   counterText: '',
@@ -227,16 +226,19 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
   }
 
   Future<void> getFilter(String str) async {
-    search_text.value = str;
-    search_text.value = search_text.value.toLowerCase();
+    String search = str;
+    search = search.toLowerCase();
     mList.clear();
-    /*if(search_text.value.length == 0) {
+    if(search.length == 0) {
       mList.addAll(arrayList);
     }else{
       for(var data in arrayList) {
-
+        String name = data.custName;
+        if(name.toLowerCase().contains(search)) {
+          mList.add(data);
+        }
       }
-    }*/
+    }
   }
 
   @override
@@ -282,45 +284,38 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                   );
                 })
             ),
-          bottomNavigationBar: btn_visable.value ? SizedBox(
-              height: CustomStyle.getHeight(60.0.h),
-              child: Obx((){
-                return Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child: InkWell(
-                          onTap: () async {
-                            await onNoneCustomer();
-                          },
-                          child: Container(
-                              height: CustomStyle.getHeight(60.0.h),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(color: main_color),
-                              child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.add, size: 20, color: styleWhiteCol),
-                                    CustomStyle.sizedBoxWidth(5.0.w),
-                                    Text(
+          bottomNavigationBar: Obx(() {
+              return btn_visable.value
+                  ? SizedBox(
+                      height: CustomStyle.getHeight(60.0.h),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                              flex: 1,
+                              child: InkWell(
+                                  onTap: () async {
+                                    await onNoneCustomer();
+                                  },
+                                  child: Container(
+                                    height: CustomStyle.getHeight(60.0.h),
+                                    alignment: Alignment.center,
+                                    decoration:
+                                        const BoxDecoration(color: main_color),
+                                    child: Text(
                                       textAlign: TextAlign.center,
                                       bottom_btn.value,
                                       style: CustomStyle.CustomFont(
                                           styleFontSize16, styleWhiteCol),
                                     ),
-                                  ]
+                                  )
                               )
-                          )
+                          ),
+                        ],
                       )
-                  ),
-                ],
-              );
-            })
-          ):const SizedBox(),
-        )
+              ) : const SizedBox();
+            }))
     );
   }
 

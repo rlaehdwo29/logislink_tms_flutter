@@ -43,7 +43,6 @@ class _BridgePageState extends State<BridgePage> {
 
     Future.delayed(Duration.zero, () async {
       bool? chkPermission = await checkPermission();
-      print("여까지 온건가? =>$chkPermission");
       if(chkPermission == true){
         await checkVersion();
       }else {

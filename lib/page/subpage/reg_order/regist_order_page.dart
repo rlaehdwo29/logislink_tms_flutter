@@ -91,7 +91,6 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
     Future.delayed(Duration.zero, () async {
 
       llRpaInfo.value = false;
-      print("아씨 몬데 => ${widget.order_vo}");
       if(widget.order_vo != null) {
         mData.value = widget.order_vo!;
         await copyData();
@@ -162,12 +161,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
     mData.value.sDate = Util.getAllDate(sCal.value);
     eCal.value = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0);
     mData.value.eDate = Util.getAllDate(eCal.value);
-    print("하아아앙111 =->${mData.value.sDate}");
-    print("하아아앙222 =->${mData.value.eDate}");
     setSDate.value = Util.splitSDate(mData.value.sDate);
-    print("응애옹애??? =>${setSDate.value}");
     setEDate.value = Util.splitSDate(mData.value.eDate);
-    print("응애옹애222??? =>${setEDate.value}");
   }
 
   Future<void> copySetDate() async {
@@ -210,15 +205,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
-        print("하하하하하 -> ${results[Const.RESULT_WORK]}");
         switch(results[Const.RESULT_WORK]){
           case Const.RESULT_WORK_DAY:
-
-            print("하하하하하2222 -> ${results["sCal"]}");
-            print("하하하하하2222-111 -> ${results["eCal"]}");
-            print("하하하하하2222-222 -> ${results["sDate"]}");
-            print("하하하하하2222-333 -> ${results["eDate"]}");
-
             sCal.value = results["sCal"] as DateTime;
             eCal.value = results["eCal"] as DateTime;
             mData.value.sDate =  results["sDate"] as String;
@@ -232,16 +220,11 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   }
 
   Future<void> goToRequestInfo() async {
-    Map<String,int> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderRequestInfoPage(order_vo:mData.value,)));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderRequestInfoPage(order_vo:mData.value,)));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
-        switch(results[Const.RESULT_WORK]){
-          case Const.RESULT_SETTING_REQUEST:
-            break;
-          case Const.RESULT_WORK_REQUEST:
-            break;
-        }
+        setActivityResult(results);
       }
     }
   }
@@ -326,7 +309,6 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         setState(() {
           mData.value = results[Const.ORDER_VO];
         });
-        print("ㅇㅇㅇㅇ하하하하핳=->${mData.value.orderStopList?.length}");
         await setStopPoint();
         break;
       case Const.RESULT_WORK_CARGO :
@@ -365,7 +347,6 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   }
 
   Future<void> addStopPoint() async {
-    //if(isRequest.value) {
       Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderAddrPage(order_vo:mData.value,code:Const.RESULT_WORK_STOP_POINT)));
 
       if(results != null && results.containsKey("code")){
@@ -374,20 +355,15 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           await setActivityResult(results);
         }
       }
-    //}else{
-    //  Util.toast(Strings.of(context)?.get("order_reg_request_info_hint")??"Not Found");
-    //}
   }
 
   Future<void> getStopPoint() async {
     Logger logger = Logger();
-    pr?.show();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).getStopPoint(
         user.authorization,
         mData.value.orderId
     ).then((it) async {
-      pr?.hide();
       ReturnMap _response = DioService.dioResponse(it);
       logger.d("getStopPoint() _response -> ${_response.status} // ${_response.resultMap}");
       if(_response.status == "200") {
@@ -401,8 +377,6 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                 data.stopSeq = null;
                 realList.add(data);
               }
-             /* StopPointModel iii = realList.map((i) => i.toMap())
-                  .toList();*/
               mData.value.orderStopList = realList;
               await setStopPoint();
           }
@@ -410,8 +384,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
         }
       }
-    }).catchError((Object obj){
-      pr?.hide();
+    }).catchError((Object obj) async {
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
@@ -929,13 +902,14 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
             Strings.of(context)?.get("yes") ?? "Error!!",
                 () {Navigator.of(context).pop(false);},
                 () async {
-              await regOrder();
               Navigator.of(context).pop(false);
+              await regOrder();
             }
         );
   }
 
   Future<void> regOrder() async {
+    String mJson = jsonEncode(mData.value.orderStopList?.map((e) => e.toJson()).toList());
     if(validation()) {
       Logger logger = Logger();
       pr?.show();
@@ -955,7 +929,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           mData.value.sWayCode,mData.value.eWayCode,mData.value.mixYn,mData.value.mixSize,mData.value.returnYn,
           mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.distance,mData.value.time,
           mData.value.reqMemo, mData.value.driverMemo,mData.value.itemCode,int.parse(mData.value.sellCharge??"0"),int.parse(mData.value.sellFee??"0"),
-          mData.value.orderStopList != null && mData.value.orderStopList?.isNotEmpty == true ? jsonEncode(mData.value.orderStopList):null,user.userId,user.mobile,
+          mData.value.orderStopList != null && mData.value.orderStopList?.isNotEmpty == true ? jsonEncode(mData.value.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
           mData.value.sellWayPointMemo,mData.value.sellWayPointCharge,mData.value.sellStayMemo,mData.value.sellStayCharge,
           mData.value.handWorkMemo,mData.value.sellHandWorkCharge,mData.value.sellRoundMemo,mData.value.sellRoundCharge,
           mData.value.sellOtherAddMemo,mData.value.sellOtherAddCharge,mData.value.sellWeight,"N",
@@ -972,7 +946,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         logger.d("regOrder() _response -> ${_response.status} // ${_response.resultMap}");
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
-            Navigator.of(context).pop({'RESULT_OK':200,'allocId':_response.resultMap?["msg"]});
+            Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
           }

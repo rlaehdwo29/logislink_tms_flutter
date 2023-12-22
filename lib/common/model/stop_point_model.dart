@@ -4,8 +4,8 @@ import 'package:logislink_tms_flutter/common/common_util.dart';
 class StopPointModel extends ReturnMap {
 
   String? orderId;
-  String? stopSeq;
-  String? stopNo;
+  int? stopSeq;
+  int? stopNo;
   String? eComName;
   String? eAddr;
   String? eAddrDetail;
@@ -65,7 +65,7 @@ class StopPointModel extends ReturnMap {
       beginDate : json["beginDate"],
       finishYn : json["finishYn"],
       finishDate : json["finishDate"],
-      goodsWeight : json["goodsWeight"],
+      goodsWeight : json["goodsWeight"].toString(),
       eLat : json["eLat"],
       eLon : json["eLon"],
       weightUnitCode : json["weightUnitCode"],
@@ -76,6 +76,19 @@ class StopPointModel extends ReturnMap {
       useYn : json["useYn"],
       stopSe : json["stopSe"]
     );
+  }
+
+  Map<String,dynamic> toJson() {
+    return {
+      "eAddr": eAddr,
+      "eAddrDetail": eAddrDetail,
+      "eComName": eComName,
+      "eLat": eLat,
+      "eLon": eLon,
+      "eStaff": eStaff,
+      "eTel": eTel,
+      "stopSe": stopSe
+    };
   }
 
   Map<String,dynamic> toMap() {

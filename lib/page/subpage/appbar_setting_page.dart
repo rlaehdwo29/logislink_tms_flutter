@@ -22,6 +22,7 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:fbroadcast/fbroadcast.dart' as FBroad;
 
 import '../../constants/const.dart';
 
@@ -499,9 +500,9 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
         // 화면 꺼짐 방지
         Container(
             padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -518,6 +519,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Switch(
                     value: _wakeChecked.value,
+                    activeColor: main_color,
                     onChanged: (value) {
                       setState(() async {
                         _wakeChecked.value = value;
@@ -853,7 +855,14 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
   @override
   Widget build(BuildContext context) {
     pr = Util.networkProgress(context);
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: () async {
+          return Future((){
+            FBroad.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+            return true;
+          });
+        },
+        child: Scaffold(
       backgroundColor: const Color(0xffececec),
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
@@ -865,6 +874,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                     styleFontSize16, styleWhiteCol)),
             leading: IconButton(
               onPressed: () {
+                FBroad.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                 Navigator.of(context).pop();
               },
               color: styleWhiteCol,
@@ -884,7 +894,8 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
               ),
             );
           }),
-        ));
+        ))
+    );
   }
 
 }

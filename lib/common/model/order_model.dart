@@ -639,16 +639,11 @@ class OrderModel extends ResultModel {
         oneCharge: json['oneCharge']
     );
     var list = json['orderStopList']??"[]"; // 경유지 목록
-    print("걋걋걋걋걋걋걋걋걋걋`111 => $list // ${list.runtimeType}");
     if(list != "[]") {
       var jsonList = jsonDecode(list);
-      print("걋걋걋걋걋걋걋걋걋걋`1112222 => $jsonList // ${jsonList.length}");
       List<StopPointModel> itemsList = jsonList.map((i) => StopPointModel.fromJSON(i)).toList();
-      print("걋걋걋걋걋 => ${itemsList}");
-      print("걋걋걋걋걋22222 => ${jsonDecode(json['orderStopList'])}");
       order.orderStopList = itemsList;
     }else{
-      print("걋걋걋걋걋걋걋걋걋걋`222 =>");
       order.orderStopList = List.empty(growable: true);
     }
     return order;

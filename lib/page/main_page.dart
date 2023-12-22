@@ -12,6 +12,7 @@ import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_main_widget.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
@@ -38,6 +39,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/rendering.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainPage extends StatefulWidget {
   final String? allocId;
@@ -55,8 +57,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   final mUser = UserModel().obs;
 
   final GlobalKey webViewKey = GlobalKey();
-  late final InAppWebViewController webViewController;
-  late final PullToRefreshController pullToRefreshController;
   final orderList = List.empty(growable: true).obs;
   final myOrder = "N".obs;
   final orderState = "".obs;
@@ -82,6 +82,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   final page = 1.obs;
   final totalPage = 1.obs;
   final mPoint = 0.obs;
+  final ivTop = false.obs;
 
   late TextEditingController searchOrderController;
 
@@ -93,20 +94,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   void initState() {
     super.initState();
     fbroad.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
-      await refresh();
+      UserModel? user = await controller.getUserInfo();
+      mUser.value = user;
+      await getOrder();
+      //setState(() {});
+      //await handleDeepLink();
     },context: this);
-    pullToRefreshController = (kIsWeb
-        ? null
-        : PullToRefreshController(
-      options: PullToRefreshOptions(color: Colors.blue),
-      onRefresh: () async {
-        if (defaultTargetPlatform == TargetPlatform.android) {
-          webViewController.reload();
-        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
-          webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));}
-      },
-    ))!;
-    handleDeepLink();
     Future.delayed(Duration.zero, () async {
       pr = Util.networkProgress(context);
       if(widget.allocId != null) {
@@ -115,6 +108,11 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       scrollController.addListener(() async {
         var now_scroll = scrollController.position.pixels;
         var max_scroll = scrollController.position.maxScrollExtent;
+        if(now_scroll >= 300) {
+          ivTop.value = true;
+        } else {
+          ivTop.value = false;
+        }
         if((max_scroll - now_scroll) <= 300){
           if(page.value < totalPage.value){
             page.value++;
@@ -157,9 +155,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     List<OrderModel> list = await db.getOrderList(context);
     if(list != null && list.length != 0) {
       if(orderList.isNotEmpty) orderList.clear();
-      for(var data in list) {
-        orderList?.add(data);
-      }
+      orderList.addAll(list);
     }
   }
 
@@ -191,6 +187,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               var db = App().getRepository();
               if(itemsList.length != 0){
                 await db.insertAll(context,itemsList);
+
+                List<OrderModel> list = await db.getOrderList(context);
+                  if(list != null && list.length != 0) {
+                    if(orderList.isNotEmpty) orderList.clear();
+                    orderList.addAll(list);
+                  }
               }
               int total = 0;
               if(_response.resultMap?["total"].runtimeType.toString() == "String") {
@@ -400,10 +402,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
               ),
               onTap: () async {
-                /*var url = Uri.parse(URL_MANUAL);
+                var url = Uri.parse(URL_MANUAL);
                 if (await canLaunchUrl(url)) {
                   launchUrl(url);
-                }*/
+                }
               },
             ),ListTile(
               title: Text(
@@ -454,15 +456,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 flex: 3,
                                 child: Row(children: [
                                   item.orderState == "09" ? Container(
-                                      decoration: CustomStyle
-                                          .baseBoxDecoWhite(),
+                                      decoration: CustomStyle.baseBoxDecoWhite(),
                                       padding: EdgeInsets.symmetric(
-                                          vertical:
-                                          CustomStyle.getHeight(
-                                              5.0.h),
-                                          horizontal:
-                                          CustomStyle.getWidth(
-                                              10.0.w)),
+                                          vertical: CustomStyle.getHeight(5.0.h),
+                                          horizontal: CustomStyle.getWidth(10.0.w)),
                                       child: Text(
                                         "${item.orderStateName}",
                                         style: CustomStyle.CustomFont(
@@ -1392,7 +1389,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         ),
         builder: (context, snapshot) {
           if(snapshot.connectionState != ConnectionState.done) {
-            return Expanded(child: Container(
+            return Expanded(
+                child: Container(
                 alignment: Alignment.center,
                 child: Center(child: CircularProgressIndicator())
             ));
@@ -1401,7 +1399,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               if (orderList.isNotEmpty) orderList.clear();
               orderList.addAll(snapshot.data["list"]);
               totalPage.value = snapshot.data?["total"];
-              return orderListWidget();
+              return Obx(()=> orderListWidget());
             } else if (snapshot.hasError) {
               return Container(
                 padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
@@ -1422,9 +1420,15 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Widget orderListWidget() {
-    print("리스트 몇개인가요? => ${orderList.length}");
     return orderList.isNotEmpty
         ? Expanded(
+      child: Stack(
+        children: [
+          Positioned(
+        child: RefreshIndicator(
+      onRefresh: () async {
+        await refresh();
+      },
       child: ListView.builder(
       scrollDirection: Axis.vertical,
       controller: scrollController,
@@ -1434,7 +1438,32 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         var item = orderList[index];
         return getListCardView(item);
       },
-    ))
+    ))),
+          Obx((){
+          return ivTop.value == true ?
+          Positioned(
+              right: 10.w,
+              bottom: 10.h,
+              child: InkWell(
+                  onTap: () async {
+                    scrollController.jumpTo(0);
+                  },
+                  child: Container(
+                      padding: EdgeInsets.all(10.w),
+                      decoration: const BoxDecoration(
+                        color: Color(0x9965656D),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_upward,
+                        size: 24,
+                        color: Colors.white,
+                      )
+                  )
+              )
+          ) : const SizedBox();
+          })
+    ]))
         : Expanded(
         child: Container(
             alignment: Alignment.center,
@@ -1445,7 +1474,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future goToRegOrder() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => RegistOrderPage()));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage()));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {

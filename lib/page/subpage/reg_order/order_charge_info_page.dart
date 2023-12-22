@@ -442,7 +442,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
 
     int total = sellCharge + sellWayPointCharge + sellStayCharge + sellHandWorkCharge + sellRoundCharge + sellOtherAddCharge - sellFee;
     print("토탈 값 보자111 =>$total");
-    tvTotal.value = Util.getInCodeCommaWon(total.toString());
+    tvTotal.value = total.toString();
 
   }
 
@@ -575,6 +575,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       mData.value.call24Cargo = mRpaSalary.value;
       mData.value.oneCharge = mRpaSalary.value;
       mData.value.manCharge = mRpaSalary.value;
+
 
       Navigator.of(context).pop({
         'code':200,
@@ -2291,6 +2292,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       mData.value.call24Charge = mRpaSalary.value;
       mData.value.oneCharge = mRpaSalary.value;
       mData.value.manCharge = mRpaSalary.value;
+
+      print("으에에에엥 =>${mData.value.sellCharge}");
 
       Navigator.of(context).pop({
         'code':200,

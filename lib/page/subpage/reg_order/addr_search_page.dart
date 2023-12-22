@@ -198,7 +198,6 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   }
 
   void selectSido(CodeModel? codeModel,String? codeType) {
-    print("dddddddd=>${codeModel?.code} // ${codeModel?.codeName} // $codeType");
     if(codeType != "") {
       switch (codeType) {
         case 'SIDO' :
@@ -211,7 +210,6 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   }
 
   void selectSidoArea(CodeModel? codeModel,String? codeType) {
-    print("dddddddd=>${codeModel?.code} // ${codeModel?.codeName} // $codeType");
     if(codeType != "") {
       switch (codeType) {
         case 'SIDO_AREA' :

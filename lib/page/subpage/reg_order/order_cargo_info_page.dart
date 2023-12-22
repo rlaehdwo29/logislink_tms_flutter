@@ -490,7 +490,6 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
       return false;
     }
     if(code.value.isEmpty) {
-      print("ㅇㅇㅇㅇ이거아냐? =>${mData.value.carTypeCode} // ${mData.value.carTypeCode}");
       if(mData.value.carTypeCode?.isEmpty == true || mData.value.carTypeCode == null) {
         Util.toast("${Strings.of(context)?.get("order_cargo_info_car_type")??"Not Found"}${Strings.of(context)?.get("valid_fail_01")??"Not Found"}");
         return false;

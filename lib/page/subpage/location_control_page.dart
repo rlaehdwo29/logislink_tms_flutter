@@ -72,7 +72,6 @@ class _LocationControlPageState extends State<LocationControlPage>{
 
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    mList.value = List.empty(growable: true);
     await pr?.show();
     await DioService.dioClient(header: true).getLocation(
         user.authorization,
@@ -89,9 +88,10 @@ class _LocationControlPageState extends State<LocationControlPage>{
               var list = _response.resultMap?["data"] as List;
               List<LocationModel> itemsList = list.map((i) => LocationModel.fromJSON(i)).toList();
               if(itemsList.length > 0){
+                mList.value = List.empty(growable: true);
                 mList.addAll(itemsList);
               }
-              //await setCurrent();
+              await setCurrent();
               isRefresh.value = false;
               Future.delayed(const Duration(milliseconds: 10000),() {
                 isRefresh.value = true;
@@ -122,21 +122,38 @@ class _LocationControlPageState extends State<LocationControlPage>{
     });
   }
 
+  Future<void> setCurrent() async {
+    if(mList.length == 0) {
+      return;
+    }
+
+    markers.removeWhere((element) {
+      return element.markerId == mData.value.carNum;
+    });
+    setState(() {
+
+      markers.add(Marker(
+        markerId: mData.value.carNum??"",
+        markerImageSrc: 'https://abt.logis-link.co.kr/images/icon/marker_q.png',
+        latLng: LatLng(mList.value[mList.length -1].lat, mList.value[mList.length -1].lon),
+      ));
+    });
+  }
+  
   Widget mapWidget() {
     return Container(
       child: KakaoMap(
         onMapCreated: ((controller) async {
 
           setState(() {
-            print("응애응애 => ${widget.order_vo.sAddr} // ${widget.order_vo.sAddrDetail} // ${widget.order_vo.sDong}");
             List<LatLng> bounds = List.empty(growable: true);
-            if(widget.order_vo.sLat.isNull != true && widget.order_vo.sLon.isNull != null) {
-              bounds.add(LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!));
+            if(mData.value.sLat.isNull != true && mData.value.sLon.isNull != null) {
+              bounds.add(LatLng(mData.value.sLat!, mData.value.sLon!));
               markers.add(Marker(
-                markerId: widget.order_vo.sComName ?? "상차지",
+                markerId: mData.value.sComName ?? "상차지",
                 markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/blue_b.png',
-                latLng: LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!),
-                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${widget.order_vo.sComName??"상차지"}</div>',
+                latLng: LatLng(mData.value.sLat!, mData.value.sLon!),
+                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${mData.value.sComName??"상차지"}</div>',
                 /*'<div class="wrap">' +
                                       '    <div class="info">' +
                                       '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
@@ -154,13 +171,13 @@ class _LocationControlPageState extends State<LocationControlPage>{
               ));
             }
 
-            if(widget.order_vo.eLat.isNull != true && widget.order_vo.eLon.isNull != null) {
-              bounds.add(LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!));
+            if(mData.value.eLat.isNull != true && mData.value.eLon.isNull != null) {
+              bounds.add(LatLng(mData.value.eLat!, mData.value.eLon!));
               markers.add(Marker(
-                markerId: widget.order_vo.eComName??"하차지",
+                markerId: mData.value.eComName??"하차지",
                 markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/red_b.png',
-                latLng: LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!),
-                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${widget.order_vo.eComName??"하차지"}</div>',
+                latLng: LatLng(mData.value.eLat!, mData.value.eLon!),
+                infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${mData.value.eComName??"하차지"}</div>',
                 /*
                                 * '<div class="wrap">' +
                                     '    <div class="info">' +
@@ -179,8 +196,17 @@ class _LocationControlPageState extends State<LocationControlPage>{
               ));
             }
 
+            // 현재 위치 마커
+            if(mList.length > 0) {
+              bounds.add(LatLng(mList.value[mList.length - 1].lat,mList.value[mList.length - 1].lon));
+              markers.add(Marker(
+                markerId: mData.value.carNum ?? "",
+                markerImageSrc: 'https://abt.logis-link.co.kr/images/icon/marker_q.png',
+                latLng: LatLng(mList.value[mList.length - 1].lat, mList.value[mList.length - 1].lon),
+              ));
+            }
             // 이동 경로 표시
-            polylines.add(
+            /*polylines.add(
               Polyline(
                 polylineId: 'polyline_${polylines.length}',
                 points: [
@@ -189,7 +215,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                 ],
                 strokeColor: Colors.red,
               ),
-            );
+            );*/
 
             mapController = controller;
             //mapController?.addOverlayMapTypeId(MapType.traffic); //교통정보
@@ -199,8 +225,6 @@ class _LocationControlPageState extends State<LocationControlPage>{
 
         }),
 
-        currentLevel: 18,
-        center: LatLng(35.81588719434526, 128.10472746046923),
         markers: markers.toList(),
         zoomControl: false,
         polylines: polylines.toList(),

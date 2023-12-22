@@ -40,6 +40,7 @@ class _StopPointPageState extends State<StopPointPage> {
 
   final addStopPointBtn = false.obs;
   final tvStopSe = "".obs;
+  final btStopAdd = false.obs;
 
   @override
   void initState() {
@@ -49,11 +50,12 @@ class _StopPointPageState extends State<StopPointPage> {
       code = widget.code!;
       if (widget.result_work_stopPoint != null) {
         mList.addAll(jsonDecode(widget.result_work_stopPoint!));
+        btStopAdd.value = false;
       }
     }else{
       if(widget.order_vo != null){
         mData.value = widget.order_vo!;
-        if(mData.value != null) {
+        if(mData.value.orderId != null) {
           mList.value = mData.value.orderStopList??List.empty(growable: true);
         }
       }
@@ -96,7 +98,6 @@ class _StopPointPageState extends State<StopPointPage> {
   }
 
   Widget stopPointListWidget() {
-    print("응애옹애옹 =>${mList.length}");
     return mList.isNotEmpty
         ? ListView.builder(
       scrollDirection: Axis.vertical,
@@ -158,7 +159,7 @@ class _StopPointPageState extends State<StopPointPage> {
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             text: TextSpan(
-                              text: item.eComName??"1111111",
+                              text: item.eComName??"",
                               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                             )
                         )

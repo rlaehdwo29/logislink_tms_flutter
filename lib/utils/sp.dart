@@ -127,7 +127,6 @@ class SP extends GetxController {
     Logger logger = Logger();
     List<CodeModel>? mList = List.empty(growable: true);
     open();
-    print("타긴한겨? => ${m_Pref?.getString(key)}");
     if(m_Pref?.getString(key)?.isNotEmpty == true && m_Pref?.getString(key) != null ) {
       String jsonString = m_Pref?.getString(key) ?? "";
       Map<String, dynamic> jsonData = jsonDecode(jsonString);

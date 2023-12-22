@@ -79,7 +79,6 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
 
   Future<void> initView() async {
     await setSDate();
-    print("흐으응ㅁ =>${widget.order_vo.sDate}");
     mSTime.value = Util.splitTime(widget.order_vo.sDate??"");
     await setEDate();
     mETime.value = Util.splitTime(widget.order_vo.eDate??"");

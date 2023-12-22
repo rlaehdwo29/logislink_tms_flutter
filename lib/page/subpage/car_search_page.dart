@@ -164,10 +164,20 @@ class _CarSearchPageState extends State<CarSearchPage> {
         },
         child: Container(
             padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: line,
+                  width: 1.w
+                )
+              )
+            ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  mData.value.carNum??"",
+                  item.carNum??"",
                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                 ),
                 Container(
@@ -175,20 +185,19 @@ class _CarSearchPageState extends State<CarSearchPage> {
                     child: Row(
                       children: [
                         Text(
-                          mData.value.driverName??"",
+                          item.driverName??"",
                           style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
                           child: Text(
-                            Util.makePhoneNumber(mData.value.mobile),
+                            Util.makePhoneNumber(item.mobile),
                             style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                           ),
                         )
                       ],
                     )
-                ),
-                CustomStyle.getDivider1()
+                )
               ],
             )
         )
@@ -212,7 +221,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
             if(list.length > 0) {
               List<CarModel> itemsList = list.map((i) => CarModel.fromJSON(i)).toList();
               size.value = itemsList.length;
-              mList.value.addAll(itemsList);
+              mList.addAll(itemsList);
             }
           }else{
             mList.value = List.empty(growable: true);
@@ -236,12 +245,12 @@ class _CarSearchPageState extends State<CarSearchPage> {
   }
 
   Future<void> searchCar() async {
-    //if(search_text.value.length == 1) {
-      //Util.toast("검색어를 2글자 이상 입력해 주세요.");
-    //}else{
+    if(search_text.value.length == 1) {
+      Util.toast("검색어를 2글자 이상 입력해 주세요.");
+    }else{
       search_text.value = search_text.value.trim();
       await getCar();
-    //}
+    }
   }
 
   Future<void> showCarAdd() async {
@@ -273,7 +282,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                         borderRadius: BorderRadius.all(Radius.circular(0.0))
                     ),
                     title: Container(
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.0),horizontal: CustomStyle.getWidth(5.0)),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
                         decoration: CustomStyle.customBoxDeco(main_color,radius: 0),
                         child: Text(
                           '${Strings.of(context)?.get("order_detail_vehicle_dispatch")}',
@@ -295,7 +304,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                         Container(
                                             padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
                                             child: Text(
-                                              Strings.of(context)?.get("order_detail_car_num")??"차랑변호_",
+                                              Strings.of(context)?.get("order_detail_car_num")??"차랑번호_",
                                               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                             )
                                         ),
@@ -659,7 +668,6 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                           child: InkWell(
                                               onTap: () async {
                                                 var result = await dialogConfirm();
-                                                print("ㅇㅇㅇㅇ=>$result");
                                                 if(result) Navigator.of(context).pop({'code': 200,'car':mData.value});
                                               },
                                               child: Container(
@@ -702,12 +710,10 @@ class _CarSearchPageState extends State<CarSearchPage> {
 
   void selectCarTon(CodeModel? codeModel,String? codeType) {
     if(codeType != ""){
-      print("응애옹애 => ${codeType}");
       switch(codeType) {
         case 'CAR_TON_CD':
           setState(() {
             mData.value.carTonCode = codeModel?.code;
-            print("응앵옹애옹 =>${mData.value.carTonCode} // ${codeModel?.code}");
             mData.value.carTonName = codeModel?.codeName;
           });
           break;

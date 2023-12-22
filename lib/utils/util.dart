@@ -147,6 +147,31 @@ class Util {
     return encrypted.base64;
   }
 
+  static Future<String> dataDecode(String value) async {
+
+    String file = await rootBundle.loadString('assets/raw/key.txt');
+    var b = utf8.encode(file);
+    var keyBytes = Uint8List(16);
+    String mIv = "";
+
+    for(var i in keyBytes){
+      mIv = mIv + i.toString();
+    }
+
+    var len = b.length;
+
+    if(len > keyBytes.lengthInBytes) len = keyBytes.length;
+    List.copyRange(b,0, keyBytes, 0, len);
+
+    final key = enc.Key.fromUtf8(file);
+    final iv = enc.IV.fromUtf8(mIv);
+
+    final encrypter = enc.Encrypter(enc.AES(key,mode: enc.AESMode.cbc,padding: 'PKCS7'));
+    final encrypted = encrypter.encrypt(value, iv: iv);
+    final decrypted = encrypter.decrypt(encrypted, iv: iv);
+    return decrypted;
+  }
+
   static String? makeString(String? _string){
     if(_string == null || _string == ""){
       return "-";
@@ -260,7 +285,6 @@ class Util {
     if(val1 == 0 || val2 == 0) {
       return 0.0;
     }
-    print("응애옹애222 =>${((val1 / val2 * 1000) / 10.0)}");
     double result = ((val1 / val2 * 1000) / 10.0).roundToDouble();
     return result;
   }
@@ -428,7 +452,7 @@ class Util {
   }
 
   static bool regexCarNumber(String num) {
-    RegExp regExp = RegExp(r'^[가-힣ㄱ-ㅎㅏ-ㅣ\x20]{2}\d{2}[아,바,사,자\x20]\d{4}$');
+    RegExp regExp = RegExp(r'^[가-힣ㄱ-ㅎㅏ-ㅣ\\x20]{2}\\d{2}[아,바,사,자\\x20]\d{4}$');
     return regExp.hasMatch(num);
   }
 

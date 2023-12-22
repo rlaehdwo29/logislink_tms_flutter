@@ -53,7 +53,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
       if(widget.order_vo != null) {
         mData.value = widget.order_vo!;
       }
-      print("으으응?? =>${widget.code}");
       if(widget.code == Const.RESULT_WORK_SADDR) {
         mTitle.value = Strings.of(context)?.get("order_s_addr_title")??"Not Found";
       }else if(widget.code == Const.RESULT_WORK_EADDR){
@@ -64,7 +63,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
       }else{
         mTitle.value = "경유지 선택";
       }
-      print("으으응22?? =>${mTitle.value}");
       await initView();
     });
   }

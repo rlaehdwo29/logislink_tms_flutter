@@ -190,7 +190,10 @@ class ShowCodeDialogWidget {
             actions: [
               IconButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      Navigator.of(context).pop();
+                      //SystemNavigator.pop();
+                    });
                   },
                   icon: const Icon(Icons.close, size: 30)
               )

@@ -331,10 +331,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
     }
 
     if(code.value != "") {
-      print("여기?");
       isOption.value = true;
     }else{
-      print("여기222?");
       await getOrderOption();
     }
     etBuyChargeController.text = mData.value.buyCharge??"0";
@@ -396,7 +394,6 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
 
     int total = buyCharge + wayPointCharge + stayCharge + handWorkCharge + handWorkCharge + roundCharge + otherAddCharge;
 
-    print("으엥응오애용??? =>$buyCharge // $wayPointCharge // $stayCharge // $handWorkCharge // $roundCharge // $otherAddCharge // $total");
     tvTotal.value = total;
   }
 
@@ -433,7 +430,6 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
         talkYn.value = false;
         kakaoPushEnable.value = false;
 
-        print("하아 뭔데1111 => ${orderBuyCharge.value}");
         etBuyChargeController.text = orderBuyCharge.value;
         etRegistController.text = "";
         break;
@@ -460,7 +456,6 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
         talkYn.value = false;
         kakaoPushEnable.value = false;
 
-        print("하아 뭔데2222 => ${orderBuyCharge.value}");
         etBuyChargeController.text = orderBuyCharge.value;
         etRegistController.text = "";
         mCustData.value = CustomerModel();
@@ -539,9 +534,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
 
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
-        print("응애응애 송아지 111 =>${results["car"]}");
         if(results["car"] != null) {
-          print("응애응애 송아지 222 =>");
           await setCar(results["car"]);
           setState(() {});
         }
@@ -587,7 +580,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
     String? dncStr = null;
     if(!(data.buyDriverLicenseNumber?.isEmpty == true) && data.buyDriverLicenseNumber != null) {
       try {
-        dncStr = await Util.dataEncryption(data.buyDriverLicenseNumber ?? "");
+        dncStr = await Util.dataDecode(data.buyDriverLicenseNumber ?? "");
       } catch (e) {
         e.printError();
       }
@@ -655,9 +648,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
     await encodeBuyDLN();
 
     var result = await validation();
-    print("컨펌 -=> $result");
     if(result) {
-      print("컨펌1111 -=> ${mData.value.allocState}");
       if(mData.value.allocState == "11") {
         await showCancelLink();
       }else{
@@ -990,7 +981,14 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: line,
+                width: 1.w
+              )
+            )
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1023,9 +1021,10 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
               ) : const SizedBox()
             ],
           )),
-          CustomStyle.getDivider2(),
         !isOption.value?
-        Row(
+        Container(
+          padding: EdgeInsets.only(top: CustomStyle.getHeight(15.h)),
+        child: Row(
           children: [
             Expanded(
               flex: 1,
@@ -1072,7 +1071,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
               )
             )
           ],
-        ) : const SizedBox(),
+        )) : const SizedBox(),
         // 운송사(필수)
           !isOption.value && llTransType01.value ?
          Container(
@@ -1662,10 +1661,9 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                               ),
                             ),
                             onChanged: (value){
-                              if(value.length > 0) {
-                              }
+                              etRegistController.text = (value != null ?  value?.replaceAllMapped(RegExp(r'(\d{6})(\d{6,7})'), (m) => '${m[1]}-${m[2]}') : "")!;
                             },
-                            maxLength: 50,
+                            maxLength: 14,
                           )
                       )
                     ],

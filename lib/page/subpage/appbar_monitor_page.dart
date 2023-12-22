@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -1290,7 +1291,6 @@ Future<void> getMonitorCustProfit() async {
           int sellAmt = mList.fold(0,(value, element) => value + element.sellAmt as int);
           int buyAmt = mList.fold(0, (value, element) => value + element.buyAmt as int);
           int profitAmt = mList.fold(0, (value, element) => value + element.profitAmt as int);
-          print("응애옹애? =>$profitAmt // $sellAmt");
           double profitPercent = Util.getInCodePercent(profitAmt, sellAmt);
 
           data = MonitorProfitModel(custName: Strings.of(context)?.get("total"),profitPercent: profitPercent, buyAmt: buyAmt, sellAmt: sellAmt, profitAmt: profitAmt);
@@ -1474,7 +1474,14 @@ Widget customTabBarWidget() {
 @override
 Widget build(BuildContext context) {
   pr = Util.networkProgress(context);
-  return Scaffold(
+  return WillPopScope(
+      onWillPop: () async {
+        return Future((){
+          FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+          return true;
+        });
+      } ,
+      child: Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       appBar: PreferredSize(
           preferredSize: Size.fromHeight(CustomStyle.getHeight(60.0)),
@@ -1486,6 +1493,7 @@ Widget build(BuildContext context) {
               ),
               leading: IconButton(
                 onPressed: () async {
+                  FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
@@ -1506,7 +1514,7 @@ Widget build(BuildContext context) {
         }
         )
       )
-  );
+  ));
 }
   
 }

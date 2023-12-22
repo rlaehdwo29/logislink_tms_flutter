@@ -52,9 +52,9 @@ const String URL_ORDER_LIST = "/cust/order/list/A/v2";
 // 오더 등록
 const String URL_ORDER_REG = "/cust/order/write/v1";
 // 오더 취소
-const String URL_ORDER_CANCEL = "cust/order/cancel";
+const String URL_ORDER_CANCEL = "/cust/order/cancel";
 // 오더 재 등록
-const String URL_ORDER_STATE = "cust/order/state";
+const String URL_ORDER_STATE = "/cust/order/state";
 
 // 경유지 목록
 const String URL_STOP_POINT_LIST = "/cust/orderstop/list";

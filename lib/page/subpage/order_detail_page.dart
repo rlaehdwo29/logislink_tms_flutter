@@ -12,6 +12,7 @@ import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/car_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_status_model.dart';
+import 'package:logislink_tms_flutter/common/model/order_link_status_sub_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
@@ -55,7 +56,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   final controller = Get.find<App>();
 
   final mStopList = List.empty(growable: true).obs;
-  final mLinkStatusSub = OrderLinkStatusModel().obs;
+  final mLinkStatusSub = OrderLinkStatusSubModel().obs;
   final mAllocId = "".obs;
 
   final tvOrderCancel = false.obs;
@@ -212,11 +213,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).getOrderDetail(
       user.authorization,
-      mData.value.orderId,
+      allocId,
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
-        logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
+        logger.d("getOrderDetail() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             if (_response.resultMap?["data"] != null) {
@@ -227,7 +228,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   mData.value = itemsList[0];
                   await rpaUseYn();
                 }else{
-                  openOkBox(context,"삭제되었더나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
+                  openOkBox(context,"삭제되었거나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
                 }
               } catch (e) {
                 print(e);
@@ -246,24 +247,24 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           }
         }
       }catch(e) {
-        print("setOrderCancel() Exeption =>$e");
+        print("getOrderDetail() Exeption =>$e");
       }
     }).catchError((Object obj){
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
           final res = (obj as DioError).response;
-          print("setOrderCancel() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          print("getOrderDetail() Error => ${res?.statusCode} // ${res?.statusMessage}");
           break;
         default:
-          print("setOrderCancel() getOrder Default => ");
+          print("getOrderDetail() getOrder Default => ");
           break;
       }
     });
   }
 
   Future<void> showNoDetail() async {
-    await openOkBox(context,"삭제되었더나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
+    await openOkBox(context,"삭제되었거나 완료된 오더입니다.", Strings.of(context)?.get("confirm")??"Not Found", () { Navigator.of(context).pop(false);});
   }
 
   Future<void> goToStopPoint() async {
@@ -330,7 +331,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             if(_response.resultMap?["data"] != null) {
-              OrderLinkStatusModel newLinkStatusSub = OrderLinkStatusModel.fromJSON(it.response.data["data"]);
+              OrderLinkStatusSubModel newLinkStatusSub = OrderLinkStatusSubModel.fromJSON(it.response.data["data"]);
               mLinkStatusSub.value = newLinkStatusSub;
             }
           } else {
@@ -370,7 +371,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             if(_response.resultMap?["data"] != null) {
-              OrderLinkStatusModel newLinkStatusSub = OrderLinkStatusModel.fromJSON(it.response.data["data"]);
+              OrderLinkStatusSubModel newLinkStatusSub = OrderLinkStatusSubModel.fromJSON(it.response.data["data"]);
               mLinkStatusSub.value = newLinkStatusSub;
             }
           } else {
@@ -530,7 +531,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           if (_response.resultMap?["result"] == true) {
             mRpaUseYn.value = _response.resultMap?["msg"];
             logger.i("cheraf ... rpaUseYn: ${mRpaUseYn.value}");
-            //if(mData != null) await initView();
+            if(mData.value.orderId != null) await initView();
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -601,6 +602,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
+
     await DioService.dioClient(header: true).stateOrder(
         user.authorization,
         mData.value.orderId,
@@ -612,9 +614,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         mData.value.oneCharge,
         mData.value.manCharge
     ).then((it) async {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("_setOrderState() _response -> ${_response.status} // ${_response.resultMap}");
       try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("_setOrderState() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             Util.toast("오더가 접수되었습니다.");
@@ -664,7 +666,27 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             Util.toast("오더가 취소되었습니다.");
-            //await getOr
+            await getOrderDetail(mData.value.sellAllocId);
+
+            if(mLinkStatusSub != null) {
+              if(!(mLinkStatusSub.value.call24Cargo != "" && mLinkStatusSub.value.call24Cargo != null)) {
+                if(!(mLinkStatusSub.value.call24Cargo == "D")) {
+                  _cancelLink(mLinkStatusSub.value.call24Cargo,"24Cargo",false);
+                }
+              }
+
+              if(!(mLinkStatusSub.value.oneCargo != "" && mLinkStatusSub.value.oneCargo != null)) {
+                if(!(mLinkStatusSub.value.oneCargo == "D")) {
+                  _cancelLink(mLinkStatusSub.value.oneCharge,"oneCargo",false);
+                }
+              }
+
+              if(!(mLinkStatusSub.value.manCargo != "" && mLinkStatusSub.value.manCargo != null)) {
+                if(!(mLinkStatusSub.value.manCargo == "D")) {
+                  _cancelLink(mLinkStatusSub.value.manCargo,"manCargo",false);
+                }
+              }
+            }
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -741,6 +763,48 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           break;
         default:
           print("_setAllocState() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> _cancelLink(String? rpqPay, String LinkCd, bool flag) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).cancelNewLink(
+        user.authorization,
+        mData.value.orderId,
+        rpqPay,
+      "09",
+      LinkCd
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("_cancelLink() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(flag) {
+              logger.i("Cancel Check => $LinkCd");
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("_cancelLink() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("_cancelLink() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("_cancelLink() getOrder Default => ");
           break;
       }
     });
@@ -1247,7 +1311,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
-        logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
+        logger.d("setAllocReg() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             await getOrderDetail(mData.value.sellAllocId);
@@ -1259,17 +1323,17 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           }
         }
       }catch(e) {
-        print("setOrderCancel() Exeption =>$e");
+        print("setAllocReg() Exeption =>$e");
       }
     }).catchError((Object obj){
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
           final res = (obj as DioError).response;
-          print("setOrderCancel() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          print("setAllocReg() Error => ${res?.statusCode} // ${res?.statusMessage}");
           break;
         default:
-          print("setOrderCancel() getOrder Default => ");
+          print("setAllocReg() getOrder Default => ");
           break;
       }
     });
@@ -1296,8 +1360,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Future<void> setAllocState() async {
     llBottom.value = true;
     await setVisibilitySendLink(false);
+    print("읭ㅇ읭읭읭ㅇ => ${mData.value.allocState} // ${mData.value.orderState}");
     switch(mData.value.allocState) {
       case "00" :
+        // 접수
         if(mData.value.orderState == "09") {
           tvReOrder.value = true;
           await setVisibilitySendLink(false);
@@ -1450,20 +1516,21 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Future<void> initView() async {
     await setOrderState();
     await setAllocState();
+    setState(() {
+      if(mData.value.stopCount != 0) {
+        llStopPointHeader.value = true;
+        llStopPointList.value = true;
+      }else{
+        llStopPointHeader.value = false;
+        llStopPointList.value = false;
+      }
 
-    if(mData.value.stopCount != 0) {
-      llStopPointHeader.value = true;
-      llStopPointList.value = true;
-    }else{
-      llStopPointHeader.value = false;
-      llStopPointList.value = false;
-    }
-
-    if(!(mData.value.receiptYn == "N")) {
-      tvReceipt.value = true;
-    }else{
-      tvReceipt.value = false;
-    }
+      if(!(mData.value.receiptYn == "N")) {
+        tvReceipt.value = true;
+      }else{
+        tvReceipt.value = false;
+      }
+    });
   }
 
   Widget topWidget() {
@@ -1480,7 +1547,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   child: Container(
                       padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
                       child: Text(
-                        mData.value.orderStateName??"접수",
+                        mData.value.orderStateName??"접수_",
                         style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
                       )
                   )
@@ -1997,7 +2064,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   Strings.of(context)?.get("order_detail_sub_title_01")??"",
                   style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
                 ),
-                //tvSendLink.value ?
+                tvSendLink.value ?
                 InkWell(
                     onTap: () async {
                       await goToSendLink();
@@ -2013,7 +2080,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
                       ),
                     )
-                ) //: const SizedBox()
+                ) : const SizedBox()
               ],
             )
           ),
@@ -2066,8 +2133,18 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             alignment: Alignment.centerLeft,
                           child: !(mData.value.sStaff?.isEmpty == true) || !(mData.value.sTel?.isEmpty == true)?
                           InkWell(
-                            onTap: (){
-
+                            onTap: () async {
+                              if(Platform.isAndroid) {
+                                DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                AndroidDeviceInfo info = await deviceInfo.androidInfo;
+                                if (info.version.sdkInt >= 23) {
+                                  await PhoneCall.calling("${mData.value.sTel}");
+                                }else{
+                                  await launch("tel://${mData.value.sTel}");
+                                }
+                              }else{
+                                await launch("tel://${mData.value.sTel}");
+                              }
                             },
                               child: Text(
                               Util.makePhoneNumber(mData.value.sTel),
@@ -2153,8 +2230,18 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 alignment: Alignment.centerLeft,
                                 child: !(mData.value.eStaff?.isEmpty == true) || !(mData.value.eTel?.isEmpty == true)?
                                 InkWell(
-                                    onTap: (){
-
+                                    onTap: () async {
+                                      if(Platform.isAndroid) {
+                                        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                        AndroidDeviceInfo info = await deviceInfo.androidInfo;
+                                        if (info.version.sdkInt >= 23) {
+                                          await PhoneCall.calling("${mData.value.eTel}");
+                                        }else{
+                                          await launch("tel://${mData.value.eTel}");
+                                        }
+                                      }else{
+                                        await launch("tel://${mData.value.eTel}");
+                                      }
                                     },
                                     child: Text(
                                         Util.makePhoneNumber(mData.value.eTel),
@@ -2231,11 +2318,19 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     return Flex(
       direction: Axis.vertical,
       children: List.generate(1, (index) {
-        return ExpansionPanelList.radio(
+        return Container(
+            decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                      color: line,
+                      width: 5.w
+                  ),
+                )
+            ),
+          child: ExpansionPanelList.radio(
           animationDuration: const Duration(milliseconds: 500),
           expandedHeaderPadding: EdgeInsets.zero,
           elevation: 0,
-          initialOpenPanelValue: 0,
           children: [
             ExpansionPanelRadio(
               value: index,
@@ -2244,89 +2339,150 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 return Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text("경유지 정보",style: CustomStyle.CustomFont(styleFontSize16, text_color_01))
+                        Text("경유지 ${mData.value.stopCount}곳",style: CustomStyle.CustomFont(styleFontSize16, text_color_01))
                       ],
-                    ));
-              },
-              body: llStopPointList.value ? Container(
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
-                    color: Colors.white,
-                    child: Row(
-                        children : [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
-                                    child: Text(
-                                      "경유지",
-                                      style: CustomStyle.CustomFont(styleFontSize12, text_box_color_01),
-                                    )
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                                    child: Text(
-                                      mData.value.eComName??"",
-                                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                    )
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                                    child: Text(
-                                      "상차",
-                                      style: CustomStyle.CustomFont(styleFontSize14, order_state_04),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              !(mData.value.eStaff?.isEmpty == true) || !(mData.value.eTel?.isEmpty == true) ?
-                              Row(
-                                children: [
-                                  Text(
-                                    mData.value.eStaff??"",
-                                    style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                  ),
-                                  InkWell(
-                                    child: Container(
-                                      padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                                      child: Text(
-                                        Util.makePhoneNumber(mData.value.eTel),
-                                        style: CustomStyle.CustomFont(styleFontSize12, addr_type_text),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ) : const SizedBox(),
-                              !(mData.value.eAddrDetail?.isEmpty == true)?
-                              Text(
-                                mData.value.eAddr??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                              ) : const SizedBox(),
-                              !(mData.value.eAddrDetail?.isEmpty == true) ?
-                                  Text(
-                                    mData.value.eAddrDetail??"",
-                                    style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                  ) : const SizedBox()
-                            ],
-                          )
-                        ]
                     )
-                ) : const SizedBox(),
+                );
+              },
+              body: llStopPointList.value ?
+                  Container(
+                      decoration: BoxDecoration(
+                          border: Border(
+                              top: BorderSide(
+                                  color: line,
+                                  width: 1.w
+                              ),
+                          )
+                      ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    mStopList.length,
+                        (index) {
+                      return stopPointItems(index);
+                    },
+                  ))) : const SizedBox(),
               canTapOnHeader: true,
             )
           ],
           expansionCallback: (int _index, bool status) {
             isStopPointExpanded[index] = !isStopPointExpanded[index];
           },
-        );
+        ));
       }),
+    );
+  }
+
+  Widget stopPointItems(int index) {
+    return Container(
+        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+        decoration: BoxDecoration(
+          color: styleGreyCol3,
+          border: Border(bottom: BorderSide(color: line, width: 1.w)),
+        ),
+        child: Container(
+            width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                      flex: 2,
+                        child: Container(
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: text_box_color_01,width: 1.w),
+                              borderRadius: BorderRadius.all(Radius.circular(5.w))
+                            ),
+                            child: Text(
+                              "경유지 ${index + 1}",
+                              style: CustomStyle.CustomFont(styleFontSize12, text_box_color_01),
+                            )
+                        )
+                      ),
+                      Expanded(
+                        flex: 5,
+                        child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                            child: Text(
+                              mStopList.value[index].eComName??"",
+                              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                            )
+                        )
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            mStopList.value[index].stopSe == "S" ? "상차" : "하자",
+                            style: CustomStyle.CustomFont(styleFontSize14, mStopList.value[index].stopSe == "S" ? order_state_04 : order_state_09),
+                          ),
+                        )
+                      )
+                    ],
+                  ),
+                  !(mStopList.value[index].eStaff?.isEmpty == true) || !(mStopList.value[index].eTel?.isEmpty == true) ?
+                  Container(
+                    margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                    child: Row(
+                      children: [
+                        Text(
+                          mStopList.value[index].eStaff??"",
+                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            if(Platform.isAndroid) {
+                              DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                              AndroidDeviceInfo info = await deviceInfo.androidInfo;
+                              if (info.version.sdkInt >= 23) {
+                                await PhoneCall.calling("${mStopList.value[index].eTel}");
+                              }else{
+                                await launch("tel://${mStopList.value[index].eTel}");
+                              }
+                            }else{
+                              await launch("tel://${mStopList.value[index].eTel}");
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
+                            child: Text(
+                              Util.makePhoneNumber(mStopList.value[index].eTel),
+                              style: CustomStyle.CustomFont(styleFontSize12, addr_type_text),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ): const SizedBox(),
+                  !(mStopList.value[index].eAddrDetail?.isEmpty == true)?
+                  Container(
+                      margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                      child: Text(
+                      mStopList.value[index].eAddr??"",
+                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                    )
+                  ) : const SizedBox(),
+                  !(mStopList.value[index].eAddrDetail?.isEmpty == true) ?
+                  Container(
+                      margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                      child: Text(
+                      mStopList.value[index].eAddrDetail??"",
+                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                    )
+                  ): const SizedBox()
+                ],
+              )
+            )
     );
   }
 
@@ -3004,6 +3160,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                 automaticallyImplyLeading: false,
                 leading: IconButton(
                   onPressed: () async {
+                    BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
@@ -3069,7 +3226,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
           bottomNavigationBar: Obx((){
             return SizedBox(
-                height: tvOrderCancel.value || tvReOrder.value || tvAlloc.value || tvAllocCancel.value || tvAllocReg.value ? CustomStyle.getHeight(60.0.h) : CustomStyle.getHeight(0.0),
+                height: CustomStyle.getHeight(60.0.h),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,

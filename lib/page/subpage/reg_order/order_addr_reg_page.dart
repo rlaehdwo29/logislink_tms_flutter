@@ -81,9 +81,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
   }
 
   Future<void> initView() async {
-    print("ㅇㅇㅇㅇ???");
     if(widget.addr_vo != null) {
-      print("ㅇㅇㅇㅇ2222???");
       mData.value = widget.addr_vo!;
       tvReg.value = false;
       tvInput.value = false;

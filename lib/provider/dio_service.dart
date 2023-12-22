@@ -53,6 +53,7 @@ class DioService {
       logger.i("DioResponse() => ${it.response.data}");
       if(it.response.data["result"] == true) {
         var jsonString = jsonEncode(it.response.data);
+        print("Dio jsonString -> ${jsonString}");
         Map<String, dynamic> jsonData = jsonDecode(jsonString);
         print("Dio jsonData -> ${jsonData}");
         ResultModel result = ResultModel.fromJSON(jsonData);

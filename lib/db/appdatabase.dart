@@ -208,8 +208,7 @@ class AppDataBase {
   Future updateOrder(OrderModel order) async {
     final db = await orderDb;
     try {
-      final List<Map<String, Object?>>? maps = await db?.query(
-          '$orderTable', where: "$orderId = ?", whereArgs: [order.orderId]);
+      final List<Map<String, Object?>>? maps = await db?.query('$orderTable', where: "$orderId = ?", whereArgs: [order.orderId]);
       if (maps == null || maps.length <= 0) {
         var result = await db?.insert(orderTable, order.toMap());
       } else {
@@ -395,13 +394,166 @@ class AppDataBase {
     final db = await orderDb;
     try{
       for(var item in orders) {
-        //final List<Map<String, Object?>>? maps = await db?.query('$orderTable', where: "$orderId = ?", whereArgs: [item.orderId]);
-        List<Map<String, dynamic>>? maps = await db?.rawQuery("SELECT * FROM $orderTable WHERE $orderId =?",[item.orderId]);
+        var maps = await db?.query('$orderTable',where: '$orderId = ?', whereArgs: [item.orderId]);
 
-        print("뭐가 안되는거지 대체?? => ${maps?.length} // ${item.orderId}");
-
-        if (maps == null || maps.isEmpty) {
-          await db?.insert(orderTable, item.toMap());
+        if (maps?.length == 0) {
+          await db?.insert(orderTable, <String, dynamic>{
+            "$orderId": item.orderId,
+            "$reqCustId": item.reqCustId,
+            "$reqCustName": item.reqCustName,
+            "$reqDeptId": item.reqDeptId,
+            "$reqDeptName": item.reqDeptName,
+            "$reqStaff": item.reqStaff,
+            "$reqTel": item.reqTel,
+            "$reqAddr": item.reqAddr,
+            "$reqAddrDetail": item.reqAddrDetail,
+            "$custId": item.custId,
+            "$custName": item.custName,
+            "$deptId": item.deptId,
+            "$deptName": item.deptName,
+            "$inOutSctn": item.inOutSctn,
+            "$inOutSctnName": item.inOutSctnName,
+            "$truckTypeCode": item.truckTypeCode,
+            "$truckTypeName": item.truckTypeName,
+            "$sComName": item.sComName,
+            "$sSido": item.sSido,
+            "$sGungu": item.sGungu,
+            "$sDong": item.sDong,
+            "$sAddr": item.sAddr,
+            "$sAddrDetail": item.sAddrDetail,
+            "$sDate": item.sDate,
+            "$sStaff": item.sStaff,
+            "$sTel": item.sTel,
+            "$sMemo": item.sMemo,
+            "$eComName": item.eComName,
+            "$eSido": item.eSido,
+            "$eGungu": item.eGungu,
+            "$eDong": item.eDong,
+            "$eAddr": item.eAddr,
+            "$eAddrDetail": item.eAddrDetail,
+            "$eDate": item.eDate,
+            "$eStaff": item.eStaff,
+            "$eTel": item.eTel,
+            "$eMemo": item.eMemo,
+            "$sLat": item.sLat,
+            "$sLon": item.sLon,
+            "$eLat": item.eLat,
+            "$eLon": item.eLon,
+            "$goodsName": item.goodsName,
+            "$goodsWeight": item.goodsWeight,
+            "$weightUnitCode": item.weightUnitCode,
+            "$weightUnitName": item.weightUnitName,
+            "$goodsQty": item.goodsQty,
+            "$qtyUnitCode": item.qtyUnitCode,
+            "$qtyUnitName": item.qtyUnitName,
+            "$sWayCode": item.sWayCode,
+            "$sWayName": item.sWayName,
+            "$eWayCode": item.eWayCode,
+            "$eWayName": item.eWayName,
+            "$mixYn": item.mixYn,
+            "$mixSize": item.mixSize,
+            "$returnYn": item.returnYn,
+            "$carTonCode": item.carTonCode,
+            "$carTonName": item.carTonName,
+            "$carTypeCode": item.carTypeCode,
+            "$carTypeName": item.carTypeName,
+            "$chargeType": item.chargeType,
+            "$chargeTypeName": item.chargeTypeName,
+            "$distance": item.distance,
+            "$time": item.time,
+            "$reqMemo": item.reqMemo,
+            "$driverMemo": item.driverMemo,
+            "$itemCode": item.itemCode,
+            "$itemName": item.itemName,
+            "$orderState": item.orderState,
+            "$orderStateName": item.orderStateName,
+            "$regid": item.regid,
+            "$regdate": item.regdate,
+            "$stopCount": item.stopCount,
+            "$sellAllocId": item.sellAllocId,
+            "$sellCustId": item.sellCustId,
+            "$sellDeptId": item.sellDeptId,
+            "$sellStaff": item.sellStaff,
+            "$sellStaffName": item.sellStaffName,
+            "$sellStaffTel": item.sellStaffTel,
+            "$sellCustName": item.sellCustName,
+            "$sellDeptName": item.sellDeptName,
+            "$sellCharge": item.sellCharge,
+            "$sellFee": item.sellFee,
+            "$sellWeight": item.sellWeight,
+            "$sellWayPointMemo": item.sellWayPointMemo,
+            "$sellWayPointCharge": item.sellWayPointCharge,
+            "$sellStayMemo": item.sellStayMemo,
+            "$sellStayCharge": item.sellStayCharge,
+            "$sellHandWorkMemo": item.sellHandWorkMemo,
+            "$sellHandWorkCharge": item.sellHandWorkCharge,
+            "$sellRoundMemo": item.sellRoundMemo,
+            "$sellRoundCharge": item.sellRoundCharge,
+            "$sellOtherAddMemo": item.sellOtherAddMemo,
+            "$sellOtherAddCharge": item.sellOtherAddCharge,
+            "$custPayType": item.custPayType,
+            "$allocId": item.allocId,
+            "$allocState": item.allocState,
+            "$allocStateName": item.allocStateName,
+            "$buyCustId": item.buyCustId,
+            "$buyDeptId": item.buyDeptId,
+            "$buyCustName": item.buyCustName,
+            "$buyDeptName": item.buyDeptName,
+            "$buyStaff": item.buyStaff,
+            "$buyStaffName": item.buyStaffName,
+            "$buyStaffTel": item.buyStaffTel,
+            "$buyCharge": item.buyCharge,
+            "$buyFee": item.buyFee,
+            "$allocDate": item.allocDate,
+            "$driverState": item.driverState,
+            "$vehicId": item.vehicId,
+            "$driverId": item.driverId,
+            "$carNum": item.carNum,
+            "$driverName": item.driverName,
+            "$driverTel": item.driverTel,
+            "$driverStateName": item.driverStateName,
+            "$carMngName": item.carMngName,
+            "$carMngMemo": item.carMngMemo,
+            "$receiptYn": item.receiptYn,
+            "$receiptPath": item.receiptPath,
+            "$receiptDate": item.receiptDate,
+            "$charge": item.charge,
+            "$startDate": item.startDate,
+            "$finishDate": item.finishDate,
+            "$enterDate": item.enterDate,
+            "$payDate": item.payDate,
+            "$linkCode": item.linkCode,
+            "$linkCodeName": item.linkCodeName,
+            "$linkType": item.linkType,
+            "$buyLinkYn": item.buyLinkYn,
+            "$linkName": item.linkName,
+            "$wayPointMemo": item.wayPointMemo,
+            "$wayPointCharge": item.wayPointCharge,
+            "$stayMemo": item.stayMemo,
+            "$stayCharge": item.stayCharge,
+            "$handWorkMemo": item.handWorkMemo,
+            "$handWorkCharge": item.handWorkCharge,
+            "$roundMemo": item.roundMemo,
+            "$roundCharge": item.roundCharge,
+            "$otherAddMemo": item.otherAddMemo,
+            "$otherAddCharge": item.otherAddCharge,
+            "$unitPrice": item.unitPrice,
+            "$unitPriceType": item.unitPriceType,
+            "$unitPriceTypeName": item.unitPriceTypeName,
+            "$custMngName": item.custMngName,
+            "$custMngMemo": item.custMngMemo,
+            "$payType": item.payType,
+            "$reqPayYN": item.reqPayYN,
+            "$reqPayDate": item.reqPayDate,
+            "$talkYn": item.talkYn,
+            "$orderStopList": jsonEncode(item.orderStopList?.map((e) => e.toJson()).toList()),
+            "$reqStaffName":item.reqStaffName,
+            "$call24Cargo": item.call24Cargo,
+            "$manCargo": item.manCargo,
+            "$oneCargo": item.oneCargo,
+            "$call24Charge": item.call24Charge,
+            "$manCharge": item.manCharge,
+            "$oneCharge": item.oneCharge});
         } else {
           await db?.update('$orderTable', <String, dynamic>{
             "$orderId": item.orderId,
@@ -552,7 +704,7 @@ class AppDataBase {
             "$reqPayYN": item.reqPayYN,
             "$reqPayDate": item.reqPayDate,
             "$talkYn": item.talkYn,
-            "$orderStopList": jsonEncode(item.orderStopList),
+            "$orderStopList": jsonEncode(item.orderStopList?.map((e) => e.toJson()).toList()),
             "$reqStaffName":item.reqStaffName,
             "$call24Cargo": item.call24Cargo,
             "$manCargo": item.manCargo,
@@ -565,7 +717,7 @@ class AppDataBase {
       }
     }catch(e){
       print("insertAll() Exepction => $e ");
-      openOkBox(context,"insertAll() Exepction => $e ",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+      //openOkBox(context,"insertAll() Exepction => $e ",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
     }
   }
 
@@ -573,10 +725,10 @@ class AppDataBase {
     final db = await orderDb;
     List<OrderModel> orderList = List.empty(growable: true);
     List<Map<String, Object?>>? result = await db?.rawQuery("SELECT * FROM $orderTable");
-    //final List<Map<String, Object?>>? result = await db?.query('$orderTable');
+
     try {
-      if (result != null && result.length > 0) {
-        List<OrderModel> itemsList = result.map((i) => OrderModel.fromJSON(i)).toList();
+      if (result?.length != 0) {
+        List<OrderModel> itemsList = result!.map((i) => OrderModel.fromJSON(i)).toList();
         orderList.addAll(itemsList);
       }else{
         orderList = List.empty(growable: true);

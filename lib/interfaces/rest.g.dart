@@ -752,7 +752,7 @@ class _Rest implements Rest {
     )
             .compose(
               _dio.options,
-              'cust/order/cancel',
+              '/cust/order/cancel',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -799,7 +799,7 @@ class _Rest implements Rest {
     )
             .compose(
               _dio.options,
-              'cust/order/state',
+              '/cust/order/state',
               queryParameters: queryParameters,
               data: _data,
             )

@@ -1,3 +1,4 @@
+import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -87,7 +88,6 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
   }
 
   Future<bool> validation() async {
-    print("응애옹애 장군 =>${etPasswordController.text.trim()} // ${etPasswordConfirmController.text.trim()}");
     if(etPasswordController.text.trim().isEmpty == true) {
       Util.toast(Strings.of(context)?.get("my_page_password_hint")??"새 비밀번호를 입력해주세요._");
       return false;
@@ -427,7 +427,10 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
           if(widget.onCallback != null) {
             widget.onCallback!(true);
           }
-          return true;
+          return Future((){
+            FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
+            return true;
+          });
         },
         child: Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
