@@ -22,9 +22,9 @@ class SP extends GetxController {
     m_Pref ??= await SharedPreferences.getInstance();
   }
 
-  static void clear() {
-    open();
-    m_Pref?.clear();
+  static Future<void> clear() async {
+    await open();
+    await m_Pref?.clear();
   }
 
   static Future<void> remove(String key) async {

@@ -363,7 +363,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
                                 child: TextField(
                                   style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
                                   textAlign: TextAlign.start,
-                                  keyboardType: TextInputType.name,
+                                  keyboardType: TextInputType.text,
                                   onChanged: (value){
                                     userID.value = value;
                                   },

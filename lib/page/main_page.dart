@@ -269,6 +269,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
+          await SP.clear();
           await logout();
         }
     );
