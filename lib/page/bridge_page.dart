@@ -17,6 +17,7 @@ import 'package:logislink_tms_flutter/page/permission_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
@@ -74,32 +75,50 @@ class _BridgePageState extends State<BridgePage> {
 
   Future<void> checkVersion() async {
     Logger logger = Logger();
-    await DioService.dioClient(header: true).getVersion("A").then((it) async {
+    var type = "A";
+    if(Platform.isIOS){
+      type = "AI";
+    }
+    await DioService.dioClient(header: true).getVersion(type).then((it) async {
       ReturnMap _response = DioService.dioResponse(it);
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
       logger.d("checkVersion() _response -> ${_response.status} // ${_response.resultMap}");
       try {
         if (_response.status == "200") {
           var list = _response.resultMap?["data"] as List;
 
           if (list != null && list.isNotEmpty) {
-              VersionModel? appVersion = VersionModel.fromJSON(list[0]);
-              VersionModel? codeVersion = VersionModel.fromJSON(list[1]);
-              String? shareVersion = await SP.get(Const.CD_VERSION);
-              if (shareVersion != codeVersion.versionCode) {
-                await SP.putString(Const.CD_VERSION, codeVersion.versionCode ?? "");
-                await GetCodeTask();
-              }
-              var nowVersion = await Util.getVersionName();
-              if (appVersion.versionCode == nowVersion) {
-                await checkLogin();
-              } else {
+            VersionModel? codeVersion = VersionModel.fromJSON(list[0]);
+            VersionModel? appVersion = VersionModel.fromJSON(list[1]);
+            String? shareVersion = await SP.get(Const.CD_VERSION);
+            var server_version_arr = appVersion.versionCode?.split('.');
+            String server_version = server_version_arr!.elementAt(0) + "." + server_version_arr!.elementAt(1) + server_version_arr!.elementAt(2);
+            var app_version_arr = packageInfo.version?.split('.');
+            String app_version = app_version_arr!.elementAt(0) + "." + app_version_arr!.elementAt(1) + app_version_arr!.elementAt(2);
+            if (appVersion.updateCode == "1") {
+              if(double.parse(app_version) < double.parse(server_version)){
                 Util.toast("새로운 앱 버전이 있습니다.");
                 if (Platform.isAndroid) {
                   launch(Const.ANDROID_STORE);
                 } else if (Platform.isIOS) {
-                  //launch(Const.IOS_STORE);
+                  launch(Const.IOS_STORE);
                 }
+              }else{
+                if (shareVersion != codeVersion.versionCode) {
+                  await SP.putString(
+                      Const.CD_VERSION, codeVersion.versionCode ?? "");
+                  await GetCodeTask();
+                }
+                await checkLogin();
               }
+            } else{
+              if (shareVersion != codeVersion.versionCode) {
+                await SP.putString(
+                    Const.CD_VERSION, codeVersion.versionCode ?? "");
+                await GetCodeTask();
+              }
+              await checkLogin();
+            }
           }
         }else{
           openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});

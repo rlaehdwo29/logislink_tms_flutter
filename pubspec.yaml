@@ -63,7 +63,6 @@ dependencies:
   flutter_native_splash: ^2.3.1
   url_launcher: ^6.2.1
   path_provider: ^2.0.15
-  app_settings: ^5.0.0
   fbroadcast: ^2.0.0
   flutter_local_notifications: ^9.5.3+1
   flutter_inappwebview: ^5.8.0
