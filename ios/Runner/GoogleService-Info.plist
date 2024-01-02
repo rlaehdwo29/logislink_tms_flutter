@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>843222466718-3kq6577vb9l8tq9sme6cbedj8ab4hpqj.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCJLsG1os71SDt_mWBogWEIoaRN5bDgkew</string>
+	<key>GCM_SENDER_ID</key>
+	<string>843222466718</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.logislink.driver</string>
+	<key>PROJECT_ID</key>
+	<string>logislinkflutter-9f180</string>
+	<key>STORAGE_BUCKET</key>
+	<string>logislinkflutter-9f180.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:843222466718:ios:b00be4f2cb5d8a3ce9bb8f</string>
+</dict>
+</plist>

@@ -263,7 +263,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Future<void> goToExit() async {
     openCommonConfirmBox(
         context,
-        "퇴근하시겠습니까?",
+        "로그아웃 하시겠습니까?",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
@@ -1059,12 +1059,13 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   backgroundColor: text_color_03,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
-                        padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                        //margin: EdgeInsets.only(left: CustomStyle.getWidth(40.h)),
+                        height: CustomStyle.getHeight(25.h),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Icon(Icons.calendar_today_rounded,size: 20,color: styleWhiteCol,),
+                            Icon(Icons.calendar_today_rounded,size: 20.h,color: styleWhiteCol,),
                             CustomStyle.sizedBoxWidth(5.0),
                             Text("날짜 설정",style: CustomStyle.CustomFont(styleFontSize14, styleWhiteCol))
                           ],
@@ -1096,13 +1097,15 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     child: Text(
                                       mCalendarStartDate.value == null?"-":"${mCalendarStartDate.value?.year}년 ${mCalendarStartDate.value?.month}월 ${mCalendarStartDate.value?.day}일",
                                       textAlign: TextAlign.center,
+                                      style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
                                     )
                                 ),
-                                const Expanded(
+                                Expanded(
                                     flex: 1,
                                     child: Text(
                                       "~",
                                       textAlign: TextAlign.center,
+                                      style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
                                     )
                                 ),
                                 Expanded(
@@ -1110,6 +1113,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     child: Text(
                                       mCalendarEndDate.value == null?"-":"${mCalendarEndDate.value?.year}년 ${mCalendarEndDate.value?.month}월 ${mCalendarEndDate.value?.day}일",
                                       textAlign: TextAlign.center,
+                                      style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
                                     )
                                 )
                               ],
@@ -1149,7 +1153,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                       vertical: CustomStyle.getHeight(5.h),
                       horizontal: CustomStyle.getWidth(10.w)),
                   decoration: CustomStyle.customBoxDeco(sub_color,
-                      radius: 5.0, border_color: Colors.white),
+                      radius: 5.w, border_color: Colors.white),
                   child: Text(
                     categoryOrderState.value,
                     style:
@@ -1193,10 +1197,11 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               )
               ),
               IconButton(
+                alignment: Alignment.center,
                   onPressed: () async {
                     await showSearchDialog();
                   },
-                  icon: Icon(Icons.search,size: 28.w,color: text_box_color_02)
+                  icon: Icon(Icons.search,size: 32.h,color: text_box_color_02)
               )
             ],
           )
@@ -1251,7 +1256,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     alignment: Alignment.center,
                     child: Text(
                     "오더 검색",
-                    style: CustomStyle.CustomFont(styleFontSize18, Colors.white),
+                    style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
                                 textAlign: TextAlign.center,
                               )),
                               Positioned(
@@ -1266,7 +1271,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                             ],
                           )),
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30.h),horizontal: CustomStyle.getWidth(15.w)),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30),horizontal: CustomStyle.getWidth(15)),
                         child: Row(
                            children: [
                              Expanded(
@@ -1276,7 +1281,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                  items: dropDownList?.map((value) {
                                    return DropdownMenuItem(
                                      value: value,
-                                     child: Text("${value.codeName}"),
+                                     child: Text(
+                                      "${value.codeName}",
+                                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01)
+                                      ),
                                    );
                                  }).toList(),
                                  onChanged: (value) {
@@ -1600,7 +1608,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
               icon: Icon(
                 Icons.notifications,
-                size: 24.0.w,
+                size: 24.0.h,
                 color: Colors.white,
               )),
         ],
@@ -1627,7 +1635,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         ]);
       })),
       bottomNavigationBar: SizedBox(
-          height: CustomStyle.getHeight(60.0.h),
+          height: CustomStyle.getHeight(60.h),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,

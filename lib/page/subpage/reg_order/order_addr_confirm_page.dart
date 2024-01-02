@@ -274,7 +274,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-                    height: CustomStyle.getHeight(250.h),
+                    height: CustomStyle.getHeight(200.h),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,

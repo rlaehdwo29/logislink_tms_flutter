@@ -7,7 +7,7 @@ class Const {
 
  //스토어 주소
  static final ANDROID_STORE = "https://play.google.com/store/apps/details?id=com.logislink.tms";
- static final IOS_STORE = "https://apps.apple.com/app/id6467700597";
+ static final IOS_STORE = "https://apps.apple.com/app/id6474982649";
 
 
  static final int CONNECT_TIMEOUT = 15;
