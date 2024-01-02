@@ -274,7 +274,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-                    height: CustomStyle.getHeight(250.h),
+                    height: CustomStyle.getHeight(200.h),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,
@@ -360,8 +360,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
               child: AppBar(
                 title: Text(
                       Strings.of(context)?.get("order_addr_confirm_title")??"Not Found",
-                      style: CustomStyle.appBarTitleFont(
-                          styleFontSize16, styleWhiteCol)
+                      style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
                   ),
                 centerTitle: true,
                 automaticallyImplyLeading: false,
@@ -404,13 +403,12 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                           child: Container(
                               height: CustomStyle.getHeight(60.0.h),
                               alignment: Alignment.center,
-                              decoration: BoxDecoration(color: main_color),
+                              decoration: const BoxDecoration(color: main_color),
                               child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(Icons.check,
-                                        size: 20, color: styleWhiteCol),
+                                    const Icon(Icons.check, size: 20, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,
@@ -419,7 +417,11 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                                       style: CustomStyle.CustomFont(
                                           styleFontSize16, styleWhiteCol),
                                     ),
-                                  ])))),
+                                  ]
+                              )
+                          )
+                      )
+                  ),
                 ],
               )),
         )

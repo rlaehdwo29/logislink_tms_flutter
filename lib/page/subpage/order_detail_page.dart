@@ -182,7 +182,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Future<void> goToLocationControl() async {
-    //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo:mData.value)));
+    await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo:mData.value)));
   }
 
   bool equalsCharge(String? text) {

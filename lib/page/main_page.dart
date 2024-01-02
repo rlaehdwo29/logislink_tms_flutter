@@ -263,7 +263,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Future<void> goToExit() async {
     openCommonConfirmBox(
         context,
-        "퇴근하시겠습니까?",
+        "로그아웃 하시겠습니까?",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
