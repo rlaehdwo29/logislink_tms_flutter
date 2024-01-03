@@ -148,7 +148,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                                               ),
                                               item == typeValue
                                                   ? Icon(Icons.check_rounded,
-                                                      size: 28, color: sub_color)
+                                                      size: 28.h, color: sub_color)
                                                   : const SizedBox()
                                             ])));
                               }
@@ -284,7 +284,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             child: Text(
               Strings.of(context)?.get("setting_work")??"업무 초기값 설정_",
               style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
@@ -296,7 +296,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             await goToRequest();
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
                 color: styleWhiteCol,
                 border: Border(
@@ -316,7 +316,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -328,7 +328,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             await goToSAddr();
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
                 color: styleWhiteCol,
                 border: Border(
@@ -348,7 +348,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -360,7 +360,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             await goToCargo();
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
                 color: styleWhiteCol,
                 border: Border(
@@ -380,7 +380,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -392,7 +392,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             await goToCharge();
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
                 color: styleWhiteCol,
                 border: Border(
@@ -412,7 +412,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -424,7 +424,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             await goToTrans();
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
                 color: styleWhiteCol,
                 border: Border(
@@ -444,14 +444,14 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(10.0),
+          padding: EdgeInsets.all(10.sp),
           child: Text(
             Strings.of(context)?.get("setting_app")??"Not Found",
             style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
@@ -463,7 +463,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             openSelectDialog(Const.first_screen,"S");
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
               color: styleWhiteCol,
               border: Border(
@@ -489,7 +489,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                     ),
                     Container(
                       padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
-                      child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                      child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                     )
                   ],
                 )
@@ -499,7 +499,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
         ),
         // 화면 꺼짐 방지
         Container(
-            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
+            padding: EdgeInsets.all(10.sp),
             decoration: const BoxDecoration(
                 color: styleWhiteCol,
                 border: Border(
@@ -542,7 +542,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             child: Text(
               Strings.of(context)?.get("setting_notice")??"Not Found",
               style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
@@ -550,7 +550,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
         ),
         // 푸시메시지 수신
         Container(
-          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
+          padding: EdgeInsets.all(10.sp),
           decoration: const BoxDecoration(
               color: styleWhiteCol,
               border: Border(
@@ -584,7 +584,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
         ),
         // 알림톡 수신
         Container(
-          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
+          padding: EdgeInsets.all(10.sp),
           decoration: const BoxDecoration(
               color: styleWhiteCol,
               border: Border(
@@ -626,7 +626,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             child: Text(
               Strings.of(context)?.get("setting_terms")??"Not Found",
               style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
@@ -639,10 +639,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 builder: (BuildContext context) => WebViewPage(Strings.of(context)?.get("setting_agree")??"Not Found", URL_AGREE_TERMS)));
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
+            padding: EdgeInsets.all(10.sp),
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -659,7 +659,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -672,10 +672,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 builder: (BuildContext context) => WebViewPage(Strings.of(context)?.get("setting_privacy")??"Not Found", URL_PRIVACY_TERMS)));
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
+            padding: EdgeInsets.all(10.sp),
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -692,7 +692,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -705,10 +705,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 builder: (BuildContext context) => WebViewPage(Strings.of(context)?.get("setting_privateInfo")??"Not Found", URL_PRIVATE_INFO_TERMS)));
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
+            padding: EdgeInsets.all(10.sp),
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -725,7 +725,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -738,10 +738,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 builder: (BuildContext context) => WebViewPage(Strings.of(context)?.get("setting_dataSecure")??"Not Found", URL_DATA_SECURE_TERMS)));
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
+            padding: EdgeInsets.all(10.sp),
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -758,7 +758,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -771,10 +771,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 builder: (BuildContext context) => WebViewPage(Strings.of(context)?.get("setting_marketing")??"Not Found", URL_MARKETING_TERMS)));
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
+            padding: EdgeInsets.all(10.sp),
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -791,7 +791,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -807,7 +807,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(10.sp),
             child: Text(
               Strings.of(context)?.get("setting_etc")??"Not Found",
               style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
@@ -822,10 +822,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             }
           },
           child: Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
+            padding: EdgeInsets.all(10.sp),
+            decoration: const BoxDecoration(
                 color: styleWhiteCol,
-                border: const Border(
+                border: Border(
                     bottom: BorderSide(
                         width: 1.0,
                         color: Color(0xffACACAC)
@@ -842,7 +842,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
-                    child: Icon(Icons.keyboard_arrow_right,size: 24.w,color: const Color(0xffACACAC))
+                    child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],
             ),
@@ -864,23 +864,25 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
         },
         child: Scaffold(
       backgroundColor: const Color(0xffececec),
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-          child: AppBar(
+      appBar: AppBar(
             centerTitle: true,
-            title: Text(
+            title: Center(
+              child: Text(
                 Strings.of(context)?.get("drawer_menu_setting")??"Not Found",
                 style: CustomStyle.appBarTitleFont(
-                    styleFontSize16, styleWhiteCol)),
+                    styleFontSize16, styleWhiteCol)
+                )
+            ),
+            toolbarHeight: 50.h,
             leading: IconButton(
               onPressed: () {
                 FBroad.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                 Navigator.of(context).pop();
               },
               color: styleWhiteCol,
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
             ),
-          )),
+          ),
         body: SafeArea(
           child: Obx(() {
             return SingleChildScrollView(

@@ -5,6 +5,7 @@ import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import '../../common/config_url.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class WebViewPage extends StatefulWidget {
 
@@ -59,22 +60,24 @@ class _WebViewPageState extends State<WebViewPage> {
     pr = Util.networkProgress(context);
     return Scaffold(
         backgroundColor: styleWhiteCol,
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-            child: AppBar(
+        appBar: AppBar(
               centerTitle: true,
-              title: Text(
+              title: Center(
+                child: Text(
                   widget.title,
                   style: CustomStyle.appBarTitleFont(
-                      styleFontSize16, styleWhiteCol)),
+                      styleFontSize16, styleWhiteCol)
+                )
+              ),
+              toolbarHeight: 50.h,
               leading: IconButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
               ),
-            )),
+            ),
         body:  SafeArea(
             child: WillPopScope(
                 onWillPop: () => _goBack(context),

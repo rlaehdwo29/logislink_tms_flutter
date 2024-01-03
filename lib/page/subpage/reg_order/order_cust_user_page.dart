@@ -63,8 +63,8 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
                   borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
               ),
               suffixIcon: GestureDetector(
-                child: const Icon(
-                  Icons.search, size: 24, color: Colors.black,
+                child: Icon(
+                  Icons.search, size: 24.h, color: Colors.black,
                 ),
                 onTap: (){
 
@@ -220,13 +220,14 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("order_cust_user_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -234,10 +235,9 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SizedBox(

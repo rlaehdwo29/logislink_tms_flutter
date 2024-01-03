@@ -171,8 +171,10 @@ Future<void> _handleTabSelection() async {
 Widget calendarWidget(String? code) {
   var mCal = Util.getDateCalToStr(focusDate.value, "yyyy-MM-dd");
   return Container(
-    color: styleWhiteCol,
+    alignment: Alignment.center,
     width: MediaQuery.of(context).size.width,
+    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+    color: styleWhiteCol,
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -181,21 +183,24 @@ Widget calendarWidget(String? code) {
             flex: 1,
             child: IconButton(
                 onPressed: (){backMonth(code);},
-                icon: Icon(Icons.keyboard_arrow_left_outlined,size: 32.w,color: text_color_01)
+                alignment: Alignment.center,
+                icon: Icon(Icons.keyboard_arrow_left_outlined,size: 26.h,color: text_color_01)
             )
         ),
         Expanded(
             flex: 1,
             child: Text(
                 "${mCal.split("-")[0]}년 ${mCal.split("-")[1]}월",
-                style: CustomStyle.CustomFont(styleFontSize14, Colors.black)
+                style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                textAlign: TextAlign.center,
             )
         ),
         Expanded(
             flex: 1,
             child: IconButton(
                 onPressed: (){nextMonth(code);},
-                icon: Icon(Icons.keyboard_arrow_right_outlined,size: 32.w,color: text_color_01)
+                alignment: Alignment.center,
+                icon: Icon(Icons.keyboard_arrow_right_outlined,size: 26.h,color: text_color_01)
             )
         )
       ],
@@ -410,7 +415,14 @@ Widget tabBarValueWidget(String? tabValue) {
 
   Widget deptSelectWidget() {
   return Container(
-    padding: EdgeInsets.all(5.w),
+    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(5.w)),
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(
+          color: line, width: 1.w
+        )
+      )
+    ),
     child: Row(
       children: [
         InkWell(
@@ -422,7 +434,7 @@ Widget tabBarValueWidget(String? tabValue) {
                   color: sub_color,
                   borderRadius: BorderRadius.circular(3.w)
               ),
-              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(30.w)),
+              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(15.w)),
               child: Text(
                 tvDept.value,
                 style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -444,7 +456,7 @@ Widget tabBarValueWidget(String? tabValue) {
                   color: sub_color,
                   borderRadius: BorderRadius.circular(3.w)
               ),
-              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(30.w)),
+              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(15.w)),
               child: Text(
                 tvDeptUser.value,
                 style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -970,9 +982,10 @@ Widget tabBarValueWidget(String? tabValue) {
 Widget orderFragment(String? code) {
   return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
     children: [
       calendarWidget(code),
-      CustomStyle.getDivider2(),
       deptSelectWidget(),
       orderStateWidget(),
       kpiWidget()
@@ -1444,6 +1457,9 @@ Widget customTabBarWidget() {
               alignment: Alignment.center,
               child: Text(
                       Strings.of(context)?.get("monitor_value_01")??"Not Found",
+                      style: TextStyle(
+                  fontSize: styleFontSize14,
+                )
                     ),
           ),
           Container(
@@ -1451,6 +1467,9 @@ Widget customTabBarWidget() {
               alignment: Alignment.center,
               child: Text(
                 Strings.of(context)?.get("monitor_value_02")??"Not Found",
+                style: TextStyle(
+                  fontSize: styleFontSize14,
+                )
               ),
           ),
           Container(
@@ -1458,6 +1477,9 @@ Widget customTabBarWidget() {
               alignment: Alignment.center,
               child: Text(
                 Strings.of(context)?.get("monitor_value_03")??"Not Found",
+                style: TextStyle(
+                  fontSize: styleFontSize14,
+                )
               ),
           ),
         ],
@@ -1483,13 +1505,14 @@ Widget build(BuildContext context) {
       } ,
       child: Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(CustomStyle.getHeight(60.0)),
-          child: AppBar(
+      appBar: AppBar(
               centerTitle: true,
-              title: Text(
+              toolbarHeight: 50.h,
+              title: Center(
+                child: Text(
                   Strings.of(context)?.get("monitor_title")??"Not Found",
                   style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
+                )
               ),
               leading: IconButton(
                 onPressed: () async {
@@ -1497,10 +1520,9 @@ Widget build(BuildContext context) {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.close,size: 28,color: styleWhiteCol),
+                icon: Icon(Icons.close,size: 24.h,color: styleWhiteCol),
               )
-          )
-      ),
+          ),
       body: SafeArea(
           child: Obx(() {
           return Column(

@@ -80,7 +80,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                   counterText: '',
                   hintText: Strings.of(context)?.get("car_search_hint")??"Not Found",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical:CustomStyle.getHeight(15.0) ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -91,8 +91,8 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
                   suffixIcon: GestureDetector(
-                    child: const Icon(
-                      Icons.search, size: 24, color: Colors.black,
+                    child: Icon(
+                      Icons.search, size: 24.h, color: Colors.black,
                     ),
                     onTap: (){
 
@@ -128,7 +128,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                     CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
                   Icon(Icons.keyboard_arrow_right,
-                      size: 24.w, color: text_color_03)
+                      size: 24.h, color: text_color_03)
                 ])));
   }
 
@@ -327,7 +327,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                       decoration: etCarNumController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -344,9 +344,9 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                             etCarNumController.clear();
                                             mData.value.carNum = "";
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
@@ -410,7 +410,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                                     decoration: etDriverNameController.text.isNotEmpty
                                                         ? InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.0)),
+                                                      
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -427,9 +427,9 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                                           etDriverNameController.clear();
                                                           mData.value.driverName = "";
                                                         },
-                                                        icon: const Icon(
+                                                        icon: Icon(
                                                           Icons.clear,
-                                                          size: 18,
+                                                          size: 18.h,
                                                           color: Colors.black,
                                                         ),
                                                       ),
@@ -492,7 +492,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                                     decoration: etTelController.text.isNotEmpty
                                                         ? InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -509,9 +509,9 @@ class _CarSearchPageState extends State<CarSearchPage> {
                                                           etTelController.clear();
                                                           mData.value.mobile = "";
                                                         },
-                                                        icon: const Icon(
+                                                        icon: Icon(
                                                           Icons.clear,
-                                                          size: 18,
+                                                          size: 18.h,
                                                           color: Colors.black,
                                                         ),
                                                       ),
@@ -773,13 +773,14 @@ class _CarSearchPageState extends State<CarSearchPage> {
         child: Scaffold(
             resizeToAvoidBottomInset: false,
             backgroundColor: sub_color,
-            appBar:PreferredSize(
-                preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-                child: AppBar(
-                  title: Text(
+            appBar: AppBar(
+                  title: Center(
+                    child: Text(
                       Strings.of(context)?.get("car_search_title")??"Not Found",
                       style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                    )
                   ),
+                  toolbarHeight: 50.h,
                   centerTitle: true,
                   automaticallyImplyLeading: false,
                   leading: IconButton(
@@ -787,10 +788,9 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       Navigator.of(context).pop({'code':100});
                     },
                     color: styleWhiteCol,
-                    icon: const Icon(Icons.arrow_back),
+                    icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
                   ),
-                )
-            ),
+                ),
             body: SafeArea(
                 child: Obx((){
                   return SizedBox(

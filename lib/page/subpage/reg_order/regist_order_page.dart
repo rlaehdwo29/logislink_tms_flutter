@@ -1073,13 +1073,14 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         } ,
         child: Scaffold(
       backgroundColor: sub_color,
-      appBar:PreferredSize(
-          preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-          child: AppBar(
-            title: Text(
+      appBar: AppBar(
+            title: Center(
+              child: Text(
                 Strings.of(context)?.get("order_reg_title")??"Not Found",
                 style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+              )
             ),
+            toolbarHeight: 50.h,
             centerTitle: true,
             automaticallyImplyLeading: false,
             leading: IconButton(
@@ -1090,10 +1091,9 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                 }
               },
               color: styleWhiteCol,
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
             ),
-          )
-      ),
+          ),
       body: SafeArea(
           child: Obx((){
             return Container(
@@ -1133,7 +1133,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.app_registration_rounded,
-                                    size: 20, color: styleWhiteCol),
+                                    size: 20.h, color: styleWhiteCol),
                                 CustomStyle.sizedBoxWidth(5.0.w),
                                 Text(
                                   textAlign: TextAlign.center,

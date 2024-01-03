@@ -504,7 +504,7 @@ Future<void> getCustUser() async {
                                 Expanded(
                                     flex: 4,
                                     child: Container(
-                                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                                         child: Text(
                                           "담당자 지정",
                                           style: CustomStyle.CustomFont(styleFontSize12, text_color_04),
@@ -759,7 +759,7 @@ Future<void> getCustUser() async {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_request_info_reg_memo_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -876,13 +876,14 @@ Future<void> getCustUser() async {
         child: Scaffold(
           backgroundColor: sub_color,
             resizeToAvoidBottomInset:false,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("order_request_info_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -890,10 +891,9 @@ Future<void> getCustUser() async {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SizedBox(
@@ -945,7 +945,7 @@ Future<void> getCustUser() async {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.check,
-                                        size: 20, color: styleWhiteCol),
+                                        size: 20.h, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,
@@ -974,7 +974,7 @@ Future<void> getCustUser() async {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.refresh, size: 20, color: styleWhiteCol),
+                                    Icon(Icons.refresh, size: 16.h, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,
@@ -1013,7 +1013,7 @@ Future<void> getCustUser() async {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.save_alt, size: 20, color: styleWhiteCol),
+                                    Icon(Icons.save_alt, size: 16.h, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,

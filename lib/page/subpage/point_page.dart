@@ -111,22 +111,24 @@ class _PointPageState extends State<PointPage> {
         },
         child: Scaffold(
             backgroundColor: Theme.of(context).backgroundColor,
-            appBar: PreferredSize(
-                preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-                child: AppBar(
+            appBar: AppBar(
                   centerTitle: true,
-                  title: Text("포인트 조회",
+                  title: Center(
+                    child: Text("포인트 조회",
                       style: CustomStyle.appBarTitleFont(
-                          styleFontSize18, styleWhiteCol)),
+                          styleFontSize18, styleWhiteCol)
+                        )
+                  ),
+                  toolbarHeight: 50.h,
                   leading: IconButton(
                     onPressed: () {
                       FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                       Navigator.of(context).pop();
                     },
                     color: styleWhiteCol,
-                    icon: const Icon(Icons.arrow_back),
+                    icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
                   ),
-                )),
+                ),
             body: SafeArea(
                 child: Container(
                     //width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,

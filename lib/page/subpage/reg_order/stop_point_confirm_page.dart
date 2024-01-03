@@ -280,9 +280,9 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                               onPressed: () {
                                 staffController.clear();
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                size: 18,
+                                size: 18.h,
                                 color: Colors.black,
                               ),
                             ),
@@ -348,9 +348,9 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                               onPressed: () {
                                 staffTelController.clear();
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                size: 18,
+                                size: 18.h,
                                 color: Colors.black,
                               ),
                             ),
@@ -415,9 +415,9 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                               onPressed: () {
                                 cargoInfoController.clear();
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.clear,
-                                size: 18,
+                                size: 18.h,
                                 color: Colors.black,
                               ),
                             ),
@@ -508,9 +508,9 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                                           onPressed: () {
                                             goodWeightController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
@@ -644,9 +644,9 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                                                   onPressed: () {
                                                     goodQtyController.clear();
                                                   },
-                                                  icon: const Icon(
+                                                  icon: Icon(
                                                     Icons.clear,
-                                                    size: 18,
+                                                    size: 18.h,
                                                     color: Colors.black,
                                                   ),
                                                 ),
@@ -743,16 +743,17 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
+          appBar: AppBar(
                 title: Obx((){
-                  return Text(
+                  return Center(
+                    child: Text(
                     mTitle.value,
                     style: CustomStyle.appBarTitleFont(
                         styleFontSize16, styleWhiteCol)
+                    )
                   );
                 }),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -760,10 +761,9 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon:  Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SizedBox(
@@ -800,7 +800,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.check, size: 20, color: styleWhiteCol),
+                                    Icon(Icons.check, size: 20.h, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,

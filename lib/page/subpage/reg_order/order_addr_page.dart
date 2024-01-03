@@ -181,7 +181,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                   counterText: '',
                   hintText: Strings.of(context)?.get("search_info")??"Not Found",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical:CustomStyle.getHeight(15.0) ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -192,8 +192,8 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
                   suffixIcon: GestureDetector(
-                    child: const Icon(
-                      Icons.search, size: 24, color: Colors.black,
+                    child: Icon(
+                      Icons.search, size: 24.h, color: Colors.black,
                     ),
                     onTap: (){
 
@@ -214,7 +214,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
         child: Container(
             padding: EdgeInsets.symmetric(
                 vertical: CustomStyle.getHeight(5.h),
-                horizontal: CustomStyle.getWidth(15.w)),
+                horizontal: CustomStyle.getWidth(5.w)),
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
@@ -229,7 +229,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                         CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
                   Icon(Icons.keyboard_arrow_right,
-                      size: 24.w, color: text_color_03)
+                      size: 24.h, color: text_color_03)
                 ])));
   }
 
@@ -432,9 +432,9 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: CustomStyle.getHeight(10.h),
-                          horizontal: CustomStyle.getWidth(20.w)),
+                      margin: EdgeInsets.symmetric(
+                          vertical: CustomStyle.getHeight(5.h),
+                          horizontal: CustomStyle.getWidth(10.w)),
                       height: 60.h,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,16 +493,17 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
+          appBar: AppBar(
                 title: Obx(() {
-                  return Text(
+                  return Center(
+                    child: Text(
                       mTitle.value,
                       style: CustomStyle.appBarTitleFont(
                           styleFontSize16, styleWhiteCol)
+                    )
                   );
                 }),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -510,10 +511,9 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                  return SizedBox(

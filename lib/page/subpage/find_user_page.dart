@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
@@ -140,7 +141,7 @@ class _FindUserPageState extends State<FindUserPage> {
                   counterText: '',
                   hintText: "이름",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -168,7 +169,7 @@ class _FindUserPageState extends State<FindUserPage> {
                   counterText: '',
                   hintText: "휴대폰 번호",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -255,7 +256,7 @@ class _FindUserPageState extends State<FindUserPage> {
                   counterText: '',
                   hintText: "이름",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -283,7 +284,7 @@ class _FindUserPageState extends State<FindUserPage> {
                   counterText: '',
                   hintText: "휴대폰 번호",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -322,13 +323,14 @@ class _FindUserPageState extends State<FindUserPage> {
     pr = Util.networkProgress(context);
     return Scaffold(
       backgroundColor: styleWhiteCol,
-      appBar:PreferredSize(
-          preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-          child: AppBar(
-            title: Text(
-                Strings.of(context)?.get("car_num")??"Not Found",
+      appBar: AppBar(
+            title: Center(
+              child: Text(
+                Strings.of(context)?.get("find_user")??"ID / 비밀번호 찾기_",
                 style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+              )
             ),
+            toolbarHeight: 50.h,
             centerTitle: true,
             automaticallyImplyLeading: false,
             leading: IconButton(
@@ -336,10 +338,9 @@ class _FindUserPageState extends State<FindUserPage> {
                 Navigator.pop(context);
               },
               color: styleWhiteCol,
-              icon: const Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
             ),
-          )
-      ),
+          ),
       body: SafeArea(
         child: Container(
           width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,

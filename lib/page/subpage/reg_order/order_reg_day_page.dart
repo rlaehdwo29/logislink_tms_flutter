@@ -493,13 +493,14 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
         child: Scaffold(
           backgroundColor: sub_color,
           resizeToAvoidBottomInset:false,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("order_reg_day_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -507,10 +508,9 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SizedBox(
@@ -558,7 +558,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.check,
-                                        size: 20, color: styleWhiteCol),
+                                        size: 20.h, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,

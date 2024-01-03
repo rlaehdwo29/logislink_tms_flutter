@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
@@ -63,7 +64,7 @@ class ShowSelectDialogWidget {
                       Navigator.of(context).pop();
                     });
                   },
-                  icon: const Icon(Icons.close, size: 30)
+                  icon: Icon(Icons.close, size: 28.h)
               )
             ],
             automaticallyImplyLeading: false,

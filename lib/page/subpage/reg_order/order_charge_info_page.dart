@@ -786,7 +786,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(10.w)),
             child: Text(
               "${Strings.of(context)?.get("order_charge_info_sub_title")}",
               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -795,7 +795,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         // 인수증/선불/착불 버튼
         !isOption.value ?
     Container(
-        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20.w)),
+        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
         child: Row(
           children: [
             Expanded(
@@ -868,7 +868,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         )) : const SizedBox(),
         // 대당단가/톤당단가 탭 버튼
         Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h), horizontal: CustomStyle.getWidth(10.w)),
             child: Row(
               children: [
                 Expanded(
@@ -921,14 +921,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         ),
         //톤당단가
         Container(
-            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
           child: Text(
             "${Strings.of(context)?.get("order_charge_info_unit_price")}",
             style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
           )
         ),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20.w)),
+          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
             margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
             height: CustomStyle.getHeight(40.h),
             child: TextFormField(
@@ -941,7 +941,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: unitPriceController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -963,9 +963,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     unitPriceController.clear();
                     mData.value.unitPrice = "0";
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -974,7 +974,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_charge_info_unit_price_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1009,7 +1009,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         ),
         //기본운임(청구)
         Container(
-            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
             child: Row(
                 children:[
                   Text(
@@ -1027,7 +1027,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
             )
         ),
         Container(
-            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w),left: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w),left: CustomStyle.getWidth(10.w)),
             height: CustomStyle.getHeight(40.h),
             child: TextFormField(
               style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1038,7 +1038,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: sellChargeController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1060,9 +1060,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     sellChargeController.clear();
                     mData.value.sellCharge = "0";
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -1071,7 +1071,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_charge_info_sell_charge_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1098,14 +1098,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         ),
         //수수료
         !isOption.value ? Container(
-            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
             child: Text(
               "${Strings.of(context)?.get("order_charge_info_sell_fee")}",
               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
             )
         ) : const SizedBox(),
         !isOption.value ? Container(
-            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
             height: CustomStyle.getHeight(40.h),
             child: TextFormField(
               style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1117,7 +1117,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: sellFeeController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1139,9 +1139,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     sellFeeController.clear();
                     mData.value.sellFee = "0";
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -1150,7 +1150,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_charge_info_sell_fee_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1178,7 +1178,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         //청구중량
         !isOption.value?
         Container(
-          padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h), left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w)),
+          padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h), left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w)),
           child:
           Text(
             "${Strings.of(context)?.get("order_charge_info_sell_wgt")}",
@@ -1187,7 +1187,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         ) : const SizedBox(),
         !isOption.value?
         Container(
-            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w)),
             height: CustomStyle.getHeight(40.h),
             child: TextFormField(
               style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1198,7 +1198,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: sellWeightController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1220,9 +1220,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     sellWeightController.clear();
                     mData.value.sellWeight = "0";
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -1231,7 +1231,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_charge_info_sell_wgt_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                     borderRadius: BorderRadius.circular(5.h)
@@ -1275,7 +1275,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
 
   Widget rpaWidget() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.h)),
+      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
         child: Flex(
       direction: Axis.vertical,
       children: List.generate(1, (index) {
@@ -1294,6 +1294,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
                     alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                     child: Text(
                             "${Strings.of(context)?.get("order_trans_info_sub_title_06")}",
                             style: CustomStyle.CustomFont(styleFontSize14, text_color_06),
@@ -1301,18 +1302,18 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 );
               },
               body: Container(
-                  padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(5.w)),
+                  padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(
-                        flex: 1,
+                        flex: 2,
                           child: Container(
                               height: CustomStyle.getHeight(30.h),
-                              margin: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                              margin: EdgeInsets.only(right: CustomStyle.getWidth(2.w)),
                           child: TextField(
-                            style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                            style: CustomStyle.CustomFont(styleFontSize11, Colors.black),
                             textAlign: TextAlign.start,
                             keyboardType: TextInputType.number,
                             controller: rpaValueController,
@@ -1320,7 +1321,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             decoration: rpaValueController.text.isNotEmpty
                                 ? InputDecoration(
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.0)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                   borderRadius: BorderRadius.circular(5.h)
@@ -1334,7 +1335,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                               ),
                               suffix: Text(
                                 "원",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               )
                             )
                                 : InputDecoration(
@@ -1366,7 +1367,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                           },
                           child: Container(
                             height: CustomStyle.getHeight(30.h),
-                            margin: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                            margin: EdgeInsets.only(right: CustomStyle.getWidth(2.w)),
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
                               border: Border.all(color: tv24Call.value ? text_box_color_01  : text_box_color_02),
@@ -1375,7 +1376,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             child: Text(
                               "${Strings.of(context)?.get("order_trans_info_rpa_24call")}",
                               textAlign: TextAlign.center,
-                              style: CustomStyle.CustomFont(styleFontSize14,  tv24Call.value ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
+                              style: CustomStyle.CustomFont(styleFontSize12,  tv24Call.value ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
                             ),
                           )
                         )
@@ -1388,7 +1389,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                               },
                               child: Container(
                                 height: CustomStyle.getHeight(30.h),
-                                margin: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                                margin: EdgeInsets.only(right: CustomStyle.getWidth(2.w)),
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                     border: Border.all(color: tvHwaMull.value ? text_box_color_01  : text_box_color_02),
@@ -1397,7 +1398,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                 child: Text(
                                   "${Strings.of(context)?.get("order_trans_info_rpa_Hwamul")}",
                                   textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(styleFontSize14,  tvHwaMull.value ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
+                                  style: CustomStyle.CustomFont(styleFontSize12,  tvHwaMull.value ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
                                 ),
                               )
                           )
@@ -1418,7 +1419,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                 child: Text(
                                   "${Strings.of(context)?.get("order_trans_info_rpa_onecall")}",
                                   textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(styleFontSize14,  tvOneCall.value ? text_box_color_01  : text_box_color_02,font_weight: FontWeight.w700),
+                                  style: CustomStyle.CustomFont(styleFontSize12,  tvOneCall.value ? text_box_color_01  : text_box_color_02,font_weight: FontWeight.w700),
                                 ),
                               )
                           )
@@ -1464,7 +1465,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                           headerBuilder: (BuildContext context, bool isExpanded) {
                             return Container(
                               alignment: Alignment.centerLeft,
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w)),
+                              padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
                               child: Text(
                                 "${Strings.of(context)?.get("order_trans_info_sub_title_03")}",
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -1484,14 +1485,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                 children: [
                                   //경유비(청구)
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_charge_info_way_point_charge")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1502,7 +1503,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellWayPointChargeController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1524,9 +1525,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellWayPointChargeController.clear();
                                               mData.value.sellWayPointCharge = "0";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1535,7 +1536,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           counterText: '',
                                           hintText: Strings.of(context)?.get("order_charge_info_sell_fee_hint")??"Not Found",
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1568,14 +1569,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //경유비 메모
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_trans_info_way_point_memo")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1586,7 +1587,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellWayPointMemoController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1603,9 +1604,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellWayPointMemoController.clear();
                                               mData.value.sellWayPointMemo = "";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1614,7 +1615,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           counterText: '',
                                           hintText: Strings.of(context)?.get("order_trans_info_way_point_memo_hint")??"Not Found",
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1638,14 +1639,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //대기료(청구)
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_charge_info_stay_charge")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1656,7 +1657,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellStayChargeController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1678,9 +1679,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellStayChargeController.clear();
                                               mData.value.sellStayCharge = "0";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1688,7 +1689,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                             : InputDecoration(
                                           counterText: '',
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1721,14 +1722,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //대기료 메모
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_trans_info_stay_memo")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1739,7 +1740,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellStayMemoController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1756,9 +1757,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellStayMemoController.clear();
                                               mData.value.sellStayMemo = "";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1767,7 +1768,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           counterText: '',
                                           hintText: Strings.of(context)?.get("order_trans_info_stay_memo_hint")??"Not Found",
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1791,14 +1792,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //수작업비(청구)
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_charge_info_hand_work_charge")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1809,7 +1810,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellHandWorkChargeController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1831,9 +1832,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellHandWorkChargeController.clear();
                                               mData.value.sellHandWorkCharge = "0";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1841,7 +1842,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                             : InputDecoration(
                                           counterText: '',
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1874,14 +1875,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //수작업비 메모
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_trans_info_hand_work_memo")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1892,7 +1893,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellStayMemoController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1909,9 +1910,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellStayMemoController.clear();
                                               mData.value.sellHandWorkMemo = "";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1920,7 +1921,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           counterText: '',
                                           hintText: Strings.of(context)?.get("order_trans_info_hand_work_memo_hint")??"Not Found",
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1944,14 +1945,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //회차료(청구)
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_charge_info_round_charge")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -1962,7 +1963,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellRoundChargeController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -1984,9 +1985,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellRoundChargeController.clear();
                                               mData.value.sellRoundCharge = "0";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -1994,7 +1995,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                             : InputDecoration(
                                           counterText: '',
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2026,14 +2027,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //회차료 메모
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_trans_info_hand_work_memo")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -2044,7 +2045,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellRoundMemoController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2061,9 +2062,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellRoundMemoController.clear();
                                               mData.value.sellRoundMemo = "";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -2072,7 +2073,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           counterText: '',
                                           hintText: Strings.of(context)?.get("order_trans_info_round_memo_hint")??"Not Found",
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2096,14 +2097,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //기타추가비(청구)
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_charge_info_other_add_charge")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -2114,7 +2115,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellOtherAddChargeController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2136,9 +2137,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellOtherAddChargeController.clear();
                                               mData.value.sellOtherAddCharge = "0";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -2146,7 +2147,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                             : InputDecoration(
                                           counterText: '',
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2178,14 +2179,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   ),
                                   //기타추가비 메모
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
                                         "${Strings.of(context)?.get("order_trans_info_other_add_memo")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
                                   Container(
-                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(20.w), left: CustomStyle.getWidth(20.w)),
+                                      padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
                                       height: CustomStyle.getHeight(40.h),
                                       child: TextFormField(
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
@@ -2196,7 +2197,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         decoration: sellOtherAddMemoController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2213,9 +2214,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                               sellOtherAddMemoController.clear();
                                               mData.value.sellOtherAddMemo = "";
                                             },
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.clear,
-                                              size: 18,
+                                              size: 18.h,
                                               color: Colors.black,
                                             ),
                                           ),
@@ -2224,7 +2225,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           counterText: '',
                                           hintText: Strings.of(context)?.get("order_trans_info_other_add_memo_hint")??"Not Found",
                                           hintStyle:CustomStyle.greyDefFont(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                           enabledBorder: OutlineInputBorder(
                                               borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                               borderRadius: BorderRadius.circular(5.h)
@@ -2323,13 +2324,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("order_charge_info_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -2337,17 +2339,16 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.white),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SingleChildScrollView(
                     child: Column(
                   children: [
                     !isOption.value ? Container(
-                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
+                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                       decoration: BoxDecoration(
                         border: Border(
                             bottom:BorderSide(
@@ -2399,7 +2400,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(Icons.check,
-                                          size: 20, color: styleWhiteCol),
+                                          size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -2428,7 +2429,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.refresh, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.refresh, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -2457,7 +2458,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.save_alt, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.save_alt, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,

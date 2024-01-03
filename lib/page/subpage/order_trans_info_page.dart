@@ -977,7 +977,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
 
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20.w)),
+      padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
       child: Column(
         children: [
           Container(
@@ -993,9 +993,12 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                Strings.of(context)?.get("order_trans_info_sub_title_01")??"배차_",
-                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+              Container(
+                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                child: Text(
+                  Strings.of(context)?.get("order_trans_info_sub_title_01")??"배차_",
+                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                )
               ),
               !isOption.value?
               Row(
@@ -1159,7 +1162,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                           },
                           child: Container(
                               alignment: Alignment.centerLeft,
-                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                               margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
                               height: CustomStyle.getHeight(35.h),
                               decoration: BoxDecoration(
@@ -1212,7 +1215,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                         ),
                         Container(
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                             margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
                             height: CustomStyle.getHeight(35.h),
                             decoration: BoxDecoration(
@@ -1256,7 +1259,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                           await goToCarSearch();
                         },
                         child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                             margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
                             height: CustomStyle.getHeight(35.h),
                             decoration: BoxDecoration(
@@ -1353,7 +1356,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                       ),
                       Container(
                           alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                           margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
                           height: CustomStyle.getHeight(35.h),
                           decoration: BoxDecoration(
@@ -1402,7 +1405,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                       ),
                       Container(
                         alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                         margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
                         height: CustomStyle.getHeight(35.h),
                         decoration: BoxDecoration(
@@ -1440,7 +1443,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                       ),
                       Container(
                           alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                           margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
                           height: CustomStyle.getHeight(35.h),
                           decoration: BoxDecoration(
@@ -1498,7 +1501,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                             decoration: etBuyChargeController.text.isNotEmpty
                                 ? InputDecoration(
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                   borderRadius: BorderRadius.circular(5.h)
@@ -1515,9 +1518,9 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                   etBuyChargeController.clear();
                                   mData.value.buyCharge = "0";
                                 },
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.clear,
-                                  size: 18,
+                                  size: 18.h,
                                   color: Colors.black,
                                 ),
                               ),
@@ -1529,7 +1532,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                             )
                                 : InputDecoration(
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                   borderRadius: BorderRadius.circular(5.h)
@@ -1575,7 +1578,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                         },
                         child: Container(
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                             margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
                             height: CustomStyle.getHeight(35.h),
                             decoration: BoxDecoration(
@@ -1622,7 +1625,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                             decoration: etRegistController.text.isNotEmpty
                                 ? InputDecoration(
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                   borderRadius: BorderRadius.circular(5.h)
@@ -1638,16 +1641,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                 onPressed: () {
                                   etRegistController.clear();
                                 },
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.clear,
-                                  size: 18,
+                                  size: 18.h,
                                   color: Colors.black,
                                 ),
                               ),
                             )
                                 : InputDecoration(
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                   borderRadius: BorderRadius.circular(5.h)
@@ -1708,7 +1711,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
               value: index,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
-                    padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                     padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(5.h)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -1721,7 +1724,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                     ));
               },
               body: !llChargeInfo.value ? Container(
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
                     child:
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1750,7 +1753,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etWayPointController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -1772,16 +1775,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                             etWayPointController.clear();
                                             mData.value.wayPointCharge = "0";
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_way_point_charge_hint")??"경유비를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -1832,7 +1835,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etWayPointMemoController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -1853,16 +1856,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etWayPointMemoController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_way_point_memo_hint")??"경유비 메모를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -1929,16 +1932,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etStayChargeController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_stay_charge_hint")??"대기료를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -1989,7 +1992,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etStayChargeMemoController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2005,16 +2008,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etStayChargeMemoController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_stay_memo_hint")??"대기료 메모를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2060,7 +2063,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etHandWorkChargeController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2081,16 +2084,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etHandWorkChargeController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_hand_work_charge_hint")??"수작업비를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2135,7 +2138,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: ethandWorkMemoController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2151,16 +2154,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             ethandWorkMemoController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_hand_work_memo_hint")??"수작업비 메모를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2206,7 +2209,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etRoundChargeController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2227,16 +2230,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etRoundChargeController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_round_charge_hint")??"회차료를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2287,7 +2290,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etRoundMemoController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2303,16 +2306,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etRoundMemoController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_round_memo_hint")??"회차료 메모를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2358,7 +2361,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etOtherAddChargeController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2379,16 +2382,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etOtherAddChargeController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_other_add_charge_hint")??"기타 추가비를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2439,7 +2442,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       decoration: etOtherAddMemoController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -2455,16 +2458,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                           onPressed: () {
                                             etOtherAddMemoController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         hintText: Strings.of(context)?.get("order_trans_info_other_add_memo_hint")??"기타 추가비를 입력해주세요._",
                                         hintStyle: CustomStyle.greyDefFont(),
                                         enabledBorder: OutlineInputBorder(
@@ -2506,7 +2509,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
     return Column(
       children: [
         Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(110.w)),
             color: Colors.white,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -2519,7 +2522,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
             )),
         CustomStyle.getDivider1(),
         Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -2547,7 +2550,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                       decoration: etOtherAddMemoController.text.isNotEmpty
                           ? InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                             borderRadius: BorderRadius.circular(5.h)
@@ -2563,16 +2566,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                           onPressed: () {
                             etOtherAddMemoController.clear();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.clear,
-                            size: 18,
+                            size: 18.h,
                             color: Colors.black,
                           ),
                         ),
                       )
                           : InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         hintText: Strings.of(context)?.get("order_trans_info_driver_memo_hint")??"차주님에게 전달할 내용을 입력해 주세요._",
                         hintStyle: CustomStyle.greyDefFont(),
                         enabledBorder: OutlineInputBorder(
@@ -2609,14 +2612,15 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
         child: Scaffold(
           //resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("order_trans_info_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(
                         styleFontSize16, styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -2624,10 +2628,9 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                   return SingleChildScrollView(
@@ -2635,7 +2638,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                     children: [
                       !isOption.value?
                         Container(
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2685,8 +2688,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.check,
-                                          size: 20, color: styleWhiteCol),
+                                      Icon(Icons.check,
+                                          size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -2715,7 +2718,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.refresh, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.refresh, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -2744,7 +2747,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.save_alt, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.save_alt, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,

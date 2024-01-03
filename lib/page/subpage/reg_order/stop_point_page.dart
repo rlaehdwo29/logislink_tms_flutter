@@ -253,13 +253,14 @@ class _StopPointPageState extends State<StopPointPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     "${Strings.of(context)?.get("stop_point_title")??"Not Found"}",
                     style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -267,10 +268,9 @@ class _StopPointPageState extends State<StopPointPage> {
                     Navigator.of(context).pop({'code':200,Const.RESULT_WORK: Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                  return SizedBox(

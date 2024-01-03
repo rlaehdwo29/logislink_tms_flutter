@@ -253,6 +253,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                 Container(
                     height: CustomStyle.getHeight(35.h),
                     margin: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                     alignment: Alignment.centerLeft,
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,
@@ -263,7 +264,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                       decoration: etPasswordController.text.isNotEmpty
                           ? InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                             borderRadius: BorderRadius.circular(5.h)
@@ -279,16 +280,16 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                           onPressed: () {
                             etPasswordController.clear();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.clear,
-                            size: 18,
+                            size: 18.h,
                             color: Colors.black,
                           ),
                         ),
                       )
                           : InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         hintText: Strings.of(context)?.get("my_page_password_hint")??"새 비밀번호를 입력해주세요._",
                         hintStyle:CustomStyle.greyDefFont(),
                         enabledBorder: OutlineInputBorder(
@@ -327,6 +328,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                 Container(
                     height: CustomStyle.getHeight(35.h),
                     margin: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                    alignment: Alignment.centerLeft,
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,
@@ -337,7 +339,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                       decoration: etPasswordConfirmController.text.isNotEmpty
                           ? InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                             borderRadius: BorderRadius.circular(5.h)
@@ -353,16 +355,16 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                           onPressed: () {
                             etPasswordConfirmController.clear();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.clear,
-                            size: 18,
+                            size: 18.h,
                             color: Colors.black,
                           ),
                         ),
                       )
                           : InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         hintText: Strings.of(context)?.get("my_page_password_confirm_hint")??"새 비밀번호를 한번 더 확인해주세요._",
                         hintStyle:CustomStyle.greyDefFont(),
                         enabledBorder: OutlineInputBorder(
@@ -434,18 +436,16 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
         },
         child: Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
-      appBar: PreferredSize(
-          preferredSize: Size.fromHeight(CustomStyle.getHeight(40.h)),
-          child: AppBar(
+      appBar: AppBar(
+                toolbarHeight: 50.h,
                 leading: IconButton(
                   onPressed: () async {
                     Navigator.of(context).pop();
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.keyboard_arrow_left,size: 32.w,color: styleWhiteCol),
+                  icon: Icon(Icons.keyboard_arrow_left,size: 24.h,color: styleWhiteCol),
                 ),
-          )
-      ),
+          ),
       body: SafeArea(
             child: Obx((){
               return SingleChildScrollView(

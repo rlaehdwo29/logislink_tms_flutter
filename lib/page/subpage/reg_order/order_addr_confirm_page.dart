@@ -62,7 +62,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
 
   Widget headerWidget() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(20.h),horizontal: CustomStyle.getWidth(20.w)),
+      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
       child: Row(
         children: [
           Expanded(
@@ -77,38 +77,35 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
             flex: 9,
             child: Container(
               height: 60.h,
-            padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Flexible(
                     child: RichText(
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                        overflow: TextOverflow.visible,
                         text: TextSpan(
                           text: "${mData.value.addrName}",
-                          style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
+                          style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                         )
                     )
                 ),
                 Flexible(
                     child: RichText(
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                        overflow: TextOverflow.visible,
                         text: TextSpan(
                           text: "${mData.value.addr}",
-                          style: CustomStyle.CustomFont(styleFontSize14, text_color_03),
+                          style: CustomStyle.CustomFont(styleFontSize13, text_color_03),
                         )
                     )
                 ),
                 Flexible(
                     child: RichText(
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
+                        overflow: TextOverflow.visible,
                         text: TextSpan(
                           text: "${mData.value.addrDetail}",
-                          style: CustomStyle.CustomFont(styleFontSize14, text_color_03),
+                          style: CustomStyle.CustomFont(styleFontSize13, text_color_03),
                         )
                     )
                 )
@@ -124,7 +121,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
   Widget bodyWidget() {
     return Expanded(
         child: Container(
-        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
         child: Column(
           children: [
             Column(
@@ -138,7 +135,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 Container(
                   padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-                    height: CustomStyle.getHeight(70.h),
+                    //height: CustomStyle.getHeight(70.h),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,
@@ -150,7 +147,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_reg_staff_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                             borderRadius: BorderRadius.circular(10.h)
@@ -166,9 +163,9 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                           onPressed: () {
                             staffController.clear();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.clear,
-                            size: 18,
+                            size: 18.h,
                             color: Colors.black,
                           ),
                         ),
@@ -177,7 +174,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_reg_staff_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                             borderRadius: BorderRadius.circular(10.h)
@@ -198,7 +195,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 // 담당자 연락처
                 Container(
-                  padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                  padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                   child: Text(
                     "${Strings.of(context)?.get("order_addr_reg_tel")??"Not Found"}",
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w700),
@@ -218,7 +215,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_reg_tel_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                             borderRadius: BorderRadius.circular(10.h)
@@ -234,9 +231,9 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                           onPressed: () {
                             staffTelController.clear();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.clear,
-                            size: 18,
+                            size: 18.h,
                             color: Colors.black,
                           ),
                         ),
@@ -266,7 +263,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 // 메모
                 Container(
-                    padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                    padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                     child: Text(
                       "${Strings.of(context)?.get("order_addr_reg_memo")??"Not Found"}",
                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w700),
@@ -274,7 +271,6 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-                    height: CustomStyle.getHeight(200.h),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,
@@ -286,7 +282,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_confirm_memo_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                             borderRadius: BorderRadius.circular(10.h)
@@ -302,9 +298,9 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                           onPressed: () {
                             memoController.clear();
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.clear,
-                            size: 18,
+                            size: 18.h,
                             color: Colors.black,
                           ),
                         ),
@@ -313,7 +309,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_confirm_memo_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                             borderRadius: BorderRadius.circular(10.h)
@@ -355,13 +351,14 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                       Strings.of(context)?.get("order_addr_confirm_title")??"Not Found",
                       style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
-                  ),
+                  )
+                ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -369,10 +366,9 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h,color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
               return SizedBox(
@@ -408,7 +404,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(Icons.check, size: 20, color: styleWhiteCol),
+                                    Icon(Icons.check, size: 20.h, color: styleWhiteCol),
                                     CustomStyle.sizedBoxWidth(5.0.w),
                                     Text(
                                       textAlign: TextAlign.center,

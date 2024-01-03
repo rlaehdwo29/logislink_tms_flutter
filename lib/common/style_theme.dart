@@ -576,9 +576,7 @@ class CustomStyle {
       filled: true,
       isDense: true,
       counterText: '',
-      contentPadding: EdgeInsets.symmetric(
-          horizontal: CustomStyle.getWidth(15.0),
-          vertical: CustomStyle.getHeight(10.0)),
+     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
     );
   }
 
@@ -597,9 +595,7 @@ class CustomStyle {
       filled: true,
       isDense: true,
       counterText: '',
-      contentPadding: EdgeInsets.symmetric(
-          horizontal: CustomStyle.getWidth(15.0),
-          vertical: CustomStyle.getHeight(10.0)),
+      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.h),vertical: CustomStyle.getHeight(5.w)),
     );
   }
 

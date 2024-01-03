@@ -4,6 +4,7 @@ import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/receipt_model.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ReceiptDetailPage extends StatefulWidget{
   ReceiptModel item;
@@ -20,23 +21,23 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
     var filePath = "$SERVER_URL$RECEIPT_PATH${widget.item.fileName}";
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-            child: AppBar(
+        appBar: AppBar(
               centerTitle: true,
-              title: Text(
+              title: Center(
+                child: Text(
                   "${widget.item.regdate}",
                   style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
+                ) 
               ),
+              toolbarHeight: 50.h,
               leading: IconButton(
                 onPressed: (){
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
               ),
-            )
-        ),
+            ),
     body: SafeArea(
       child: Container(
         alignment: Alignment.center,

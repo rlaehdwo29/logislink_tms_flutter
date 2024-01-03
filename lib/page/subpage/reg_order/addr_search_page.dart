@@ -249,12 +249,12 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
               backgroundColor: text_color_03,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
-                    padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                     padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(5.h)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Icon(Icons.house,size: 20,color: styleWhiteCol,),
+                        Icon(Icons.house,size: 20.h,color: styleWhiteCol,),
                         CustomStyle.sizedBoxWidth(5.0),
                         Text("주소지 불분명 시",style: CustomStyle.CustomFont(styleFontSize14, styleWhiteCol))
                       ],
@@ -262,16 +262,20 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
               },
               body: Obx((){
                   return Container(
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                     color: Colors.white,
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children : [
-                        InkWell(
+                        Row(
+                          children: [
+                          InkWell(
                           onTap: (){
                             ShowCodeDialogWidget(context:context, mTitle: "시/도", codeType: Const.SIDO, mFilter: "", callback: selectSido).showDialog();
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(30.w)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(15.w)),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.all(Radius.circular(5.w)),
                                 color: Colors.white,
@@ -292,7 +296,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                             ShowCodeDialogWidget(context:context, mTitle: "시/군/구", codeType: Const.SIDO_AREA, mFilter: mSido.value, callback: selectSidoArea).showDialog();
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(30.w)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(15.w)),
                             margin: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.all(Radius.circular(5.w)),
@@ -305,13 +309,14 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                             ),
                           )
                         ),
+                          ]
+                        ),
                         InkWell(
                           onTap: () async {
                             await confirm();
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
-                            margin: EdgeInsets.only(left: CustomStyle.getWidth(20.w)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.all(Radius.circular(5.w)),
                                 color: main_color,
@@ -362,7 +367,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                     onPressed: () {
                       searchController.clear();
                     },
-                    icon: const Icon(Icons.clear, size: 18,color: Colors.black,),
+                    icon: Icon(Icons.clear, size: 18.h,color: Colors.black,),
                   ),
                 ) : InputDecoration(
                   border: InputBorder.none,
@@ -384,7 +389,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                 onPressed: (){
                   getJuso();
                 },
-                icon: const Icon(Icons.search, size: 28,color: Colors.black),
+                icon: Icon(Icons.search, size: 28.h,color: Colors.black),
               )
           )
         ]));
@@ -429,25 +434,25 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(CustomStyle.getHeight(60.0)),
-            child: AppBar(
+        appBar: AppBar(
               centerTitle: true,
-              title: Text(
+              title: Center(
+                child: Text(
                   Strings.of(context)?.get("addr_search_title") ?? "Not Found",
                   style: CustomStyle.appBarTitleFont(
                       styleFontSize18, styleWhiteCol)
+                )
               ),
+              toolbarHeight: 50.h,
               leading: IconButton(
                 onPressed: () async {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
                 icon: Icon(
-                    Icons.keyboard_arrow_left, size: 32.w, color: styleWhiteCol),
+                    Icons.keyboard_arrow_left, size: 24.h, color: styleWhiteCol),
               ),
-            )
-        ),
+            ),
         body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

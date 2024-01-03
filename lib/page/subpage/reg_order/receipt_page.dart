@@ -24,6 +24,7 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ReceiptPage extends StatefulWidget{
   OrderModel? order_vo;
@@ -266,23 +267,23 @@ class _ReceiptPageState extends State<ReceiptPage>{
         } ,
         child: Scaffold(
           backgroundColor: Theme.of(context).backgroundColor,
-          appBar: PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
+          appBar: AppBar(
                 centerTitle: true,
-                title: Text(
+                title: Center(
+                  child: Text(
                     "인수증",
                     style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 leading: IconButton(
                   onPressed: (){
                     Navigator.of(context).pop({'code':200});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
              child: Container(
                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,

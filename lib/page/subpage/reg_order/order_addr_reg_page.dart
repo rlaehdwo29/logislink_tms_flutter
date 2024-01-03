@@ -262,7 +262,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
               decoration: addrNameController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -278,9 +278,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   onPressed: () {
                     addrNameController.clear();
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -289,7 +289,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_addr_reg_addr_name_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -332,9 +332,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
           },
         child: Container(
             margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-            height: CustomStyle.getHeight(45.h),
+       
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
             decoration: BoxDecoration(
               border: Border.all(color: text_box_color_02,width: 1.w),
               borderRadius: BorderRadius.all(Radius.circular(10.w))
@@ -353,7 +353,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                         )
                     )
                 ),
-                Icon(Icons.search, color: styleDefaultGrey,size: 28.w)
+                Icon(Icons.search, color: styleDefaultGrey,size: 28.h)
               ],
             )
         )),
@@ -377,7 +377,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
               decoration: addrDetailController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -393,9 +393,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   onPressed: () {
                     addrDetailController.clear();
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -404,7 +404,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_addr_reg_addr_detail_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -442,7 +442,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
               decoration: staffNameController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -458,9 +458,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   onPressed: () {
                     staffNameController.clear();
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -469,7 +469,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_addr_reg_staff_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -507,7 +507,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
               decoration: staffTelController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -523,9 +523,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   onPressed: () {
                     staffTelController.clear();
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -534,7 +534,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_addr_reg_tel_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -572,7 +572,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
               decoration: orderMemoController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -588,9 +588,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   onPressed: () {
                     orderMemoController.clear();
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.clear,
-                    size: 18,
+                    size: 18.h,
                     color: Colors.black,
                   ),
                 ),
@@ -599,7 +599,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                 counterText: '',
                 hintText: Strings.of(context)?.get("order_addr_reg_memo_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
-                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                     borderRadius: BorderRadius.circular(10.h)
@@ -634,16 +634,17 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
+          appBar: AppBar(
                 title: Obx((){
-                  return Text(
+                  return Center(
+                    child: Text(
                       mTitle.value,
                       style: CustomStyle.appBarTitleFont(
                           styleFontSize16, styleWhiteCol)
+                    )
                   );
                 }),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -651,10 +652,9 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
               return SingleChildScrollView(
@@ -686,7 +686,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.add, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.add, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -712,7 +712,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.edit, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.edit, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -738,7 +738,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.check, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.check, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,

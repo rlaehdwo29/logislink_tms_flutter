@@ -13,6 +13,7 @@ import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:dio/dio.dart';
 
 class ShowCodeDialogWidget {
@@ -195,7 +196,7 @@ class ShowCodeDialogWidget {
                       //SystemNavigator.pop();
                     });
                   },
-                  icon: const Icon(Icons.close, size: 30)
+                  icon: Icon(Icons.close, size: 28.h)
               )
             ],
             automaticallyImplyLeading: false,

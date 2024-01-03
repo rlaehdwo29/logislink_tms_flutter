@@ -10,7 +10,7 @@ import 'package:logislink_tms_flutter/page/subpage/appbar_notice_detail_page.dar
 import 'package:logislink_tms_flutter/provider/appbar_service.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../utils/util.dart';
 
 class AppBarNoticePage extends StatefulWidget {
@@ -124,23 +124,25 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
     } ,
       child: Scaffold(
         backgroundColor: styleWhiteCol,
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-            child: AppBar(
+        appBar: AppBar(
               centerTitle: true,
-              title: Text(
+              toolbarHeight: 50.h,
+              title: Center( 
+                child: Text(
                   "공지사항",
                   style: CustomStyle.appBarTitleFont(
-                      styleFontSize16, styleWhiteCol)),
+                      styleFontSize16, styleWhiteCol)
+                  )
+              ),
               leading: IconButton(
                 onPressed: () {
                   FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
               ),
-            )),
+          ),
         body: SafeArea(
             child: SingleChildScrollView(
                   child: SizedBox(

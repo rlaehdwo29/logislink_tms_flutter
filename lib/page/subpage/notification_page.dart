@@ -92,22 +92,24 @@ class _NotificationPageState extends State<NotificationPage> {
     },
     child: Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
-        appBar: PreferredSize(
-            preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-            child: AppBar(
+        appBar: AppBar(
               centerTitle: true,
-              title: Text("알림",
+              title: Center(
+                child: Text("알림",
                   style: CustomStyle.appBarTitleFont(
-                      styleFontSize18, styleWhiteCol)),
+                      styleFontSize18, styleWhiteCol)
+                      )
+                  ),
+                toolbarHeight: 50.h,
               leading: IconButton(
                 onPressed: () {
                   FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: const Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
               ),
-            )),
+            ),
         body: SafeArea(
             child: Container(
               width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
@@ -168,7 +170,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               ),
                               Expanded(
                                 flex: 1,
-                               child: item.allocId != null ? Icon(Icons.arrow_forward_ios_outlined, size: 24.w, color: Colors.grey) : const SizedBox()
+                               child: item.allocId != null ? Icon(Icons.arrow_forward_ios_outlined, size: 24.h, color: Colors.grey) : const SizedBox()
                               )
                             ],
                           )));

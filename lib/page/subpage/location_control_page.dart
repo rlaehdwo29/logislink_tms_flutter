@@ -251,23 +251,25 @@ class _LocationControlPageState extends State<LocationControlPage>{
         } ,
         child: Scaffold(
           backgroundColor: styleWhiteCol,
-          appBar: PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
+          appBar: AppBar(
                 centerTitle: true,
-                title: Text(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("location_control_title")??"위치관제_",
                     style: CustomStyle.appBarTitleFont(
-                        styleFontSize16, styleWhiteCol)),
+                        styleFontSize16, styleWhiteCol)
+                    )
+                ),
+                toolbarHeight: 50.h,
                 leading: IconButton(
                   onPressed: () {
                     FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                     Navigator.of(context).pop();
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
                 ),
-              )),
+              ),
           body: SafeArea(
               child: SingleChildScrollView(
                   child: SizedBox(
@@ -291,9 +293,9 @@ class _LocationControlPageState extends State<LocationControlPage>{
                                 color: main_btn,
                                 shape: BoxShape.circle,
                               ),
-                                child: const Icon(
+                                child: Icon(
                               Icons.refresh,
-                                  size: 24,
+                                  size: 24.h,
                                   color: Colors.white,
                             )
                           )

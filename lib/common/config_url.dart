@@ -8,7 +8,7 @@ const String m_ServerDebug = "http://192.168.68.70:8080";
 //const String m_ServerDebug = "http://192.168.0.2:8080";
 const String m_ServerTest = "http://211.252.86.30:806";
 //const String m_ServerTest = "http://211.252.86.30:8005";
-const String SERVER_URL = m_ServerRelease;
+const String SERVER_URL = m_ServerTest;
 
 const String RECEIPT_PATH = "/files/receipt/";
 

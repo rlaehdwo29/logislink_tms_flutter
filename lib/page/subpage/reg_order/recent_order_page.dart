@@ -295,18 +295,20 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                 children: [
                                   TableCalendar(
                                     locale: 'ko_KR',
+                                    rowHeight: MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio > 1500 ? CustomStyle.getHeight(30.h) :CustomStyle.getHeight(45.h) ,
                                     firstDay: DateTime.utc(2010, 1, 1),
                                     lastDay: DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day),
-                                    headerStyle: const HeaderStyle(
+                                    headerStyle: HeaderStyle(
                                       // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
                                       formatButtonVisible: false,
                                       // 달력 타이틀을 센터로
                                       titleCentered: true,
                                       // 말 그대로 타이틀 텍스트 스타일링
-                                      titleTextStyle: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16.0,
-                                      ),
+                                      titleTextStyle:   CustomStyle.CustomFont(
+                                          styleFontSize16, Colors.black,font_weight: FontWeight.w700
+                                          ),
+                                          rightChevronIcon: Icon(Icons.chevron_right,size: 26.h),
+                                          leftChevronIcon: Icon(Icons.chevron_left, size: 26.h),
                                     ),
                                     calendarStyle: CalendarStyle(
                                       // 오늘 날짜에 하이라이팅의 유무
@@ -325,7 +327,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                       selectedDecoration: BoxDecoration(
                                           color: styleWhiteCol,
                                           shape: BoxShape.rectangle,
-                                          border: Border.all(color: sub_color)
+                                          border: Border.all(color: main_color,width: 1.w)
                                       ),
                                       defaultTextStyle: CustomStyle.CustomFont(
                                           styleFontSize14, Colors.black),
@@ -347,7 +349,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                       rangeStartDecoration: BoxDecoration(
                                           color: styleWhiteCol,
                                           shape: BoxShape.rectangle,
-                                          border: Border.all(color: sub_color)
+                                          border: Border.all(color: main_color,width: 1.w)
                                       ),
 
                                       // rangeEndDay 글자 조정
@@ -358,7 +360,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                       rangeEndDecoration: BoxDecoration(
                                           color: styleWhiteCol,
                                           shape: BoxShape.rectangle,
-                                          border: Border.all(color: sub_color)
+                                          border: Border.all(color: main_color,width: 1.w)
                                       ),
 
                                       // startDay, endDay 사이의 글자 조정
@@ -578,13 +580,14 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                     Strings.of(context)?.get("order_recent_order_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  )
                 ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -592,10 +595,9 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                  return SizedBox(

@@ -917,7 +917,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                       decoration: etCarNumController.text.isNotEmpty
                                           ? InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -933,16 +933,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                           onPressed: () {
                                             etCarNumController.clear();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.clear,
-                                            size: 18,
+                                            size: 18.h,
                                             color: Colors.black,
                                           ),
                                         ),
                                       )
                                           : InputDecoration(
                                         counterText: '',
-                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                             borderRadius: BorderRadius.circular(5.h)
@@ -999,7 +999,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     decoration: etDriverNameController.text.isNotEmpty
                                                         ? InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1015,16 +1015,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                         onPressed: () {
                                                           etDriverNameController.clear();
                                                         },
-                                                        icon: const Icon(
+                                                        icon: Icon(
                                                           Icons.clear,
-                                                          size: 18,
+                                                          size: 18.h,
                                                           color: Colors.black,
                                                         ),
                                                       ),
                                                     )
                                                         : InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1079,7 +1079,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     decoration: etDriverNameController.text.isNotEmpty
                                                         ? InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1095,16 +1095,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                         onPressed: () {
                                                           etDriverNameController.clear();
                                                         },
-                                                        icon: const Icon(
+                                                        icon: Icon(
                                                           Icons.clear,
-                                                          size: 18,
+                                                          size: 18.h,
                                                           color: Colors.black,
                                                         ),
                                                       ),
                                                     )
                                                         : InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1973,7 +1973,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     onTap:(){
                       Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo: mData.value)));
                     } ,
-                    child: Icon(Icons.location_on,size: 40.h,color: swipe_edit_btn)
+                    child: Icon(Icons.location_on,size: 35.h,color: swipe_edit_btn)
                   ),
                 )
               ],
@@ -2054,7 +2054,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(10.w),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h), horizontal: CustomStyle.getWidth(5.w)),
             alignment: Alignment.centerLeft,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2070,7 +2070,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       await goToSendLink();
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
+                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                       decoration: BoxDecoration(
                           border: Border.all(color: order_state_01,width: 1.w),
                           borderRadius: BorderRadius.all(Radius.circular(5.w))
@@ -2093,6 +2093,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                 flex: 4,
                 child: Container(
+                    height: CustomStyle.getHeight(180.h),
                     margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
                     padding: EdgeInsets.all(5.0.h),
                     decoration: const BoxDecoration(
@@ -2104,32 +2105,32 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         children: [
                           Text(
                             "${Util.splitSDate(mData.value.sDate)} 상차",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_box_color_01),
+                            style: CustomStyle.CustomFont(styleFontSize13, text_box_color_01),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                             alignment: Alignment.center,
                             child: Text(
                               mData.value.sComName??"",
                               style: CustomStyle.CustomFont(
-                                  styleFontSize16, text_color_01,
+                                  styleFontSize14, text_color_01,
                                   font_weight: FontWeight.w700),
                               textAlign: TextAlign.center,
                             )
                           ),
                           Container(
-                            padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w), bottom: CustomStyle.getHeight(5.h)),
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
                             alignment: Alignment.centerLeft,
                             child: Text(
                               mData.value.sStaff??"",
                               style: CustomStyle.CustomFont(
-                                  styleFontSize14, text_color_02,
+                                  styleFontSize13, text_color_02,
                                   font_weight: FontWeight.w400),
                               textAlign: TextAlign.center,
                             )
                           ),
                           Container(
-                            padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w), bottom: CustomStyle.getHeight(10.h)),
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
                             alignment: Alignment.centerLeft,
                           child: !(mData.value.sStaff?.isEmpty == true) || !(mData.value.sTel?.isEmpty == true)?
                           InkWell(
@@ -2148,15 +2149,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             },
                               child: Text(
                               Util.makePhoneNumber(mData.value.sTel),
-                              style: CustomStyle.CustomFont(styleFontSize14, addr_type_text)
+                              style: CustomStyle.CustomFont(styleFontSize12, addr_type_text)
                           )) : const SizedBox()),
                           Container(
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                             child: Text(
                               mData.value.sAddr??"",
                               style: CustomStyle.CustomFont(
-                                  styleFontSize14, text_color_02,
+                                  styleFontSize13, text_color_02,
                                   font_weight: FontWeight.w600),
                               textAlign: TextAlign.center,
                             )
@@ -2168,13 +2169,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             child: Text(
                               mData.value.sAddrDetail??"",
                               style: CustomStyle.CustomFont(
-                                  styleFontSize14, text_color_02,
+                                  styleFontSize13, text_color_02,
                                   font_weight: FontWeight.w600),
                               textAlign: TextAlign.center,
                             )
                           ) : const SizedBox(),
                           Container(
-                            padding: const EdgeInsets.all(10.0),
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h), bottom: CustomStyle.getHeight(10.h)),
                             alignment: Alignment.centerLeft,
                             child: Text(
                               !(mData.value.sMemo?.isEmpty == true) ? mData.value.sMemo??"-" : "-",
@@ -2185,11 +2186,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ),
               Expanded(
                 flex: 1,
-                child: Icon(Icons.arrow_right_alt,size: 21.w,color: const Color(0xff6d7780)),
+                child: Icon(Icons.arrow_right_alt,size: 21.h,color: const Color(0xff6d7780)),
               ),
               Expanded(
                   flex: 4,
                   child: Container(
+                    height: CustomStyle.getHeight(180.h),
                       margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
                       padding: EdgeInsets.all(5.0.h),
                       decoration: const BoxDecoration(
@@ -2200,33 +2202,33 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              "${Util.splitSDate(mData.value.eDate)} 상차",
-                              style: CustomStyle.CustomFont(styleFontSize14, text_box_color_01),
+                              "${Util.splitEDate(mData.value.eDate)} 하차",
+                              style: CustomStyle.CustomFont(styleFontSize13, text_box_color_01),
                             ),
                             Container(
-                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
+                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                 alignment: Alignment.center,
                                 child: Text(
                                   mData.value.eComName??"",
                                   style: CustomStyle.CustomFont(
-                                      styleFontSize16, text_color_01,
+                                      styleFontSize14, text_color_01,
                                       font_weight: FontWeight.w700),
                                   textAlign: TextAlign.center,
                                 )
                             ),
                             Container(
-                                padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w), bottom: CustomStyle.getHeight(5.h)),
+                                padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
                                 alignment: Alignment.centerLeft,
                                 child: Text(
                                   mData.value.eStaff??"",
                                   style: CustomStyle.CustomFont(
-                                      styleFontSize14, text_color_02,
+                                      styleFontSize13, text_color_02,
                                       font_weight: FontWeight.w400),
                                   textAlign: TextAlign.center,
                                 )
                             ),
                             Container(
-                                padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w), bottom: CustomStyle.getHeight(10.h)),
+                                 padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
                                 alignment: Alignment.centerLeft,
                                 child: !(mData.value.eStaff?.isEmpty == true) || !(mData.value.eTel?.isEmpty == true)?
                                 InkWell(
@@ -2245,15 +2247,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                     },
                                     child: Text(
                                         Util.makePhoneNumber(mData.value.eTel),
-                                        style: CustomStyle.CustomFont(styleFontSize14, addr_type_text)
+                                        style: CustomStyle.CustomFont(styleFontSize12, addr_type_text)
                                     )) : const SizedBox()),
                             Container(
                                 alignment: Alignment.centerLeft,
-                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                                 child: Text(
                                   mData.value.eAddr??"",
                                   style: CustomStyle.CustomFont(
-                                      styleFontSize14, text_color_02,
+                                      styleFontSize13, text_color_02,
                                       font_weight: FontWeight.w600),
                                   textAlign: TextAlign.center,
                                 )
@@ -2261,11 +2263,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             !(mData.value.eAddrDetail?.isEmpty == true) ?
                             Container(
                                 alignment: Alignment.centerLeft,
-                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                                 child: Text(
                                   mData.value.eAddrDetail??"",
                                   style: CustomStyle.CustomFont(
-                                      styleFontSize14, text_color_02,
+                                      styleFontSize13, text_color_02,
                                       font_weight: FontWeight.w600),
                                   textAlign: TextAlign.center,
                                 )
@@ -2275,7 +2277,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               alignment: Alignment.centerLeft,
                               child: Text(
                                 !(mData.value.eMemo?.isEmpty == true) ? mData.value.eMemo??"-" : "-",
-                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize13, text_color_01),
                               ),
                             )
                           ]
@@ -2289,7 +2291,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             padding: EdgeInsets.all(10.w),
             child: Row(
               children: [
-                Icon(Icons.more_vert, size: 24.w, color: text_color_02),
+                Icon(Icons.more_vert, size: 24.h, color: text_color_02),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
                   child: Text(
@@ -2337,7 +2339,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               backgroundColor: Colors.white,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
-                    padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                     padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(5.h)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -2501,7 +2503,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               backgroundColor: Colors.white,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
-                    padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(5.h)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -2530,13 +2532,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           flex: 2,
                           child: Container(
                             alignment: Alignment.center,
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(2.w)),
                             decoration: BoxDecoration(
                                 border: Border.all(color: line, width: 1.w)
                             ),
                             child: Text(
                                 Strings.of(context)?.get("order_cargo_info_in_out_sctn")??"수출입구분_",
-                              style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                              style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                             ),
                           )
                         ),
@@ -2559,7 +2561,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           ),
                           child: Text(
                               mData.value.inOutSctnName??"",
-                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                            style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                           ),
                         )
                       ),
@@ -2583,7 +2585,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_truck_type")??"운송유형_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2606,7 +2608,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.truckTypeName??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         )
@@ -2655,7 +2657,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.carTonName??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2676,7 +2678,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_car_type")??"차종_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2696,7 +2698,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.carTypeName??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         )
@@ -2725,7 +2727,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_cargo")??"화물정보_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2745,7 +2747,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.goodsName??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         )
@@ -2774,7 +2776,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_item_lvl_1")??"운송품목_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2794,7 +2796,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.itemName??"-",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2815,7 +2817,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_wgt")??"적재중량_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2835,7 +2837,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 "${mData.value.goodsWeight} ${mData.value.weightUnitCode}",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         )
@@ -2884,7 +2886,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.sWayName??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2905,7 +2907,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_way_off")??"하차방법_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2925,7 +2927,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.eWayName??"",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         )
@@ -2954,7 +2956,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_mix_type")??"혼적여부_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -2995,7 +2997,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 Strings.of(context)?.get("order_cargo_info_return_type")??"왕복여부_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         ),
@@ -3015,7 +3017,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               ),
                               child: Text(
                                 mData.value.returnYn == "Y"?"${Strings.of(context)?.get("order_cargo_info_return_y")}":"${Strings.of(context)?.get("order_cargo_info_return_n")}",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                               ),
                             )
                         )
@@ -3052,7 +3054,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               backgroundColor: Colors.white,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
-                    padding: EdgeInsets.only(left: CustomStyle.getWidth(40.0)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(5.w)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -3063,7 +3065,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               },
               body: Obx((){
                 return Container(
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border(
@@ -3093,7 +3095,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                                 child: Text(
                                   !(mData.value.driverMemo?.isEmpty == true) ? mData.value.driverMemo??"-" : "-",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                  style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                                 ),
                               ),
                               Container(
@@ -3114,7 +3116,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                                 child: Text(
                                   !(mData.value.reqMemo?.isEmpty == true) ? mData.value.reqMemo??"-" : "-",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                  style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                                 ),
                               )
                             ],
@@ -3148,14 +3150,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                       Strings.of(context)?.get("order_detail_title")??"Not Found",
                       style: CustomStyle.appBarTitleFont(
                           styleFontSize16, styleWhiteCol)
-                  ),
+                  )
+                ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -3164,10 +3167,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SizedBox(
@@ -3192,14 +3194,14 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       ),
                     ),
                     Positioned(
-                        bottom: CustomStyle.getHeight(10.h),
-                        right: CustomStyle.getWidth(15.w),
+                        bottom: CustomStyle.getHeight(7.h),
+                        right: CustomStyle.getWidth(10.w),
                         child: InkWell(
                           onTap: () async {
                             await copyOrder();
                           },
                           child: Container(
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(15.w)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(10.w)),
                           decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
                               borderRadius: BorderRadius.circular(30.w),
@@ -3208,7 +3210,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           child: Row(
                             children: [
                               Container(
-                                padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                                padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                                 child: Icon(Icons.file_copy, size: 24.h,color: Colors.white),
                               ),
                               Text(

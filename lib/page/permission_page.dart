@@ -5,6 +5,7 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PermissionPage extends StatefulWidget {
   const  PermissionPage({Key? key}) : super(key:key);
@@ -66,8 +67,8 @@ class _PermissionPageState extends State<PermissionPage>{
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: CustomStyle.getWidth(10.0)),
-                                child: const Icon(Icons.circle_notifications,
-                                    color: Colors.black, size: 24),
+                                child: Icon(Icons.circle_notifications,
+                                    color: Colors.black, size: 24.h),
                               ),
                               Column(
                                 mainAxisAlignment: MainAxisAlignment.center,

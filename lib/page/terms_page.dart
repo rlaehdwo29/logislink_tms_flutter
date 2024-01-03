@@ -114,7 +114,7 @@ class _TermsPageState extends State<TermsPage> {
                 child: Container(
                   height: CustomStyle.getHeight(54.0),
                   margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-                  child: Icon(allcheck.value?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28,color: allcheck.value?main_color:text_color_03)
+                  child: Icon(allcheck.value?Icons.check_circle:Icons.check_circle_outline_outlined,size: 24.h,color: allcheck.value?main_color:text_color_03)
                 )
               ),
               Expanded(
@@ -149,7 +149,7 @@ class _TermsPageState extends State<TermsPage> {
                                     flex: 2,
                                     child:Container(
                                         margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-                                        child: Icon(checkBoxArrayList.value[0]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28,color: checkBoxArrayList.value[0]?main_color:text_color_03)
+                                        child: Icon(checkBoxArrayList.value[0]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 24.h,color: checkBoxArrayList.value[0]?main_color:text_color_03)
                                     )
                                 ),
                                 Expanded(
@@ -174,7 +174,7 @@ class _TermsPageState extends State<TermsPage> {
                           },
                             child: Container(
                             padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(14.0.w)),
-                            child: Icon(Icons.keyboard_arrow_right_outlined,size: 32.w,color: text_color_03)
+                            child: Icon(Icons.keyboard_arrow_right_outlined,size: 28.h,color: text_color_03)
                           )
                         )
                       ),
@@ -199,7 +199,7 @@ class _TermsPageState extends State<TermsPage> {
                                     flex: 2,
                                     child:Container(
                                         margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-                                        child: Icon(checkBoxArrayList.value[1]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28,color: checkBoxArrayList.value[1]?main_color:text_color_03)
+                                        child: Icon(checkBoxArrayList.value[1]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28.h,color: checkBoxArrayList.value[1]?main_color:text_color_03)
                                     )
                                 ),
                                 Expanded(
@@ -224,7 +224,7 @@ class _TermsPageState extends State<TermsPage> {
                             },
                               child: Container(
                               padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(14.0.w)),
-                              child: Icon(Icons.keyboard_arrow_right_outlined,size: 32.w,color: text_color_03)
+                              child: Icon(Icons.keyboard_arrow_right_outlined,size: 28.h,color: text_color_03)
                           )
                         )
                       ),
@@ -249,7 +249,7 @@ class _TermsPageState extends State<TermsPage> {
                                     flex: 2,
                                     child:Container(
                                         margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-                                        child: Icon(checkBoxArrayList.value[2]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28,color: checkBoxArrayList.value[2]?main_color:text_color_03)
+                                        child: Icon(checkBoxArrayList.value[2]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28.h,color: checkBoxArrayList.value[2]?main_color:text_color_03)
                                     )
                                 ),
                                 Expanded(
@@ -274,7 +274,7 @@ class _TermsPageState extends State<TermsPage> {
                               },
                                 child: Container(
                                 padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(14.0.w)),
-                                child: Icon(Icons.keyboard_arrow_right_outlined,size: 32.w,color: text_color_03)
+                                child: Icon(Icons.keyboard_arrow_right_outlined,size: 28.h,color: text_color_03)
                             )
                          )
                       ),
@@ -299,7 +299,7 @@ class _TermsPageState extends State<TermsPage> {
                                     flex: 2,
                                     child:Container(
                                         margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-                                        child: Icon(checkBoxArrayList.value[3]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28,color: checkBoxArrayList.value[3]?main_color:text_color_03)
+                                        child: Icon(checkBoxArrayList.value[3]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28.h,color: checkBoxArrayList.value[3]?main_color:text_color_03)
                                     )
                                 ),
                                 Expanded(
@@ -324,7 +324,7 @@ class _TermsPageState extends State<TermsPage> {
                               },
                                 child: Container(
                                 padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(14.0.w)),
-                                child: Icon(Icons.keyboard_arrow_right_outlined,size: 32.w,color: text_color_03)
+                                child: Icon(Icons.keyboard_arrow_right_outlined,size: 28.h,color: text_color_03)
                             )
                          )
                       ),
@@ -349,7 +349,7 @@ class _TermsPageState extends State<TermsPage> {
                                     flex: 2,
                                     child:Container(
                                         margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.0)),
-                                        child: Icon(checkBoxArrayList.value[4]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28,color: checkBoxArrayList.value[4]?main_color:text_color_03)
+                                        child: Icon(checkBoxArrayList.value[4]?Icons.check_circle:Icons.check_circle_outline_outlined,size: 28.h,color: checkBoxArrayList.value[4]?main_color:text_color_03)
                                     )
                                 ),
                                 Expanded(
@@ -374,7 +374,7 @@ class _TermsPageState extends State<TermsPage> {
                               },
                               child: Container(
                               padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(14.0.w)),
-                              child: Icon(Icons.keyboard_arrow_right_outlined,size: 32.w,color: text_color_03)
+                              child: Icon(Icons.keyboard_arrow_right_outlined,size: 28.h,color: text_color_03)
                           )
                         )
                       ),

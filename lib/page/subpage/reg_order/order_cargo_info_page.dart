@@ -632,14 +632,15 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
-          appBar:PreferredSize(
-              preferredSize: Size.fromHeight(CustomStyle.getHeight(50.0)),
-              child: AppBar(
-                title: Text(
+          appBar: AppBar(
+                title: Center(
+                  child: Text(
                       "화물정보",
                       style: CustomStyle.appBarTitleFont(
                           styleFontSize16, styleWhiteCol)
-                  ),
+                  )
+                ),
+                toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
                 leading: IconButton(
@@ -647,15 +648,14 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
-              )
-          ),
+              ),
           body: SafeArea(
               child: Obx((){
                  return SingleChildScrollView(
                      child:Container(
-                   padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+                   padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -672,7 +672,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                     ),
                                     Container(
-                                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                                         child: Text(
                                           "${Strings.of(context)?.get("essential")??"Not Found"}",
                                           style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
@@ -719,7 +719,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                     ),
                                     Container(
-                                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                                         child: Text(
                                           "${Strings.of(context)?.get("essential")??"Not Found"}",
                                           style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
@@ -767,7 +767,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                           style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                         ),
                                         Container(
-                                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                                             child: Text(
                                               "${Strings.of(context)?.get("essential")??"Not Found"}",
                                               style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
@@ -844,7 +844,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                           style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                         ),
                                         Container(
-                                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                                             child: Text(
                                               "${Strings.of(context)?.get("essential")??"Not Found"}",
                                               style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
@@ -866,7 +866,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                           decoration: goodsNameController.text.isNotEmpty
                                               ? InputDecoration(
                                             counterText: '',
-                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                 borderRadius: BorderRadius.circular(5.h)
@@ -883,22 +883,22 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                                 goodsNameController.clear();
                                                 mData.value.goodsName = "";
                                               },
-                                              icon: const Icon(
+                                              icon: Icon(
                                                 Icons.clear,
-                                                size: 18,
+                                                size: 18.h,
                                                 color: Colors.black,
                                               ),
                                             ),
                                           )
                                               : InputDecoration(
                                             counterText: '',
-                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                           contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                             enabledBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                 borderRadius: BorderRadius.circular(5.h)
                                             ),
                                             disabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
+                                                borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w))
                                             ),
                                             focusedBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
@@ -986,7 +986,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                                   decoration: cargoWgtController.text.isNotEmpty
                                                       ? InputDecoration(
                                                     counterText: '',
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                     enabledBorder: OutlineInputBorder(
                                                         borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                         borderRadius: BorderRadius.circular(5.h)
@@ -1003,22 +1003,22 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                                         cargoWgtController.clear();
                                                         mData.value.goodsWeight = "";
                                                       },
-                                                      icon: const Icon(
+                                                      icon: Icon(
                                                         Icons.clear,
-                                                        size: 18,
+                                                        size: 18.h,
                                                         color: Colors.black,
                                                       ),
                                                     ),
                                                   )
                                                       : InputDecoration(
                                                     counterText: '',
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                     enabledBorder: OutlineInputBorder(
                                                         borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                         borderRadius: BorderRadius.circular(5.h)
                                                     ),
                                                     disabledBorder: UnderlineInputBorder(
-                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5))
+                                                        borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w))
                                                     ),
                                                     focusedBorder: OutlineInputBorder(
                                                         borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
@@ -1105,16 +1105,16 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                                         goodsQtyController.clear();
                                                         mData.value.goodsQty = "";
                                                       },
-                                                      icon: const Icon(
+                                                      icon: Icon(
                                                         Icons.clear,
-                                                        size: 18,
+                                                        size: 18.h,
                                                         color: Colors.black,
                                                       ),
                                                     ),
                                                   )
                                                       : InputDecoration(
                                                     counterText: '',
-                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                                    contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                                     enabledBorder: OutlineInputBorder(
                                                         borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                         borderRadius: BorderRadius.circular(5.h)
@@ -1463,7 +1463,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Icon(Icons.check,
-                                          size: 20, color: styleWhiteCol),
+                                          size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -1492,7 +1492,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.refresh, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.refresh, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
@@ -1521,7 +1521,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.save_alt, size: 20, color: styleWhiteCol),
+                                      Icon(Icons.save_alt, size: 20.h, color: styleWhiteCol),
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
