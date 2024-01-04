@@ -75,12 +75,10 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
           ),
           Expanded(
             flex: 9,
-            child: Container(
-              height: 60.h,
-            padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
                     child: RichText(
@@ -111,7 +109,6 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 )
               ],
             )
-          )
         )
         ],
       )
@@ -203,7 +200,6 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                 ),
                 Container(
                     padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
-                    height: CustomStyle.getHeight(70.h),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.start,
@@ -325,7 +321,6 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                       onChanged: (value){
                         mData.value.orderMemo = value;
                       },
-                      maxLength: 50,
                     )
                 )
               ]
@@ -352,12 +347,10 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
-                title: Center(
-                  child: Text(
+                title: Text(
                       Strings.of(context)?.get("order_addr_confirm_title")??"Not Found",
                       style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
-                  )
-                ),
+                  ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
@@ -371,17 +364,21 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
               ),
           body: SafeArea(
               child: Obx((){
-              return SizedBox(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        headerWidget(),
-                        CustomStyle.getDivider1(),
-                        bodyWidget()
-                      ],
-                    )
-                );
+              return SingleChildScrollView(
+                  child: SizedBox(
+                  height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
+                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          headerWidget(),
+                          CustomStyle.getDivider1(),
+                          bodyWidget()
+                        ],
+                      )
+                )
+              );
               })
           ),
           bottomNavigationBar: SizedBox(

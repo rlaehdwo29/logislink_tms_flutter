@@ -23,11 +23,9 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
               centerTitle: true,
-              title: Center(
-                child: Text(
+              title: Text(
                   "${widget.item.regdate}",
                   style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
-                ) 
               ),
               toolbarHeight: 50.h,
               leading: IconButton(

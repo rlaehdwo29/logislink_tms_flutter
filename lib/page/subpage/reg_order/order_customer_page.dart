@@ -253,11 +253,9 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
           resizeToAvoidBottomInset: false,
             backgroundColor: sub_color,
             appBar: AppBar(
-                  title: Center(
-                    child: Text(
+                  title:  Text(
                       Strings.of(context)?.get("order_customer_title")??"Not Found",
                       style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
-                    )
                   ),
                   toolbarHeight: 50.h,
                   centerTitle: true,

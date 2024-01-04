@@ -254,11 +254,9 @@ class _StopPointPageState extends State<StopPointPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
-                title: Center(
-                  child: Text(
+                title: Text(
                     "${Strings.of(context)?.get("stop_point_title")??"Not Found"}",
                     style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
-                  )
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,

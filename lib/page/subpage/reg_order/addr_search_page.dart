@@ -436,12 +436,10 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
               centerTitle: true,
-              title: Center(
-                child: Text(
+              title: Text(
                   Strings.of(context)?.get("addr_search_title") ?? "Not Found",
                   style: CustomStyle.appBarTitleFont(
                       styleFontSize18, styleWhiteCol)
-                )
               ),
               toolbarHeight: 50.h,
               leading: IconButton(

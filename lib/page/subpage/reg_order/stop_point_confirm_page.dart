@@ -745,12 +745,10 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
           backgroundColor: sub_color,
           appBar: AppBar(
                 title: Obx((){
-                  return Center(
-                    child: Text(
+                  return Text(
                     mTitle.value,
                     style: CustomStyle.appBarTitleFont(
                         styleFontSize16, styleWhiteCol)
-                    )
                   );
                 }),
                 toolbarHeight: 50.h,

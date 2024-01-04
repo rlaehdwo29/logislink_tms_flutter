@@ -2613,12 +2613,10 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
           //resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
-                title: Center(
-                  child: Text(
+                title: Text(
                     Strings.of(context)?.get("order_trans_info_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(
                         styleFontSize16, styleWhiteCol)
-                  )
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,

@@ -269,11 +269,9 @@ class _ReceiptPageState extends State<ReceiptPage>{
           backgroundColor: Theme.of(context).backgroundColor,
           appBar: AppBar(
                 centerTitle: true,
-                title: Center(
-                  child: Text(
+                title: Text(
                     "인수증",
                     style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
-                  )
                 ),
                 toolbarHeight: 50.h,
                 leading: IconButton(

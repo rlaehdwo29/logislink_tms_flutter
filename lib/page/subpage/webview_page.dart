@@ -62,12 +62,10 @@ class _WebViewPageState extends State<WebViewPage> {
         backgroundColor: styleWhiteCol,
         appBar: AppBar(
               centerTitle: true,
-              title: Center(
-                child: Text(
+              title: Text(
                   widget.title,
                   style: CustomStyle.appBarTitleFont(
                       styleFontSize16, styleWhiteCol)
-                )
               ),
               toolbarHeight: 50.h,
               leading: IconButton(

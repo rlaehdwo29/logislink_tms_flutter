@@ -63,12 +63,10 @@ class _AppBarNoticeDetailPageState extends State<AppBarNoticeDetailPage> {
       backgroundColor: styleWhiteCol,
       appBar: AppBar(
             centerTitle: true,
-            title: Center(
-              child: Text(
+            title: Text(
                 Strings.of(context)?.get("drawer_menu_notice")??"공지사항_",
                 style: CustomStyle.appBarTitleFont(
                     styleFontSize16, styleWhiteCol)
-                )
             ),
             toolbarHeight: 50.h,
             leading: IconButton(

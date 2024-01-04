@@ -1508,11 +1508,9 @@ Widget build(BuildContext context) {
       appBar: AppBar(
               centerTitle: true,
               toolbarHeight: 50.h,
-              title: Center(
-                child: Text(
+              title: Text(
                   Strings.of(context)?.get("monitor_title")??"Not Found",
                   style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
-                )
               ),
               leading: IconButton(
                 onPressed: () async {

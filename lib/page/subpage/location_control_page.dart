@@ -253,12 +253,10 @@ class _LocationControlPageState extends State<LocationControlPage>{
           backgroundColor: styleWhiteCol,
           appBar: AppBar(
                 centerTitle: true,
-                title: Center(
-                  child: Text(
+                title: Text(
                     Strings.of(context)?.get("location_control_title")??"위치관제_",
                     style: CustomStyle.appBarTitleFont(
                         styleFontSize16, styleWhiteCol)
-                    )
                 ),
                 toolbarHeight: 50.h,
                 leading: IconButton(

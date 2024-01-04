@@ -494,11 +494,9 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
           backgroundColor: sub_color,
           resizeToAvoidBottomInset:false,
           appBar: AppBar(
-                title: Center(
-                  child: Text(
+                title: Text(
                     Strings.of(context)?.get("order_reg_day_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
-                  )
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,

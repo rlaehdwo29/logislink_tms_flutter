@@ -324,11 +324,9 @@ class _FindUserPageState extends State<FindUserPage> {
     return Scaffold(
       backgroundColor: styleWhiteCol,
       appBar: AppBar(
-            title: Center(
-              child: Text(
+            title: Text(
                 Strings.of(context)?.get("find_user")??"ID / 비밀번호 찾기_",
                 style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
-              )
             ),
             toolbarHeight: 50.h,
             centerTitle: true,

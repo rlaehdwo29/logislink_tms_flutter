@@ -1602,11 +1602,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       resizeToAvoidBottomInset:false,
       appBar: AppBar(
         backgroundColor: main_color,
-        title: Center(
-          child: Text(
+        title: Text(
             "로지스링크 주선사/운송사용",
             style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
-          )
         ),
         toolbarHeight: 50.h,
         centerTitle: true,

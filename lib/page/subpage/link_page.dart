@@ -843,12 +843,10 @@ class _LinkPageState extends State<LinkPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar:AppBar(
-                title: Center(
-                  child: Text(
+                title:  Text(
                     "정보망 전송 목록",
                     style: CustomStyle.appBarTitleFont(
                         styleFontSize16, styleWhiteCol)
-                  )
                 ),
                 centerTitle: true,
                 toolbarHeight: 50.h,

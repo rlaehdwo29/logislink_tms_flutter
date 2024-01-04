@@ -127,12 +127,9 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
         appBar: AppBar(
               centerTitle: true,
               toolbarHeight: 50.h,
-              title: Center( 
-                child: Text(
+              title: Text(
                   "공지사항",
-                  style: CustomStyle.appBarTitleFont(
-                      styleFontSize16, styleWhiteCol)
-                  )
+                  style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
               ),
               leading: IconButton(
                 onPressed: () {

@@ -633,12 +633,10 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
-                title: Center(
-                  child: Text(
+                title: Text(
                       "화물정보",
                       style: CustomStyle.appBarTitleFont(
                           styleFontSize16, styleWhiteCol)
-                  )
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,

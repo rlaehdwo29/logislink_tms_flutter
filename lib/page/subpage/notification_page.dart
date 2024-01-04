@@ -94,11 +94,9 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: Theme.of(context).backgroundColor,
         appBar: AppBar(
               centerTitle: true,
-              title: Center(
-                child: Text("알림",
+              title:Text("알림",
                   style: CustomStyle.appBarTitleFont(
                       styleFontSize18, styleWhiteCol)
-                      )
                   ),
                 toolbarHeight: 50.h,
               leading: IconButton(

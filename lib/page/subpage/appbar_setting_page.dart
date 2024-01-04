@@ -866,12 +866,10 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
       backgroundColor: const Color(0xffececec),
       appBar: AppBar(
             centerTitle: true,
-            title: Center(
-              child: Text(
+            title: Text(
                 Strings.of(context)?.get("drawer_menu_setting")??"Not Found",
                 style: CustomStyle.appBarTitleFont(
                     styleFontSize16, styleWhiteCol)
-                )
             ),
             toolbarHeight: 50.h,
             leading: IconButton(

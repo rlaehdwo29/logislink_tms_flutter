@@ -113,11 +113,9 @@ class _PointPageState extends State<PointPage> {
             backgroundColor: Theme.of(context).backgroundColor,
             appBar: AppBar(
                   centerTitle: true,
-                  title: Center(
-                    child: Text("포인트 조회",
+                  title: Text("포인트 조회",
                       style: CustomStyle.appBarTitleFont(
                           styleFontSize18, styleWhiteCol)
-                        )
                   ),
                   toolbarHeight: 50.h,
                   leading: IconButton(
