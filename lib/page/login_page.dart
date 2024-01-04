@@ -248,13 +248,69 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
     });
   }
 
+  void goToGuestQuestion() {
+    openCommonConfirmBox(
+        context,
+        "Guest 모드는 사용에 제한이 있습니다.\n계속 진행하시겠습니까? ",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () {
+              Navigator.of(context).pop(false);
+              guestLogin();
+              }
+    );
+  }
+
+  Future<void> guestLogin() async {
+    Logger logger = Logger();
+    SP.putBool(Const.KEY_GUEST_MODE, true);
+    var password = Util.encryption(Const.GUEST_PW);
+    await pr?.show();
+    await DioService.dioClient(header: true).login(Const.GUEST_ID, password).then((it) async {
+      await pr?.hide();
+      ReturnMap _response = DioService.dioResponse(it);
+      if(_response.status == "200") {
+        UserModel userInfo = UserModel.fromJSON(it.response.data["data"]);
+        if (userInfo != null) {
+          userInfo.authorization = it.response.headers["authorization"]?[0];
+          logger.i("userJson => $userInfo");
+          controller.setUserInfo(userInfo);
+          var app = await controller.getUserInfo();
+          goToMain();
+        } else {
+          openOkBox(context, _response.message ?? "",
+              Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                Navigator.of(context).pop(false);
+              });
+        }
+      }else{
+        Util.snackbar(context, "등록된 사용자가 아닙니다.");
+      }
+    }).catchError((Object obj) async {
+      await pr?.hide();
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          logger.e("login_page.dart guestLogin() error : ${res?.statusCode} -> ${res?.statusMessage}");
+          openOkBox(context,"${res?.statusCode} / ${res?.statusMessage}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+          break;
+        default:
+          logger.e("login_page.dart guestLogin() error2 =>");
+          break;
+      }
+    });
+  }
+
   Future<void> userLogin() async {
+     Logger logger = Logger();
+    SP.putBool(Const.KEY_GUEST_MODE, false);
     if (validate()) {
       var terms = await SP.getBoolean(Const.KEY_TERMS);
       if (!terms) {
         CheckTermsAgree();
       } else {
-        Logger logger = Logger();
         var password = Util.encryption(userPassword.value);
         password.replaceAll("\n", "");
         await pr?.show();
@@ -421,7 +477,18 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
                                         fontSize: styleFontSize15,
                                     )
                                 ),
-                              ) : const SizedBox(),
+                              ) : InkWell(
+                                onTap: () {
+                                  goToGuestQuestion();
+                                },
+                                child: Text(
+                                    "Guest 로그인",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: styleFontSize15,
+                                    )
+                                ),
+                              ),
                                 InkWell(
                                   onTap: () async {
                                     await goToFindUser();

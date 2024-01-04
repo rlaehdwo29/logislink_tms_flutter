@@ -437,7 +437,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   Widget getListCardView(OrderModel item) {
     return Container(
-        padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w),right: CustomStyle.getWidth(10.0.w),top: CustomStyle.getHeight(10.0.h)),
+        padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),top: CustomStyle.getHeight(10.0.h)),
         child: InkWell(
             onTap: () async {
               await goToOrderDetail(item);

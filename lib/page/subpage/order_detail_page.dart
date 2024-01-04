@@ -1538,14 +1538,14 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       children: [
         // 접수
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(10.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(10.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
              tvOrderState.value ?
               Expanded(
                   flex: 2,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                       child: Text(
                         mData.value.orderStateName??"접수_",
                         style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
@@ -1553,9 +1553,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   )
               ) : const SizedBox(),
               Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.sellCustName??"",
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1565,7 +1565,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 4,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.sellDeptName??"",
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1585,14 +1585,14 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         ) ,
         // 운송사 접수
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               tvAllocState.value ?
               Expanded(
                   flex: 3,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                       child: Text(
                         mData.value.allocStateName??"운송사접수",
                         style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
@@ -1602,7 +1602,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 2,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.linkName??"",
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1612,7 +1612,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 2,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.buyCustName??"",
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1622,7 +1622,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 3,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.buyDeptName??"",
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1643,13 +1643,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         // 경유비(지불)
         Util.equalsCharge(mData.value.wayPointCharge??"0")?
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               Expanded(
                   flex: 3,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                       child: Text(
                         Strings.of(context)?.get("order_trans_info_way_point_charge")??"경유지_(지불)",
                         style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1659,7 +1659,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 7,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: RichText(
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -1684,13 +1684,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         // 대기료(지불)
         Util.equalsCharge(mData.value.stayCharge??"0") ?
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               Expanded(
                   flex: 3,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                       child: Text(
                         Strings.of(context)?.get("order_trans_info_stay_charge")??"대기료_(지불)",
                         style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1731,7 +1731,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 4,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                       child: Text(
                         Strings.of(context)?.get("order_trans_info_hand_work_charge")??"수작업비_(지불)",
                         style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1741,7 +1741,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 7,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: RichText(
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -1766,13 +1766,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         // 회차료(지불)
         Util.equalsCharge(mData.value.roundCharge ?? "0") ?
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               Expanded(
                   flex: 3,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                       child: Text(
                         Strings.of(context)?.get("order_trans_info_round_charge")??"회차료_(지불)",
                         style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1782,7 +1782,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 7,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: RichText(
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -1807,13 +1807,13 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         // 기타추가비(지불)
         Util.equalsCharge(mData.value.otherAddCharge??"0") ?
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               Expanded(
                   flex: 4,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                       child: Text(
                         Strings.of(context)?.get("order_trans_info_other_add_charge")??"기타추가비_(지불)",
                         style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -1823,7 +1823,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               Expanded(
                   flex: 7,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: RichText(
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -1874,7 +1874,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     await goToReceipt();
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                     decoration: BoxDecoration(
                         border: Border.all(color: order_state_01,width: 1.w),
                         borderRadius: BorderRadius.all(Radius.circular(5.w))
@@ -1906,7 +1906,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         ),
                         borderRadius: BorderRadius.all(Radius.circular(5.w))
                     ),
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
                     child: Text(
                       mData.value.driverStateName??"출발",
                       style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
@@ -1918,7 +1918,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         ),
         CustomStyle.getDivider1(),
         Container(
-          padding: EdgeInsets.all(10.w),
+          padding: EdgeInsets.all(5.w),
           child: Row(
               children: [
                 Expanded(
@@ -1950,7 +1950,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                     }
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                                     child: Text(
                                       Util.makePhoneNumber(mData.value.driverTel),
                                       style: CustomStyle.CustomFont(styleFontSize14, addr_type_text),
@@ -1983,7 +1983,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               //입차
               mData.value.enterDate != null ?
               Container(
-                padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h), top: CustomStyle.getHeight(10.h), right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
+                padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h), top: CustomStyle.getHeight(10.h), right: CustomStyle.getWidth(5.w), left: CustomStyle.getWidth(5.w)),
                 child:  Row(
                   children: [
                     Text(
@@ -1991,7 +1991,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                     ),
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                         child: Text(
                           mData.value.enterDate??"",
                           style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -2003,7 +2003,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               // 출발
               mData.value.startDate != null ?
               Container(
-                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h), top: CustomStyle.getHeight(5.h), right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
+                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h), top: CustomStyle.getHeight(5.h), right: CustomStyle.getWidth(5.w), left: CustomStyle.getWidth(5.w)),
                   child:  Row(
                     children: [
                       Text(
@@ -2011,7 +2011,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                       Container(
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                           child: Text(
                             mData.value.startDate??"",
                             style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -2023,7 +2023,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               // 도착
               mData.value.finishDate != null ?
               Container(
-                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(10.h), top: CustomStyle.getHeight(5.h), right: CustomStyle.getWidth(10.w), left: CustomStyle.getWidth(10.w)),
+                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(10.h), top: CustomStyle.getHeight(5.h), right: CustomStyle.getWidth(5.w), left: CustomStyle.getWidth(5.w)),
                   child:  Row(
                     children: [
                       Text(
@@ -2031,7 +2031,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                       Container(
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                           child: Text(
                             mData.value.finishDate??"",
                             style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -2070,7 +2070,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       await goToSendLink();
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(5.w)),
                       decoration: BoxDecoration(
                           border: Border.all(color: order_state_01,width: 1.w),
                           borderRadius: BorderRadius.all(Radius.circular(5.w))
@@ -2086,7 +2086,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           ),
           CustomStyle.getDivider1(),
           Container(
-            padding: EdgeInsets.all(10.w),
+            padding: EdgeInsets.all(5.w),
             child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -2153,7 +2153,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           )) : const SizedBox()),
                           Container(
                             alignment: Alignment.centerLeft,
-                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                             child: Text(
                               mData.value.sAddr??"",
                               style: CustomStyle.CustomFont(
@@ -2165,7 +2165,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           !(mData.value.sAddrDetail?.isEmpty == true) ?
                           Container(
                             alignment: Alignment.centerLeft,
-                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                             child: Text(
                               mData.value.sAddrDetail??"",
                               style: CustomStyle.CustomFont(
@@ -2293,7 +2293,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               children: [
                 Icon(Icons.more_vert, size: 24.h, color: text_color_02),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
+                  padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                   child: Text(
                     Util.makeDistance(mData.value.distance),
                     style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
@@ -2381,7 +2381,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
   Widget stopPointItems(int index) {
     return Container(
-        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(20.w)),
+        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
         decoration: BoxDecoration(
           color: styleGreyCol3,
           border: Border(bottom: BorderSide(color: line, width: 1.w)),
@@ -2398,7 +2398,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       Expanded(
                       flex: 2,
                         child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(5.w)),
                             decoration: BoxDecoration(
                               border: Border.all(color: text_box_color_01,width: 1.w),
                               borderRadius: BorderRadius.all(Radius.circular(5.w))
@@ -2412,7 +2412,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       Expanded(
                         flex: 5,
                         child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                             child: Text(
                               mStopList.value[index].eComName??"",
                               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -2422,7 +2422,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       Expanded(
                         flex: 2,
                         child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
                           alignment: Alignment.centerRight,
                           child: Text(
                             mStopList.value[index].stopSe == "S" ? "상차" : "하자",
@@ -2456,7 +2456,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             }
                           },
                           child: Container(
-                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(3.w)),
                             child: Text(
                               Util.makePhoneNumber(mStopList.value[index].eTel),
                               style: CustomStyle.CustomFont(styleFontSize12, addr_type_text),
