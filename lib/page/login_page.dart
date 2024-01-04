@@ -409,6 +409,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                              Platform.isAndroid?
                               InkWell(
                                 onTap: () async {
                                   await join();
@@ -420,7 +421,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
                                         fontSize: styleFontSize15,
                                     )
                                 ),
-                              ),
+                              ) : const SizedBox(),
                                 InkWell(
                                   onTap: () async {
                                     await goToFindUser();
