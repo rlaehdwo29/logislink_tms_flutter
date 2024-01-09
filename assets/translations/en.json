@@ -252,6 +252,8 @@
   "order_addr_confirm_title" : "주소지 확인",
   "order_addr_confirm_memo_hint" : "주소지 관련 메모입니다.",
 
+  "Guest_Intro_Mode":"현재 Guest모드 입니다.\n\n정상적인 앱 로그인 이용을 원하시는 경우 \n아래 경로로 연락 주세요.\n\nTel : 02-783-1436\nFax : 02-783-1437\nE-mail : contact@logis-link.co.kr",
+
   "order_cargo_info_title" : "화물 정보",
   "order_cargo_info_in_out_sctn" : "수출입구분",
   "order_cargo_info_truck_type" : "운송유형",

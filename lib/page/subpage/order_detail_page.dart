@@ -33,6 +33,7 @@ import 'package:phone_call/phone_call.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
+import 'package:logislink_tms_flutter/utils/sp.dart';
 
 class OrderDetailPage extends StatefulWidget {
 
@@ -3136,6 +3137,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     );
   }
 
+  void showGuestDialog(){
+    openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+  }
+
   @override
   Widget build(BuildContext context) {
     pr = Util.networkProgress(context);
@@ -3235,6 +3240,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
+                              var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
                               await showOrderCancel();
                             },
                             child: Container(
@@ -3254,6 +3264,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
+                                var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
                               await showReOrder();
                             },
                             child: Container(
@@ -3274,6 +3289,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
+                                var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
                               await goToAlloc();
                             },
                             child: Container(
@@ -3293,6 +3313,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
+                                var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
                               await showAllocCancel();
                             },
                             child: Container(
@@ -3311,6 +3336,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
+                                var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
                               await showAllocReg();
                             },
                             child: Container(

@@ -1594,6 +1594,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     });
   }
 
+  void showGuestDialog(){
+    openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1653,6 +1657,11 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   flex: 1,
                   child: InkWell(
                       onTap: () async {
+                          var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
                         await goToRegOrder();
                       },
                       child: Container(
