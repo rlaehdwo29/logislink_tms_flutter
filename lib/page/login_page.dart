@@ -211,23 +211,35 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
     await DioService.dioClient(header: true).getTermsUserAgree(user?.authorization??"",userID.value).then((it) async {
       await pr?.hide();
       ReturnMap _response = DioService.dioResponse(it);
-
+      logger.i("CheckTermsAgree() _response -> ${_response.status} // ${_response.resultMap}");
       if(_response.status == "200") {
-        TermsAgreeModel user = TermsAgreeModel.fromJSON(it.response.data["data"]);
-        if(user != null) {
-          if(user.necessary == "N" || user.necessary == ""){
-            m_TermsCheck = true;
-            m_TermsMode = TERMS.UPDATE;
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              TermsAgreeModel user = TermsAgreeModel.fromJSON(it.response.data["data"]);
+              if (user != null) {
+                if (user.necessary == "N" || user.necessary == "") {
+                  m_TermsCheck = true;
+                  m_TermsMode = TERMS.UPDATE;
+                } else {
+                  m_TermsCheck = true;
+                  m_TermsMode = TERMS.DONE;
+                }
+              } else {
+                m_TermsCheck = false;
+                m_TermsMode = TERMS.INSERT;
+              }
+            }else{
+              m_TermsCheck = false;
+              m_TermsMode = TERMS.DONE;
+            }
+            await SP.putBool(Const.KEY_TERMS, true);
+            await userLogin();
           }else{
-            m_TermsCheck = true;
-            m_TermsMode = TERMS.DONE;
+            openOkBox(context, _response.resultMap?["msg"],
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
           }
-        }else{
-          m_TermsCheck = false;
-          m_TermsMode= TERMS.INSERT;
-        }
-        await SP.putBool(Const.KEY_TERMS, true);
-        await userLogin();
       }else{
         openOkBox(context,_response.message??"",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       }
@@ -309,7 +321,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
     if (validate()) {
       var terms = await SP.getBoolean(Const.KEY_TERMS);
       if (!terms) {
-        CheckTermsAgree();
+        await CheckTermsAgree();
       } else {
         var password = Util.encryption(userPassword.value);
         password.replaceAll("\n", "");
@@ -326,8 +338,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
               if (_response.resultMap?["data"] != null) {
               UserModel userInfo = UserModel.fromJSON(it.response.data["data"]);
                 if (userInfo != null) {
-                  userInfo.authorization =
-                  it.response.headers["authorization"]?[0];
+                  userInfo.authorization = it.response.headers["authorization"]?[0];
                   await controller.setUserInfo(userInfo);
                   if (m_TermsCheck == false && m_TermsMode == TERMS.INSERT) {
                     var results = await Navigator.of(context).push(
