@@ -789,9 +789,9 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
           user.authorization,
           mData.value.orderId,
           user.custId, user.deptId, user.userId, user.mobile,
-          "", "", "", "",
-          mData.value.buyCharge, mData.value.buyFee, mData.value.vehicId, mData.value.driverId, mData.value.carNum,
-          mData.value.carTonCode, mData.value.carTypeCode,mData.value.driverName,mData.value.carNum,mData.value.driverMemo,
+          "", "", "", "", mData.value.buyCharge, mData.value.buyFee,
+          mData.value.vehicId, mData.value.driverId, mData.value.carNum, mData.value.carTonCode,
+          mData.value.carTypeCode,mData.value.driverName,mData.value.driverTel,mData.value.driverMemo,
           mData.value.wayPointMemo, mData.value.wayPointCharge, mData.value.stayMemo, mData.value.stayCharge,
           mData.value.handWorkMemo, mData.value.handWorkCharge, mData.value.roundMemo, mData.value.roundCharge,
           mData.value.otherAddMemo,mData.value.otherAddCharge, payType.value,talkYn.value ? "Y" : "N",buyDrivLicNum.value
