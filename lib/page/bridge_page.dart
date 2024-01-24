@@ -88,8 +88,15 @@ class _BridgePageState extends State<BridgePage> {
           var list = _response.resultMap?["data"] as List;
 
           if (list != null && list.isNotEmpty) {
-            VersionModel? codeVersion = VersionModel.fromJSON(list[0]);
-            VersionModel? appVersion = VersionModel.fromJSON(list[1]);
+            VersionModel? codeVersion = VersionModel();
+            VersionModel? appVersion = VersionModel();
+            if(Platform.isIOS) {
+               codeVersion = VersionModel.fromJSON(list[0]);
+               appVersion = VersionModel.fromJSON(list[1]);
+            }else{
+              appVersion = VersionModel.fromJSON(list[0]);
+              codeVersion = VersionModel.fromJSON(list[1]);
+            }
             String? shareVersion = await SP.get(Const.CD_VERSION);
             var server_version_arr = appVersion.versionCode?.split('.');
             String server_version = server_version_arr!.elementAt(0) + "." + server_version_arr!.elementAt(1) + server_version_arr!.elementAt(2);
