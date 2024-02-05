@@ -331,41 +331,42 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
             .then((it) async {
           await pr?.hide();
           ReturnMap _response = DioService.dioResponse(it);
-          logger.i("userLogin() _response -> ${_response.status} // ${_response
-              .resultMap}");
+          logger.i("userLogin() _response -> ${_response.status} // ${_response.resultMap}");
           if (_response.status == "200") {
             if (_response.resultMap?["result"] == true) {
               if (_response.resultMap?["data"] != null) {
-              UserModel userInfo = UserModel.fromJSON(it.response.data["data"]);
-                if (userInfo != null) {
-                  userInfo.authorization = it.response.headers["authorization"]?[0];
-                  await controller.setUserInfo(userInfo);
-                  if (m_TermsCheck == false && m_TermsMode == TERMS.INSERT) {
-                    var results = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (BuildContext context) => const TermsPage())
-                    );
+                  UserModel userInfo = UserModel.fromJSON(it.response.data["data"]);
+                  if (userInfo != null) {
+                    userInfo.authorization =
+                    it.response.headers["authorization"]?[0];
+                    await controller.setUserInfo(userInfo);
+                    if (m_TermsCheck == false && m_TermsMode == TERMS.INSERT) {
+                      var results = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (
+                                  BuildContext context) => const TermsPage())
+                      );
 
-                    if (results != null && results.containsKey("code")) {
-                      if (results["code"] == 200) {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (
-                                    BuildContext context) => const LoginPage()),
-                                (route) => false);
+                      if (results != null && results.containsKey("code")) {
+                        if (results["code"] == 200) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (
+                                      BuildContext context) => const LoginPage()),
+                                  (route) => false);
+                        }
                       }
+                    } else {
+                      await sendDeviceInfo();
+                      await sendAlarmTalk();
                     }
                   } else {
-                    sendDeviceInfo();
-                    sendAlarmTalk();
+                    openOkBox(context, _response.message ?? "",
+                        Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                          Navigator.of(context).pop(false);
+                        });
                   }
-                } else {
-                  openOkBox(context, _response.message ?? "",
-                      Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                        Navigator.of(context).pop(false);
-                      });
                 }
-              }
             }else{
               openOkBox(context, _response.resultMap?["msg"],
                   Strings.of(context)?.get("confirm") ?? "Error!!", () {

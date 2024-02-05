@@ -438,10 +438,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     int sellRoundCharge = mData.value.sellRoundCharge?.isEmpty == true || mData.value.sellRoundCharge == null ? 0 : int.parse(mData.value.sellRoundCharge!);
     int sellOtherAddCharge = mData.value.sellOtherAddCharge?.isEmpty == true || mData.value.sellOtherAddCharge == null ? 0 : int.parse(mData.value.sellOtherAddCharge!);
 
-    print("토탈 값 보자 =>$sellCharge // $sellFee // $sellWayPointCharge // $sellStayCharge // $sellHandWorkCharge // $sellRoundCharge // $sellOtherAddCharge");
-
     int total = sellCharge + sellWayPointCharge + sellStayCharge + sellHandWorkCharge + sellRoundCharge + sellOtherAddCharge - sellFee;
-    print("토탈 값 보자111 =>$total");
     tvTotal.value = total.toString();
 
   }
@@ -454,14 +451,12 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   }
 
   Future<void> setChargeType() async {
-    print("뭐지 대체 =>${mData.value.chargeType}");
     if(mData.value.chargeType == CHARGE_TYPE_01) {
       tvChargeType01.value = true;
       tvChargeType04.value = false;
       tvChargeType05.value = false;
       llSellFee.value = false;
       etSellFee.value = false;
-      print("뭐지 대체222 =>${etSellFee.value}");
       mData.value.sellFee = "0";
     } else if(mData.value.chargeType == CHARGE_TYPE_04) {
       tvChargeType01.value = false;
@@ -479,7 +474,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   }
 
   Future<void> setUnitPriceType(bool isFirst) async {
-    print("응애옹에 =>${isFirst} // ${mData.value.unitPriceType}");
     if(mData.value.unitPriceType == UNIT_PRICE_TYPE_01) {
       tvUnitPriceType01.value = true;
       tvUnitPriceType02.value = false;
@@ -697,6 +691,11 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     if(mData.value.sellCharge.toString().trim().isEmpty) {
       Util.toast("${Strings.of(context)?.get("order_charge_info_sell_charge_hint")??"Not Found"}");
       return false;
+    } else if(m24Call.value == "Y" || mOneCall.value == "Y" || mHwaMull.value == "Y"){
+      if(mRpaSalary.value == "0" || mRpaSalary.value?.isEmpty == true || mRpaSalary.value == null) {
+        Util.toast("정보망전송 청구금액을 입력해주세요.");
+        return false;
+      }
     }
     return true;
   }
@@ -1354,7 +1353,13 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                               ),
                             ),
                             onChanged: (value){
-                              mRpaSalary.value = value;
+                              if(value.length > 0) {
+                                mRpaSalary.value = int.parse(value.trim()).toString();
+                                rpaValueController.text = int.parse(value.trim()).toString();
+                              }else{
+                                rpaValueController.text = "0";
+                                mRpaSalary.value = "0";
+                              }
                             },
                             maxLength: 50,
                           )
@@ -2294,8 +2299,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       mData.value.oneCharge = mRpaSalary.value;
       mData.value.manCharge = mRpaSalary.value;
 
-      print("으에에에엥 =>${mData.value.sellCharge}");
-
       Navigator.of(context).pop({
         'code':200,
         Const.RESULT_WORK: Const.RESULT_WORK_CHARGE,
@@ -2322,7 +2325,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
           return true;
         } ,
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
                 title: Text(

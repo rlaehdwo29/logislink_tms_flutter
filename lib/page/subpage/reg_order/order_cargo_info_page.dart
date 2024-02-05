@@ -283,10 +283,8 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
 
   Future<void> selectInOutSctn(CodeModel? codeModel,String? codeType) async {
     if(codeType != "") {
-      print("응애옹에? =>$codeType");
       switch(codeType) {
         case "IN_OUT_SCTN" :
-          print("응애옹에222? =>${codeModel?.code} // ${codeModel?.codeName}");
           setState(() {
             mData.value.inOutSctn = codeModel?.code;
             mData.value.inOutSctnName = codeModel?.codeName;

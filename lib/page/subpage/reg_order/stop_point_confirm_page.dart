@@ -99,7 +99,6 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
   }
 
   void selectItem(CodeModel? codeModel,String? codeType) {
-    print("dddddddd=>${codeModel?.code} // ${codeModel?.codeName} // $codeType");
     if(codeType != "") {
       switch (codeType) {
         case 'QTY_UNIT_CD' :
@@ -728,7 +727,6 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
   }
 
   Future<void> confirm() async {
-    print("어디서 문제지? => ${mData.value.eComName} // ${mData.value.eTel}");
     Navigator.of(context).pop({'code':200,Const.RESULT_WORK_STOP_POINT:mData.value});
   }
 

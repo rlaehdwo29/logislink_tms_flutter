@@ -137,7 +137,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
           }
         }
       }catch(e) {
-        print("에러에러에러!!! =>$e");
+        print("getAddr() Exception =>$e");
       }
     }).catchError((Object obj){
       switch (obj.runtimeType) {
@@ -275,16 +275,12 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
           print("confirmStopPoint() -> ${results[Const.RESULT_WORK_STOP_POINT]}");
           if(results[Const.RESULT_WORK_STOP_POINT] != null) {
             List<StopPointModel>? dataList = mData.value.orderStopList??List.empty(growable: true);
-            print("confirmStopPoint()222 1111=> ${dataList?.length}");
             if(dataList?.length == 0) {
               dataList = List.empty(growable: true);
             }
             StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
-            print("confirmStopPoint()222 2222=> ${data.eComName}");
             dataList?.add(data);
-            print("confirmStopPoint()222 2222=> ${dataList?.length}");
             mData.value.orderStopList = dataList;
-            print("confirmStopPoint()222 => ${mData.value.orderStopList?.length}");
             Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
           }
         }
@@ -313,7 +309,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
-        print("하하하하하 -> ${widget.code}");
         if(widget.code == Const.RESULT_SETTING_SADDR) {
           if(results[Const.ADDR_VO] != null) {
             AddrModel addr = results[Const.ADDR_VO];
@@ -398,7 +393,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
   Widget getListItemView(AddrModel item,int position) {
     return InkWell(
         onTap: () async {
-          print("응애옹애 => ${widget.code}");
           if (Const.RESULT_WORK_STOP_POINT == widget.code) {
             await confirmStopPoint(item);
           } else {

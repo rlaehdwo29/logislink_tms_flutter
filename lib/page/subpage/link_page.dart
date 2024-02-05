@@ -224,7 +224,7 @@ class _LinkPageState extends State<LinkPage> {
   }
 
   Future<void> registRpa(OrderLinkCurrentModel data) async {
-    if(mRpaPay.value == "" || mRpaPay.value == null) {
+    if(mRpaPay.value == "0" || mRpaPay.value == "" || mRpaPay.value == null) {
       Util.toast("지불운임을 입력해 주세요.");
       return;
     }

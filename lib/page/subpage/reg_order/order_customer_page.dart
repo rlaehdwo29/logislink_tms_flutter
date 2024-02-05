@@ -170,7 +170,6 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                 textAlign: TextAlign.start,
                 keyboardType: TextInputType.text,
                 onChanged: (value) async {
-                  print("뭐징뭐징 =>$value");
                   search_text.value = value;
                   if(size.value != 0) {
                     await getFilter(search_text.value);
@@ -178,14 +177,11 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                   }
                   mFlag.value = false;
                   String mResult = search_text.value.trim();
-                  print("컹스컹스 -> ${mList.length}");
                   for(int i = 0; i < mList.length; i++) {
-                    print("컹스컹스 -> ${mResult} // ${mList[i].custName} // ${mList[i].deptName}");
                     if((mResult == mList[i].custName && "물류팀(임시)" == mList[i].deptName)) {
                       mFlag.value = true;
                     }
                   }
-                  print("컹스컹스333 => ${mFlag.value}");
                   if(mFlag.value){
                     btn_visable.value = false;
                   }else{
