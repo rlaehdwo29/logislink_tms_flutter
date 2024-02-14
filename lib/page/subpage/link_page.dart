@@ -472,9 +472,11 @@ class _LinkPageState extends State<LinkPage> {
                   ),
                   onChanged: (value) async {
                     if(value.length > 0) {
-                      rpaPayValue.value = value;
+                      rpaPayValue.value = int.parse(value.trim()).toString();
+                      etRpaPayController.text = int.parse(value.trim()).toString();
                     }else{
                       rpaPayValue.value = "0";
+                      etRpaPayController.text = "0";
                     }
                   },
                   maxLength: 50,

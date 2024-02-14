@@ -1547,9 +1547,11 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                             ),
                             onChanged: (value) async {
                               if(value.length > 0) {
-                                mData.value.buyCharge = value.trim();
+                                mData.value.buyCharge = int.parse(value.trim()).toString();
+                                etBuyChargeController.text = int.parse(value.trim()).toString();
                               }else{
                                 mData.value.buyCharge = "0";
+                                etBuyChargeController.text = "0";
                               }
                               await setTotal();
                             },
@@ -1801,9 +1803,11 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       ),
                                       onChanged: (value) async {
                                         if(value.length > 0) {
-                                          mData.value.wayPointCharge = value;
+                                          mData.value.wayPointCharge = int.parse(value.trim()).toString();
+                                          etWayPointController.text = int.parse(value.trim()).toString();
                                         }else{
                                           mData.value.wayPointCharge = "0";
+                                          etWayPointController.text = "0";
                                         }
                                         await setTotal();
                                       },
@@ -1958,9 +1962,11 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       ),
                                       onChanged: (value) async {
                                         if(value.length > 0) {
-                                          mData.value.stayCharge = value;
+                                          mData.value.stayCharge = int.parse(value.trim()).toString();
+                                          etStayChargeController.text = int.parse(value.trim()).toString();
                                         }else{
                                           mData.value.stayCharge = "0";
+                                          etStayChargeController.text = "0";
                                         }
                                         await setTotal();
                                       },
@@ -2255,10 +2261,12 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                         ),
                                       ),
                                       onChanged: (value) async {
-                                        if(value.length > 0){
-                                          mData.value.roundCharge = value;
+                                        if(value.length > 0) {
+                                          mData.value.roundCharge = int.parse(value.trim()).toString();
+                                          etRoundChargeController.text = int.parse(value.trim()).toString();
                                         }else{
                                           mData.value.roundCharge = "0";
+                                          etRoundChargeController.text = "0";
                                         }
                                         await setTotal();
                                       },
@@ -2408,9 +2416,11 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                       ),
                                       onChanged: (value) async {
                                         if(value.length > 0) {
-                                          mData.value.otherAddCharge = value;
+                                          mData.value.otherAddCharge = int.parse(value.trim()).toString();
+                                          etOtherAddChargeController.text = int.parse(value.trim()).toString();
                                         }else{
                                           mData.value.otherAddCharge = "0";
+                                          etOtherAddChargeController.text = "0";
                                         }
                                         await setTotal();
                                       },

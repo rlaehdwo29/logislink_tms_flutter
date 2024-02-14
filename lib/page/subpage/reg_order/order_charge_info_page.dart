@@ -988,9 +988,11 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  mData.value.unitPrice = value;
+                  mData.value.unitPrice = int.parse(value.trim()).toString();
+                  unitPriceController.text = int.parse(value.trim()).toString();
                 }else{
                   mData.value.unitPrice = "0";
+                  unitPriceController.text = "0";
                 }
                 if(mData.value.unitPriceType == UNIT_PRICE_TYPE_02) {
                   if(Const.RESULT_SETTING_CHARGE == code) {
@@ -1085,9 +1087,11 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  mData.value.sellCharge = value;
+                  mData.value.sellCharge = int.parse(value.trim()).toString();
+                  sellChargeController.text = int.parse(value.trim()).toString();
                 }else{
                   mData.value.sellCharge = "0";
+                  sellChargeController.text = "0";
                 }
                 await setTotal();
 
@@ -1164,9 +1168,11 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  mData.value.sellFee = value;
+                  mData.value.sellFee = int.parse(value.trim()).toString();
+                  sellFeeController.text = int.parse(value.trim()).toString();
                 }else{
                   mData.value.sellFee = "0";
+                  sellFeeController.text = "0";
                 }
                 await setTotal();
 
