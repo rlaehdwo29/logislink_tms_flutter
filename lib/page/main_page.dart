@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:fbroadcast/fbroadcast.dart' as fbroad;
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -30,11 +32,15 @@ import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_smart_order_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_select_dialog_widget.dart';
+import 'package:material_dialogs/material_dialogs.dart';
+import 'package:material_dialogs/shared/types.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -90,6 +96,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   late AppDataBase db;
 
   ProgressDialog? pr;
+
+  //Sample
+  final smartOrderCode = "".obs;
 
   @override
   void initState() {
@@ -426,6 +435,17 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future<void> goToOrderDetail(OrderModel item) async {
+    var user = await controller.getUserInfo();
+    await FirebaseAnalytics.instance.logEvent(
+      name: Platform.isAndroid ? "inquire_order_aos" : "inquire_order_ios",
+      parameters: {
+        "user_id": user.userId,
+        "user_custId" : user.custId,
+        "user_deptId": user.deptId,
+        "orderId" : item.orderId,
+      },
+    );
+
     Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(order_vo: item)));
 
     if(results != null && results.containsKey("code")){
@@ -1499,6 +1519,177 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     }
   }
 
+  Future goToSmartRegOrder() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistSmartOrderPage()));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+        await setRegResult(results);
+      }
+    }
+  }
+
+  Future goToRegOrderSample() async {
+    smartOrderCode.value = "";
+    Dialogs.materialDialog(
+        context: context,
+        color: Colors.white,
+        customView: RegOrderCustomView(),
+        customViewPosition: CustomViewPosition.BEFORE_ACTION,
+        actions: [
+          Obx((){
+          return IconsButton(
+            onPressed: () async {
+              if(smartOrderCode.value == "") {
+                //Util.snackbar(context,"등록할 오더를 선택해주세요.");
+                return Util.toast("등록할 오더 방법을 선택해주세요.");
+              }
+              if(smartOrderCode.value == "01") {
+                Navigator.of(context).pop();
+                await goToSmartRegOrder();
+              }else if(smartOrderCode.value == "02") {
+                Navigator.of(context).pop();
+                await goToRegOrder();
+              }
+            },
+            text: '다음',
+            color: smartOrderCode.value != "" ? renew_main_color : const Color(0xffA5A5A5),
+            textStyle: CustomStyle.CustomFont(styleFontSize16, Colors.white),
+            iconColor: Colors.white,
+          );
+          }),
+        ],
+    );
+  }
+
+  Widget RegOrderCustomView() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 20,vertical: CustomStyle.getHeight(5.h)),
+          child: Text(
+            "어떤 방법으로\n오더를 등록하시겠어요?",
+            style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w600),
+          ),
+        ),
+        Obx((){
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(3.h)),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: InkWell(
+                  onTap: (){
+                    smartOrderCode.value = "01";
+                    },
+                  child: Card(
+                      elevation: 3.0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                      color: smartOrderCode.value == "01" ? renew_main_color : Colors.white,
+                      margin: const EdgeInsets.only(bottom: 20,top: 20,left: 10,right: 10),
+                      surfaceTintColor: text_box_color_02,
+                      child: Container(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  color: smartOrderCode.value == "01" ? Colors.white : renew_main_color,
+                                ),
+                                child: Image.asset(
+                                  "assets/image/ic_smart_order_on.png",
+                                  width: 10.w,
+                                  height: 10.h,
+                                  color: smartOrderCode.value == "01" ? renew_main_color : Colors.white,
+                                ),
+                              ),
+                              Container(
+                                  padding: const EdgeInsets.only(top: 15),
+                                child: Text(
+                                  "신속한 오더 등록이\n가능해요",
+                                  style: CustomStyle.CustomFont(styleFontSize12, smartOrderCode.value == "01" ? Colors.white : const Color(0xffA5A5A5)),
+                                  textAlign: TextAlign.center,
+                                )
+                              ),
+                              Container(
+                                padding: const EdgeInsets.only(top: 10),
+                                child: Text(
+                                  "스마트오더",
+                                  style: CustomStyle.CustomFont(styleFontSize16, smartOrderCode.value == "01" ? Colors.white : Colors.black ,font_weight: FontWeight.w800),
+                                ),
+                              )
+                            ],
+                          )
+                      )
+                  )
+                )
+              ),
+              Expanded(
+                flex: 1,
+                child: InkWell(
+                    onTap: (){
+                      smartOrderCode.value = "02";
+                    },
+                    child: Card(
+                        elevation: 3.0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                        color: smartOrderCode.value == "02" ? renew_main_color : Colors.white,
+                        margin: const EdgeInsets.only(bottom: 20,top: 20,left: 10,right: 10),
+                        surfaceTintColor: text_box_color_02,
+                        child: Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Column(
+                              children: [
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                      color: smartOrderCode.value == "02" ? Colors.white : renew_main_color
+                                  ),
+                                  child: Image.asset(
+                                    "assets/image/ic_nomal_order_off.png",
+                                    width: 10.w,
+                                    height: 10.h,
+                                    color: smartOrderCode.value == "02" ? renew_main_color : Colors.white,
+                                  ),
+                                ),
+                                Container(
+                                    padding: const EdgeInsets.only(top: 15),
+                                    child: Text(
+                                      "정확한 오더 등록이\n가능해요",
+                                      style: CustomStyle.CustomFont(styleFontSize12,  smartOrderCode.value == "02" ? Colors.white : const Color(0xffA5A5A5)),
+                                      textAlign: TextAlign.center,
+                                    )
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(top: 10),
+                                  child: Text(
+                                    "일반오더",
+                                    style: CustomStyle.CustomFont(styleFontSize16, smartOrderCode.value == "02" ? Colors.white : Colors.black ,font_weight: FontWeight.w800),
+                                  ),
+                                )
+                              ],
+                            )
+                        )
+                    )
+                )
+              )
+            ],
+          )
+        );
+        })
+      ],
+    );
+  }
+
   Future<void> setRegResult(Map<String,dynamic> results) async {
     await refresh();
     Util.toast("${Strings.of(context)?.get("order_reg_title")}${Strings.of(context)?.get("reg_success")}");
@@ -1657,12 +1848,14 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   flex: 1,
                   child: InkWell(
                       onTap: () async {
-                          var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+
+                        var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
                               if(guest) {
                                 showGuestDialog();
                                 return;
                                 }
                         await goToRegOrder();
+                        //await goToRegOrderSample();
                       },
                       child: Container(
                           height: CustomStyle.getHeight(60),

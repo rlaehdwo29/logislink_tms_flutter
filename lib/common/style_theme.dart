@@ -11,6 +11,8 @@ const Color main_btn = Color(0xff191962);
 const Color sub_btn = Color(0xff65656D);
 const Color copy_btn = Color(0xff31363A);
 
+const Color renew_main_color = Color(0xff8AAAE6);
+
 const Color terms_text = Color(0xff141420);
 const Color swipe_edit_btn = Color(0xff3535B2);
 const Color swipe_delete_btn = Color(0xffEF5350);

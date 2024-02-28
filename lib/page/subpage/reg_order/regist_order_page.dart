@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -946,6 +948,36 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         logger.d("regOrder() _response -> ${_response.status} // ${_response.resultMap}");
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
+            var user = await controller.getUserInfo();
+
+            await FirebaseAnalytics.instance.logEvent(
+              name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
+              parameters: {
+                "user_id": user.userId,
+                "user_custId" : user.custId,
+                "user_deptId": user.deptId,
+                "reqCustId" : mData.value.sellCustId,
+                "sellDeptId" : mData.value.sellDeptId
+              },
+            );
+
+            if(mData.value.call24Cargo == "Y" || mData.value.manCargo == "Y" || mData.value.oneCargo == "Y"){
+              await FirebaseAnalytics.instance.logEvent(
+                name: Platform.isAndroid ? "regist_order_rpa_aos" : "regist_order_rpa_ios",
+                parameters: {
+                  "user_id": user.userId,
+                  "user_custId" : user.custId,
+                  "user_deptId": user.deptId,
+                  "reqCustId" : mData.value.sellCustId,
+                  "sellDeptId" : mData.value.sellDeptId,
+                  "call24Cargo_Status" : mData.value.call24Cargo,
+                  "manCargo_Status" : mData.value.manCargo,
+                  "oneCharge_Status" : mData.value.oneCharge,
+                  "rpaSalary" : mData.value.call24Charge,
+                },
+              );
+            }
+
             Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});

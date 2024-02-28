@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -27,6 +28,8 @@ import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/provider/receipt_service.dart';
 import 'package:provider/provider.dart';
 import 'package:logislink_tms_flutter/utils/util.dart' as app_util;
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 AndroidNotificationChannel? channel;
 FlutterLocalNotificationsPlugin? flutterLocalNotificationsPlugin;
@@ -34,7 +37,17 @@ late AppDataBase database;
 
 Future<void> main() async{
   final binding = WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
+  } catch(e) {
+    print("Failed to initialize Firebase: $e");
+  }
+
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
 
@@ -225,8 +238,9 @@ class _MyAppState extends State<MyApp> {
               backgroundColor: styleWhiteCol,
               textTheme: TextTheme(bodyText1: CustomStyle.baseFont()),
               visualDensity: VisualDensity.adaptivePlatformDensity,
-              fontFamily: 'NanumSquare',
+              fontFamily: 'NotoSansKR',
             ),
+            themeMode: ThemeMode.system,
             home: GetBuilder<App>(
               init: App(),
               builder: (_) {

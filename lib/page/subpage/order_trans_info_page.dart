@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -761,6 +764,17 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
           logger.d("getUnitChargeComp() TRANS_TYPE_01 _response -> ${_response.status} // ${_response.resultMap}");
           if (_response.status == "200") {
             if (_response.resultMap?["result"] == true) {
+              await FirebaseAnalytics.instance.logEvent(
+                name: Platform.isAndroid ? "trans_order_aos" : "trans_order_ios",
+                parameters: {
+                  "user_id": user.userId,
+                  "user_custId" : user.custId,
+                  "user_deptId": user.deptId,
+                  "orderId" : mData.value.orderId,
+                  "buyCustId" : mData.value.buyCustId,
+                  "buyDeptId" : mData.value.buyDeptId
+                },
+              );
               Navigator.of(context).pop({'code': 200});
             } else {
               openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -2467,6 +2481,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                         suffixIcon: IconButton(
                                           onPressed: () {
                                             etOtherAddMemoController.clear();
+                                            mData.value.driverMemo = "";
                                           },
                                           icon: Icon(
                                             Icons.clear,
@@ -2493,6 +2508,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                                         ),
                                       ),
                                       onChanged: (value){
+                                        mData.value.driverMemo = value;
                                       },
                                       maxLength: 50,
                                     )
@@ -2575,6 +2591,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             etOtherAddMemoController.clear();
+                            mData.value.driverMemo = "";
                           },
                           icon: Icon(
                             Icons.clear,
@@ -2601,6 +2618,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                         ),
                       ),
                       onChanged: (value){
+                        mData.value.driverMemo = value;
                       },
                     )
                 )
