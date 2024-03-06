@@ -43,20 +43,34 @@ class _LinkPageState extends State<LinkPage> {
   final m24Call = false.obs;
   final mHwaMull = false.obs;
   final mOneCall = false.obs;
-  final mRpaPay = "".obs;
-  final rpaPay = "".obs;
+  final mRpaPay = "".obs; // ,처리 안함
+  //final rpaPay = "".obs; // ,처리
 
   final count = 0.obs;
 
-  final rpaPayValue = "0".obs;
-
   late TextEditingController etRpaPayController;
+
+
+  final carRegist = true.obs;
+  final modify = true.obs;
+  final cancel = true.obs;
+
+  final infoTitle = false.obs;
+  final dispatch = false.obs;
+  final regist = false.obs;
+
+  final badge = false.obs;
+
+  final llCharge = false.obs;
+
+  final tvRpaTitle = "".obs;
+  final rpaDate = "".obs;
 
   @override
   void initState(){
     super.initState();
     etRpaPayController = TextEditingController();
-    rpaPayValue.value = "0";
+    mRpaPay.value = "0";
 
     Future.delayed(Duration.zero, () async {
       await initView();
@@ -134,7 +148,7 @@ class _LinkPageState extends State<LinkPage> {
               var mList = _response.resultMap?["data"] as List;
               if(list.length > 0) list.clear();
               if(mList.length > 0) {
-                List<OrderLinkCurrentModel> itemsList = list.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
+                List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
                 list.addAll(itemsList);
               }
               for(int i = 0; i < list.length; i++) {
@@ -147,9 +161,9 @@ class _LinkPageState extends State<LinkPage> {
                 }
               }
 
-              if(status.value != null) {
+              if(status.value.order_id != null) {
                 if(!(status.value.call24Status == "E")) {
-                  if(m24Call.value = false) {
+                  if(m24Call.value == false) {
                     OrderLinkCurrentModel dum24Call = OrderLinkCurrentModel();
                     dum24Call.linkCd = Const.CALL_24_KEY_NAME;
                     list.add(dum24Call);
@@ -195,7 +209,7 @@ class _LinkPageState extends State<LinkPage> {
                     }
                   }
                 }
-              //list.sort((a,b) => b.compareTo(a));
+              list.sort((a,b) => int.parse(a.linkCd).compareTo(int.parse(b.linkCd)));
               }
               await initView();
             }
@@ -247,7 +261,7 @@ class _LinkPageState extends State<LinkPage> {
 
     await openCommonConfirmBox(
         context,
-        "금액: ${rpaPay.value}\n$text",
+        "금액: ${etRpaPayController.text}원\n$text",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
@@ -302,15 +316,15 @@ class _LinkPageState extends State<LinkPage> {
     });
   }
 
-  Future<void> cancelLink(String linkCd, bool flag) async {
-    if(mRpaPay.value == null) count.value--;
+  Future<void> cancelLink(String? rpaPay,String? linkCd, bool flag) async {
+    if(rpaPay == null) count.value--;
 
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).cancelNewLink(
         user.authorization,
         mData.value.orderId,
-        mRpaPay.value,
+        rpaPay,
         "09",
         linkCd
     ).then((it) async {
@@ -399,7 +413,7 @@ class _LinkPageState extends State<LinkPage> {
   }
 
   Widget topWidget() {
-    etRpaPayController.text = rpaPayValue.value;
+    etRpaPayController.text = Util.getInCodeCommaWon(mRpaPay.value);
       return Container(
         padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
         child: Column(
@@ -444,7 +458,7 @@ class _LinkPageState extends State<LinkPage> {
                     suffixIcon: IconButton(
                       onPressed: () {
                         etRpaPayController.clear();
-                        rpaPayValue.value = "0";
+                        mRpaPay.value = "0";
                       },
                       icon: Icon(
                         Icons.clear,
@@ -472,10 +486,10 @@ class _LinkPageState extends State<LinkPage> {
                   ),
                   onChanged: (value) async {
                     if(value.length > 0) {
-                      rpaPayValue.value = int.parse(value.trim()).toString();
-                      etRpaPayController.text = int.parse(value.trim()).toString();
+                      etRpaPayController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                      mRpaPay.value = etRpaPayController.text.replaceAll(",", "");
                     }else{
-                      rpaPayValue.value = "0";
+                      mRpaPay.value = "0";
                       etRpaPayController.text = "0";
                     }
                   },
@@ -484,6 +498,122 @@ class _LinkPageState extends State<LinkPage> {
             )
           ],
         )
+    );
+  }
+
+  Future<void> modifyRpa(OrderLinkCurrentModel data) async {
+
+    if(mRpaPay.isEmpty == true || mRpaPay.value == null) {
+      Util.toast("지불운임을 입력해 주세요");
+      return;
+    }
+
+    String cd = "";
+    String textHeader = "";
+    String text = "수정하시겠습니까?";
+
+    if(Const.CALL_24_KEY_NAME == data.linkCd) {
+      cd = "24Cargo";
+      textHeader = "24시콜: ";
+    }else if(Const.ONE_CALL_KEY_NAME == data.linkCd) {
+      cd = "oneCargo";
+      textHeader = "원콜: ";
+    }else if(Const.HWA_MULL_KEY_NAME == data.linkCd) {
+      cd = "manCargo";
+      textHeader = "화물맨: ";
+    }else{
+      cd = "";
+    }
+
+    openCommonConfirmBox(
+        context,
+        "${textHeader}${etRpaPayController.text}원\n${text}",
+        Strings.of(context)?.get("no") ?? "아니오_",
+        Strings.of(context)?.get("yes") ?? "예_",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await modLink("N", cd, true);
+        }
+    );
+
+  }
+
+  Future<void> cancelRpa(OrderLinkCurrentModel data) async {
+    String? res = data.allocCharge;
+    String? cd;
+    String? text;
+
+    if(Const.CALL_24_KEY_NAME == data.linkCd) {
+      cd = "24Cargo";
+      text = "24시콜 정보망 전송 \n\n취소하시겠습니까?";
+    }else if(Const.ONE_CALL_KEY_NAME == data.linkCd) {
+      cd = "oneCargo";
+      text = "원콜 정보망 전송\n\n취소하시겠습니까?";
+    }else if(Const.HWA_MULL_KEY_NAME == data.linkCd) {
+      cd = "manCargo";
+      text = "화물맨 정보망 전송\n\n취소하시겠습니까?";
+    }else{
+      cd = "";
+      text ="";
+    }
+
+    openCommonConfirmBox(
+        context,
+        "${text}",
+        Strings.of(context)?.get("no") ?? "아니오_",
+        Strings.of(context)?.get("yes") ?? "예_",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await cancelLink(res, cd, true);
+        }
+    );
+
+  }
+
+  Future<void> carConfirmRpa(OrderLinkCurrentModel data) async {
+    String textHeader = "${data.carNum}\t\t${data.carType}\t\t${data.carTon}";
+    String textSub = "${data.driverName}\t\t${Util.makePhoneNumber(data.driverTel)}";
+    String text = "배차 확정 하시겠습니까?";
+    String textEtc="(나머지 정보망전송은 취소됩니다)";
+
+    openCommonConfirmBox(
+        context,
+        "${textHeader}\n${textSub}\n${text}\n${textEtc}",
+        Strings.of(context)?.get("no") ?? "아니오_",
+        Strings.of(context)?.get("yes") ?? "예_",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          count.value++;
+
+          for(var value in list.value) {
+            count.value++;
+            if(value.linkCd == Const.CALL_24_KEY_NAME) {
+              if(value.linkCd == data.linkCd) {
+                await confirmLink(data);
+              }else{
+                await cancelLink(value.allocCharge, "24Cargo",false);
+              }
+            }
+            if(value.linkCd == Const.ONE_CALL_KEY_NAME) {
+              if(value.linkCd == data.linkCd) {
+                await confirmLink(data);
+              }else{
+                await cancelLink(value.allocCharge, "oneCargo",false);
+              }
+            }
+            if(value.linkCd == Const.HWA_MULL_KEY_NAME) {
+              if(value.linkCd == data.linkCd) {
+                await confirmLink(data);
+              }else{
+                await cancelLink(value.allocCharge, "manCargo",false);
+              }
+            }
+          }
+
+        }
     );
   }
 
@@ -513,73 +643,58 @@ class _LinkPageState extends State<LinkPage> {
 
   Widget getListItemView(OrderLinkCurrentModel item,int position) {
 
-    bool carRegist = true;
-    bool modify = true;
-    bool cancel = true;
-
-    bool infoTitle = false;
-    bool dispatch = false;
-    bool regist = false;
-
-    bool badge = false;
-
-    bool llCharge = false;
-
-    String tvRpaTitle = "";
-    String rpaDate = "";
-
     if(!(item.editDate == "") && item.editDate != null) {
       if(!(item.editDate?.trim() == "")) {
-        rpaDate = "(${item.editDate})";
+        rpaDate.value = "(${item.editDate})";
       }else{
         if(item.regDate == null) {
-          rpaDate = "";
+          rpaDate.value = "";
         }else{
-          rpaDate = "(${item.regDate})";
+          rpaDate.value = "(${item.regDate})";
         }
       }
     }else{
       if(item.regDate == null) {
-        rpaDate = "";
+        rpaDate.value = "";
       }else{
-        rpaDate = "(${item.regDate})";
+        rpaDate.value = "(${item.regDate})";
       }
     }
 
     if(item.orderId == "" || item.orderId == null || item.linkStat == "D"){
-      infoTitle = false;
-      dispatch = false;
-      regist = true;
+      infoTitle.value = false;
+      dispatch.value = false;
+      regist.value = true;
 
       // 추가 확인
-      carRegist = false;
-      modify = false;
-      cancel = false;
-      llCharge = false;
-      rpaDate = "";
+      carRegist.value = false;
+      modify.value = false;
+      cancel.value = false;
+      llCharge.value = false;
+      rpaDate.value = "";
     }else{
-      llCharge = true;
+      llCharge.value = true;
 
       if(item.linkStat == "R") {
-        infoTitle = true;
-        dispatch = true;
-        regist = false;
+        infoTitle.value = true;
+        dispatch.value = true;
+        regist.value = false;
 
-        carRegist = true;
-        modify = false;
-        cancel = true;
+        carRegist.value = true;
+        modify.value = false;
+        cancel.value = true;
 
-        badge = true;
+        badge.value = true;
       }else{
-        infoTitle = true;
-        dispatch = false;
-        regist = false;
+        infoTitle.value = true;
+        dispatch.value = false;
+        regist.value = false;
 
-        carRegist = false;
-        modify = true;
-        cancel = true;
+        carRegist.value = false;
+        modify.value = true;
+        cancel.value = true;
 
-        badge = false;
+        badge.value = false;
       }
     }
 
@@ -605,7 +720,7 @@ class _LinkPageState extends State<LinkPage> {
                     item.linkCd == Const.HWA_MULL_KEY_NAME ? "화물맨" : "",
                     style: CustomStyle.CustomFont(styleFontSize12, text_color_01, font_weight: FontWeight.w700),
                   ),
-                  badge?
+                  badge.value?
                   Container(
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(20.w)),
                     margin: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
@@ -621,12 +736,12 @@ class _LinkPageState extends State<LinkPage> {
                 ],
               ),
               Text(
-                "(${item.editDate})",
+                "${rpaDate.value}",
                 style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
               )
             ],
           )),
-          infoTitle?
+          infoTitle.value?
           Container(
           padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
           child: Text(
@@ -640,7 +755,7 @@ class _LinkPageState extends State<LinkPage> {
             item.jobStat == "R" ? order_state_01 :
             order_state_01),
           )) : const SizedBox(),
-          dispatch?
+          dispatch.value?
           Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -703,130 +818,125 @@ class _LinkPageState extends State<LinkPage> {
                       ),
                     )
                   ],
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
-                  child: Row(
-                    children: [
-                      llCharge?
-                      Expanded(
-                        flex: 1,
-                      child: Container(
+                )
+              ],
+            ),
+          ) : const SizedBox(),
+          Container(
+            padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
+            child: Row(
+                children: [
+                  Expanded(
+                      flex: 1,
+                      child: llCharge.value? Container(
                         padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                         child: Text(
                           "${Util.getInCodeCommaWon(item.allocCharge)} 원",
                           style: CustomStyle.CustomFont(styleFontSize12, terms_text,font_weight: FontWeight.w600),
                         ),
-                      )
-                      ) : const SizedBox(),
-                      modify ?
-                      Expanded(
-                            flex: 1,
-                            child: InkWell(
-                              onTap: () async {
-                                //await modifyRpa(item);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: CustomStyle.getWidth(15.w),
-                                    vertical: CustomStyle.getHeight(5.h)),
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5.w)),
-                                    color: main_color),
-                                child: Text(
-                                  "수정",
-                                  textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize12, Colors.white),
-                                ),
-                              ),
-                            ))
-                        : const SizedBox(),
-                      carRegist ?
-                        Expanded(
-                            flex: 1,
-                            child: InkWell(
-                              onTap: () async {
-                                //await carConfirmRpa(item);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: CustomStyle.getWidth(5.w),
-                                    vertical: CustomStyle.getHeight(5.h)),
-                                margin: EdgeInsets.only(
-                                    left: CustomStyle.getWidth(5.w)),
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5.w)),
-                                    color: swipe_edit_btn),
-                                child: Text(
-                                  "배차확정",
-                                  textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize12, Colors.white),
-                                ),
-                              ),
-                            ))
-                        : const SizedBox(),
-                      regist ?
-                      Expanded(
-                            flex: 1,
-                            child: InkWell(
-                              onTap: () async {
-                                //await registRpa(item);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: CustomStyle.getWidth(15.w),
-                                    vertical: CustomStyle.getHeight(5.h)),
-                                margin: EdgeInsets.only(
-                                    left: CustomStyle.getWidth(5.w)),
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5.w)),
-                                    color: main_color),
-                                child: Text(
-                                  "등록",
-                                  textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize12, Colors.white),
-                                ),
-                              ),
-                            ))
-                        : const SizedBox(),
-                      cancel ?
-                      Expanded(
-                            flex: 1,
-                            child: InkWell(
-                              onTap: () async {
-                                //await cancelRpa(item);
-                              },
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: CustomStyle.getWidth(15.w),
-                                    vertical: CustomStyle.getHeight(5.h)),
-                                margin: EdgeInsets.only(
-                                    left: CustomStyle.getWidth(5.w)),
-                                decoration: BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5.w)),
-                                    color: sub_btn),
-                                child: Text(
-                                  "취소",
-                                  textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize12, Colors.white),
-                                ),
-                              ),
-                            ))
-                        : const SizedBox(),
-                  ]
+                      ): const SizedBox()
                   ),
-                )
-              ],
+                  Expanded(
+                    flex: 3,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        modify.value ? InkWell(
+                          onTap: () async {
+                            await modifyRpa(item);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: CustomStyle.getWidth(15.w),
+                                vertical: CustomStyle.getHeight(5.h)),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5.w)),
+                                color: main_color),
+                            child: Text(
+                              "수정",
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize12, Colors.white),
+                            ),
+                          ),
+                        ) : const SizedBox(),
+                        carRegist.value ?
+                        InkWell(
+                          onTap: () async {
+                            await carConfirmRpa(item);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: CustomStyle.getWidth(5.w),
+                                vertical: CustomStyle.getHeight(5.h)),
+                            margin: EdgeInsets.only(
+                                left: CustomStyle.getWidth(5.w)),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5.w)),
+                                color: swipe_edit_btn),
+                            child: Text(
+                              "배차확정",
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize12, Colors.white),
+                            ),
+                          ),
+                        ) : const SizedBox(),
+                        regist.value ?
+                        InkWell(
+                          onTap: () async {
+                            await registRpa(item);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: CustomStyle.getWidth(15.w),
+                                vertical: CustomStyle.getHeight(5.h)),
+                            margin: EdgeInsets.only(
+                                left: CustomStyle.getWidth(5.w)),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5.w)),
+                                color: main_color),
+                            child: Text(
+                              "등록",
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize12, Colors.white),
+                            ),
+                          ),
+                        ) : const SizedBox(),
+                        cancel.value ?
+                        InkWell(
+                          onTap: () async {
+                            await cancelRpa(item);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: CustomStyle.getWidth(15.w),
+                                vertical: CustomStyle.getHeight(5.h)),
+                            margin: EdgeInsets.only(
+                                left: CustomStyle.getWidth(5.w)),
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(5.w)),
+                                color: sub_btn),
+                            child: Text(
+                              "취소",
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize12, Colors.white),
+                            ),
+                          ),
+                        ) : const SizedBox(),
+                      ],
+                    )
+                  ),
+                ]
             ),
-          ) : const SizedBox()
+          )
         ],
       ),
     );
@@ -862,16 +972,16 @@ class _LinkPageState extends State<LinkPage> {
                 ),
               ),
           body: SafeArea(
-              child: //Obx((){
-           SingleChildScrollView(
+              child: Obx((){
+           return SingleChildScrollView(
                     child: Column(
                       children: [
                         topWidget(),
                         rpaListWidget()
                       ],
                   )
-           )
-             // })
+           );
+              })
           ),
         )
     );

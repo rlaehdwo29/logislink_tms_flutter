@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.1.35+47
+version: 1.1.39+51
 
 environment:
   sdk: '>=3.0.3 <4.0.0'
@@ -66,10 +66,11 @@ dependencies:
   fbroadcast: ^2.0.0
   flutter_local_notifications: ^9.5.3+1
   flutter_inappwebview: ^5.8.0
+  firebase_analytics: ^10.8.0
   firebase_dynamic_links: ^5.3.5
   table_calendar: ^3.0.9
-  firebase_crashlytics: ^3.3.4
-  firebase_core: ^2.15.0
+  firebase_crashlytics: ^3.4.9
+  firebase_core: ^2.24.2
   firebase_messaging: ^14.6.5
   floor: ^1.4.2
   time_picker_sheet: ^0.0.2+1
@@ -80,6 +81,10 @@ dependencies:
   flutter_dotenv: ^5.0.2
   image_picker: ^1.0.0
   photo_view: ^0.14.0
+
+  ####Renew Sample
+  material_dialogs: ^1.1.4
+  flutter_sliding_up_panel: ^2.1.1
 
 
 dev_dependencies:
@@ -168,3 +173,25 @@ android_12:
   #image_dark: assets/android12splash-invert.png
   #color_dark: "#042a49"
   #icon_background_color_dark: "#eeeeee"
+
+  fonts:
+    - family: NotoSansKR
+      fonts:
+        - asset: assets/fonts/NotoSansKR-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/NotoSansKR-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/NotoSansKR-Light.ttf
+          weight: 300
+        - asset: assets/fonts/NotoSansKR-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/NotoSansKR-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/NotoSansKR-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansKR-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Pretendard-ExtraBold.ttf
+          weight: 800
+        - asset: fonts/Pretendard-Black.ttf
+          weight: 900

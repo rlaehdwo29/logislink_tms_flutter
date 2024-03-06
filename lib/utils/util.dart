@@ -271,7 +271,7 @@ class Util {
   }
 
   static String getInCodeCommaWon(String? won) {
-    if (won == null || won.isEmpty) return "0";
+    if (won == null || won.isEmpty || won.length > 8) return "0";
     double inValues = double.parse(won);
     NumberFormat Commas = NumberFormat("#,###");
     return Commas.format(inValues);
