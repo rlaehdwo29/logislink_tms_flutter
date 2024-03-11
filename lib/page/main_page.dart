@@ -64,6 +64,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   final mUser = UserModel().obs;
 
   final GlobalKey webViewKey = GlobalKey();
+  late final InAppWebViewController webViewController;
+  late final PullToRefreshController pullToRefreshController;
+
   final orderList = List.empty(growable: true).obs;
   final myOrder = "N".obs;
   final orderState = "".obs;
@@ -108,6 +111,17 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       mUser.value = user;
       await getOrder();
     },context: this);
+    pullToRefreshController = (kIsWeb
+        ? null
+        : PullToRefreshController(
+      options: PullToRefreshOptions(color: Colors.blue,),
+      onRefresh: () async {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          webViewController.reload();
+        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+          webViewController.loadUrl(urlRequest: URLRequest(url: await webViewController.getUrl()));}
+      },
+    ))!;
     handleDeepLink();
     Future.delayed(Duration.zero, () async {
       pr = Util.networkProgress(context);
@@ -485,11 +499,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                           vertical: CustomStyle.getHeight(5.0.h),
                                           horizontal: CustomStyle.getWidth(10.0.w)),
                                       child: Text(
-                                        "${item.orderStateName}",
+                                        item.orderStateName??"",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
-                                            Util.getOrderStateColor(
-                                                item.orderStateName)),
+                                            Util.getOrderStateColor(item.orderStateName)),
                                       )) : const SizedBox(),
                                   Container(
                                       /*padding: EdgeInsets.only(
@@ -498,13 +511,13 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                           right: CustomStyle.getWidth(
                                               5.0.w)),*/
                                       child: Text(
-                                        "${item.sellCustName}",
+                                        item.sellCustName??"",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             main_color),
                                       )),
                                   Text(
-                                    "${item.sellDeptName}",
+                                    item.sellDeptName??"",
                                     style: CustomStyle.CustomFont(
                                         styleFontSize10, main_color),
                                   )
@@ -1791,6 +1804,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   @override
   Widget build(BuildContext context) {
+    Util.notificationDialog(context,"기본",webViewKey);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: order_item_background,
@@ -1858,9 +1872,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         //await goToRegOrderSample();
                       },
                       child: Container(
-                          height: CustomStyle.getHeight(60),
+                          height: CustomStyle.getHeight(80),
                           alignment: Alignment.center,
-                          decoration: BoxDecoration(color: main_color),
+                          decoration: const BoxDecoration(color: main_color),
                           child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,

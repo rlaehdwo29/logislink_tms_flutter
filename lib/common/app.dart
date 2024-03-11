@@ -8,6 +8,7 @@ class App extends GetxController{
   final device_info = <String, dynamic>{}.obs;
   final app_info = <String,dynamic>{}.obs;
   final user = UserModel().obs;
+  final isIsNoticeOpen = false.obs;
 
   Future<void> setUserInfo(UserModel userInfo) async {
     await SP.putUserModel(Const.KEY_USER_INFO, userInfo);

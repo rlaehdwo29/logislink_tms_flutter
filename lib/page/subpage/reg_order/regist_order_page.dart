@@ -30,8 +30,9 @@ import 'package:dio/dio.dart';
 class RegistOrderPage extends StatefulWidget {
 
   OrderModel? order_vo;
+  String? flag;
 
-  RegistOrderPage({Key? key, this.order_vo}):super(key:key);
+  RegistOrderPage({Key? key, this.order_vo, this.flag}):super(key:key);
 
   _RegistOrderPageState createState() => _RegistOrderPageState();
 }
@@ -459,7 +460,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
 
   Future<void> goToChargeInfo() async {
     if(isCargoInfo.value) {
-      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderChargeInfoPage(order_vo:mData.value,unit_charge_cnt:ChargeCheck.value,unit_buy_charge_local: mBuyChargeDummy.value, unit_price_local: mUnitPriceDummy.value, unit_sell_charge_local: mSellChargeDummy.value)));
+      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderChargeInfoPage(order_vo:mData.value,flag:widget.flag, unit_charge_cnt:ChargeCheck.value,unit_buy_charge_local: mBuyChargeDummy.value, unit_price_local: mUnitPriceDummy.value, unit_sell_charge_local: mSellChargeDummy.value)));
       if(results["code"] == 200) {
         print("goToChargeInfo() -> ${results[Const.RESULT_WORK]}");
         await setActivityResult(results);
@@ -692,7 +693,9 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Row(
+                          Wrap(
+                            direction: Axis.vertical,
+                            alignment: WrapAlignment.start,
                             children: [
                               Text(
                                 mData.value.goodsName??"",
@@ -780,7 +783,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                         margin: EdgeInsets.only(left: 5.w, right: 10.w),
                       ),
                       Text(
-                        llChargeInfo.value ? "${mData.value.sellCharge} / ${mData.value.chargeTypeName}":Strings.of(context)?.get("order_reg_charge_info_hint")??"Not Found",
+                        llChargeInfo.value ? "${Util.getInCodeCommaWon(mData.value.sellCharge)}원 / ${mData.value.chargeTypeName}":Strings.of(context)?.get("order_reg_charge_info_hint")??"Not Found",
                         style: CustomStyle.CustomFont(
                             styleFontSize12, text_color_03),
                       )
@@ -808,21 +811,23 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
 
   Future<void> copyData() async {
     bool checkflag = false;
-    if(!(mData.value.call24Cargo == "") && mData.value.call24Charge != null) {
-      mData.value.call24Cargo = "N";
-      checkflag = true;
-    }
+    if(widget.flag != "M") {
+      if (!(mData.value.call24Cargo == "") &&
+          mData.value.call24Charge != null) {
+        mData.value.call24Cargo = "N";
+        checkflag = true;
+      }
 
-    if(!(mData.value.oneCargo == "") && mData.value.oneCargo != null) {
-      mData.value.oneCargo = "N";
-      checkflag = true;
-    }
+      if (!(mData.value.oneCargo == "") && mData.value.oneCargo != null) {
+        mData.value.oneCargo = "N";
+        checkflag = true;
+      }
 
-    if(!(mData.value.manCargo == "") && mData.value.manCargo != null) {
-      mData.value.manCargo = "Y";
-      checkflag = true;
+      if (!(mData.value.manCargo == "") && mData.value.manCargo != null) {
+        mData.value.manCargo = "Y";
+        checkflag = true;
+      }
     }
-
     if(mData.value.stopCount != 0) {
       await getStopPoint();
     }
@@ -1107,7 +1112,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
       backgroundColor: sub_color,
       appBar: AppBar(
             title: Text(
-                Strings.of(context)?.get("order_reg_title")??"Not Found",
+                widget.flag == "M" ? Strings.of(context)?.get("order_detail_order_modify")??"오더수정_" : Strings.of(context)?.get("order_reg_title")??"오더 등록_",
                 style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
             ),
             toolbarHeight: 50.h,
@@ -1152,7 +1157,11 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   flex: 1,
                   child: InkWell(
                       onTap: () async {
-                        await showRegOrder();
+                        if(widget.flag == "M") {
+
+                        }else{
+                          await showRegOrder();
+                        }
                       },
                       child: Container(
                           height: CustomStyle.getHeight(60.0.h),
@@ -1162,17 +1171,19 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.app_registration_rounded,
-                                    size: 20.h, color: styleWhiteCol),
+                                widget.flag == "M" ? Icon(Icons.edit, size: 20.h, color: styleWhiteCol): Icon(Icons.app_registration_rounded, size: 20.h, color: styleWhiteCol),
                                 CustomStyle.sizedBoxWidth(5.0.w),
                                 Text(
                                   textAlign: TextAlign.center,
-                                  Strings.of(context)?.get("reg_btn") ??
-                                      "Not Found",
+                                  widget.flag == "M" ? Strings.of(context)?.get("edit_btn") ?? "수정하기_" : Strings.of(context)?.get("reg_btn") ?? "등록하기_",
                                   style: CustomStyle.CustomFont(
                                       styleFontSize16, styleWhiteCol),
                                 ),
-                              ])))),
+                              ]
+                          )
+                      )
+                  )
+              ),
             ],
           )),
     )
