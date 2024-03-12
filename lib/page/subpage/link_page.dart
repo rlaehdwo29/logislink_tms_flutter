@@ -162,7 +162,12 @@ class _LinkPageState extends State<LinkPage> {
               }
 
               if(status.value.order_id != null) {
-                if(!(status.value.call24Status == "E")) {
+                for(int i = 0; i < list.length; i++) {
+                  if(list[i].linkCd == Const.CALL_24_KEY_NAME) {
+                    list.removeAt(i);
+                  }
+                }
+                /*if(!(status.value.call24Status == "E")) {
                   if(m24Call.value == false) {
                     OrderLinkCurrentModel dum24Call = OrderLinkCurrentModel();
                     dum24Call.linkCd = Const.CALL_24_KEY_NAME;
@@ -176,7 +181,7 @@ class _LinkPageState extends State<LinkPage> {
                       }
                     }
                   }
-                }
+                }*/
 
                 if(!(status.value.oneCallStatus == "E")) {
                   if(mOneCall.value == false) {

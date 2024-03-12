@@ -1370,7 +1370,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             maxLength: 50,
                           )
                       )),
-                      Expanded(
+                      /*Expanded(
                         flex: 1,
                         child: InkWell(
                           onTap: () async {
@@ -1391,7 +1391,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             ),
                           )
                         )
-                      ),
+                      ),*/
                       Expanded(
                           flex: 1,
                           child: InkWell(
