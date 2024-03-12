@@ -168,6 +168,7 @@
   "order_detail_staff" : "담당자",
   "order_detail_order_cancel" : "오더취소",
   "order_detail_re_order" : "오더접수",
+  "order_detail_order_modify" : "오더수정",
   "order_detail_alloc" : "배차하기",
   "order_detail_alloc_cancel" : "배차취소",
   "order_detail_alloc_reg" : "차량직접배차",

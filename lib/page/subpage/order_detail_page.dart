@@ -63,6 +63,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   final tvOrderCancel = false.obs;
   final tvReOrder = false.obs;
   final tvAlloc = false.obs;
+  final tvModify = false.obs;
   final tvAllocCancel = false.obs;
   final tvAllocReg = false.obs;
 
@@ -1367,6 +1368,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         // 접수
         if(mData.value.orderState == "09") {
           tvReOrder.value = true;
+          tvModify.value = true;
           await setVisibilitySendLink(false);
           tvOrderCancel.value = false;
           tvAlloc.value = false;
@@ -1375,6 +1377,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           await setVisibilitySendLink(true);
           tvOrderCancel.value = true;
           tvAlloc.value = true;
+          tvModify.value = true;
         }
         tvAllocCancel.value = false;
         tvAllocReg.value = false;
@@ -1390,6 +1393,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
         tvAlloc.value = false;
         tvAllocCancel.value = true;
+        tvModify.value = true;
         tvAllocReg.value = false;
         break;
 
@@ -1407,10 +1411,12 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
 
         if(mData.value.orderState == "00") {
           tvAlloc.value = false;
+          tvModify.value = true;
           tvAllocCancel.value = true;
           tvAllocReg.value = true;
         }else if(mData.value.orderState == "01") {
           tvAlloc.value = false;
+          tvModify.value = true;
           tvAllocCancel.value = true;
           tvAllocReg.value = false;
         }else{
@@ -1429,7 +1435,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         tvReOrder.value = false;
         tvOrderCancel.value  = false;
         tvAlloc.value = true;
-
+        tvModify.value = true;
         tvAllocCancel.value = false;
         tvOrderCancel.value = true;
         tvAllocReg.value = false;
@@ -1541,46 +1547,42 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         Container(
           padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(10.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             tvOrderState.value ?
-              Expanded(
-                  flex: 2,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
-                      child: Text(
-                        mData.value.orderStateName??"접수_",
-                        style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
-                      )
-                  )
-              ) : const SizedBox(),
-              Expanded(
-                  flex: 4,
-                  child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
-                    child: Text(
-                      mData.value.sellCustName??"",
-                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                    ),
-                  )
+              Row(
+                children: [
+                  tvOrderState.value ?
+                  Container(
+                          padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                          child: Text(
+                            mData.value.orderStateName??"접수_",
+                            style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
+                          )
+                      ) : const SizedBox(),
+                  mData.value.sellCustName?.isNotEmpty == true?
+                  Container(
+                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                        child: Text(
+                          mData.value.sellCustName??"",
+                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                        ),
+                      ) : const SizedBox(),
+                  mData.value.sellDeptName?.isNotEmpty == true?
+                  Container(
+                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                        child: Text(
+                          mData.value.sellDeptName??"",
+                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                        ),
+                      ) : const SizedBox(),
+                ],
               ),
-              Expanded(
-                  flex: 4,
-                  child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
-                    child: Text(
-                      mData.value.sellDeptName??"",
-                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                    ),
-                  )
-              ),
-              Expanded(
-                  flex: 4,
-                  child: Text(
-                    "${Util.getInCodeCommaWon(mData.value.sellCharge??"0")}원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w700),
-                  )
-              ),
+              Text(
+                "${Util.getInCodeCommaWon(mData.value.sellCharge??"0")}원",
+                textAlign: TextAlign.right,
+                style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w700),
+              )
             ],
           ),
         ) ,
@@ -1600,6 +1602,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       )
                   )
               ) : const SizedBox(),
+              mData.value.linkName?.isNotEmpty == true ?
               Expanded(
                   flex: 2,
                   child: Container(
@@ -1609,7 +1612,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
-              ),
+              ) : const SizedBox(),
+              mData.value.buyCustName?.isNotEmpty == true ?
               Expanded(
                   flex: 2,
                   child: Container(
@@ -1619,7 +1623,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
-              ),
+              ) : const SizedBox(),
+              mData.value.buyDeptName?.isNotEmpty == true ?
               Expanded(
                   flex: 3,
                   child: Container(
@@ -1629,7 +1634,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
-              ),
+              ) : const SizedBox(),
               Expanded(
                   flex: 3,
                   child: Text(
@@ -2071,6 +2076,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       await goToSendLink();
                     },
                     child: Container(
+                      width: CustomStyle.getWidth(70),
                       padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(5.w)),
                       decoration: BoxDecoration(
                           border: Border.all(color: order_state_01,width: 1.w),
@@ -2079,6 +2085,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                       child: Text(
                         "정보망",
                         style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
+                        textAlign: TextAlign.center,
                       ),
                     )
                 ) : const SizedBox()
@@ -3141,6 +3148,23 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
   }
 
+  Future goToModifyOrder() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(order_vo: mData.value,flag: "M")));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+        await setModifyResult(results);
+      }
+    }
+  }
+
+  Future<void> setModifyResult(Map<String,dynamic> results) async {
+    if(results["allocId"] != null){
+      String allocId = results["allocId"].toString();
+      await getOrderDetail(allocId);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     pr = Util.networkProgress(context);
@@ -3236,6 +3260,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // 오더 취소 Button
                     tvOrderCancel.value ? Expanded(
                         flex: 1,
                         child: InkWell(
@@ -3260,6 +3285,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             )
                         )
                     ):const SizedBox(),
+                    // 오더 접수 Button
                     tvReOrder.value ? Expanded(
                         flex: 1,
                         child: InkWell(
@@ -3284,6 +3310,31 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             )
                         )
                     ) : const SizedBox(),
+                    // 오더수정 Button
+                    tvModify.value ? Expanded(
+                        flex: 1,
+                        child: InkWell(
+                            onTap: () async {
+                              var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                              }
+                              await goToModifyOrder();
+                            },
+                            child: Container(
+                              height: CustomStyle.getHeight(60.0.h),
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(color: swipe_edit_btn),
+                              child:Text(
+                                textAlign: TextAlign.center,
+                                Strings.of(context)?.get("order_detail_order_modify")??"Not Found",
+                                style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
+                              ),
+                            )
+                        )
+                    ) : const SizedBox(),
+                    // 배차하기 Button
                     tvAlloc.value ?
                     Expanded(
                         flex: 1,
@@ -3309,6 +3360,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             )
                         )
                     ) : const SizedBox(),
+                    // 배차 취소 Button
                     tvAllocCancel.value ? Expanded(
                         flex: 1,
                         child: InkWell(
@@ -3332,6 +3384,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                             )
                         )
                     ) : const SizedBox(),
+                    // 차량 직접 배차 Button
                     tvAllocReg.value ? Expanded(
                         flex: 1,
                         child: InkWell(

@@ -20,13 +20,14 @@ import 'package:dio/dio.dart';
 class OrderChargeInfoPage extends StatefulWidget {
 
   OrderModel order_vo;
+  String? flag;
   String? unit_charge_cnt;
   String unit_buy_charge_local;
   String unit_price_local;
   String unit_sell_charge_local;
   String? code;
 
-  OrderChargeInfoPage({Key? key,required this.order_vo, this.unit_charge_cnt, required this.unit_buy_charge_local, required this.unit_price_local, required this.unit_sell_charge_local, this.code}):super(key:key);
+  OrderChargeInfoPage({Key? key,required this.order_vo, this.flag, this.unit_charge_cnt, required this.unit_buy_charge_local, required this.unit_price_local, required this.unit_sell_charge_local, this.code}):super(key:key);
 
   _OrderChargeInfoPageState createState() => _OrderChargeInfoPageState();
 }
@@ -48,6 +49,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   static const String CHARGE_CAR_TYPE = "01";
   static const String CHARGE_TON_TYPE = "02";
 
+  final isFirst = true.obs;
   final isOption = false.obs;
   String code = "";
   final mData = OrderModel().obs;
@@ -299,18 +301,27 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       if(widget.unit_charge_cnt != null) ChargeCheck.value = widget.unit_charge_cnt!;
       mHwaMullFlag.value = false;
 
+      print("응애응애 송아지 =>${ChargeCheck}// ${code} // ${mData.value.unitPrice} // ${mData.value.sellCharge}");
+
       if(ChargeCheck.value == "Y") {
         await getUnitChargeCar();
       }else{
-        if(Const.RESULT_SETTING_CHARGE == code) {
-          mData.value.unitPrice = mUnitPriceDummy.value;
-        }else{
-          mData.value.sellCharge = mSellChargeDummy.value;
-          mData.value.unitPrice = mUnitPriceDummy.value;
-        }
+          if (Const.RESULT_SETTING_CHARGE == code) {
+            mData.value.unitPrice = mUnitPriceDummy.value;
+        } else {
+            if(widget.flag != "M") {
+              mData.value.sellCharge = mSellChargeDummy.value;
+              mData.value.unitPrice = mUnitPriceDummy.value;
+            }
+          }
       }
       await getRpaLinkFlag();
       await initView();
+      if(widget.flag == "M") {
+        await setTotal();
+        print("응애옹애 알피에이 => ${mData.value.call24Cargo} // ${mData.value.manCargo} // ${mData.value.oneCargo} // ${mData.value.call24Charge} // ${mData.value.manCharge} // ${mData.value.oneCharge}");
+      }
+      isFirst.value = false;
     });
   }
 
@@ -335,32 +346,32 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   }
 
   Future<void> initView() async {
-    isOption.value = !widget.code.isNull;
-    isRpaExpanded.value = List.filled(1, false);
-    isTransExpanded.value = List.filled(1, false);
+      isOption.value = !widget.code.isNull;
+      isRpaExpanded.value = List.filled(1, false);
+      isTransExpanded.value = List.filled(1, false);
 
-    if(!(code == null || code.isEmpty == true)) {
-      llRpaSection.value = false;
-    }
-    if(code == null || code.isEmpty == true) {
-      if(mData.value.chargeType == null || mData.value.chargeType?.isEmpty == true) {
-        mData.value.chargeType = CHARGE_TYPE_01;
-        mData.value.chargeTypeName = "인수증";
+      if (!(code == null || code.isEmpty == true)) {
+        llRpaSection.value = false;
       }
-      await setChargeType();
-    }
-    if(mData.value.unitPriceType == "01") {
-      mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
-      mData.value.unitPriceTypeName = "대당단가";
-    }else if(mData.value.unitPriceType == "02") {
-      mData.value.unitPriceType = UNIT_PRICE_TYPE_02;
-      mData.value.unitPriceTypeName = "톤당단가";
-    }else {
-      mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
-      mData.value.unitPriceTypeName = "대당단가";
-    }
-    await setUnitPriceType(false);
-
+      if (code == null || code.isEmpty == true) {
+        if (mData.value.chargeType == null || mData.value.chargeType?.isEmpty == true) {
+          mData.value.chargeType = CHARGE_TYPE_01;
+          mData.value.chargeTypeName = "인수증";
+        }
+        await setChargeType();
+      }
+      print("가볼까아앙 => ${mData.value.unitPriceType}");
+      if (mData.value.unitPriceType == "01") {
+        mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
+        mData.value.unitPriceTypeName = "대당단가";
+      } else if (mData.value.unitPriceType == "02") {
+        mData.value.unitPriceType = UNIT_PRICE_TYPE_02;
+        mData.value.unitPriceTypeName = "톤당단가";
+      } else {
+        mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
+        mData.value.unitPriceTypeName = "대당단가";
+      }
+      await setUnitPriceType();
   }
 
   Future<void> getRpaLinkFlag() async {
@@ -400,13 +411,13 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                   }else{
                     mHwaMull.value = "N";
                     mData.value.manCargo = "N";
-                    tvHwaMull.value = false;
+                    tvHwaMull.value = true;
                     mHwaMullFlag.value = false;
                   }
                 }
               }
             }else{
-              //llRpaSection.value = false;
+              llRpaSection.value = false;
             }
             await initView();
           }
@@ -473,43 +484,43 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     }
   }
 
-  Future<void> setUnitPriceType(bool isFirst) async {
-    if(mData.value.unitPriceType == UNIT_PRICE_TYPE_01) {
-      tvUnitPriceType01.value = true;
-      tvUnitPriceType02.value = false;
-      llUnitPrice.value = false;
-      etUnitPrice.value = false;
+  Future<void> setUnitPriceType() async {
+      if (mData.value.unitPriceType == UNIT_PRICE_TYPE_01) {
+        tvUnitPriceType01.value = true;
+        tvUnitPriceType02.value = false;
+        llUnitPrice.value = false;
+        etUnitPrice.value = false;
 
-      if(!isFirst) {
-        if(Const.RESULT_SETTING_CHARGE == code){
-          mData.value.unitPrice = rUnitPrice.value;
-          mData.value.sellCharge = rSellCharge.value;
-          mData.value.buyCharge = rBuyCharge.value;
-        }else{
-          mData.value.unitPrice = "0";
-          mData.value.sellCharge = rSellCharge.value;
-        }
-      }
-      mData.value.sellWeight = "";
+          if (!isFirst.value) {
+            if (Const.RESULT_SETTING_CHARGE == code) {
+              mData.value.unitPrice = rUnitPrice.value;
+              mData.value.sellCharge = rSellCharge.value;
+              mData.value.buyCharge = rBuyCharge.value;
+            } else {
+              mData.value.unitPrice = "0";
+              mData.value.sellCharge = rSellCharge.value;
+            }
+          }
+          mData.value.sellWeight = "";
+      } else {
+        tvUnitPriceType01.value = false;
+        tvUnitPriceType02.value = true;
+        llUnitPrice.value = true;
+        etUnitPrice.value = true;
 
-    }else{
-      tvUnitPriceType01.value = false;
-      tvUnitPriceType02.value = true;
-      llUnitPrice.value = true;
-      etUnitPrice.value = true;
-      if(!isFirst) {
-        if(Const.RESULT_SETTING_CHARGE == code) {
-          mData.value.unitPrice = rUnitPrice.value;
-          mData.value.sellCharge = rSellCharge.value;
-          mData.value.buyCharge = rBuyCharge.value;
-          mData.value.sellWeight = mData.value.goodsWeight;
-        }else{
-          mData.value.sellCharge = "";
-          mData.value.unitPrice = rUnitPrice.value;
-          mData.value.sellWeight = mData.value.goodsWeight;
-        }
+          if (!isFirst.value) {
+            if (Const.RESULT_SETTING_CHARGE == code) {
+              mData.value.unitPrice = rUnitPrice.value;
+              mData.value.sellCharge = rSellCharge.value;
+              mData.value.buyCharge = rBuyCharge.value;
+              mData.value.sellWeight = mData.value.goodsWeight;
+            } else {
+              mData.value.sellCharge = "";
+              mData.value.unitPrice = rUnitPrice.value;
+              mData.value.sellWeight = mData.value.goodsWeight;
+            }
+          }
       }
-    }
   }
 
   Future<void> displayChargeInfo() async {
@@ -524,11 +535,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     if(m24Call.value == "N") {
       m24Call.value = "Y";
       mData.value.call24Cargo = "Y";
-      tv24Call.value = true;
     }else{
       m24Call.value = "N";
       mData.value.call24Cargo = "Y";
-      tv24Call.value = false;
     }
   }
 
@@ -536,11 +545,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     if(mOneCall.value == "N") {
       mOneCall.value = "Y";
       mData.value.oneCargo = "Y";
-      tvOneCall.value = true;
     }else{
       mOneCall.value = "N";
       mData.value.oneCargo = "YN";
-      tvOneCall.value = false;
     }
   }
 
@@ -553,12 +560,10 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       if(mHwaMullFlag.value) {
         mHwaMull.value == "Y";
         mData.value.manCargo = "Y";
-        tvHwaMull.value = true;
         mHwaMullFlag.value = false; // 지속적으로 On 되어 있는것이 On/Off로 전환 - 2023-09-04
       }else{
         mHwaMull.value = "N";
         mData.value.manCargo = "N";
-        tvHwaMull.value = false;
       }
     }
   }
@@ -566,7 +571,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   Future<void> confirm() async {
     var result = await validation();
     if(result) {
-      mData.value.call24Cargo = mRpaSalary.value;
+      mData.value.call24Charge = mRpaSalary.value;
       mData.value.oneCharge = mRpaSalary.value;
       mData.value.manCharge = mRpaSalary.value;
 
@@ -876,7 +881,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                         onTap: () async {
                           mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
                           mData.value.unitPriceTypeName = "대당단가";
-                          await setUnitPriceType(false);
+                          await setUnitPriceType();
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -898,7 +903,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                         onTap: () async {
                           mData.value.unitPriceType = UNIT_PRICE_TYPE_02;
                           mData.value.unitPriceTypeName = "톤당단가";
-                          await setUnitPriceType(false);
+                          await setUnitPriceType();
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -940,6 +945,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: unitPriceController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
+                filled: true,
+                fillColor: !etUnitPrice.value ? light_gray24 : Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
@@ -988,8 +995,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  mData.value.unitPrice = int.parse(value.trim()).toString();
-                  unitPriceController.text = int.parse(value.trim()).toString();
+                  unitPriceController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                  mData.value.unitPrice = unitPriceController.text.replaceAll(",", "");
                 }else{
                   mData.value.unitPrice = "0";
                   unitPriceController.text = "0";
@@ -1039,6 +1046,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: sellChargeController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
+                filled: true,
+                fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
@@ -1087,8 +1096,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  mData.value.sellCharge = int.parse(value.trim()).toString();
-                  sellChargeController.text = int.parse(value.trim()).toString();
+                  sellChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                  mData.value.sellCharge = sellChargeController.text.replaceAll(",", "");
                 }else{
                   mData.value.sellCharge = "0";
                   sellChargeController.text = "0";
@@ -1120,6 +1129,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: sellFeeController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
+                filled: true,
+                fillColor: !etSellFee.value ? light_gray24 : Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
@@ -1168,8 +1179,10 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  mData.value.sellFee = int.parse(value.trim()).toString();
-                  sellFeeController.text = int.parse(value.trim()).toString();
+                  print("잉 먼데 ?? =>${value}");
+                  sellFeeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                  print("잉 먼데2222 ?? =>${sellFeeController.text}");
+                  mData.value.sellFee = sellFeeController.text.replaceAll(",", "");
                 }else{
                   mData.value.sellFee = "0";
                   sellFeeController.text = "0";
@@ -1203,6 +1216,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               decoration: sellWeightController.text.isNotEmpty
                   ? InputDecoration(
                 counterText: '',
+                filled: true,
+                fillColor: Colors.white,
                 contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
@@ -1234,6 +1249,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               )
                   : InputDecoration(
                 counterText: '',
+                filled: true,
+                fillColor: Colors.white,
                 hintText: Strings.of(context)?.get("order_charge_info_sell_wgt_hint")??"Not Found",
                 hintStyle:CustomStyle.greyDefFont(),
                 contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
@@ -1326,7 +1343,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             decoration: rpaValueController.text.isNotEmpty
                                 ? InputDecoration(
                               counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
                                   borderRadius: BorderRadius.circular(5.h)
@@ -1360,8 +1377,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             ),
                             onChanged: (value){
                               if(value.length > 0) {
-                                mRpaSalary.value = int.parse(value.trim()).toString();
-                                rpaValueController.text = int.parse(value.trim()).toString();
+                                rpaValueController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                mRpaSalary.value = rpaValueController.text.replaceAll(",", "");
                               }else{
                                 rpaValueController.text = "0";
                                 mRpaSalary.value = "0";
@@ -1370,6 +1387,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             maxLength: 50,
                           )
                       )),
+<<<<<<< HEAD
                       /*Expanded(
                         flex: 1,
                         child: InkWell(
@@ -1395,46 +1413,85 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                       Expanded(
                           flex: 1,
                           child: InkWell(
+=======
+                      Expanded(
+                        flex: 3,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          tv24Call.value ?
+                          Expanded(
+                            flex: 1,
+                            child: InkWell(
+>>>>>>> custom
                               onTap: () async {
-                                await displayHwaMull();
+                                await display24Call();
                               },
                               child: Container(
                                 height: CustomStyle.getHeight(30.h),
                                 margin: EdgeInsets.only(right: CustomStyle.getWidth(2.w)),
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: tvHwaMull.value ? text_box_color_01  : text_box_color_02),
+                                    border: Border.all(color: m24Call.value == "Y" ? text_box_color_01  : text_box_color_02),
                                     borderRadius: BorderRadius.all(Radius.circular(5.h))
                                 ),
                                 child: Text(
-                                  "${Strings.of(context)?.get("order_trans_info_rpa_Hwamul")}",
+                                  "${Strings.of(context)?.get("order_trans_info_rpa_24call")}",
                                   textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(styleFontSize12,  tvHwaMull.value ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
+                                  style: CustomStyle.CustomFont(styleFontSize12,  m24Call.value == "Y"? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
                                 ),
                               )
-                          )
-                      ),
-                      Expanded(
-                          flex: 1,
-                          child: InkWell(
-                              onTap: () async {
-                                await displayOneCall();
-                              },
-                              child: Container(
-                                height: CustomStyle.getHeight(30.h),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: tvOneCall.value ? text_box_color_01  : text_box_color_02),
-                                    borderRadius: BorderRadius.all(Radius.circular(5.h))
-                                ),
-                                child: Text(
-                                  "${Strings.of(context)?.get("order_trans_info_rpa_onecall")}",
-                                  textAlign: TextAlign.center,
-                                  style: CustomStyle.CustomFont(styleFontSize12,  tvOneCall.value ? text_box_color_01  : text_box_color_02,font_weight: FontWeight.w700),
-                                ),
+                            )
+                          ) : const SizedBox(),
+                          tvHwaMull.value ?
+                          Expanded(
+                            flex: 1,
+                            child: InkWell(
+                                onTap: () async {
+                                  await displayHwaMull();
+                                },
+                                child: Container(
+                                  height: CustomStyle.getHeight(30.h),
+                                  margin: EdgeInsets.only(right: CustomStyle.getWidth(2.w)),
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: mHwaMull.value == "Y"? text_box_color_01  : text_box_color_02),
+                                      borderRadius: BorderRadius.all(Radius.circular(5.h))
+                                  ),
+                                  child: Text(
+                                    "${Strings.of(context)?.get("order_trans_info_rpa_Hwamul")}",
+                                    textAlign: TextAlign.center,
+                                    style: CustomStyle.CustomFont(styleFontSize12,  mHwaMull.value == "Y" ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
+                                  ),
+                                )
+                            )
+                          ) : const SizedBox(),
+                          tvOneCall.value ?
+                            Expanded(
+                              flex:1,
+                              child: InkWell(
+                                  onTap: () async {
+                                    await displayOneCall();
+                                  },
+                                  child: Container(
+                                    height: CustomStyle.getHeight(30.h),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: mOneCall.value == "Y" ? text_box_color_01  : text_box_color_02),
+                                        borderRadius: BorderRadius.all(Radius.circular(5.h))
+                                    ),
+                                    child: Text(
+                                      "${Strings.of(context)?.get("order_trans_info_rpa_onecall")}",
+                                      textAlign: TextAlign.center,
+                                      style: CustomStyle.CustomFont(styleFontSize12,  mOneCall.value == "Y" ? text_box_color_01  : text_box_color_02,font_weight: FontWeight.w700),
+                                    ),
+                                  )
                               )
-                          )
-                      ),
+                            ) : const SizedBox()
+                        ],
+                      )
+                      )
                     ],
                   )
               ),
@@ -2277,13 +2334,13 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   }
 
   Widget bodyWidget() {
-    unitPriceController.text = mData.value.unitPrice??"0";
-    sellChargeController.text = mData.value.sellCharge??"0";
-    sellFeeController.text = mData.value.sellFee??"0";
+    unitPriceController.text = mData.value.unitPrice == null || mData.value.unitPrice?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.unitPrice??"0".trim().replaceAll(",", "")).toString());
+    sellChargeController.text = mData.value.sellCharge == null || mData.value.sellCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellCharge??"0".trim().replaceAll(",", "")).toString());
+    sellFeeController.text = mData.value.sellFee == null || mData.value.sellFee?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellFee??"0".trim().replaceAll(",", "")).toString());
     sellWayPointChargeController.text = mData.value.sellWayPointCharge??"0";
     sellStayChargeController.text = mData.value.sellStayCharge??"0";
     sellRoundChargeController.text = mData.value.sellRoundCharge??"0";
-    rpaValueController.text = mRpaSalary.value.isEmpty?"0":mRpaSalary.value;
+    rpaValueController.text = mRpaSalary.value?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mRpaSalary.value.trim().replaceAll(",", "")).toString());
 
     return Container(
         child: Column(
