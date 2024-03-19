@@ -19,5 +19,4 @@ abstract class JusoRest {
       @Field("keyword") String? keyword,
       @Field("resultType") String? resultType);
 
-
 }
