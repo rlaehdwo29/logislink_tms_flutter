@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/model/order_link_current_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
 import 'package:logislink_tms_flutter/common/model/unit_charge_model.dart';
@@ -72,8 +73,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   final llRpaSection = false.obs;
 
   final tv24Call = false.obs;
-  final tvHwaMull = false.obs;
-  final tvOneCall = false.obs;
+  final tvHwaMull = true.obs;
+  final tvOneCall = true.obs;
   final tvTotal = "".obs;
 
   final tvChargeType01 = false.obs;
@@ -303,23 +304,33 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
 
       print("응애응애 송아지 =>${ChargeCheck}// ${code} // ${mData.value.unitPrice} // ${mData.value.sellCharge}");
 
+      if(widget.flag != "M"){
       if(ChargeCheck.value == "Y") {
         await getUnitChargeCar();
-      }else{
-          if (Const.RESULT_SETTING_CHARGE == code) {
-            mData.value.unitPrice = mUnitPriceDummy.value;
+      }else {
+        if (Const.RESULT_SETTING_CHARGE == code) {
+          mData.value.unitPrice = mUnitPriceDummy.value;
         } else {
-            if(widget.flag != "M") {
-              mData.value.sellCharge = mSellChargeDummy.value;
-              mData.value.unitPrice = mUnitPriceDummy.value;
-            }
+          if (widget.flag != "M") {
+            mData.value.sellCharge = mSellChargeDummy.value;
+            mData.value.unitPrice = mUnitPriceDummy.value;
           }
+          }
+        }
       }
       await getRpaLinkFlag();
       await initView();
       if(widget.flag == "M") {
         await setTotal();
-        print("응애옹애 알피에이 => ${mData.value.call24Cargo} // ${mData.value.manCargo} // ${mData.value.oneCargo} // ${mData.value.call24Charge} // ${mData.value.manCharge} // ${mData.value.oneCharge}");
+        String? rpaSell = "0";
+        if(mData.value.call24Cargo == "Y") {
+           rpaSell = mData.value.call24Charge?.isEmpty == true || mData.value.call24Charge == null ? "0" : mData.value.call24Charge;
+        }else if(mData.value.oneCargo == "Y") {
+          rpaSell = mData.value.oneCharge?.isEmpty == true || mData.value.oneCharge == null ? "0" : mData.value.oneCharge;
+        }else if(mData.value.manCargo == "Y") {
+          rpaSell = mData.value.manCharge?.isEmpty == true || mData.value.manCharge == null ? "0" : mData.value.manCharge;
+        }
+        mRpaSalary.value = rpaSell!;
       }
       isFirst.value = false;
     });
@@ -378,66 +389,70 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await pr?.show();
-    await DioService.dioClient(header: true).getLinkFlag(user.authorization).then((it) async {
-      ReturnMap _response = DioService.dioResponse(it);
-      logger.d("getRpaLinkFlag() _response -> ${_response.status} // ${_response.resultMap}");
-      await pr?.hide();
-      if(_response.status == "200") {
-        if(_response.resultMap?["result"] == true) {
-          if(_response.resultMap?["data"] != null) {
-            var list = _response.resultMap?["data"] as List;
-            List<RpaFlagModel> itemsList = list.map((i) => RpaFlagModel.fromJSON(i)).toList();
-            if(itemsList.length != 0) {
-              llRpaSection.value = true;
-              tv24Call.value = false;
-              tvHwaMull.value = false;
-              tvOneCall.value = false;
+      await DioService.dioClient(header: true).getLinkFlag(user.authorization).then((it) async {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getRpaLinkFlag() Regist _response -> ${_response.status} // ${_response.resultMap}");
+        await pr?.hide();
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              var list = _response.resultMap?["data"] as List;
+              List<RpaFlagModel> itemsList = list.map((i) => RpaFlagModel.fromJSON(i)).toList();
+              if (itemsList.length != 0) {
+                llRpaSection.value = true;
+                tv24Call.value = false;
+                tvHwaMull.value = false;
+                tvOneCall.value = false;
 
-              for(var i = 0; i < itemsList.length; i++) {
-                if(itemsList[i].linkCd == Const.CALL_24_KEY_NAME) {
-                  m24Call.value = "N";
-                  mData.value.call24Cargo = "N";
-                  tv24Call.value = true;
-                }else if(itemsList[i].linkCd == Const.ONE_CALL_KEY_NAME) {
-                  mOneCall.value = "N";
-                  mData.value.oneCargo = "N";
-                  tvOneCall.value = true;
-                }else if(itemsList[i].linkCd == Const.HWA_MULL_KEY_NAME) {
-                  if(itemsList[i].linkFlag == "Y") {
-                    mHwaMull.value = "Y";
-                    mData.value.manCargo = "Y";
-                    tvHwaMull.value = true;
-                    mHwaMullFlag.value = true;
-                  }else{
-                    mHwaMull.value = "N";
-                    mData.value.manCargo = "N";
-                    tvHwaMull.value = true;
-                    mHwaMullFlag.value = false;
+                for (var i = 0; i < itemsList.length; i++) {
+                  if (itemsList[i].linkCd == Const.CALL_24_KEY_NAME) {
+                    m24Call.value = "N";
+                    mData.value.call24Cargo = "N";
+                    tv24Call.value = true;
+                  } else if (itemsList[i].linkCd == Const.ONE_CALL_KEY_NAME) {
+                    mOneCall.value = "N";
+                    mData.value.oneCargo = "N";
+                    tvOneCall.value = true;
+                  } else if (itemsList[i].linkCd == Const.HWA_MULL_KEY_NAME) {
+                    if (itemsList[i].linkFlag == "Y") {
+                      mHwaMull.value = "Y";
+                      mData.value.manCargo = "Y";
+                      tvHwaMull.value = true;
+                      mHwaMullFlag.value = true;
+                    } else {
+                      mHwaMull.value = "N";
+                      mData.value.manCargo = "N";
+                      tvHwaMull.value = true;
+                      mHwaMullFlag.value = false;
+                    }
                   }
                 }
+              } else {
+                llRpaSection.value = false;
               }
-            }else{
-              llRpaSection.value = false;
+              await initView();
             }
-            await initView();
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
           }
-        }else{
-          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
         }
-      }
-    }).catchError((Object obj) async {
-      await pr?.hide();
-      switch (obj.runtimeType) {
-        case DioError:
-        // Here's the sample to get the failed response error code and message
-          final res = (obj as DioError).response;
-          print("getRpaLinkFlag() Error => ${res?.statusCode} // ${res?.statusMessage}");
-          break;
-        default:
-          print("getRpaLinkFlag() getOrder Default => ");
-          break;
-      }
-    });
+      }).catchError((Object obj) async {
+        await pr?.hide();
+        switch (obj.runtimeType) {
+          case DioError:
+          // Here's the sample to get the failed response error code and message
+            final res = (obj as DioError).response;
+            print("getRpaLinkFlag() RegVersion Error => ${res?.statusCode} // ${res
+                ?.statusMessage}");
+            break;
+          default:
+            print("getRpaLinkFlag() RegVersion getOrder Default => ");
+            break;
+        }
+      });
   }
 
   Future<void> setTotal() async {
@@ -456,8 +471,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
 
   Future<String> makeCharge() async {
     if(mData.value.sellWeight?.isEmpty == true) return "0";
-    double unit = double.parse(mData.value.sellWeight??"0.0");
-    int price = int.parse(mData.value.unitPrice??"0");
+    double unit = double.parse(mData.value.sellWeight??"0");
+    int price = int.parse(mData.value.unitPrice?.isEmpty == true || mData.value.unitPrice == null ? "0" : mData.value.unitPrice!);
     return (unit * price).floor().toInt().toString();
   }
 
@@ -500,8 +515,8 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               mData.value.unitPrice = "0";
               mData.value.sellCharge = rSellCharge.value;
             }
+            mData.value.sellWeight = "";
           }
-          mData.value.sellWeight = "";
       } else {
         tvUnitPriceType01.value = false;
         tvUnitPriceType02.value = true;
@@ -513,7 +528,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               mData.value.unitPrice = rUnitPrice.value;
               mData.value.sellCharge = rSellCharge.value;
               mData.value.buyCharge = rBuyCharge.value;
-              mData.value.sellWeight = mData.value.goodsWeight;
+             mData.value.sellWeight = mData.value.goodsWeight;
             } else {
               mData.value.sellCharge = "";
               mData.value.unitPrice = rUnitPrice.value;
@@ -547,7 +562,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       mData.value.oneCargo = "Y";
     }else{
       mOneCall.value = "N";
-      mData.value.oneCargo = "YN";
+      mData.value.oneCargo = "N";
     }
   }
 
@@ -1238,7 +1253,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 suffixIcon: IconButton(
                   onPressed: () {
                     sellWeightController.clear();
-                    mData.value.sellWeight = "0";
+                    mData.value.sellWeight = "";
                   },
                   icon: Icon(
                     Icons.clear,
@@ -1269,8 +1284,10 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               onChanged: (value) async {
                 if(mData.value.unitPriceType == UNIT_PRICE_TYPE_02) {
                   if(value.length > 0) {
+                    sellWeightController.text = value;
                     mData.value.sellWeight = value;
                   }else{
+                    sellWeightController.text = "";
                     mData.value.sellWeight = "";
                   }
                   if(Const.RESULT_SETTING_CHARGE == code) {
@@ -1281,8 +1298,14 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                   await setTotal();
                 }else{
                   if(value.length > 0) {
-                    mData.value.sellWeight = value;
+                    print("하아 몬데몬데 =>${value.replaceFirst(RegExp(r'^0+'), '')}");
+                    sellWeightController.text = value.replaceFirst(RegExp(r'^0+'), '');
+                    mData.value.sellWeight = sellWeightController.text;
+
+                    /*sellWeightController.text = value;
+                    mData.value.sellWeight = value;*/
                   }else{
+                    sellWeightController.text = "";
                     mData.value.sellWeight = "";
                   }
                 }
@@ -1387,44 +1410,16 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                             maxLength: 50,
                           )
                       )),
-<<<<<<< HEAD
-                      /*Expanded(
-                        flex: 1,
-                        child: InkWell(
-                          onTap: () async {
-                            await display24Call();
-                          },
-                          child: Container(
-                            height: CustomStyle.getHeight(30.h),
-                            margin: EdgeInsets.only(right: CustomStyle.getWidth(2.w)),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: tv24Call.value ? text_box_color_01  : text_box_color_02),
-                              borderRadius: BorderRadius.all(Radius.circular(5.h))
-                            ),
-                            child: Text(
-                              "${Strings.of(context)?.get("order_trans_info_rpa_24call")}",
-                              textAlign: TextAlign.center,
-                              style: CustomStyle.CustomFont(styleFontSize12,  tv24Call.value ? text_box_color_01  : text_box_color_02, font_weight: FontWeight.w700),
-                            ),
-                          )
-                        )
-                      ),*/
-                      Expanded(
-                          flex: 1,
-                          child: InkWell(
-=======
                       Expanded(
                         flex: 3,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          tv24Call.value ?
+                          /*tv24Call.value ?
                           Expanded(
                             flex: 1,
                             child: InkWell(
->>>>>>> custom
                               onTap: () async {
                                 await display24Call();
                               },
@@ -1443,7 +1438,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                 ),
                               )
                             )
-                          ) : const SizedBox(),
+                          ) : const SizedBox(),*/
                           tvHwaMull.value ?
                           Expanded(
                             flex: 1,
@@ -1619,15 +1614,11 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         ),
                                         onChanged: (value) async {
                                           if(value.length > 0) {
-                                            if(value.length >= 2) {
-                                              var ii = value.split('');
-                                              if (ii[0] == "0") {
-                                                value.substring(0);
-                                              }
-                                            }
-                                            mData.value.sellWayPointCharge = value;
+                                              sellWayPointChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                              mData.value.sellWayPointCharge = sellWayPointChargeController.text.replaceAll(",", "");
                                           }else{
                                             mData.value.sellWayPointCharge = "0";
+                                            sellWayPointChargeController.text = "0";
                                           }
                                           await setTotal();
 
@@ -1772,18 +1763,13 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         ),
                                         onChanged: (value) async {
                                           if(value.length > 0) {
-                                            if(value.length >= 2) {
-                                              var ii = value.split('');
-                                              if (ii[0] == "0") {
-                                                value.substring(0);
-                                              }
-                                            }
-                                            mData.value.sellStayCharge = value;
+                                            sellStayChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                            mData.value.sellStayCharge = sellStayChargeController.text.replaceAll(",", "");
                                           }else{
                                             mData.value.sellStayCharge = "0";
+                                            sellStayChargeController.text = "0";
                                           }
                                           await setTotal();
-
                                         },
                                         maxLength: 50,
                                       )
@@ -1925,18 +1911,13 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         ),
                                         onChanged: (value) async {
                                           if(value.length > 0) {
-                                            if(value.length >= 2) {
-                                              var ii = value.split('');
-                                              if (ii[0] == "0") {
-                                                value.substring(0);
-                                              }
-                                            }
-                                            mData.value.sellHandWorkCharge = value;
+                                            sellHandWorkChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                            mData.value.sellHandWorkCharge = sellHandWorkChargeController.text.replaceAll(",", "");
                                           }else{
                                             mData.value.sellHandWorkCharge = "0";
+                                            sellHandWorkChargeController.text = "0";
                                           }
                                           await setTotal();
-
                                         },
                                         maxLength: 50,
                                       )
@@ -1956,9 +1937,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                                         textAlign: TextAlign.start,
                                         keyboardType: TextInputType.text,
-                                        controller: sellStayMemoController,
+                                        controller: sellHandWorkMemoController,
                                         maxLines: 1,
-                                        decoration: sellStayMemoController.text.isNotEmpty
+                                        decoration: sellHandWorkMemoController.text.isNotEmpty
                                             ? InputDecoration(
                                           counterText: '',
                                           contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
@@ -1975,7 +1956,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           ),
                                           suffixIcon: IconButton(
                                             onPressed: () {
-                                              sellStayMemoController.clear();
+                                              sellHandWorkMemoController.clear();
                                               mData.value.sellHandWorkMemo = "";
                                             },
                                             icon: Icon(
@@ -2078,15 +2059,11 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                         ),
                                         onChanged: (value) async {
                                           if(value.length > 0) {
-                                            if(value.length >= 2) {
-                                              var ii = value.split('');
-                                              if (ii[0] == "0") {
-                                                value.substring(0);
-                                              }
-                                            }
-                                            mData.value.sellRoundCharge = value;
+                                            sellRoundChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                            mData.value.sellRoundCharge = sellRoundChargeController.text.replaceAll(",", "");
                                           }else{
                                             mData.value.sellRoundCharge = "0";
+                                            sellRoundChargeController.text = "0";
                                           }
                                           await setTotal();
                                         },
@@ -2097,7 +2074,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                   Container(
                                       padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
                                       child: Text(
-                                        "${Strings.of(context)?.get("order_trans_info_hand_work_memo")}",
+                                        "${Strings.of(context)?.get("order_trans_info_round_memo")}",
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       )
                                   ),
@@ -2229,16 +2206,13 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                           ),
                                         ),
                                         onChanged: (value) async {
+
                                           if(value.length > 0) {
-                                            if(value.length >= 2) {
-                                              var ii = value.split('');
-                                              if (ii[0] == "0") {
-                                                value.substring(0);
-                                              }
-                                            }
-                                            mData.value.sellOtherAddCharge = value;
+                                            sellOtherAddChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                            mData.value.sellOtherAddCharge = sellOtherAddChargeController.text.replaceAll(",", "");
                                           }else{
                                             mData.value.sellOtherAddCharge = "0";
+                                            sellOtherAddChargeController.text = "0";
                                           }
                                           await setTotal();
                                         },
@@ -2337,10 +2311,24 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
     unitPriceController.text = mData.value.unitPrice == null || mData.value.unitPrice?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.unitPrice??"0".trim().replaceAll(",", "")).toString());
     sellChargeController.text = mData.value.sellCharge == null || mData.value.sellCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellCharge??"0".trim().replaceAll(",", "")).toString());
     sellFeeController.text = mData.value.sellFee == null || mData.value.sellFee?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellFee??"0".trim().replaceAll(",", "")).toString());
-    sellWayPointChargeController.text = mData.value.sellWayPointCharge??"0";
-    sellStayChargeController.text = mData.value.sellStayCharge??"0";
-    sellRoundChargeController.text = mData.value.sellRoundCharge??"0";
+    sellWeightController.text = mData.value.sellWeight??"0";
     rpaValueController.text = mRpaSalary.value?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mRpaSalary.value.trim().replaceAll(",", "")).toString());
+    //추가 운임
+    //경유비
+    sellWayPointChargeController.text = mData.value.sellWayPointCharge == null || mData.value.sellWayPointCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellWayPointCharge??"0".trim().replaceAll(",", "")).toString());
+    sellWayPointMemoController.text = mData.value.sellWayPointMemo??"";
+    //대기료
+    sellStayChargeController.text = mData.value.sellStayCharge == null || mData.value.sellStayCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellStayCharge??"0".trim().replaceAll(",", "")).toString());
+    sellStayMemoController.text = mData.value.sellStayMemo??"";
+    //수작업비
+    sellHandWorkChargeController.text = mData.value.sellHandWorkCharge == null || mData.value.sellHandWorkCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellHandWorkCharge??"0".trim().replaceAll(",", "")).toString());
+    sellHandWorkMemoController.text = mData.value.sellHandWorkMemo??"";
+    //회차료
+    sellRoundChargeController.text = mData.value.sellRoundCharge == null || mData.value.sellRoundCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellRoundCharge??"0".trim().replaceAll(",", "")).toString());
+    sellRoundMemoController.text = mData.value.sellRoundMemo??"";
+    //기타
+    sellOtherAddChargeController.text = mData.value.sellOtherAddCharge == null || mData.value.sellOtherAddCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellOtherAddCharge??"0".trim().replaceAll(",", "")).toString());
+    sellOtherAddMemoController.text = mData.value.sellOtherAddMemo??"";
 
     return Container(
         child: Column(

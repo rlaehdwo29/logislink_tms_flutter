@@ -205,6 +205,59 @@ abstract class Rest {
       );
 
   /**
+   * 오더 수정
+   */
+  @FormUrlEncoded()
+  @POST(URL_ORDER_MOD)
+  Future<HttpResponse> orderMod(@Header("Authorization") String? Authorization,
+      @Field("orderId") String? orderId,
+      @Field("sellCustName") String? reqCustName,
+      @Field("reqCustId") String? reqCustId,
+      @Field("reqDeptId") String? reqDeptId,
+      @Field("reqStaff") String? reqStaff, @Field("reqTel") String? reqTel,
+      @Field("reqAddr") String? reqAddr, @Field("reqAddrDetail") String? reqAddrDetail,
+      @Field("custId") String? custId, @Field("deptId") String? deptId,
+      @Field("inOutSctn") String? inOutSctn, @Field("truckTypeCode") String? truckTypeCode,
+      @Field("sComName") String? sComName, @Field("sSido") String? sSido,
+      @Field("sGungu") String? sGungu, @Field("sDong") String? sDong,
+      @Field("sAddr") String? sAddr, @Field("sAddrDetail") String? sAddrDetail,
+      @Field("sDate") String? sDate, @Field("sStaff") String? sStaff,
+      @Field("sTel") String? sTel, @Field("sMemo") String? sMemo,
+      @Field("eComName") String? eComName, @Field("eSido") String? eSido,
+      @Field("eGungu") String? eGungu, @Field("eDong") String? eDong,
+      @Field("eAddr") String? eAddr, @Field("eAddrDetail") String? eAddrDetail,
+      @Field("eDate") String? eDate, @Field("eStaff") String? eStaff,
+      @Field("eTel") String? eTel, @Field("eMemo") String? eMemo,
+      @Field("sLat") double? sLat, @Field("sLon") double? sLon,
+      @Field("eLat") double? eLat, @Field("eLon") double? eLon,
+      @Field("goodsName") String? goodsName, @Field("goodsWeight") double? goodsWeight,
+      @Field("weightUnitCode") String? weightUnitCode, @Field("goodsQty") String? goodsQty,
+      @Field("qtyUnitCode") String? qtyUnitCode, @Field("sWayCode") String? sWayCode,
+      @Field("eWayCode") String? eWayCode, @Field("mixYn") String? mixYn,
+      @Field("mixSize") String? mixSize, @Field("returnYn") String? returnYn,
+      @Field("carTonCode") String? carTonCode, @Field("carTypeCode") String? carTypeCode,
+      @Field("chargeType") String? chargeType, @Field("distance") double? distance,
+      @Field("time") int? time, @Field("reqMemo") String? reqMemo,
+      @Field("driverMemo") String? driverMemo, @Field("itemCode") String? itemCode,
+      @Field("sellCharge") int? sellCharge, @Field("sellFee") int? sellFee,
+      @Field("orderStopList") String? orderStopList, @Field("buyStaff") String? buyStaff,
+      @Field("buyStaffTel") String? buyStaffTel, @Field("sellWayPointMemo") String? sellWayPointMemo,
+      @Field("sellWayPointCharge") String? sellWayPointCharge, @Field("sellStayMemo") String? sellStayMemo,
+      @Field("sellStayCharge") String? sellStayCharge, @Field("sellHandWorkMemo") String? sellHandWorkMemo,
+      @Field("sellHandWorkCharge") String? sellHandWorkCharge, @Field("sellRoundMemo") String? sellRoundMemo,
+      @Field("sellRoundCharge") String? sellRoundCharge, @Field("sellOtherAddMemo") String? sellOtherAddMemo,
+      @Field("sellOtherAddCharge") String? sellOtherAddCharge, @Field("sellWeight") String? sellWeight,
+      @Field("talkYn") String? talkYn,
+
+      @Field("call24Cargo") String? call24Cargo,
+      @Field("manCargo") String? manCargo,
+      @Field("oneCargo") String? oneCargo,
+      @Field("call24Charge") String? call24Charge,
+      @Field("manCharge") String? manCharge,
+      @Field("oneCharge") String? oneCharge
+      );
+
+  /**
    * 오더 취소
    */
   @FormUrlEncoded()
@@ -452,6 +505,13 @@ abstract class Rest {
   @FormUrlEncoded()
   @POST(URL_ADDR_LIST)
   Future<HttpResponse> getAddr(@Header("Authorization") String? Authorization,
+      @Field("addrName") String? addrName);
+
+  /**
+   * KAKAO Lat,Lon 데이터 가져오기
+   */
+  @GET(URL_KAKAO_ADDRESS)
+  Future<HttpResponse> getLatLon(@Header("Authorization") String? Authorization,
       @Field("addrName") String? addrName);
 
   /**
@@ -850,6 +910,13 @@ abstract class Rest {
       @Field("necessary") String? necessary,
       @Field("selective") String? selective
       );
+
+  /**
+   * 지번 검색
+   */
+  @FormUrlEncoded()
+  @POST(URL_JIBUN)
+  Future<HttpResponse> getJibun(@Field("fullAddr") String? fullAddr);
 
 
 }

@@ -1523,7 +1523,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future goToRegOrder() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage()));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(flag: "R")));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {

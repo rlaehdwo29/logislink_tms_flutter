@@ -3,12 +3,12 @@
 
 //public static String SERVER_URL = "https://app.logis-link.co.kr";   // PRO URL
 
-const String m_ServerRelease = "https://app.logis-link.co.kr";
-const String m_ServerDebug = "http://192.168.68.70:8080";
+const String m_ServerRelease = "https://app.logis-link.co.kr";    // 운영서버
+const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
 //const String m_ServerDebug = "http://192.168.0.2:8080";
-const String m_ServerTest = "http://211.252.86.30:806";
+const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
-const String SERVER_URL = m_ServerRelease;
+const String SERVER_URL = m_ServerDebug;
 
 const String RECEIPT_PATH = "/files/receipt/";
 
@@ -22,6 +22,9 @@ const String JUSO_URL = "https://www.juso.go.kr";
 const String KAKAO_URL = "https://dapi.kakao.com";
 
 // 도로명 API 주소검색
+
+// 내부 지번 주소 검색
+const String URL_JIBUN = "/cmm/jibunlist/v1";
 
 // 공통코드
 const String URL_CODE_LIST = "/cmm/code/list";
@@ -51,6 +54,8 @@ const String URL_ORDER_LIST2= "/cust/order/list/A/v2/order";
 const String URL_ORDER_LIST = "/cust/order/list/A/v2";
 // 오더 등록
 const String URL_ORDER_REG = "/cust/order/write/v1";
+// 오더 수정
+const String URL_ORDER_MOD = "/cust/order/update/v1";
 // 오더 취소
 const String URL_ORDER_CANCEL = "/cust/order/cancel";
 // 오더 재 등록

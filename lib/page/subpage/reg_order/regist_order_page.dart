@@ -30,7 +30,7 @@ import 'package:dio/dio.dart';
 class RegistOrderPage extends StatefulWidget {
 
   OrderModel? order_vo;
-  String? flag;
+  String? flag; // R: 오더 등록, CR:오더 복사, M: 오더 수정
 
   RegistOrderPage({Key? key, this.order_vo, this.flag}):super(key:key);
 
@@ -102,6 +102,10 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         await getOption();
       }
 
+      if(widget.flag == "M") {
+        setSDate.value = Util.splitSDate(mData.value.sDate);
+        setEDate.value = Util.splitSDate(mData.value.eDate);
+      }
 
     });
   }
@@ -160,12 +164,14 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   }
 
   Future<void> setDate() async {
-    sCal.value = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0);
-    mData.value.sDate = Util.getAllDate(sCal.value);
-    eCal.value = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0);
-    mData.value.eDate = Util.getAllDate(eCal.value);
-    setSDate.value = Util.splitSDate(mData.value.sDate);
-    setEDate.value = Util.splitSDate(mData.value.eDate);
+    if(widget.flag != "M") {
+      sCal.value = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0);
+      mData.value.sDate = Util.getAllDate(sCal.value);
+      eCal.value = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0);
+      mData.value.eDate = Util.getAllDate(eCal.value);
+      setSDate.value = Util.splitSDate(mData.value.sDate);
+      setEDate.value = Util.splitSDate(mData.value.eDate);
+    }
   }
 
   Future<void> copySetDate() async {
@@ -460,7 +466,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
 
   Future<void> goToChargeInfo() async {
     if(isCargoInfo.value) {
-      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderChargeInfoPage(order_vo:mData.value,flag:widget.flag, unit_charge_cnt:ChargeCheck.value,unit_buy_charge_local: mBuyChargeDummy.value, unit_price_local: mUnitPriceDummy.value, unit_sell_charge_local: mSellChargeDummy.value)));
+      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderChargeInfoPage(order_vo:mData.value,flag:widget.flag, unit_charge_cnt:ChargeCheck.value,unit_buy_charge_local: mData.value.buyCharge??"0", unit_price_local: mUnitPriceDummy.value, unit_sell_charge_local: mSellChargeDummy.value)));
       if(results["code"] == 200) {
         print("goToChargeInfo() -> ${results[Const.RESULT_WORK]}");
         await setActivityResult(results);
@@ -479,7 +485,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
             color: Colors.white),
         child: InkWell(
             onTap: () async {
-              await goToRequestInfo();
+              if(widget.flag != "M") await goToRequestInfo();
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -812,8 +818,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   Future<void> copyData() async {
     bool checkflag = false;
     if(widget.flag != "M") {
-      if (!(mData.value.call24Cargo == "") &&
-          mData.value.call24Charge != null) {
+      if (!(mData.value.call24Cargo == "") && mData.value.call24Charge != null) {
         mData.value.call24Cargo = "N";
         checkflag = true;
       }
@@ -856,7 +861,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
     // Insert
     await getUnitChargeCnt();
 
-    await copySetDate();
+    if(widget.flag != "M") await copySetDate();
 
     if(checkflag) {
       llRpaInfo.value = true;
@@ -915,11 +920,24 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         );
   }
 
+  Future<void> showModiOrder() async {
+    openCommonConfirmBox(
+        context,
+        "오더를 수정하시겠습니까?",
+        Strings.of(context)?.get("no") ?? "Error!!",
+        Strings.of(context)?.get("yes") ?? "Error!!",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await modOrder();
+        }
+    );
+  }
+
   Future<void> regOrder() async {
-    String mJson = jsonEncode(mData.value.orderStopList?.map((e) => e.toJson()).toList());
     if(validation()) {
       Logger logger = Logger();
-      pr?.show();
+      await pr?.show();
       UserModel? user = await controller.getUserInfo();
       await DioService.dioClient(header: true).orderReg(
           user.authorization,
@@ -948,12 +966,13 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           mData.value.oneCharge
 
       ).then((it) async {
-        pr?.hide();
+        await pr?.hide();
         ReturnMap _response = DioService.dioResponse(it);
         logger.d("regOrder() _response -> ${_response.status} // ${_response.resultMap}");
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
-            var user = await controller.getUserInfo();
+
+            /*var user = await controller.getUserInfo();
 
             await FirebaseAnalytics.instance.logEvent(
               name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
@@ -981,15 +1000,15 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   "rpaSalary" : mData.value.call24Charge,
                 },
               );
-            }
+            }*/
 
             Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
           }
         }
-      }).catchError((Object obj){
-        pr?.hide();
+      }).catchError((Object obj) async {
+        await pr?.hide();
         switch (obj.runtimeType) {
           case DioError:
           // Here's the sample to get the failed response error code and message
@@ -998,6 +1017,67 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
             break;
           default:
             print("regOrder() getOrder Default => ");
+            break;
+        }
+      });
+    }else{
+      Util.toast(Strings.of(context)?.get("order_reg_hint")??"Not Found");
+    }
+  }
+
+  Future<void> modOrder() async {
+    if(validation()) {
+      Logger logger = Logger();
+      await pr?.show();
+      UserModel? user = await controller.getUserInfo();
+      await DioService.dioClient(header: true).orderMod(
+          user.authorization,
+          mData.value.orderId,
+          mData.value.sellCustName,
+          mData.value.sellCustId,
+          mData.value.sellDeptId,
+          mData.value.sellStaff, mData.value.sellStaffTel, mData.value.reqAddr,
+          mData.value.reqAddrDetail,user.custId,user.deptId,mData.value.inOutSctn,mData.value.truckTypeCode,
+          mData.value.sComName,mData.value.sSido,mData.value.sGungu,mData.value.sDong,mData.value.sAddr,mData.value.sAddrDetail,
+          mData.value.sDate,mData.value.sStaff,mData.value.sTel,mData.value.sMemo,mData.value.eComName,mData.value.eSido,
+          mData.value.eGungu,mData.value.eDong,mData.value.eAddr,mData.value.eAddrDetail,mData.value.eDate,mData.value.eStaff,
+          mData.value.eTel,mData.value.eMemo,mData.value.sLat,mData.value.sLon,mData.value.eLat,mData.value.eLon,
+          mData.value.goodsName,double.parse(mData.value.goodsWeight??"0.0"),mData.value.weightUnitCode,mData.value.goodsQty,mData.value.qtyUnitCode,
+          mData.value.sWayCode,mData.value.eWayCode,mData.value.mixYn,mData.value.mixSize,mData.value.returnYn,
+          mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.distance,mData.value.time,
+          mData.value.reqMemo, mData.value.driverMemo,mData.value.itemCode,int.parse(mData.value.sellCharge??"0"),int.parse(mData.value.sellFee??"0"),
+          mData.value.orderStopList != null && mData.value.orderStopList?.isNotEmpty == true ? jsonEncode(mData.value.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
+          mData.value.sellWayPointMemo,mData.value.sellWayPointCharge,mData.value.sellStayMemo,mData.value.sellStayCharge,
+          mData.value.sellHandWorkMemo,mData.value.sellHandWorkCharge,mData.value.sellRoundMemo,mData.value.sellRoundCharge,
+          mData.value.sellOtherAddMemo,mData.value.sellOtherAddCharge,mData.value.sellWeight,"N",
+          mData.value.call24Cargo,
+          mData.value.manCargo,
+          mData.value.oneCargo,
+          mData.value.call24Charge,
+          mData.value.manCharge,
+          mData.value.oneCharge
+
+      ).then((it) async {
+        await pr?.hide();
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("modOrder() _response -> ${_response.status} // ${_response.resultMap}");
+        if(_response.status == "200") {
+          if(_response.resultMap?["result"] == true) {
+            Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
+          }else{
+            openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+          }
+        }
+      }).catchError((Object obj) async {
+        await pr?.hide();
+        switch (obj.runtimeType) {
+          case DioError:
+          // Here's the sample to get the failed response error code and message
+            final res = (obj as DioError).response;
+            print("modOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
+            break;
+          default:
+            print("modOrder() getOrder Default => ");
             break;
         }
       });
@@ -1158,7 +1238,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   child: InkWell(
                       onTap: () async {
                         if(widget.flag == "M") {
-
+                          await showModiOrder();
                         }else{
                           await showRegOrder();
                         }

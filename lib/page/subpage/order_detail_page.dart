@@ -196,7 +196,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   }
 
   Future<void> copyOrder() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(order_vo:mData.value)));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(order_vo:mData.value,flag: "CR",)));
 
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
@@ -3161,6 +3161,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Future<void> setModifyResult(Map<String,dynamic> results) async {
     if(results["allocId"] != null){
       String allocId = results["allocId"].toString();
+      Util.toast("오더가 수정되었습니다.");
       await getOrderDetail(allocId);
     }
   }

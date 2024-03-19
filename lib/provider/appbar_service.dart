@@ -4,14 +4,17 @@ import 'package:logger/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/model/jibun_model.dart';
 import 'package:logislink_tms_flutter/common/model/notice_model.dart';
 import 'package:logislink_tms_flutter/common/model/point_model.dart';
+import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 
 class AppbarService with ChangeNotifier {
   final addrList = List.empty(growable: true).obs;
+  final jibunList = List.empty(growable: true).obs;
   final noticeList = List.empty(growable: true).obs;
   final pointList = List.empty(growable: true).obs;
 
@@ -46,6 +49,39 @@ class AppbarService with ChangeNotifier {
       }
     });
     return addrList;
+  }
+
+  Future getJibunAddr(BuildContext context, String? keyword) async {
+    Logger logger = Logger();
+    jibunList.value = List.empty(growable: true);
+    await DioService.dioClient(header: true).getJibun(keyword).then((it) {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.i("getJibunAddr() _response -> ${_response.status} // ${_response.resultMap}");
+      if (_response.status == "200") {
+        if (_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["data"] != null) {
+            var list = _response.resultMap?["data"] as List;
+            List<JibunModel> itemsList = list.map((i) => JibunModel.fromJSON(i)).toList();
+            if(jibunList.isNotEmpty) jibunList.clear();
+            jibunList.addAll(itemsList);
+          }
+        }else{
+          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+        }
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getJibunAddr() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getJibunAddr() Error Default => ");
+          break;
+      }
+    });
+    return jibunList;
   }
 
   Future getNotice(BuildContext? context) async {

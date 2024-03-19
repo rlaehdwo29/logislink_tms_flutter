@@ -1,3 +1,4 @@
+import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,6 +35,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   TextEditingController searchController = TextEditingController();
 
   final mList = List.empty(growable: true).obs;
+  final mJibunList = List.empty(growable: true).obs;
   final isExpanded = [].obs;
 
   final mSido = "".obs;
@@ -93,11 +95,155 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
     });
   }
 
-  Widget getAddrListWidget() {
+  Future<void> onSelectItem2(String? addr) async {
+    Logger logger = Logger();
+    await DioService.kakaoClient(header: true).getGeoAddress(
+        "KakaoAK ${Strings.of(context)?.get("kakao_rest_app_key")}",
+        addr
+    ).then((it) async {
+      try {
+        KakaoModel kakao = DioService.kakaoDioResponse2(it);
+        widget.callback(kakao);
+        Navigator.of(context).pop();
+      }catch(e) {
+        print("onSelectItem() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("onSelectItem2() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("onSelectItem2() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Widget getJibunListWidget() {
     return Expanded(
-        child: mList.isNotEmpty ?
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(10)),
+              decoration: BoxDecoration(
+                color: light_gray1,
+                border: Border(
+                  bottom: BorderSide(
+                    color: light_gray12,
+                    width: 5.w
+                  )
+                )
+              ),
+              child: Row(
+                children: [
+                  Expanded(flex: 2,
+                      child: Text(
+                          "시/도",
+                        textAlign: TextAlign.center,
+                        style: CustomStyle.CustomFont(styleFontSize15, Colors.black,font_weight: FontWeight.w600),
+                      ),
+                  ),
+                  Expanded(flex: 3,
+                    child: Text(
+                      "구/군",
+                      textAlign: TextAlign.center,
+                      style: CustomStyle.CustomFont(styleFontSize15, Colors.black,font_weight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(flex: 5,
+                    child: Text(
+                      "동",
+                      textAlign: TextAlign.center,
+                      style: CustomStyle.CustomFont(styleFontSize15, Colors.black,font_weight: FontWeight.w600),
+                    ),
+                  ),
+                  Expanded(flex: 3,
+                    child: Text(
+                      "리",
+                      textAlign: TextAlign.center,
+                      style: CustomStyle.CustomFont(styleFontSize15, Colors.black,font_weight: FontWeight.w600),
+                    ),
+                  )
+                ],
+              )
+            ),
+            
+            mJibunList.isNotEmpty ?
+            SingleChildScrollView(
+                child : Flex(
+                    direction: Axis.vertical,
+                    children: List.generate(
+                        mJibunList.length,
+                            (index) {
+                          var item = mJibunList[index];
+                          return InkWell(
+                            onTap: (){
+                              onSelectItem2(item.fullAddr);
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: line, width: CustomStyle.getWidth(0.5)
+                                        )
+                                    )
+                                ),
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: Text(
+                                        "${item.sido}",
+                                        textAlign: TextAlign.center,
+                                        style: CustomStyle.CustomFont(styleFontSize13, Colors.black),
+                                      )
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                        child: Text(
+                                          "${item.gugun}",
+                                          textAlign: TextAlign.center,
+                                          style: CustomStyle.CustomFont(styleFontSize13, Colors.black),
+                                        )
+                                    ),
+                                    Expanded(
+                                      flex: 5,
+                                        child: Text(
+                                          "${item.dong}",
+                                          textAlign: TextAlign.center,
+                                          style: CustomStyle.CustomFont(styleFontSize13, Colors.black),
+                                        )
+                                    ),
+                                    Expanded(
+                                      flex: 3,
+                                        child: Text(
+                                          "${item.ri}",
+                                          textAlign: TextAlign.center,
+                                          style: CustomStyle.CustomFont(styleFontSize13, Colors.black),
+                                        )
+                                    )
+                                  ],
+                                )
+                            ),
+                          );
+                        }
+                    )
+                )
+            ): const SizedBox()
+          ],
+        )
+    );
+
+  }
+
+  Widget getAddrListWidget() {
+    return mList.isNotEmpty ?
         SingleChildScrollView(
-            child:Flex(
+            child: Flex(
                 direction: Axis.vertical,
                 children: List.generate(
                     mList.length,
@@ -185,16 +331,14 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                     }
                 )
             )
-        ): SizedBox(
+          ): SizedBox(
           child: Center(
-              child: Text(
-                Strings.of(context)?.get("empty_list") ?? "Not Found",
-                style:
-                CustomStyle.CustomFont(styleFontSize20, styleBlackCol1),
-              )),
-        )
-    );
-
+            child: Text(
+              Strings.of(context)?.get("empty_list") ?? "Not Found",
+              style:CustomStyle.baseFont()
+            ),
+          )
+      );
   }
 
   void selectSido(CodeModel? codeModel,String? codeType) {
@@ -386,8 +530,8 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
           Expanded(
               flex: 1,
               child: IconButton(
-                onPressed: (){
-                  getJuso();
+                onPressed: () async {
+                  await getJuso();
                 },
                 icon: Icon(Icons.search, size: 28.h,color: Colors.black),
               )
@@ -395,21 +539,56 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
         ]));
   }
 
-  Widget itemListFuture() {
+  Widget addrItemListFuture() {
     final appbarService = Provider.of<AppbarService>(context);
     return FutureBuilder(
         future: appbarService.getAddr(context, searchController.text),
         builder: (context, snapshot) {
           if(snapshot.connectionState != ConnectionState.done) {
-            return Expanded(child: Container(
+            return Container(
                 alignment: Alignment.center,
-                child: Center(child: CircularProgressIndicator())
-            ));
+                child: const Center(child: CircularProgressIndicator())
+            );
           }else {
             if (snapshot.hasData) {
               if (mList.isNotEmpty) mList.clear();
               mList.value.addAll(snapshot.data);
               return getAddrListWidget();
+            } else if (snapshot.hasError) {
+              return Container(
+                padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
+                alignment: Alignment.center,
+                child: Text(
+                    "${Strings.of(context)?.get("empty_list")}",
+                    style: CustomStyle.baseFont()),
+              );
+            }
+          }
+          return Container(
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(
+              backgroundColor: styleGreyCol1,
+            ),
+          );
+        }
+    );
+  }
+
+  Widget jibunItemListFuture() {
+    final appbarService = Provider.of<AppbarService>(context);
+    return FutureBuilder(
+        future: appbarService.getJibunAddr(context, searchController.text),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState != ConnectionState.done) {
+            return Container(
+                alignment: Alignment.center,
+                child: const Center(child: CircularProgressIndicator())
+            );
+          }else {
+            if (snapshot.hasData) {
+              if (mJibunList.isNotEmpty) mJibunList.clear();
+              mJibunList.value.addAll(snapshot.data);
+              return getJibunListWidget();
             } else if (snapshot.hasError) {
               return Container(
                 padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
@@ -434,6 +613,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
               centerTitle: true,
               title: Text(
@@ -459,10 +639,35 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                 filterWidget(),
                 searchWidget(),
                 CustomStyle.getDivider1(),
-                itemListFuture()
+                Expanded(
+                    child: ContainedTabBarView(
+                  tabs: [
+                    Text(
+                      "도로명+지번",
+                    style: CustomStyle.CustomFont(styleFontSize15, Colors.black)
+                    ),
+                    Text(
+                        "시/군/동",
+                    style: CustomStyle.CustomFont(styleFontSize15, Colors.black)
+                    ),
+
+                  ],
+                  views: [
+                    addrItemListFuture(),
+                    searchController.text.length > 1 ? jibunItemListFuture()
+                        : Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                          "${Strings.of(context)?.get("empty_list")}",
+                          style: CustomStyle.baseFont()),
+                    )
+                  ],
+                )
+                )
               ],
             )
-        ));
+        )
+    );
   }
 
 }

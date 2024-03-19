@@ -129,5 +129,36 @@ class DioService {
     return kakao;
   }
 
+  static KakaoModel kakaoDioResponse2(dynamic it) {
+    Logger logger = Logger();
+    KakaoModel kakao = KakaoModel();
+
+    logger.i("kakaoDioResponse2() => ${it.response.data}");
+
+    try {
+      var documents = it.response.data["documents"][0];
+      kakao.x = documents["x"];
+      kakao.y = documents["y"];
+
+      var addressItem = it.response.data["documents"][0]["address"];
+      kakao.address_name = addressItem["address_name"];
+      kakao.region_1depth_name = addressItem["region_1depth_name"];
+      kakao.region_2depth_name = addressItem["region_2depth_name"];
+      kakao.region_3depth_name = addressItem["region_3depth_name"];
+    } catch(e) {
+
+      var documents = it.response.data["documents"][0];
+      kakao.x = documents["x"];
+      kakao.y = documents["y"];
+
+      var roadItem = it.response.data["documents"][0]["road_address"];
+      kakao.rd_address_name = roadItem["rd_address_name"];
+      kakao.rd_region_1depth_name = roadItem["region_1depth_name"];
+      kakao.rd_region_2depth_name = roadItem["region_2depth_name"];
+      kakao.rd_region_3depth_name = roadItem["region_3depth_name"];
+    }
+    return kakao;
+  }
+
 }
 
