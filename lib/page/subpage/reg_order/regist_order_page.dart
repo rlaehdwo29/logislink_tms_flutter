@@ -164,6 +164,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   }
 
   Future<void> setDate() async {
+
     if(widget.flag != "M") {
       sCal.value = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0);
       mData.value.sDate = Util.getAllDate(sCal.value);
@@ -379,11 +380,10 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         if(_response.resultMap?["result"] == true) {
           if (_response.resultMap?["data"] != null) {
               var list = _response.resultMap?["data"] as List;
-              List<StopPointModel> tempList = list.map((i) =>
-                  StopPointModel.fromJSON(i)).toList();
+              List<StopPointModel> tempList = list.map((i) => StopPointModel.fromJSON(i)).toList();
               List<StopPointModel> realList = List.empty(growable: true);
               for (StopPointModel data in tempList) {
-                data.stopSeq = null;
+                // data.stopSeq = null; 2024.03.20 Kim DongJae 수정
                 realList.add(data);
               }
               mData.value.orderStopList = realList;
@@ -862,6 +862,22 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
     await getUnitChargeCnt();
 
     if(widget.flag != "M") await copySetDate();
+    else {
+      if(mData.value.sDate?.isNotEmpty == true || mData.value.sDate != null) {
+        var ssDate = DateTime.parse(mData.value.sDate!);
+        sCal.value = DateTime(ssDate.year, ssDate.month, ssDate.day, ssDate.hour, ssDate.minute);
+      }else{
+        sCal.value = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour + 1, 0);
+      }
+      if(mData.value.eDate?.isNotEmpty == true || mData.value.eDate != null) {
+        var eeDate = DateTime.parse(mData.value.eDate!);
+        eCal.value = DateTime(eeDate.year, eeDate.month, eeDate.day, eeDate.hour, eeDate.minute);
+      }else{
+        eCal.value = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, DateTime.now().hour + 1, 0);
+      }
+      mData.value.sDate = Util.getAllDate(sCal.value);
+      mData.value.eDate = Util.getAllDate(eCal.value);
+    }
 
     if(checkflag) {
       llRpaInfo.value = true;

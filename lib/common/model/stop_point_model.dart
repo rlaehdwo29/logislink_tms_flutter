@@ -80,6 +80,7 @@ class StopPointModel extends ReturnMap {
 
   Map<String,dynamic> toJson() {
     return {
+      "stopSeq": stopSeq,
       "eAddr": eAddr,
       "eAddrDetail": eAddrDetail,
       "eComName": eComName,
@@ -87,7 +88,8 @@ class StopPointModel extends ReturnMap {
       "eLon": eLon,
       "eStaff": eStaff,
       "eTel": eTel,
-      "stopSe": stopSe
+      "stopSe": stopSe,
+      "useYn": useYn,
     };
   }
 

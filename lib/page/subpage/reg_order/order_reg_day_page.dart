@@ -441,7 +441,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
             Util.toast(Strings.of(context)?.get("order_reg_day_date_fail"));
           }else{
             if (!isSameDay(eCal.value, selectedDay)) {
-              setState(() async {
+              //setState(() async {
                 eCal.value = selectedDay;
                 _endFocusedDay.value = focusedDay;
                 await setEDate();
@@ -450,7 +450,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
                 }else{
                   mETime.value = "08:00";
                 }
-              });
+              //});
             }
           }
         },
