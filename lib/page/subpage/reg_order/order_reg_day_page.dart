@@ -286,6 +286,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
     return Container(
       child: TableCalendar(
         focusedDay: _startFocusedDay.value,
+        availableGestures: AvailableGestures.none,
         firstDay:  DateTime.utc(2010, 1, 1),
         locale: 'ko-KR',
         lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
@@ -374,6 +375,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
     return Container(
       child: TableCalendar(
         focusedDay: _endFocusedDay.value,
+        availableGestures: AvailableGestures.none,
         firstDay:  DateTime.utc(2010, 1, 1),
         locale: 'ko-KR',
         lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
