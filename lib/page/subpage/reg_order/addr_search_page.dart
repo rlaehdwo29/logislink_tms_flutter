@@ -123,8 +123,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   }
 
   Widget getJibunListWidget() {
-    return Expanded(
-        child: Column(
+    return Column(
           children: [
             Container(
               padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(10)),
@@ -235,8 +234,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                 )
             ): const SizedBox()
           ],
-        )
-    );
+        );
 
   }
 

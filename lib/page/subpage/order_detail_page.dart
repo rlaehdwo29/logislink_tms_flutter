@@ -1362,11 +1362,10 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
   Future<void> setAllocState() async {
     llBottom.value = true;
     await setVisibilitySendLink(false);
-    print("읭ㅇ읭읭읭ㅇ => ${mData.value.allocState} // ${mData.value.orderState}");
     switch(mData.value.allocState) {
       case "00" :
         // 접수
-        if(mData.value.orderState == "09") {
+        if(mData.value.orderState == "09") { // 09 재접수
           tvReOrder.value = true;
           tvModify.value = true;
           await setVisibilitySendLink(false);
