@@ -618,7 +618,7 @@ class OrderModel extends ResultModel {
         otherAddCharge: json['otherAddCharge'],
         //기타추가비 금액
 
-        unitPrice: json['unitPrice'],
+        unitPrice: (json['unitCharge']??0).toString(),
         unitPriceType: json['unitPriceType'],
         unitPriceTypeName: json['unitPriceTypeName'],
 

@@ -302,8 +302,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       if(widget.unit_charge_cnt != null) ChargeCheck.value = widget.unit_charge_cnt!;
       mHwaMullFlag.value = false;
 
-      print("응애응애 송아지 =>${ChargeCheck}// ${code} // ${mData.value.unitPrice} // ${mData.value.sellCharge}");
-
       if(widget.flag != "M"){
       if(ChargeCheck.value == "Y") {
         await getUnitChargeCar();
@@ -371,7 +369,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
         }
         await setChargeType();
       }
-      print("가볼까아앙 => ${mData.value.unitPriceType}");
       if (mData.value.unitPriceType == "01") {
         mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
         mData.value.unitPriceTypeName = "대당단가";
@@ -384,6 +381,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
       }
       await setUnitPriceType();
   }
+
 
   Future<void> getRpaLinkFlag() async {
     Logger logger = Logger();
@@ -1194,9 +1192,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ),
               onChanged: (value) async {
                 if(value.length > 0) {
-                  print("잉 먼데 ?? =>${value}");
                   sellFeeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
-                  print("잉 먼데2222 ?? =>${sellFeeController.text}");
                   mData.value.sellFee = sellFeeController.text.replaceAll(",", "");
                 }else{
                   mData.value.sellFee = "0";
@@ -1298,7 +1294,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                   await setTotal();
                 }else{
                   if(value.length > 0) {
-                    print("하아 몬데몬데 =>${value.replaceFirst(RegExp(r'^0+'), '')}");
                     sellWeightController.text = value.replaceFirst(RegExp(r'^0+'), '');
                     mData.value.sellWeight = sellWeightController.text;
 

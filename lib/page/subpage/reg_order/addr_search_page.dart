@@ -641,24 +641,23 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                     child: ContainedTabBarView(
                   tabs: [
                     Text(
-                      "도로명+지번",
-                    style: CustomStyle.CustomFont(styleFontSize15, Colors.black)
+                        "시/군/동",
+                        style: CustomStyle.CustomFont(styleFontSize15, Colors.black)
                     ),
                     Text(
-                        "시/군/동",
+                      "도로명+지번",
                     style: CustomStyle.CustomFont(styleFontSize15, Colors.black)
-                    ),
-
+                    )
                   ],
                   views: [
-                    addrItemListFuture(),
                     searchController.text.length > 1 ? jibunItemListFuture()
                         : Container(
                       alignment: Alignment.center,
                       child: Text(
                           "${Strings.of(context)?.get("empty_list")}",
                           style: CustomStyle.baseFont()),
-                    )
+                    ),
+                    addrItemListFuture()
                   ],
                 )
                 )
