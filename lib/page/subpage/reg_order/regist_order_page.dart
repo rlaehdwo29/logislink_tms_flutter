@@ -647,11 +647,23 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                           color: Colors.white,
                           margin: EdgeInsets.only(left: 5.w, right: 10.w),
                         ),
-                        Text(
-                          llEAddr.value ? "${mData.value.eAddr}" : Strings.of(context)?.get("order_reg_e_addr_hint")??"Not Found",
-                          style: CustomStyle.CustomFont(
-                              styleFontSize12, text_color_03),
-                        )
+
+                        Flexible(
+                            child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                alignment: Alignment.centerLeft,
+                                child: RichText(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                textAlign: TextAlign.left,
+                                text: TextSpan(
+                                  text:
+                                  llEAddr.value ? "${mData.value.eAddr}" : Strings.of(context)?.get("order_reg_e_addr_hint")??"Not Found",
+                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
+                            )
+                            )
+                          )
+                        ),
                       ],
                     ),
                   ),

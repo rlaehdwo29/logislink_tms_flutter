@@ -1614,7 +1614,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ) : const SizedBox(),
               mData.value.buyCustName?.isNotEmpty == true ?
               Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: Container(
                     padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
@@ -1625,7 +1625,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
               ) : const SizedBox(),
               mData.value.buyDeptName?.isNotEmpty == true ?
               Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: Container(
                     padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
@@ -1635,7 +1635,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   )
               ) : const SizedBox(),
               Expanded(
-                  flex: 3,
+                  flex: 2,
                   child: Text(
                     "${Util.getInCodeCommaWon(mData.value.buyCharge??"0")}원",
                     textAlign: TextAlign.right,
@@ -2181,13 +2181,19 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                               textAlign: TextAlign.center,
                             )
                           ) : const SizedBox(),
-                          Container(
-                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h), bottom: CustomStyle.getHeight(10.h)),
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              !(mData.value.sMemo?.isEmpty == true) ? mData.value.sMemo??"-" : "-",
-                              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                            ),
+                          Flexible(
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                  alignment: Alignment.centerLeft,
+                                  child: RichText(
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.left,
+                                    text: TextSpan(
+                                      text: !(mData.value.sMemo?.isEmpty == true) ? mData.value.sMemo??"-" : "-",
+                                      style: CustomStyle.CustomFont(styleFontSize13, text_color_01),
+                                    ),
+                                  )
+                              )
                           )
                         ])),
               ),
@@ -2206,10 +2212,11 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           color: light_gray1
                       ),
                       child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               "${Util.splitEDate(mData.value.eDate)} 하차",
+                              textAlign: TextAlign.center,
                               style: CustomStyle.CustomFont(styleFontSize13, text_box_color_01),
                             ),
                             Container(
@@ -2279,13 +2286,21 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                   textAlign: TextAlign.center,
                                 )
                             ) : const SizedBox(),
-                            Container(
-                              padding: const EdgeInsets.all(10.0),
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                !(mData.value.eMemo?.isEmpty == true) ? mData.value.eMemo??"-" : "-",
-                                style: CustomStyle.CustomFont(styleFontSize13, text_color_01),
-                              ),
+                            Flexible(
+                                child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                    alignment: Alignment.centerLeft,
+                                    child: RichText(
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.left,
+                                      text: TextSpan(
+                                        text: !(mData.value.eMemo?.isEmpty == true) ? mData.value.eMemo ?? "-" : "-",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize13,
+                                            text_color_01),
+                                      ),
+                                    )
+                                )
                             )
                           ]
                       )
