@@ -882,19 +882,22 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                           style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
                         )
                     ),
-                    content: Obx((){
-                      return SingleChildScrollView(
-                          child: Column(
+                    content: SingleChildScrollView(
+                          child: SizedBox(
+                              width:MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.9,
+                              child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 // 차량번호(필수)
                                 Container(
-                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(15.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5),top:CustomStyle.getHeight(10), left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5)),
                                     child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Container(
-                                            padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w), right: CustomStyle.getWidth(20.w), bottom: CustomStyle.getHeight(10.h), top: CustomStyle.getWidth(20.h)),
+                                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5), right: CustomStyle.getWidth(5)),
                                             child: Text(
                                               Strings.of(context)?.get("order_detail_car_num")??"차랑변호_",
                                               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -908,8 +911,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                     )
                                 ),
                                 Container(
-                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
-                                    height: CustomStyle.getHeight(35.h),
+                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5)),
+                                    height: CustomStyle.getHeight(35),
                                     child: TextField(
                                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                       textAlign: TextAlign.start,
@@ -964,7 +967,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                                 // 성명/연락처
                                 Container(
-                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5)),
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -990,8 +993,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                   )
                                               ),
                                               Container(
-                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
-                                                  height: CustomStyle.getHeight(35.h),
+                                                  margin: EdgeInsets.only(bottom: CustomStyle.getHeight(5),right: CustomStyle.getWidth(5)),
+                                                  height: CustomStyle.getHeight(35),
                                                   child: TextField(
                                                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                                     textAlign: TextAlign.start,
@@ -1001,7 +1004,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     decoration: etDriverNameController.text.isNotEmpty
                                                         ? InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1026,7 +1029,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     )
                                                         : InputDecoration(
                                                       counterText: '',
-                                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1052,7 +1055,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                           child: Column(
                                             children: [
                                               Container(
-                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
+                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5),right: CustomStyle.getWidth(5)),
                                                   child: Row(
                                                     children: [
                                                       Text(
@@ -1070,8 +1073,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                   )
                                               ),
                                               Container(
-                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
-                                                  height: CustomStyle.getHeight(35.h),
+                                                  margin: EdgeInsets.only(bottom: CustomStyle.getHeight(5),left: CustomStyle.getWidth(5)),
+                                                  height: CustomStyle.getHeight(35),
                                                   child: TextField(
                                                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                                     textAlign: TextAlign.start,
@@ -1081,7 +1084,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     decoration: etDriverNameController.text.isNotEmpty
                                                         ? InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1106,7 +1109,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     )
                                                         : InputDecoration(
                                                       counterText: '',
-                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                                                       enabledBorder: OutlineInputBorder(
                                                           borderSide: BorderSide(color: text_color_01, width: CustomStyle.getWidth(0.5.w)),
                                                           borderRadius: BorderRadius.circular(5.h)
@@ -1132,7 +1135,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 ),
                                 // 차종 / 톤급
                                 Container(
-                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(20.w),right: CustomStyle.getWidth(20.w)),
+                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5)),
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -1140,7 +1143,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                           child: Column(
                                             children: [
                                               Container(
-                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
+                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5)),
                                                   child: Row(
                                                     children: [
                                                       Text(
@@ -1158,12 +1161,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                   )
                                               ),
                                               Container(
+                                                width:double.infinity,
+                                                height: CustomStyle.getHeight(30),
+                                                margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                                 decoration: BoxDecoration(
                                                   border: Border.all(color: text_color_01,width: 0.5.w),
                                                   borderRadius: BorderRadius.all(Radius.circular(5.w)),
                                                 ),
                                                 child: Text(
-                                                  "차종입니다..",
+                                                  "",
                                                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                                 ),
                                               ),
@@ -1175,7 +1181,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                           child: Column(
                                             children: [
                                               Container(
-                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
+                                                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5),left: CustomStyle.getWidth(5)),
                                                   child: Row(
                                                     children: [
                                                       Text(
@@ -1193,12 +1199,15 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                   )
                                               ),
                                               Container(
+                                                width:double.infinity,
+                                                height: CustomStyle.getHeight(30),
+                                                margin: EdgeInsets.only(left: CustomStyle.getWidth(5)),
                                                 decoration: BoxDecoration(
                                                   border: Border.all(color: text_color_01,width: 0.5.w),
                                                   borderRadius: BorderRadius.all(Radius.circular(5.w)),
                                                 ),
                                                 child: Text(
-                                                  "톤급입니다..",
+                                                  "",
                                                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                                 ),
                                               ),
@@ -1209,8 +1218,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                   ),
                                 ),
                                 Container(
-                                  height: CustomStyle.getHeight(60.h),
-                                  margin: EdgeInsets.only(top: CustomStyle.getHeight(20.h)),
+                                  height: CustomStyle.getHeight(50),
+                                  margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
                                   child: Row(
                                     children: [
                                       Expanded(
@@ -1221,9 +1230,9 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                               },
                                               child: Container(
                                                   color: sub_btn,
+                                                  alignment: Alignment.center,
                                                   child: Text(
-                                                    Strings.of(context)?.get(
-                                                        "cancel") ?? "취소_",
+                                                    Strings.of(context)?.get("cancel") ?? "취소_",
                                                     style: CustomStyle
                                                         .CustomFont(
                                                         styleFontSize16,
@@ -1238,7 +1247,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                               onTap: () async {
                                                 var validation = await allocRegValid();
                                                 if(validation){
-                                                  if(!(Util.regexCarNumber(etCarNumController.text.trim()))) {
+                                                  if(Util.regexCarNumber(etCarNumController.text.trim())) {
                                                     Util.toast("차량번호를 확인해 주세요.");
                                                   }else{
                                                     CarModel car = CarModel();
@@ -1246,18 +1255,16 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                                     car.driverName = etDriverNameController.text.trim();
                                                     car.mobile = etTelController.text.trim();
                                                     await setAllocReg(car);
+                                                    Navigator.of(context).pop();
                                                   }
                                                 }
                                               },
                                               child: Container(
                                                   color: main_btn,
+                                                  alignment: Alignment.center,
                                                   child: Text(
-                                                    Strings.of(context)?.get(
-                                                        "confirm") ?? "확인_",
-                                                    style: CustomStyle
-                                                        .CustomFont(
-                                                        styleFontSize16,
-                                                        Colors.white),
+                                                    Strings.of(context)?.get("confirm") ?? "확인_",
+                                                    style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
                                                   )
                                               )
                                           )
@@ -1267,9 +1274,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                                 )
 
                               ]
-                          )
-                      );
-                    })
+                          ))
+                      )
                 );
               }
           );
@@ -1299,6 +1305,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
     await DioService.dioClient(header: true).orderAllocReg(
         user.authorization,
         mData.value.orderId,
+        mData.value.allocId,
         mData.value.buyCustId,
         mData.value.buyDeptId,
         mData.value.buyStaff,
@@ -1403,8 +1410,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         //출발, 도착, 입차, 취소
         llBottom.value = false;
         break;
-      case "10":
-        //운송사지정
+      case "10": //운송사지정
         tvReOrder.value = false;
         tvOrderCancel.value = false;
 

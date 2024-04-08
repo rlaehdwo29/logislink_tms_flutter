@@ -356,7 +356,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
               if (list.length > 0) {
                 List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
                 mOrderOption.value = itemsList[0];
-                mData.value.buyCharge = mOrderOption.value.buyCharge;
+                mData.value.buyCharge = mOrderOption.value.buyCharge??"0";
                 orderBuyCharge.value = mOrderOption.value.buyCharge??"";
                 if(!(mOrderOption.value.driverMemo?.isEmpty == true) && !(mOrderOption.value.driverMemo == null)) {
                   mData.value.driverMemo = mOrderOption.value.driverMemo;
@@ -433,7 +433,6 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
         talkYn.value = false;
         kakaoPushEnable.value = false;
 
-        etBuyChargeController.text = orderBuyCharge.value;
         etRegistController.text = "";
         break;
       case TRANS_TYPE_02 :
@@ -459,7 +458,6 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
         talkYn.value = false;
         kakaoPushEnable.value = false;
 
-        etBuyChargeController.text = orderBuyCharge.value;
         etRegistController.text = "";
         mCustData.value = CustomerModel();
         break;
@@ -714,10 +712,10 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
             if(_response.resultMap?["data"] != null) {
               UnitChargeModel value = UnitChargeModel.fromJSON(it.response.data["data"]);
               mData.value.buyCharge = value.unit_charge;
-              etBuyChargeController.text = value.unit_charge??"";
+              etBuyChargeController.text = value.unit_charge??"0";
             }else{
-              mData.value.buyCharge = orderBuyCharge.value;
-              etBuyChargeController.text = orderBuyCharge.value;
+              mData.value.buyCharge = orderBuyCharge.value??"0";
+              etBuyChargeController.text = orderBuyCharge.value??"0";
             }
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1049,6 +1047,9 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                   onTap: () async {
                     transType.value = TRANS_TYPE_01;
                     await setTransType();
+                    etBuyChargeController.text = orderBuyCharge.value;
+                    mData.value.buyCharge = orderBuyCharge.value;
+                    await setTotal();
                   },
                 child: Container(
                 padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -1071,6 +1072,9 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                     onTap: () async {
                       transType.value = TRANS_TYPE_02;
                       await setTransType();
+                      etBuyChargeController.text = orderBuyCharge.value;
+                      mData.value.buyCharge = orderBuyCharge.value;
+                      await setTotal();
                     },
                     child: Container(
                   padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -1561,8 +1565,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                             ),
                             onChanged: (value) async {
                               if(value.length > 0) {
-                                mData.value.buyCharge = int.parse(value.trim()).toString();
-                                etBuyChargeController.text = int.parse(value.trim()).toString();
+                                etBuyChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
+                                mData.value.buyCharge = etBuyChargeController.text.replaceAll(",", "");
                               }else{
                                 mData.value.buyCharge = "0";
                                 etBuyChargeController.text = "0";
@@ -2535,20 +2539,18 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
     return Column(
       children: [
         Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(110.w)),
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
             color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text("기타",
-                    style:
-                        CustomStyle.CustomFont(styleFontSize16, text_color_01))
-              ],
-            )),
+            child: Text(
+                "기타",
+                textAlign: TextAlign.start,
+                style: CustomStyle.CustomFont(styleFontSize16, text_color_01)
+          )
+        ),
         CustomStyle.getDivider1(),
         Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
@@ -2566,7 +2568,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                 ),
                 Container(
-                    margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                    margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       textAlign: TextAlign.start,
@@ -2576,17 +2578,17 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                       decoration: etOtherAddMemoController.text.isNotEmpty
                           ? InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(5.h)
+                            borderRadius: BorderRadius.circular(5)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
                         ),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(5.h)
+                            borderRadius: BorderRadius.circular(5)
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
@@ -2602,19 +2604,19 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                       )
                           : InputDecoration(
                         counterText: '',
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         hintText: Strings.of(context)?.get("order_trans_info_driver_memo_hint")??"차주님에게 전달할 내용을 입력해 주세요._",
                         hintStyle: CustomStyle.greyDefFont(),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(5.h)
+                            borderRadius: BorderRadius.circular(5)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
                         ),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(5.h)
+                            borderRadius: BorderRadius.circular(5)
                         ),
                       ),
                       onChanged: (value){

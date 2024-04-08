@@ -1069,7 +1069,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           mData.value.sComName,mData.value.sSido,mData.value.sGungu,mData.value.sDong,mData.value.sAddr,mData.value.sAddrDetail,
           mData.value.sDate,mData.value.sStaff,mData.value.sTel,mData.value.sMemo,mData.value.eComName,mData.value.eSido,
           mData.value.eGungu,mData.value.eDong,mData.value.eAddr,mData.value.eAddrDetail,mData.value.eDate,mData.value.eStaff,
-          mData.value.eTel,mData.value.eMemo,mData.value.sLat,mData.value.sLon,mData.value.eLat,mData.value.eLon,
+          mData.value.eTel,mData.value.eMemo,mData.value.sLat,mData.value.sLon,mData.value.eLat,mData.value.eLon,mData.value.orderState,
           mData.value.goodsName,double.parse(mData.value.goodsWeight??"0.0"),mData.value.weightUnitCode,mData.value.goodsQty,mData.value.qtyUnitCode,
           mData.value.sWayCode,mData.value.eWayCode,mData.value.mixYn,mData.value.mixSize,mData.value.returnYn,
           mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.unitPriceType,int.parse(mData.value.unitPrice??"0"), mData.value.distance,mData.value.time,

@@ -9,10 +9,12 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
+import 'package:logislink_tms_flutter/provider/appbar_service.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
+import 'package:provider/provider.dart';
 
 class OrderCustUserPage extends StatefulWidget {
 
@@ -31,6 +33,19 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
 
   final search_text = "".obs;
   final mList = List.empty(growable: true).obs;
+
+  @override
+  void initState(){
+    super.initState();
+
+    Future.delayed(Duration.zero, () async {
+      if(widget.mode == MODE.KEEPER) {
+        await getCustKeeper();
+      }else{
+        await getCustUser();
+      }
+    });
+  }
 
   Widget searchBoxWidget() {
     return Row(
@@ -108,22 +123,34 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
         Navigator.of(context).pop({'code':200,'custUser':item});
       },
         child: Container(
-        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
-        child: Column(
-          children: [
-            Text(
-              item.userName??"",
-              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+                        color: styleDividerGrey,
+                        width: 1.w
+                    )
+                )
             ),
-            Container(
-              padding: EdgeInsets.only(top: CustomStyle.getHeight(5.0)),
-              child: Text(
-                Util.makePhoneNumber(item.mobile),
-                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-              )
-            ),
-            CustomStyle.getDivider1()
-          ],
+        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
+        child: Container(
+            padding: EdgeInsets.symmetric( horizontal: CustomStyle.getWidth(10)),
+            child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                item.userName??"",
+                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+              ),
+              Container(
+                padding: EdgeInsets.only(top: CustomStyle.getHeight(5.0)),
+                child: Text(
+                  Util.makePhoneNumber(item.mobile),
+                  style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
+                )
+              ),
+            ],
+          )
         )
       )
     );

@@ -1299,7 +1299,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
 
                     /*sellWeightController.text = value;
                     mData.value.sellWeight = value;*/
-                  }else{
+                  } else {
                     sellWeightController.text = "";
                     mData.value.sellWeight = "";
                   }
@@ -1411,7 +1411,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          /*tv24Call.value ?
+                          tv24Call.value ?
                           Expanded(
                             flex: 1,
                             child: InkWell(
@@ -1433,7 +1433,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                                 ),
                               )
                             )
-                          ) : const SizedBox(),*/
+                          ) : const SizedBox(),
                           tvHwaMull.value ?
                           Expanded(
                             flex: 1,

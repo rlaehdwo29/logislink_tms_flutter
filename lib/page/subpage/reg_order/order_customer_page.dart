@@ -65,15 +65,15 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
             if(mList.length > 0) mList.clear();
             if(list.length > 0) {
               List<CustomerModel> itemsList = list.map((i) => CustomerModel.fromJSON(i)).toList();
-              mList.value.addAll(itemsList);
-              arrayList.value.addAll(mList);
+              mList.addAll(itemsList);
+              arrayList.addAll(mList);
             }else{
-              arrayList.value.clear();
+              arrayList.clear();
             }
             size.value = mList.length;
           }else{
             mList.value = List.empty(growable: true);
-            arrayList.value.clear();
+            arrayList.clear();
           }
         }else{
           openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
@@ -246,27 +246,27 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
           return true;
         } ,
         child: Scaffold(
-          resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInset: false,
             backgroundColor: sub_color,
             appBar: AppBar(
-                  title:  Text(
-                      Strings.of(context)?.get("order_customer_title")??"Not Found",
-                      style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
-                  ),
-                  toolbarHeight: 50.h,
-                  centerTitle: true,
-                  automaticallyImplyLeading: false,
-                  leading: IconButton(
-                    onPressed: () async {
-                      Navigator.of(context).pop({'code':100});
-                    },
-                    color: styleWhiteCol,
-                    icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
-                  ),
-                ),
+              title:  Text(
+                  Strings.of(context)?.get("order_customer_title")??"Not Found",
+                  style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+              ),
+              toolbarHeight: 50.h,
+              centerTitle: true,
+              automaticallyImplyLeading: false,
+              leading: IconButton(
+                onPressed: () async {
+                  Navigator.of(context).pop({'code':100});
+                },
+                color: styleWhiteCol,
+                icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+              ),
+            ),
             body: SafeArea(
                 child: Obx((){
-                   return SizedBox(
+                  return SizedBox(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -278,36 +278,36 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                   );
                 })
             ),
-          bottomNavigationBar: Obx(() {
+            bottomNavigationBar: Obx(() {
               return btn_visable.value
                   ? SizedBox(
-                      height: CustomStyle.getHeight(60.0.h),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                              flex: 1,
-                              child: InkWell(
-                                  onTap: () async {
-                                    await onNoneCustomer();
-                                  },
-                                  child: Container(
-                                    height: CustomStyle.getHeight(60.0.h),
-                                    alignment: Alignment.center,
-                                    decoration:
-                                        const BoxDecoration(color: main_color),
-                                    child: Text(
-                                      textAlign: TextAlign.center,
-                                      bottom_btn.value,
-                                      style: CustomStyle.CustomFont(
-                                          styleFontSize16, styleWhiteCol),
-                                    ),
-                                  )
+                  height: CustomStyle.getHeight(60.0.h),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: InkWell(
+                              onTap: () async {
+                                await onNoneCustomer();
+                              },
+                              child: Container(
+                                height: CustomStyle.getHeight(60.0.h),
+                                alignment: Alignment.center,
+                                decoration:
+                                const BoxDecoration(color: main_color),
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  bottom_btn.value,
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize16, styleWhiteCol),
+                                ),
                               )
-                          ),
-                        ],
-                      )
+                          )
+                      ),
+                    ],
+                  )
               ) : const SizedBox();
             }))
     );
