@@ -1265,6 +1265,21 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   flex: 1,
                   child: InkWell(
                       onTap: () async {
+                        if(mData.value.call24Cargo == "Y") {
+                          if(int.parse(mData.value.call24Charge??"0") < 20000){
+                            return Util.toast("정보망 전송(24시콜) 시 지불운임은 20,000원이상입니다.");
+                          }
+                        }
+                        if(mData.value.oneCargo == "Y") {
+                          if(int.parse(mData.value.oneCharge??"0") < 20000){
+                            return Util.toast("정보망 전송(원콜) 시 지불운임은 20,000원이상입니다.");
+                          }
+                        }
+                        if(mData.value.manCargo == "Y") {
+                          if(int.parse(mData.value.manCharge??"0") < 20000){
+                            return Util.toast("정보망 전송(화물맨) 시 지불운임은 20,000원이상입니다.");
+                          }
+                        }
                         if(widget.flag == "M") {
                           await showModiOrder();
                         }else{
