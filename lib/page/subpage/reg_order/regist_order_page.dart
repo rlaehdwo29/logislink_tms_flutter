@@ -1000,7 +1000,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
 
-            /*var user = await controller.getUserInfo();
+            var user = await controller.getUserInfo();
 
             await FirebaseAnalytics.instance.logEvent(
               name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
@@ -1028,7 +1028,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   "rpaSalary" : mData.value.call24Charge,
                 },
               );
-            }*/
+            }
 
             Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
           }else{
