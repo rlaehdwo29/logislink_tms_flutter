@@ -1776,11 +1776,15 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future<void> setRegResult(Map<String,dynamic> results) async {
-    await refresh();
-    Util.toast("${Strings.of(context)?.get("order_reg_title")}${Strings.of(context)?.get("reg_success")}");
-    if(results["allocId"] != null){
-      String allocId = results["allocId"].toString();
-      await showOrderTrans(allocId);
+    if(mounted) {
+      setState(() {
+        refresh();
+        Util.toast("오더 등록이 완료되었습니다.");
+        if (results["allocId"] != null) {
+          String allocId = results["allocId"].toString();
+          showOrderTrans(allocId);
+        }
+      });
     }
   }
 
@@ -2652,10 +2656,11 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
   }
 
-  Future<OrderLinkCurrentModel> currentLink(String? orderId, String? link_type) async {
+  Future<Map<String,dynamic>> currentLink(String? orderId, String? link_type) async {
     // link_type = 03: 24시콜, 18: 원콜, 21: 화물맨
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
+    Map<String,dynamic> result = {};
     OrderLinkCurrentModel returnModel = OrderLinkCurrentModel();
 
     await DioService.dioClient(header: true).currentNewLink(
@@ -2676,6 +2681,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     returnModel = list;
                   }
                 }
+                result = {"currentList" : itemsList, "currentItem" : returnModel};
               }
             }
           } else {
@@ -2700,13 +2706,56 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           break;
       }
     });
-    return returnModel;
+    return result;
+  }
+
+  Future<void> carConfirmRpa(Map<String,dynamic> data_map) async {
+    String textHeader = "${data_map["currentItem"].carNum}\t\t${data_map["currentItem"].carType}\t\t${data_map["currentItem"].carTon}";
+    String textSub = "${data_map["currentItem"].driverName}\t\t${Util.makePhoneNumber(data_map["currentItem"].driverTel)}";
+    String text = "배차 확정 하시겠습니까?";
+    String textEtc="(나머지 정보망전송은 취소됩니다)";
+
+    openCommonConfirmBox(
+        context,
+        "${textHeader}\n${textSub}\n${text}\n${textEtc}",
+        Strings.of(context)?.get("no") ?? "아니오_",
+        Strings.of(context)?.get("yes") ?? "예_",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+
+          for(var value in data_map["currentList"]) {
+            if(value.linkCd == Const.CALL_24_KEY_NAME) {
+              if(value.linkCd == data_map["currentItem"].linkCd) {
+                await confirmLink(data_map["currentItem"]);
+              }else{
+                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "24Cargo", false);
+              }
+            }
+            if(value.linkCd == Const.ONE_CALL_KEY_NAME) {
+              if(value.linkCd == data_map["currentItem"].linkCd) {
+                await confirmLink(data_map["currentItem"]);
+              }else{
+                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "oneCargo", false);
+              }
+            }
+            if(value.linkCd == Const.HWA_MULL_KEY_NAME) {
+              if(value.linkCd == data_map["currentItem"].linkCd) {
+                await confirmLink(data_map["currentItem"]);
+              }else{
+                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "manCargo", false);
+              }
+            }
+          }
+          await refresh();
+        }
+    );
   }
 
   Future<void> openRpaInfoDialog(BuildContext context,OrderModel item,String alloc_type, String? link_type,{OrderLinkCurrentModel? link_model})  async {
     // alloc_type: 01 = 배차 확정된 상태, 02 = 배차 미확정 상태
 
-    var currend_link = await currentLink(item.orderId,link_type);
+    Map<String,dynamic> currend_link = await currentLink(item.orderId,link_type);
 
     showDialog(
         barrierDismissible: false,
@@ -2766,7 +2815,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      item.linkType == "99" ? "${currend_link.carNum}" : "${item.carNum}",
+                                      item.allocState == "00" ? "${currend_link["currentItem"].carNum}" : "${item.carNum}",
+                                      //"${currend_link["currentItem"].carNum}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2775,7 +2825,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                           )
                       ),
 
-                      item.linkType == "99" ?
+                      item.allocState == "00" ?
                       Container(
                           margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
@@ -2847,7 +2897,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      "${currend_link.carType}",
+                                      "${currend_link["currentItem"].carType}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2856,7 +2906,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                           )
                       ),
 
-                      item.linkType == "99" ?
+                      item.allocState == "00" ?
                       Container(
                           margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
@@ -2928,7 +2978,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      "${currend_link.carTon}",
+                                      "${currend_link["currentItem"].carTon}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2968,7 +3018,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      item.linkType == "99" ? currend_link.driverName??"" : item.driverName??"",
+                                      item.allocState == "00" ? currend_link["currentItem"].driverName??"" : item.driverName??"",
+                                      //currend_link["currentItem"].driverName??"",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -3008,7 +3059,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      item.linkType == "99" ? Util.makePhoneNumber(currend_link.driverTel??"") : Util.makePhoneNumber(item.driverTel??""),
+                                      item.allocState == "00" ? Util.makePhoneNumber(currend_link["currentItem"].driverTel??"") : Util.makePhoneNumber(item.driverTel??""),
+                                      //Util.makePhoneNumber(currend_link["currentItem"].driverTel??""),
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -3044,7 +3096,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                             alloc_type == "02" ?
                             InkWell(
                               onTap: () async {
-                                await confirmLink(link_model);
+                                await carConfirmRpa(currend_link);
+                                //await confirmLink(link_model);
                               },
                               child: Container(
                                 width: CustomStyle.getWidth(100),
@@ -3120,7 +3173,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future<void> cancelRpa(String? orderId, OrderLinkCurrentModel data) async {
-    String? res = data.allocCharge;
+    String? allocCharge = data.allocCharge;
     String? cd;
     String? text;
 
@@ -3146,7 +3199,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
-          await cancelLink(orderId, res, cd, true);
+          await cancelLink(orderId, allocCharge, cd, true);
         }
     );
 
@@ -3168,8 +3221,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         logger.d("cancelLink() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.snackbar(context, "정보망 전송이 취소되었습니다.");
-            await refresh();
+
+
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -3265,8 +3318,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         logger.d("confirmLink() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.snackbar(context, "배차 확정이 완료되었습니다.");
-            await refresh();
+
+
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -3335,7 +3388,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Future<void> openRpaModiDialog(BuildContext context, OrderModel item, String? link_type,{String? flag}) async {
-    var currend_link = await currentLink(item.orderId, link_type);
+
     final SelectNumber = "0".obs;
     if(flag != "D") {
       SelectNumber.value =

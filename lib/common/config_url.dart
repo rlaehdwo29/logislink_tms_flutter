@@ -4,11 +4,12 @@
 //public static String SERVER_URL = "https://app.logis-link.co.kr";   // PRO URL
 
 const String m_ServerRelease = "https://app.logis-link.co.kr";    // 운영서버
-const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
+//const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
+const String m_ServerDebug = "http://192.168.68.64:8080";         // Local
 //const String m_ServerDebug = "http://192.168.0.2:8080";
 const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
-const String SERVER_URL = m_ServerDebug;
+const String SERVER_URL = m_ServerRelease;
 
 const String RECEIPT_PATH = "/files/receipt/";
 
@@ -100,7 +101,7 @@ const String URL_LINK_LIST = "/cust/orderLink/list/v1";
 // 정보망 일괄 취소
 const String URL_LINK_CANCEL = "/cust/orderLink/cancel/v1";
 // New : 정보망 배차확정
-const String UIRL_LINK_RPA_CONFIRM = "cust/order/confirmLink";
+const String UIRL_LINK_RPA_CONFIRM = "/cust/order/confirmLink";
 // New : 정보망 수정
 const String URL_LINK_RPA_MOD = "/cust/order/modLink";
 // New : 정보망 취소(개별)

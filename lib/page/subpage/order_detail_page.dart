@@ -1498,7 +1498,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
           if (results["code"] == 200) {
             if(results["link"] != null) {
               if(results["link"] == "Y") {
-                Navigator.of(context).pop(false);
+                Navigator.of(context).pop({'code' : 200});
               }
             }
           }
@@ -1513,7 +1513,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
         if (results["code"] == 200) {
           if(results["link"] != null) {
             if(results["link"] == "Y") {
-              Navigator.of(context).pop(false);
+              Navigator.of(context).pop({'code' : 200});
             }
           }
         }

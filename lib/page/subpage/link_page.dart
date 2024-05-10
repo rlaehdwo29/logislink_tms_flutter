@@ -347,11 +347,6 @@ class _LinkPageState extends State<LinkPage> {
             if(count.value == 1) {
               Navigator.of(context).pop({'code':200,'link':'Y'});
             }
-          } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
-                Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                  Navigator.of(context).pop(false);
-                });
           }
         }
       }catch(e) {
@@ -394,11 +389,6 @@ class _LinkPageState extends State<LinkPage> {
               if(count.value == 1) {
                 Navigator.of(context).pop({'code':200,'link':'Y'});
               }
-          } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
-                Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                  Navigator.of(context).pop(false);
-                });
           }
         }
       }catch(e) {
