@@ -11,6 +11,10 @@ const Color main_btn = Color(0xff191962);
 const Color sub_btn = Color(0xff65656D);
 const Color copy_btn = Color(0xff31363A);
 
+const Color rpa_btn_regist = Color(0xff0A8DFF);
+const Color rpa_btn_modify = Color(0xff006633);
+const Color rpa_btn_cancle = Color(0xffFF0033);
+
 const Color renew_main_color = Color(0xff8AAAE6);
 
 const Color terms_text = Color(0xff141420);
@@ -74,6 +78,7 @@ const Color addr_type_text = Color(0xff008bd3);
 
 const Color point_red = Color(0xffFF5050);
 const Color point_blue = Color(0xff5050FF);
+const Color card_background = Color(0xffDFF1FF);
 
 const Color styleBaseCol1 = Color(0xff0C5767);
 const Color styleBaseCol2 = Color(0xff083742);

@@ -7,10 +7,13 @@ import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
+import 'package:logislink_tms_flutter/common/model/user_rpa_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:path/path.dart';
+
+import '../common/model/order_link_current_model.dart';
 
 class OrderService with ChangeNotifier {
 
@@ -18,12 +21,14 @@ class OrderService with ChangeNotifier {
   final orderRecentList = List.empty(growable: true).obs;
   List<StopPointModel> stopPointList = List.empty(growable: true);
   List<OrderModel> historyList = List.empty(growable: true);
+  final orderLinkList = List.empty(growable: true).obs;
 
   OrderService() {
     orderList.value = List.empty(growable: true);
     orderRecentList.value = List.empty(growable: true);
     stopPointList = List.empty(growable: true);
     historyList = List.empty(growable: true);
+    orderLinkList.value = List.empty(growable: true);
   }
 
   void init() {
@@ -31,6 +36,7 @@ class OrderService with ChangeNotifier {
     orderRecentList.value = List.empty(growable: true);
     stopPointList = List.empty(growable: true);
     historyList = List.empty(growable: true);
+    orderLinkList.value = List.empty(growable: true);
   }
 
   Future getStopPoint(BuildContext? context, String? orderId) async {
@@ -74,13 +80,15 @@ class OrderService with ChangeNotifier {
     Logger logger = Logger();
     UserModel? user = await App().getUserInfo();
     orderList.value = List.empty(growable: true);
+    Map<String,dynamic> api24Data  = Map<String,dynamic>();
     int totalPage = 1;
     await DioService.dioClient(header: true).getOrder(user.authorization, startDate, endDate, orderState, allocState, myOrder, page, searchColumn, searchValue ).then((it) async {
       ReturnMap _response = DioService.dioResponse(it);
-      logger.d("getOrder() _response -> ${_response.status} // ${_response.resultMap}");
+      logger.d("orderService.dartgetOrder() _response -> ${_response.status} // ${_response.resultMap}");
       //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       if(_response.status == "200") {
         if(_response.resultMap?["result"] == true) {
+           if(_response.resultMap?["api24Data"] != null) api24Data = _response.resultMap?["api24Data"];
           if (_response.resultMap?["data"] != null) {
             try {
               var list = _response.resultMap?["data"] as List;
@@ -111,17 +119,77 @@ class OrderService with ChangeNotifier {
         case DioError:
         // Here's the sample to get the failed response error code and message
           final res = (obj as DioError).response;
-          print("getOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          print("orderService.dart getOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
           break;
         default:
-          print("getOrder() getOrder Default => ");
+          print("orderService.dart getOrder() getOrder Default => ");
           break;
       }
     });
-    Map<String,dynamic> maps = {"total":totalPage,"list":orderList};
+    Map<String,dynamic> maps = {"total":totalPage,"api24Data":api24Data,"list":orderList};
     return maps;
   }
 
+  Future currentLink(BuildContext context, String? orderId) async {
+    // link_type = 03: 24시콜, 18: 원콜, 21: 화물맨
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    UserRpaModel rpa = UserRpaModel();
+
+    await DioService.dioClient(header: true).currentNewLink(
+      user.authorization,
+      orderId,
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("order_service.dart currentLink() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["rpa"] != null) rpa = UserRpaModel(
+              link24Id: _response.resultMap?["rpa"]["link24Id"],
+              link24Pass: _response.resultMap?["rpa"]["link24Pass"],
+              man24Id: _response.resultMap?["rpa"]["man24Id"],
+              man24Pass: _response.resultMap?["rpa"]["man24Pass"],
+              one24Id: _response.resultMap?["rpa"]["one24Id"],
+              one24Pass: _response.resultMap?["rpa"]["one24Pass"]
+            );
+            if (_response.resultMap?["data"] != null) {
+              var mList = _response.resultMap?["data"] as List;
+              if(mList.length > 0) {
+                var mList = _response.resultMap?["data"] as List;
+                if(orderLinkList.length > 0) orderLinkList.clear();
+                if(mList.length > 0) {
+                  List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
+                  orderLinkList.addAll(itemsList);
+                }
+              }
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("order_service.dart currentLink() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("order_service.dart currentLink() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("order_service.dart currentLink() getOrder Default => ");
+          break;
+      }
+    });
+    Map<String,dynamic> maps = {"rpa":rpa,"list":orderLinkList};
+    return maps;
+    //return orderLinkList;
+  }
 
   Future getOrderList2(context, String? auth, String? allocId, String? orderId) async {
     Logger logger = Logger();

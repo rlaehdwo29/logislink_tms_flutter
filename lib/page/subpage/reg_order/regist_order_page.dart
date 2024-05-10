@@ -1000,37 +1000,42 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
 
-            var user = await controller.getUserInfo();
+              var user = await controller.getUserInfo();
 
-            await FirebaseAnalytics.instance.logEvent(
-              name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
-              parameters: {
-                "user_id": user.userId,
-                "user_custId" : user.custId,
-                "user_deptId": user.deptId,
-                "reqCustId" : mData.value.sellCustId,
-                "sellDeptId" : mData.value.sellDeptId
-              },
-            );
-
-            if(mData.value.call24Cargo == "Y" || mData.value.manCargo == "Y" || mData.value.oneCargo == "Y"){
               await FirebaseAnalytics.instance.logEvent(
-                name: Platform.isAndroid ? "regist_order_rpa_aos" : "regist_order_rpa_ios",
+                name: Platform.isAndroid
+                    ? "regist_order_aos"
+                    : "regist_order_ios",
                 parameters: {
                   "user_id": user.userId,
-                  "user_custId" : user.custId,
+                  "user_custId": user.custId,
                   "user_deptId": user.deptId,
-                  "reqCustId" : mData.value.sellCustId,
-                  "sellDeptId" : mData.value.sellDeptId,
-                  "call24Cargo_Status" : mData.value.call24Cargo,
-                  "manCargo_Status" : mData.value.manCargo,
-                  "oneCharge_Status" : mData.value.oneCharge,
-                  "rpaSalary" : mData.value.call24Charge,
+                  "reqCustId": mData.value.sellCustId,
+                  "sellDeptId": mData.value.sellDeptId
                 },
               );
-            }
 
-            Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
+              if (mData.value.call24Cargo == "Y" ||
+                  mData.value.manCargo == "Y" || mData.value.oneCargo == "Y") {
+                await FirebaseAnalytics.instance.logEvent(
+                  name: Platform.isAndroid
+                      ? "regist_order_rpa_aos"
+                      : "regist_order_rpa_ios",
+                  parameters: {
+                    "user_id": user.userId,
+                    "user_custId": user.custId,
+                    "user_deptId": user.deptId,
+                    "reqCustId": mData.value.sellCustId,
+                    "sellDeptId": mData.value.sellDeptId,
+                    "call24Cargo_Status": mData.value.call24Cargo??"",
+                    "manCargo_Status": mData.value.manCargo??"",
+                    "oneCargo_Status": mData.value.oneCargo??"",
+                    "rpaSalary": mData.value.call24Charge,
+                  },
+                );
+              }
+
+              Navigator.of(context).pop({'code': 200, 'allocId': _response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
           }

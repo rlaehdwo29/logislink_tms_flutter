@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'package:fbroadcast/fbroadcast.dart' as fbroad;
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_awesome_bottom_sheet/flutter_awesome_bottom_sheet.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
+import 'package:logislink_tms_flutter/common/model/user_rpa_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
@@ -48,6 +50,8 @@ import 'package:flutter/rendering.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../common/model/order_link_current_model.dart';
+
 class MainPage extends StatefulWidget {
   final String? allocId;
   const MainPage({Key? key, this.allocId}):super(key:key);
@@ -75,8 +79,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   late String startDate, endDate, nowDate;
 
   DateTime mCalendarNowDate = DateTime.now();
-  final mCalendarStartDate = DateTime.now().add(const Duration(days: -30)).obs;
-  final mCalendarEndDate = DateTime.now().obs;
+  final mCalendarStartDate = DateTime.now().obs;
+  final mCalendarEndDate = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day+1).obs;
   CalendarFormat _calendarFormat = CalendarFormat.month;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOn;
 
@@ -88,13 +92,19 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
 
-  var scrollController = ScrollController();
+  ScrollController scrollController = ScrollController();
   final page = 1.obs;
+  final api24Data = Map<String, dynamic>().obs;
+  final prev_page = 1.obs;
   final totalPage = 1.obs;
   final mPoint = 0.obs;
   final ivTop = false.obs;
+  final ivBottom = true.obs;
+  final maxScroller = 0.obs;
+  final lastScrollPosition = 0.0.obs;
 
   late TextEditingController searchOrderController;
+  final AwesomeBottomSheet _awesomeBottomSheet = AwesomeBottomSheet();
 
   late AppDataBase db;
 
@@ -105,7 +115,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   @override
   void initState() {
-    super.initState();
     fbroad.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
       UserModel? user = await controller.getUserInfo();
       mUser.value = user;
@@ -128,7 +137,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       if(widget.allocId != null) {
         Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailPage(allocId: widget.allocId)));
       }
-      scrollController.addListener(() async {
+      scrollController.addListener(() {
         var now_scroll = scrollController.position.pixels;
         var max_scroll = scrollController.position.maxScrollExtent;
         if(now_scroll >= 300) {
@@ -136,9 +145,15 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         } else {
           ivTop.value = false;
         }
+        if(now_scroll < (max_scroll-800)) {
+          ivBottom.value = true;
+        }else{
+          ivBottom.value = false;
+        }
         if((max_scroll - now_scroll) <= 300){
           if(page.value < totalPage.value){
             page.value++;
+            lastScrollPosition.value = max_scroll;
           }
         }
       });
@@ -151,6 +166,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       dropDownList?.add(CodeModel(code: "driverName",codeName: "차주명"));
       dropDownList?.add(CodeModel(code: "sellCustName",codeName: "거래처명"));
     });
+
+    super.initState();
   }
 
   void selectItem(CodeModel? codeModel,{codeType = "",value = 0}) {
@@ -160,13 +177,13 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           categoryOrderCode.value = codeModel?.code??"";
           categoryOrderState.value = codeModel?.codeName??"-";
           page.value = 1;
-          scrollController.jumpTo(0);
+          scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
         case 'ALLOC_STATE_CD':
-         categoryVehicCode.value = codeModel?.code??"";
-         categoryVehicState.value = codeModel?.codeName??"-";
-         page.value = 1;
-         scrollController.jumpTo(0);
+          categoryVehicCode.value = codeModel?.code??"";
+          categoryVehicState.value = codeModel?.codeName??"-";
+          page.value = 1;
+          scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
       }
     }
@@ -182,9 +199,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     }
   }
 
-  Future<void> getOrder() async {
+  Future<void> getOrder({double? now_scroller}) async {
     Logger logger = Logger();
     UserModel? user = await App().getUserInfo();
+
     await pr?.show();
     await DioService.dioClient(header: true).getOrder(
         user.authorization,
@@ -203,19 +221,23 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       if(_response.status == "200") {
         if(_response.resultMap?["result"] == true) {
+          if(_response.resultMap?["api24Data"] != null) api24Data.value =  _response.resultMap?["api24Data"];
           if (_response.resultMap?["data"] != null) {
             try {
               var list = _response.resultMap?["data"] as List;
               List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
               var db = App().getRepository();
-              if(itemsList.length != 0){
+              if(itemsList.length > 0){
                 await db.insertAll(context,itemsList);
+              }else{
+                await db.deleteAll();
+              }
+              if(orderList.isNotEmpty) orderList.clear();
+              var reposi_order = await db.getOrderList(context);
+              orderList.addAll(reposi_order);
 
-                List<OrderModel> list = await db.getOrderList(context);
-                  if(list != null && list.length != 0) {
-                    if(orderList.isNotEmpty) orderList.clear();
-                    orderList.addAll(list);
-                  }
+              if(now_scroller != null) {
+                scrollController.animateTo(now_scroller, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
               }
               int total = 0;
               if(_response.resultMap?["total"].runtimeType.toString() == "String") {
@@ -248,24 +270,24 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   void handleDeepLink() async {
-    
+
     FirebaseDynamicLinks.instance.getInitialLink().then(
-          (PendingDynamicLinkData? dynamicLinkData) {
-        // Set up the `onLink` event listener next as it may be received here
-        if (dynamicLinkData != null) {
-          final Uri deepLink = dynamicLinkData.link;
-          String? code = deepLink.pathSegments.last;
-          String? allocId = deepLink.queryParameters["allocId"];
-          if(allocId == null) return;
-          switch(code) {
-            case "tmsOrder":
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId)));
-              break;
+            (PendingDynamicLinkData? dynamicLinkData) {
+          // Set up the `onLink` event listener next as it may be received here
+          if (dynamicLinkData != null) {
+            final Uri deepLink = dynamicLinkData.link;
+            String? code = deepLink.pathSegments.last;
+            String? allocId = deepLink.queryParameters["allocId"];
+            if(allocId == null) return;
+            switch(code) {
+              case "tmsOrder":
+                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderDetailPage(allocId: allocId)));
+                break;
+            }
+          }else{
+            return;
           }
-        }else{
-          return;
-        }
-      });
+        });
 
   }
 
@@ -325,57 +347,57 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 child: Row(
                   children: [
                     Expanded(
-                      flex:1,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Obx(()=>
-                                Text(
-                                  "${mUser.value.bizName}",
-                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
-                                )),
-                            CustomStyle.sizedBoxHeight(10.0.h),
-                            Obx(()=>Text(
-                              "${mUser.value.deptName}",
-                              style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
-                            )
-                            )
-                          ]
-                      )
+                        flex:1,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Obx(()=>
+                                  Text(
+                                    "${mUser.value.bizName}",
+                                    style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                  )),
+                              CustomStyle.sizedBoxHeight(10.0.h),
+                              Obx(()=>Text(
+                                "${mUser.value.deptName}",
+                                style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
+                              )
+                              )
+                            ]
+                        )
                     ),
                     Expanded(
-                        flex:1,
-                        child: mPoint.value != 0 && mPoint.value != null ?
-                            Obx(()=>
-                              InkWell(
-                                onTap: () async {
-                                  await goToPoint();
-                                },
-                                child: Stack(
-                                    alignment: Alignment.centerRight,
-                                    children: [
-                                      Positioned(
-                                          child: Container(
+                      flex:1,
+                      child: mPoint.value != 0 && mPoint.value != null ?
+                      Obx(()=>
+                          InkWell(
+                              onTap: () async {
+                                await goToPoint();
+                              },
+                              child: Stack(
+                                alignment: Alignment.centerRight,
+                                children: [
+                                  Positioned(
+                                      child: Container(
                                         decoration: const BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage('assets/image/pointBox.png')
-                                          )
+                                            image: DecorationImage(
+                                                image: AssetImage('assets/image/pointBox.png')
+                                            )
                                         ),
                                       )
-                                      ),
-                                      Positioned(
-                                        right: 15.w,
-                                        child: Text(
-                                          Util.getInCodeCommaWon(mPoint.value.toString()),
-                                          textAlign: TextAlign.center,
-                                          style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
-                                        ),
-                                      )
-                                    ],
+                                  ),
+                                  Positioned(
+                                    right: 15.w,
+                                    child: Text(
+                                      Util.getInCodeCommaWon(mPoint.value.toString()),
+                                      textAlign: TextAlign.center,
+                                      style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
+                                    ),
                                   )
-                            )
-                        ) : const SizedBox(),
+                                ],
+                              )
+                          )
+                      ) : const SizedBox(),
                     )
                   ],
                 )
@@ -470,6 +492,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   }
 
   Widget getListCardView(OrderModel item) {
+
+
     return Container(
         padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),top: CustomStyle.getHeight(10.0.h)),
         child: InkWell(
@@ -493,7 +517,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                             Flexible(
                                 flex: 3,
                                 child: Row(children: [
-                                  item.orderState == "09" ? Container(
+                                  item.orderState == "09" ?
+                                  Container(
                                       decoration: CustomStyle.baseBoxDecoWhite(),
                                       padding: EdgeInsets.symmetric(
                                           vertical: CustomStyle.getHeight(5.0.h),
@@ -505,11 +530,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                             Util.getOrderStateColor(item.orderStateName)),
                                       )) : const SizedBox(),
                                   Container(
-                                      /*padding: EdgeInsets.only(
-                                          left: CustomStyle.getWidth(
-                                              5.0.w),
-                                          right: CustomStyle.getWidth(
-                                              5.0.w)),*/
                                       child: Text(
                                         item.sellCustName??"",
                                         style: CustomStyle.CustomFont(
@@ -532,7 +552,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     style: CustomStyle.CustomFont(
                                         styleFontSize14,
                                         text_color_01,
-                                    font_weight: FontWeight.w700),
+                                        font_weight: FontWeight.w700),
                                   ),
                                 ))
                           ],
@@ -544,51 +564,62 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                             Flexible(
                                 flex: 3,
                                 child: Row(children: [
-                                  item.orderState != "09" && item.driverState == null ? Container(
-                                      decoration: CustomStyle
-                                          .baseBoxDecoWhite(),
+                                  item.orderState != "09" && item.driverState == null ?
+                                  Container(
+                                      decoration: CustomStyle.baseBoxDecoWhite(),
                                       padding: EdgeInsets.symmetric(
-                                          vertical:
-                                          CustomStyle.getHeight(
-                                              5.0.h),
-                                          /*horizontal:
-                                          CustomStyle.getWidth(
-                                            10.0.w)*/),
+                                        vertical:
+                                        CustomStyle.getHeight(5.0.h),),
                                       child: Text(
                                         "${item.allocStateName}",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize14,
                                             order_state_01),
                                       )) : const SizedBox(),
-                                      item.linkName?.isEmpty == false && item.linkName != "" ?
+                                  item.linkName?.isEmpty == false && item.linkName != "" ?
+                                  (item.call24Cargo == null || item.call24Cargo?.isEmpty == true)
+                                      && (item.manCargo == null || item.manCargo?.isEmpty == true)
+                                      && (item.oneCargo == null || item.oneCargo?.isEmpty == true) ?
                                   Container(
                                       padding: EdgeInsets.only(
-                                          right: CustomStyle.getWidth(
-                                              5.0.w)),
+                                          right: CustomStyle.getWidth(5.0.w)),
+                                      child: Text(
+                                        "지불운임",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize12,
+                                            text_color_01),
+                                      )) :
+                                  Container(
+                                      padding: EdgeInsets.only(
+                                          right: CustomStyle.getWidth(5.0.w)),
                                       child: Text(
                                         item.linkName??"",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             text_color_01),
-                                      )): const SizedBox(),
+                                      ))
+                                      : const SizedBox(),
                                   item.buyCustName?.isEmpty == false && item.buyCustName != "" ?
-                                    Text(
-                                      item.buyCustName??"",
-                                      style: CustomStyle.CustomFont(
-                                          styleFontSize12, text_color_01),
-                                    ) : const SizedBox(),
+                                  Text(
+                                    item.buyCustName??"",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize12, text_color_01),
+                                  ) : const SizedBox(),
                                   item.buyDeptName?.isEmpty == false && item.buyDeptName != "" ?
-                                    Text(
-                                      item.buyDeptName??"",
-                                      style: CustomStyle.CustomFont(
-                                          styleFontSize10, text_color_01),
-                                    ) : const SizedBox()
+                                  Text(
+                                    item.buyDeptName??"",
+                                    style: CustomStyle.CustomFont(
+                                        styleFontSize10, text_color_01),
+                                  ) : const SizedBox()
                                 ])),
                             Flexible(
                                 flex: 1,
-                                child: Container(
-                                  alignment:
-                                  Alignment.centerRight,
+                                child: (item.call24Cargo != "" && item.call24Cargo != null) ||
+                                    (item.manCargo != "" && item.manCargo != null ) ||
+                                    (item.oneCargo != "" && item.oneCargo != null)
+                                    ? const SizedBox()
+                                    : Container(
+                                  alignment: Alignment.centerRight,
                                   child: Text(
                                     "${Util.getInCodeCommaWon(item.buyCharge.toString())}원",
                                     style: CustomStyle.CustomFont(
@@ -596,17 +627,18 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         text_color_01,
                                         font_weight: FontWeight.w700),
                                   ),
-                                ))
+                                )
+                            )
                           ],
                         ),
                         item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(3.0.h):const SizedBox(),
                         item.orderState != "09" && item.driverState != null? CustomStyle.getDivider1():const SizedBox(),
                         item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(3.0.h):const SizedBox(),
-                        item.orderState != "09" && item.driverState != null? Container(
-                            decoration: CustomStyle
-                                .baseBoxDecoWhite(),
-                          
-                          child: Row(children: [
+                        item.orderState != "09" && item.driverState != null?
+                        Container(
+                            decoration: CustomStyle.baseBoxDecoWhite(),
+                            child: Row(
+                                children: [
                                   Flexible(
                                       flex: 9,
                                       child: Row(children: [
@@ -620,12 +652,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                                     styleFontSize14,
                                                     order_state_01,
                                                     font_weight:
-                                                        FontWeight.w700))),
+                                                    FontWeight.w700))),
                                         Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               "${item.driverName} 차주님",
@@ -642,12 +674,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                           ],
                                         )
                                       ])),
-                            Flexible(
+                                  Flexible(
                                       flex: 1,
                                       child: InkWell(
-                                        onTap: (){
-                                          Util.call(item.driverTel);
-                                        },
+                                          onTap: (){
+                                            Util.call(item.driverTel);
+                                          },
                                           child: Container(
                                               padding: EdgeInsets.all(4.0.h),
                                               decoration: const BoxDecoration(
@@ -665,162 +697,168 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h):const SizedBox(),
                         item.orderState != "09" && item.driverState != null? CustomStyle.getDivider1(): const SizedBox(),
                         item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h): const SizedBox(),
+                        //RPA
+                        /*Column(
+                          children: [
+                            Text("orderId => ${item.orderId}"),
+                            Text("call24Cargo => ${item.call24Cargo}"),
+                            Text("manCargo => ${item.manCargo}"),
+                            Text("oneCargo => ${item.oneCargo}"),
+                            Text("linkCode => ${item.linkCode}"),
+                            Text("linkType => ${item.linkType}"),
+                            Text("linkCodeName => ${item.linkCodeName}"),
+                            Text("driverState => ${item.driverState}"),
+                            Text("allocState => ${item.allocState}"),
+                            Text("allocStateName => ${item.allocStateName}"),
+                            Text("orderState => ${item.orderState}"),
+                            Text("orderStateName => ${item.orderStateName}"),
+                            //Text("linkList[0].linkStat => ${linkList[0].linkStat}"),
+                            //Text("linkList[0].jobStat => ${linkList[0].jobStat}"),
+                            //Text("linkList[1].linkStat => ${linkList[1].linkStat}"),
+                            //Text("linkList[1].jobStat => ${linkList[1].jobStat}"),
+                            //Text("linkList[2].linkStat => ${linkList[2].linkStat}"),
+                            //Text("linkList[2].jobStat => ${linkList[2].jobStat}"),
+                          ],
+                        ),*/
+                        item.orderState != "09" ? rpaFunctionFuture(item) : const SizedBox(),
+                        item.call24Cargo == "R" || item.manCargo == "R" || item.oneCargo == "R" ? CustomStyle.getDivider1(): const SizedBox(),
                         Container(
-                            padding: EdgeInsets.symmetric(vertical:CustomStyle.getWidth(8.w),horizontal: CustomStyle.getHeight(8.h)),
+                            padding: EdgeInsets.symmetric(vertical:CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(8.w)),
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(topLeft: Radius.circular(5.0),topRight: Radius.circular(5.0)),
-                              color: sub_color
+                                borderRadius: BorderRadius.only(topLeft: Radius.circular(5.0),topRight: Radius.circular(5.0)),
+                                color: sub_color
                             ),
                             child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                          Util.ynToBoolean(item.payType)?
-                          Container(
-                              child: Text(
-                                "빠른지급",
-                                style: CustomStyle.CustomFont(styleFontSize12, order_state_09,font_weight: FontWeight.w700),
-                              )):const SizedBox(),
-                          Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              flex: 4,
-                              child: Container(
-                                height: 150.h,
-                                 margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                    color: light_gray1
-                                  ),
-                                  child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                Text(
-                                  "${Util.splitSDate(item.sDate)} 상차",
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize14, text_box_color_01,
-                                      font_weight: FontWeight.w400),
-                                  textAlign: TextAlign.center,
-                                ),
-                                    Flexible(
-                                        child: RichText(
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2,
-                                            textAlign:TextAlign.center,
-                                            text: TextSpan(
-                                              text: item.sComName??"",
-                                              style:  CustomStyle.CustomFont(styleFontSize16, main_color, font_weight: FontWeight.w600),
-                                            )
-                                        )
-                                    ),
-                                CustomStyle.sizedBoxHeight(15.0.h),
-                                    Flexible(
-                                        child: RichText(
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 2,
-                                            textAlign:TextAlign.center,
-                                            text: TextSpan(
-                                              text: item.sAddr??"",
-                                              style: CustomStyle.CustomFont(styleFontSize12, main_color),
-                                            )
-                                        )
-                                    ),
-                              ])),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Icon(Icons.arrow_right_alt,size: 21.h,color: const Color(0xff6d7780)),
-                            ),
-                            Expanded(
-                                flex: 4,
-                                child: Container(
-                                    height: 150.h,
-                                    margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                    decoration: const BoxDecoration(
-                                        borderRadius:  BorderRadius.all(Radius.circular(10)),
-                                        color: light_gray1
-                                    ),
-                                    child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                  Text(
-                                    "${Util.splitSDate(item.eDate)} 하차",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize14, text_box_color_01,
-                                        font_weight: FontWeight.w400),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  Flexible(
-                                     child: RichText(
-                                         overflow: TextOverflow.ellipsis,
-                                         maxLines: 2,
-                                         textAlign: TextAlign.center,
-                                         text: TextSpan(
-                                           text:
-                                           item.eComName ?? "",
-                                           style: CustomStyle.CustomFont(
-                                               styleFontSize16,
-                                               main_color,
-                                               font_weight: FontWeight.w600),
-                                         )
-                                     )
-                                  ),
-                                  CustomStyle.sizedBoxHeight(15.0.h),
-                                  Flexible(
-                                     child: RichText(
-                                         overflow: TextOverflow.ellipsis,
-                                         maxLines: 2,
-                                         textAlign: TextAlign.center,
-                                         text: TextSpan(
-                                           text: item.eAddr??"",
-                                           style:CustomStyle.CustomFont(styleFontSize12, main_color)
-                                         )
-                                     )
-                                  ),
-                                ])))
-                          ],
-                        )
-                        ])),
-                        Container(
-                          color: sub_color,
-                        padding: EdgeInsets.only(left:CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),bottom: CustomStyle.getHeight(5.h)),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                          decoration: const BoxDecoration(
-                            color: light_gray1,
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(children: [
-                              Container(
-                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(5.0.w)),
-                                  child: Icon(Icons.social_distance,size: 24.h,color: text_color_01)
-                              ),
-                              Container(
-                                  padding: EdgeInsets.only(left: CustomStyle.getWidth(5.0.w)),
-                                  child: Text(
-                                    "${Util.makeDistance(item.distance)} ${Util.makeTime(item.time??0)}",
-                                    style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Util.ynToBoolean(item.payType)?
+                                  Container(
+                                      child: Text(
+                                        "빠른지급",
+                                        style: CustomStyle.CustomFont(styleFontSize12, order_state_09,font_weight: FontWeight.w700),
+                                      )):const SizedBox(),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex: 4,
+                                        child: Container(
+                                            height: 130.h,
+                                            margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                            decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                color: light_gray1
+                                            ),
+                                            child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "${Util.splitSDate(item.sDate)} 상차",
+                                                    style: CustomStyle.CustomFont(styleFontSize12, text_box_color_01,
+                                                        font_weight: FontWeight.w400),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  Flexible(
+                                                      child: RichText(
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 2,
+                                                          textAlign:TextAlign.center,
+                                                          text: TextSpan(
+                                                            text: item.sComName??"",
+                                                            style:  CustomStyle.CustomFont(styleFontSize14, main_color, font_weight: FontWeight.w600),
+                                                          )
+                                                      )
+                                                  ),
+                                                  CustomStyle.sizedBoxHeight(15.0.h),
+                                                  Flexible(
+                                                      child: RichText(
+                                                          overflow: TextOverflow.ellipsis,
+                                                          maxLines: 2,
+                                                          textAlign:TextAlign.center,
+                                                          text: TextSpan(
+                                                            text: item.sAddr??"",
+                                                            style: CustomStyle.CustomFont(styleFontSize11, main_color),
+                                                          )
+                                                      )
+                                                  ),
+                                                ])),
+                                      ),
+                                      Expanded(
+                                          flex: 2,
+                                          child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                    child: Text(
+                                                      "${Util.makeDistance(item.distance)}",
+                                                      style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                                                    )
+                                                ),
+                                                Icon(Icons.arrow_right_alt,size: 21.h,color: const Color(0xff6d7780)),
+                                                Container(
+
+                                                    child: Text(
+                                                      "${Util.makeTime(item.time??0)}",
+                                                      style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                                                    )
+                                                )
+                                              ]
+                                          )
+                                      ),
+                                      Expanded(
+                                          flex: 4,
+                                          child: Container(
+                                              height: 130.h,
+                                              margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:  BorderRadius.all(Radius.circular(10)),
+                                                  color: light_gray1
+                                              ),
+                                              child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      "${Util.splitSDate(item.eDate)} 하차",
+                                                      style: CustomStyle.CustomFont(styleFontSize12, text_box_color_01, font_weight: FontWeight.w400),
+                                                      textAlign: TextAlign.center,
+                                                    ),
+                                                    Flexible(
+                                                        child: RichText(
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 2,
+                                                            textAlign: TextAlign.center,
+                                                            text: TextSpan(
+                                                              text:
+                                                              item.eComName ?? "",
+                                                              style: CustomStyle.CustomFont(styleFontSize14, main_color, font_weight: FontWeight.w600),
+                                                            )
+                                                        )
+                                                    ),
+                                                    CustomStyle.sizedBoxHeight(15.h),
+                                                    Flexible(
+                                                        child: RichText(
+                                                            overflow: TextOverflow.ellipsis,
+                                                            maxLines: 2,
+                                                            textAlign: TextAlign.center,
+                                                            text: TextSpan(
+                                                                text: item.eAddr??"",
+                                                                style:CustomStyle.CustomFont(styleFontSize11, main_color)
+                                                            )
+                                                        )
+                                                    ),
+                                                  ]
+                                              )
+                                          )
+                                      )
+                                    ],
                                   )
-                              )
-                            ]),
-                            item.stopCount!=0? Container(
-                                padding: EdgeInsets.only(right: CustomStyle.getWidth(5.0.w)),
-                                child: Text(
-                                  "경유지 ${item.stopCount}곳",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                                )
-                            ):const SizedBox()
-                          ],
-                        )
-                        )
-                      ),
+                                ]
+                            )
+                        ),
                         Container(
                             padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(10.0.h)),
                             decoration: const BoxDecoration(
@@ -833,23 +871,23 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               children: [
                                 Text(
                                   "${item.carTonName}  ${item.carTypeName} ",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
+                                  style: CustomStyle.CustomFont(styleFontSize10, text_color_02),
                                 ),
                                 Row(children: [
                                   Text(
                                     item.truckTypeName == null?"":"${item.truckTypeName}  |  ",
                                     style: CustomStyle.CustomFont(
-                                        styleFontSize12, text_color_02),
+                                        styleFontSize10, text_color_02),
                                   ),
                                   Text(
                                     "${item.mixYn == "Y" ? "혼적" : "독차"}  |  ",
                                     style: CustomStyle.CustomFont(
-                                        styleFontSize12, text_color_02),
+                                        styleFontSize10, text_color_02),
                                   ),
                                   Text(
                                     item.returnYn == "Y" ? "왕복" : "편도",
                                     style: CustomStyle.CustomFont(
-                                        styleFontSize12, text_color_02),
+                                        styleFontSize10, text_color_02),
                                   ),
                                 ])
                               ],
@@ -917,12 +955,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                       // 달력 타이틀을 센터로
                                       titleCentered: true,
                                       // 말 그대로 타이틀 텍스트 스타일링
-                                      titleTextStyle: 
+                                      titleTextStyle:
                                       CustomStyle.CustomFont(
                                           styleFontSize16, Colors.black,font_weight: FontWeight.w700
-                                          ),
-                                          rightChevronIcon: Icon(Icons.chevron_right,size: 26.h),
-                                          leftChevronIcon: Icon(Icons.chevron_left, size: 26.h),
+                                      ),
+                                      rightChevronIcon: Icon(Icons.chevron_right,size: 26.h),
+                                      leftChevronIcon: Icon(Icons.chevron_left, size: 26.h),
                                     ),
                                     calendarStyle: CalendarStyle(
                                       tablePadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
@@ -944,7 +982,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                           color: styleWhiteCol,
                                           shape: BoxShape.rectangle,
                                           border: Border.all(color: main_color,width: 1.w)
-                                    
+
                                       ),
                                       defaultTextStyle: CustomStyle.CustomFont(
                                           styleFontSize14, Colors.black),
@@ -1066,6 +1104,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                               mCalendarStartDate.value = _tempRangeStart!;
                                               mCalendarEndDate.value = _tempRangeEnd!;
                                               page.value = 1;
+                                              lastScrollPosition.value = 0;
                                               Navigator.of(context).pop(false);
                                             },
                                             child: Text(
@@ -1102,7 +1141,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   backgroundColor: text_color_03,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
-                        //margin: EdgeInsets.only(left: CustomStyle.getWidth(40.h)),
+                      //margin: EdgeInsets.only(left: CustomStyle.getWidth(40.h)),
                         height: CustomStyle.getHeight(25.h),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1138,25 +1177,25 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                 Expanded(
                                     flex: 1,
                                     child: Text(
-                                      mCalendarStartDate.value == null?"-":"${mCalendarStartDate.value?.year}년 ${mCalendarStartDate.value?.month}월 ${mCalendarStartDate.value?.day}일",
-                                      textAlign: TextAlign.center,
-                                      style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
+                                        mCalendarStartDate.value == null?"-":"${mCalendarStartDate.value?.year}년 ${mCalendarStartDate.value?.month}월 ${mCalendarStartDate.value?.day}일",
+                                        textAlign: TextAlign.center,
+                                        style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
                                     )
                                 ),
                                 Expanded(
                                     flex: 1,
                                     child: Text(
-                                      "~",
-                                      textAlign: TextAlign.center,
-                                      style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
+                                        "~",
+                                        textAlign: TextAlign.center,
+                                        style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
                                     )
                                 ),
                                 Expanded(
                                     flex: 1,
                                     child: Text(
-                                      mCalendarEndDate.value == null?"-":"${mCalendarEndDate.value?.year}년 ${mCalendarEndDate.value?.month}월 ${mCalendarEndDate.value?.day}일",
-                                      textAlign: TextAlign.center,
-                                      style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
+                                        mCalendarEndDate.value == null?"-":"${mCalendarEndDate.value?.year}년 ${mCalendarEndDate.value?.month}월 ${mCalendarEndDate.value?.day}일",
+                                        textAlign: TextAlign.center,
+                                        style: CustomStyle.CustomFont(styleFontSize10, text_color_01)
                                     )
                                 )
                               ],
@@ -1200,7 +1239,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   child: Text(
                     categoryOrderState.value,
                     style:
-                        CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                    CustomStyle.CustomFont(styleFontSize12, text_color_01),
                   )),
             ),
             CustomStyle.sizedBoxWidth(5.0),
@@ -1217,7 +1256,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   child: Text(
                     categoryVehicState.value,
                     style:
-                        CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                    CustomStyle.CustomFont(styleFontSize12, text_color_01),
                   )),
             )
           ]),
@@ -1226,19 +1265,19 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                onTap: (){
-                  page.value = 1;
-                  myOrderSelect.value = !myOrderSelect.value;
-                  scrollController.jumpTo(0);
-                },
-              child: Container(
-                decoration: CustomStyle.customBoxDeco(Colors.white,radius: 5.0, border_color: myOrderSelect.value?text_box_color_01:text_box_color_02),
-                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
-                child: Text(
-                  "내오더",
-                  style: CustomStyle.CustomFont(styleFontSize12, myOrderSelect.value?text_box_color_01:text_box_color_02),
-                ),
-              )
+                  onTap: (){
+                    page.value = 1;
+                    myOrderSelect.value = !myOrderSelect.value;
+                    scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                  },
+                  child: Container(
+                    decoration: CustomStyle.customBoxDeco(Colors.white,radius: 5.0, border_color: myOrderSelect.value?text_box_color_01:text_box_color_02),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                    child: Text(
+                      "내오더",
+                      style: CustomStyle.CustomFont(styleFontSize12, myOrderSelect.value?text_box_color_01:text_box_color_02),
+                    ),
+                  )
               ),
               IconButton(
                   onPressed: () async {
@@ -1256,9 +1295,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Future<void> search(CodeModel search_value) async {
     var mSearchValue = searchOrderController.text.trim();
     if(mSearchValue.length != 1) {
-        select_value.value = search_value;
-        searchValue.value = mSearchValue;
-        await refresh();
+      select_value.value = search_value;
+      searchValue.value = mSearchValue;
+      await refresh();
     }else{
       Util.toast("검색어를 2글자 이상 입력해주세요.");
     }
@@ -1284,139 +1323,139 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 insetPadding: EdgeInsets.all(CustomStyle.getHeight(10.0)),
                 contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
                 content: SingleChildScrollView(
-                  child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                    Container(
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
-                    color: main_color,
-                    child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                    Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                    "오더 검색",
-                    style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
-                                textAlign: TextAlign.center,
-                              )),
-                              Positioned(
-                                right: 5.w,
-                                child: IconButton(
-                                    onPressed: (){
-                                      Navigator.of(context).pop(false);
-                                    },
-                                    icon: Icon(Icons.close,size: 24.h,color: Colors.white)
-                                ),
-                              )
-                            ],
-                          )),
-                      Padding(
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30.h),horizontal: CustomStyle.getWidth(15.w)),
-                        child: Row(
-                           children: [
-                             Expanded(
-                               flex: 2,
-                             child: DropdownButton(
-                                 value: temp_search_column,
-                                 items: dropDownList?.map((value) {
-                                   return DropdownMenuItem(
-                                     value: value,
-                                     child: Text(
-                                      "${value.codeName}",
-                                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01)
-                                      ),
-                                   );
-                                 }).toList(),
-                                 onChanged: (value) {
-                                   setState(() {
-                                     temp_search_column = value!;
-                                   });
-                                 }
-                             )),
-                             Expanded(
-                               flex: 5,
-                             child: Container(
-                               padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
-                                 //height: CustomStyle.getHeight(40.h),
-                                 child: TextField(
-                                   style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
-                                   textAlign: TextAlign.start,
-                                   keyboardType: TextInputType.text,
-                                   controller: searchOrderController,
-                                   maxLines: null,
-                                   decoration: searchOrderController.text.isNotEmpty
-                                       ? InputDecoration(
-                                     counterText: '',
-                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
-                                     enabledBorder: OutlineInputBorder(
-                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                         borderRadius: BorderRadius.circular(5.h)
-                                     ),
-                                     disabledBorder: UnderlineInputBorder(
-                                         borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
-                                     ),
-                                     focusedBorder: OutlineInputBorder(
-                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                         borderRadius: BorderRadius.circular(5.h)
-                                     ),
-                                     suffixIcon: IconButton(
-                                       onPressed: () {
-                                         searchOrderController.clear();
-                                       },
-                                       icon: Icon(
-                                         Icons.clear,
-                                         size: 18.h,
-                                         color: Colors.black,
-                                       ),
-                                     ),
-                                   )
-                                       : InputDecoration(
-                                     counterText: '',
-                                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
-                                     enabledBorder: OutlineInputBorder(
-                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                         borderRadius: BorderRadius.circular(5.h)
-                                     ),
-                                     disabledBorder: UnderlineInputBorder(
-                                         borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
-                                     ),
-                                     focusedBorder: OutlineInputBorder(
-                                         borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                         borderRadius: BorderRadius.circular(5.h)
-                                     ),
-                                   ),
-                                   onChanged: (value){
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Container(
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                            color: main_color,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Container(
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      "오더 검색",
+                                      style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
+                                      textAlign: TextAlign.center,
+                                    )),
+                                Positioned(
+                                  right: 5.w,
+                                  child: IconButton(
+                                      onPressed: (){
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      icon: Icon(Icons.close,size: 24.h,color: Colors.white)
+                                  ),
+                                )
+                              ],
+                            )),
+                        Padding(
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30.h),horizontal: CustomStyle.getWidth(15.w)),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                    flex: 2,
+                                    child: DropdownButton(
+                                        value: temp_search_column,
+                                        items: dropDownList?.map((value) {
+                                          return DropdownMenuItem(
+                                            value: value,
+                                            child: Text(
+                                                "${value.codeName}",
+                                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01)
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            temp_search_column = value!;
+                                          });
+                                        }
+                                    )),
+                                Expanded(
+                                    flex: 5,
+                                    child: Container(
+                                        padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
+                                        //height: CustomStyle.getHeight(40.h),
+                                        child: TextField(
+                                          style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                                          textAlign: TextAlign.start,
+                                          keyboardType: TextInputType.text,
+                                          controller: searchOrderController,
+                                          maxLines: null,
+                                          decoration: searchOrderController.text.isNotEmpty
+                                              ? InputDecoration(
+                                            counterText: '',
+                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                                borderRadius: BorderRadius.circular(5.h)
+                                            ),
+                                            disabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                                borderRadius: BorderRadius.circular(5.h)
+                                            ),
+                                            suffixIcon: IconButton(
+                                              onPressed: () {
+                                                searchOrderController.clear();
+                                              },
+                                              icon: Icon(
+                                                Icons.clear,
+                                                size: 18.h,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          )
+                                              : InputDecoration(
+                                            counterText: '',
+                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                                borderRadius: BorderRadius.circular(5.h)
+                                            ),
+                                            disabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                                borderRadius: BorderRadius.circular(5.h)
+                                            ),
+                                          ),
+                                          onChanged: (value){
 
-                                   },
-                                   maxLength: 50,
-                                 )
-                             ))
-                           ],
-                        )
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          await search(temp_search_column);
-                          Navigator.of(context).pop(false);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
-                          decoration: BoxDecoration(
-                            color: sub_btn,
-                            border: CustomStyle.borderAllBase(),
-                          ),
-                          child: Text(
-                            Strings.of(context)?.get("confirm") ?? "Not Found",
-                            style: CustomStyle.whiteFont15B(),
-                            textAlign: TextAlign.center,
+                                          },
+                                          maxLength: 50,
+                                        )
+                                    ))
+                              ],
+                            )
+                        ),
+                        InkWell(
+                          onTap: () async {
+                            await search(temp_search_column);
+                            Navigator.of(context).pop(false);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
+                            decoration: BoxDecoration(
+                              color: sub_btn,
+                              border: CustomStyle.borderAllBase(),
+                            ),
+                            child: Text(
+                              Strings.of(context)?.get("confirm") ?? "Not Found",
+                              style: CustomStyle.whiteFont15B(),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  )
+                      ],
+                    )
                 )),
           );
         });
@@ -1440,13 +1479,14 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           if(snapshot.connectionState != ConnectionState.done) {
             return Expanded(
                 child: Container(
-                alignment: Alignment.center,
-                child: Center(child: CircularProgressIndicator())
-            ));
+                    alignment: Alignment.center,
+                    child: Center(child: CircularProgressIndicator())
+                ));
           }else {
             if (snapshot.hasData) {
               if (orderList.isNotEmpty) orderList.clear();
               orderList.addAll(snapshot.data["list"]);
+              api24Data.value = snapshot.data?["api24Data"];
               totalPage.value = snapshot.data?["total"];
               return Obx(()=> orderListWidget());
             } else if (snapshot.hasError) {
@@ -1471,48 +1511,80 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Widget orderListWidget() {
     return orderList.isNotEmpty
         ? Expanded(
-      child: Stack(
-        children: [
-          Positioned(
-        child: RefreshIndicator(
-      onRefresh: () async {
-        await refresh();
-      },
-      child: ListView.builder(
-      scrollDirection: Axis.vertical,
-      controller: scrollController,
-      shrinkWrap: true,
-      itemCount: orderList.length,
-      itemBuilder: (context, index) {
-        var item = orderList[index];
-        return getListCardView(item);
-      },
-    ))),
-          Obx((){
-          return ivTop.value == true ?
-          Positioned(
-              right: 10.w,
-              bottom: 10.h,
-              child: InkWell(
-                  onTap: () async {
-                    scrollController.jumpTo(0);
-                  },
-                  child: Container(
-                      padding: EdgeInsets.all(10.w),
-                      decoration: const BoxDecoration(
-                        color: Color(0x9965656D),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_upward,
-                        size: 21.h,
-                        color: Colors.white,
+        child: Stack(
+            children: [
+              Positioned(
+                  child: RefreshIndicator(
+                      onRefresh: () async {
+                        lastScrollPosition.value = 0;
+                        await refresh();
+                      },
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        controller: scrollController,
+                        shrinkWrap: true,
+                        itemCount: orderList.length,
+                        itemBuilder: (context, index) {
+                          var item = orderList[index];
+                          if(page.value != prev_page.value) {
+                            scrollController.animateTo(lastScrollPosition.value, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                            prev_page.value = page.value;
+                          }
+                          return getListCardView(item);
+                        },
                       )
                   )
-              )
-          ) : const SizedBox();
-          })
-    ]))
+              ),
+              Obx((){
+                return ivTop.value == true ?
+                Positioned(
+                    right: 10.w,
+                    bottom: ivBottom.value == false ? 10.h : 60.h,
+                    child: InkWell(
+                        onTap: () async {
+                          scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                        },
+                        child: Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: const BoxDecoration(
+                              color: Color(0x9965656D),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.arrow_upward,
+                              size: 21.h,
+                              color: Colors.white,
+                            )
+                        )
+                    )
+                ) : const SizedBox();
+              }),
+
+              Obx((){
+                return ivBottom.value == true ?
+                Positioned(
+                    right: 10.w,
+                    bottom: 10.h,
+                    child: InkWell(
+                        onTap: () async {
+                          scrollController.animateTo(scrollController.position.maxScrollExtent-800, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                        },
+                        child: Container(
+                            padding: EdgeInsets.all(10.w),
+                            decoration: const BoxDecoration(
+                              color: Color(0x9965656D),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.arrow_downward,
+                              size: 21.h,
+                              color: Colors.white,
+                            )
+                        )
+                    )
+                ) : const SizedBox();
+              }),
+            ]))
         : Expanded(
         child: Container(
             alignment: Alignment.center,
@@ -1545,12 +1617,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Future goToRegOrderSample() async {
     smartOrderCode.value = "";
     Dialogs.materialDialog(
-        context: context,
-        color: Colors.white,
-        customView: RegOrderCustomView(),
-        customViewPosition: CustomViewPosition.BEFORE_ACTION,
-        actions: [
-          Obx((){
+      context: context,
+      color: Colors.white,
+      customView: RegOrderCustomView(),
+      customViewPosition: CustomViewPosition.BEFORE_ACTION,
+      actions: [
+        Obx((){
           return IconsButton(
             onPressed: () async {
               if(smartOrderCode.value == "") {
@@ -1570,8 +1642,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             textStyle: CustomStyle.CustomFont(styleFontSize16, Colors.white),
             iconColor: Colors.white,
           );
-          }),
-        ],
+        }),
+      ],
     );
   }
 
@@ -1589,115 +1661,115 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           ),
         ),
         Obx((){
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(3.h)),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: InkWell(
-                  onTap: (){
-                    smartOrderCode.value = "01";
-                    },
-                  child: Card(
-                      elevation: 3.0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                      color: smartOrderCode.value == "01" ? renew_main_color : Colors.white,
-                      margin: const EdgeInsets.only(bottom: 20,top: 20,left: 10,right: 10),
-                      surfaceTintColor: text_box_color_02,
-                      child: Container(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(50)),
-                                  color: smartOrderCode.value == "01" ? Colors.white : renew_main_color,
-                                ),
-                                child: Image.asset(
-                                  "assets/image/ic_smart_order_on.png",
-                                  width: 10.w,
-                                  height: 10.h,
-                                  color: smartOrderCode.value == "01" ? renew_main_color : Colors.white,
-                                ),
-                              ),
-                              Container(
-                                  padding: const EdgeInsets.only(top: 15),
-                                child: Text(
-                                  "신속한 오더 등록이\n가능해요",
-                                  style: CustomStyle.CustomFont(styleFontSize12, smartOrderCode.value == "01" ? Colors.white : const Color(0xffA5A5A5)),
-                                  textAlign: TextAlign.center,
-                                )
-                              ),
-                              Container(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: Text(
-                                  "스마트오더",
-                                  style: CustomStyle.CustomFont(styleFontSize16, smartOrderCode.value == "01" ? Colors.white : Colors.black ,font_weight: FontWeight.w800),
-                                ),
+          return Container(
+              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(3.h)),
+              child: Row(
+                children: [
+                  Expanded(
+                      flex: 1,
+                      child: InkWell(
+                          onTap: (){
+                            smartOrderCode.value = "01";
+                          },
+                          child: Card(
+                              elevation: 3.0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                              color: smartOrderCode.value == "01" ? renew_main_color : Colors.white,
+                              margin: const EdgeInsets.only(bottom: 20,top: 20,left: 10,right: 10),
+                              surfaceTintColor: text_box_color_02,
+                              child: Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(50)),
+                                          color: smartOrderCode.value == "01" ? Colors.white : renew_main_color,
+                                        ),
+                                        child: Image.asset(
+                                          "assets/image/ic_smart_order_on.png",
+                                          width: 10.w,
+                                          height: 10.h,
+                                          color: smartOrderCode.value == "01" ? renew_main_color : Colors.white,
+                                        ),
+                                      ),
+                                      Container(
+                                          padding: const EdgeInsets.only(top: 15),
+                                          child: Text(
+                                            "신속한 오더 등록이\n가능해요",
+                                            style: CustomStyle.CustomFont(styleFontSize12, smartOrderCode.value == "01" ? Colors.white : const Color(0xffA5A5A5)),
+                                            textAlign: TextAlign.center,
+                                          )
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          "스마트오더",
+                                          style: CustomStyle.CustomFont(styleFontSize16, smartOrderCode.value == "01" ? Colors.white : Colors.black ,font_weight: FontWeight.w800),
+                                        ),
+                                      )
+                                    ],
+                                  )
                               )
-                            ],
+                          )
+                      )
+                  ),
+                  Expanded(
+                      flex: 1,
+                      child: InkWell(
+                          onTap: (){
+                            smartOrderCode.value = "02";
+                          },
+                          child: Card(
+                              elevation: 3.0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                              color: smartOrderCode.value == "02" ? renew_main_color : Colors.white,
+                              margin: const EdgeInsets.only(bottom: 20,top: 20,left: 10,right: 10),
+                              surfaceTintColor: text_box_color_02,
+                              child: Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.all(Radius.circular(50)),
+                                            color: smartOrderCode.value == "02" ? Colors.white : renew_main_color
+                                        ),
+                                        child: Image.asset(
+                                          "assets/image/ic_nomal_order_off.png",
+                                          width: 10.w,
+                                          height: 10.h,
+                                          color: smartOrderCode.value == "02" ? renew_main_color : Colors.white,
+                                        ),
+                                      ),
+                                      Container(
+                                          padding: const EdgeInsets.only(top: 15),
+                                          child: Text(
+                                            "정확한 오더 등록이\n가능해요",
+                                            style: CustomStyle.CustomFont(styleFontSize12,  smartOrderCode.value == "02" ? Colors.white : const Color(0xffA5A5A5)),
+                                            textAlign: TextAlign.center,
+                                          )
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Text(
+                                          "일반오더",
+                                          style: CustomStyle.CustomFont(styleFontSize16, smartOrderCode.value == "02" ? Colors.white : Colors.black ,font_weight: FontWeight.w800),
+                                        ),
+                                      )
+                                    ],
+                                  )
+                              )
                           )
                       )
                   )
-                )
-              ),
-              Expanded(
-                flex: 1,
-                child: InkWell(
-                    onTap: (){
-                      smartOrderCode.value = "02";
-                    },
-                    child: Card(
-                        elevation: 3.0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                        color: smartOrderCode.value == "02" ? renew_main_color : Colors.white,
-                        margin: const EdgeInsets.only(bottom: 20,top: 20,left: 10,right: 10),
-                        surfaceTintColor: text_box_color_02,
-                        child: Container(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Column(
-                              children: [
-                                Container(
-                                  width: 60,
-                                  height: 60,
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.all(Radius.circular(50)),
-                                      color: smartOrderCode.value == "02" ? Colors.white : renew_main_color
-                                  ),
-                                  child: Image.asset(
-                                    "assets/image/ic_nomal_order_off.png",
-                                    width: 10.w,
-                                    height: 10.h,
-                                    color: smartOrderCode.value == "02" ? renew_main_color : Colors.white,
-                                  ),
-                                ),
-                                Container(
-                                    padding: const EdgeInsets.only(top: 15),
-                                    child: Text(
-                                      "정확한 오더 등록이\n가능해요",
-                                      style: CustomStyle.CustomFont(styleFontSize12,  smartOrderCode.value == "02" ? Colors.white : const Color(0xffA5A5A5)),
-                                      textAlign: TextAlign.center,
-                                    )
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(top: 10),
-                                  child: Text(
-                                    "일반오더",
-                                    style: CustomStyle.CustomFont(styleFontSize16, smartOrderCode.value == "02" ? Colors.white : Colors.black ,font_weight: FontWeight.w800),
-                                  ),
-                                )
-                              ],
-                            )
-                        )
-                    )
-                )
+                ],
               )
-            ],
-          )
-        );
+          );
         })
       ],
     );
@@ -1740,10 +1812,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       if(_response.status == "200") {
         if(_response.resultMap?["result"] == true) {
           if (_response.resultMap?["data"] != null) {
-              var list = _response.resultMap?["data"] as List;
-              List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
-              OrderModel data = itemsList[0];
-              await goToTransInfo(data);
+            var list = _response.resultMap?["data"] as List;
+            List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
+            OrderModel data = itemsList[0];
+            await goToTransInfo(data);
           }
         }else{
           openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
@@ -1798,8 +1870,1632 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     });
   }
 
+  Widget rpaFunctionFuture(OrderModel item) {
+    final orderService = Provider.of<OrderService>(context);
+    return FutureBuilder(
+        future: orderService.currentLink(
+            context,
+            item.orderId
+        ),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState != ConnectionState.done) {
+            return const SizedBox();
+          }else {
+            if (snapshot.hasData) {
+              return rpaFunctionWidget(item, snapshot);
+            } else if (snapshot.hasError) {
+              return const SizedBox();
+            }
+          }
+          return Container(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              backgroundColor: styleGreyCol1,
+            ),
+          );
+        }
+    );
+  }
+
+  Widget rpaFunctionWidget(OrderModel item, AsyncSnapshot snapshot) {
+    final call24State = false.obs;
+    final manState = false.obs;
+    final oneCallState = false.obs;
+
+    final call24LinkModel = OrderLinkCurrentModel().obs;
+    final hwaMullLinkModel = OrderLinkCurrentModel().obs;
+    final oneCallLinkModel = OrderLinkCurrentModel().obs;
+
+    for(var linkData in snapshot.data["list"]) {
+      if(linkData.linkCd  == Const.CALL_24_KEY_NAME){
+        call24LinkModel.value = linkData;
+      }else if(linkData.linkCd == Const.HWA_MULL_KEY_NAME) {
+        hwaMullLinkModel.value = linkData;
+      }else if(linkData.linkCd == Const.ONE_CALL_KEY_NAME) {
+        oneCallLinkModel.value = linkData;
+      }
+    }
+
+    final userRpaData = UserRpaModel().obs;
+    userRpaData.value = snapshot.data["rpa"];
+
+    //var msg = statMsg(link_data.value.linkStat, link_data.value.jobStat);
+
+    return InkWell(
+        onTap: () {
+
+        },
+        child: (item.call24Cargo != "" && item.call24Cargo != null) ||
+            (item.manCargo != "" && item.manCargo != null ) ||
+            (item.oneCargo != "" && item.oneCargo != null) ?
+        SizedBox(
+            child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // 24시콜
+                      api24Data.value["apiKey24"] != null && api24Data.value["apiKey24"] != '' ?
+                      SizedBox(
+                              width: CustomStyle.getWidth(100),
+                              height: CustomStyle.getHeight(85),
+                              child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          manState.value = false;
+                                          oneCallState.value = false;
+                                          call24State.value = !call24State.value;
+                                        },
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Obx(() =>
+                                                  Container(
+                                                    width: CustomStyle.getWidth(80),
+                                                    height: CustomStyle.getHeight(65),
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: CustomStyle.getHeight(3.h)),
+                                                    decoration: BoxDecoration(
+                                                        color: statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat) == ""
+                                                            ? card_background
+                                                            : call24LinkModel.value.linkStat == "D" && call24LinkModel.value.jobStat == "F"
+                                                            ? styleGreyCol1
+                                                            : card_background,
+                                                        borderRadius: const BorderRadius.all(Radius.circular(5))
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          "24시콜",
+                                                          style: CustomStyle.CustomFont(styleFontSize13, main_color, font_weight: FontWeight.w500),
+                                                        ),
+                                                        Text(
+                                                          "${Util.getInCodeCommaWon(item.call24Charge)}원",
+                                                          style: statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat) == ""
+                                                              ?  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
+                                                              : call24LinkModel.value.linkStat == "D" && call24LinkModel.value.jobStat == "F"
+                                                              ?   TextStyle(decoration: TextDecoration.lineThrough, fontSize: styleFontSize13)
+                                                              :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800),
+                                                        ),
+                                                        Text(
+                                                          "${statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat)}",
+                                                          style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent,font_weight: FontWeight.w800),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              )
+                                            ])
+                                    ),
+                                    Obx(() =>
+                                    call24State.value ? Positioned(
+                                        bottom: 0,
+                                        child: Image.asset(
+                                          "assets/image/down-arrow.png",
+                                          width: CustomStyle.getWidth(10.0),
+                                          height: CustomStyle.getHeight(10.0),
+                                          color: styleBaseCol1,
+                                        )
+                                    ) : const SizedBox()
+                                    ),
+                                    item.call24Cargo == "R" && item.driverState == "01" ?
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomStyle.getWidth(6),
+                                                vertical: CustomStyle.getHeight(6)),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle
+                                            ),
+                                            child: Text(
+                                              "배차\n확정",
+                                              style: CustomStyle.CustomFont(styleFontSize8, Colors.white, font_weight: FontWeight.w500),
+                                            )
+                                        )
+                                    ) : item.call24Cargo == "R" && item.driverState != "01" ?
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomStyle.getWidth(8),
+                                                vertical: CustomStyle.getHeight(8)),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle
+                                            ),
+                                            child: Text(
+                                              "배차",
+                                              style: CustomStyle.CustomFont(
+                                                  styleFontSize9, Colors.white,
+                                                  font_weight: FontWeight.w500),
+                                            )
+                                        )
+                                    ) : const SizedBox()
+                                  ])
+                          ) : const SizedBox(),
+                      //화물맨
+                      SizedBox(
+                              width: CustomStyle.getWidth(100),
+                              height: CustomStyle.getHeight(85),
+                              child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          oneCallState.value = false;
+                                          call24State.value = false;
+                                          manState.value = !manState.value;
+                                        },
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Obx(() =>
+                                                  Container(
+                                                    width: CustomStyle.getWidth(80),
+                                                    height: CustomStyle.getHeight(65),
+                                                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3.h)),
+                                                    decoration: BoxDecoration(
+                                                        color: statMsg(hwaMullLinkModel.value.linkStat, hwaMullLinkModel.value.jobStat) == ""
+                                                            ? card_background
+                                                            : hwaMullLinkModel.value.linkStat == "D" && hwaMullLinkModel.value.jobStat == "F"
+                                                            ? styleGreyCol1 : card_background,
+                                                        borderRadius: const BorderRadius.all(Radius.circular(5))
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          "화물맨",
+                                                          style: CustomStyle.CustomFont(styleFontSize13, main_color, font_weight: FontWeight.w500),
+                                                        ),
+                                                        Text(
+                                                            "${Util.getInCodeCommaWon(item.manCharge)}원",
+                                                            style: statMsg(hwaMullLinkModel.value.linkStat, hwaMullLinkModel.value.jobStat) == ""
+                                                                ?  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
+                                                                : hwaMullLinkModel.value.linkStat == "D" && hwaMullLinkModel.value.jobStat == "F"
+                                                                ?   TextStyle(decoration: TextDecoration.lineThrough, fontSize: styleFontSize13)
+                                                                :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
+                                                        ),
+                                                        Text(
+                                                          "${statMsg(hwaMullLinkModel.value.linkStat, hwaMullLinkModel.value.jobStat)}",
+                                                          style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent,font_weight: FontWeight.w800),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              )
+                                            ])
+                                    ),
+                                    Obx(() =>
+                                    manState.value ? Positioned(
+                                        bottom: 0,
+                                        child: Image.asset(
+                                          "assets/image/down-arrow.png",
+                                          width: CustomStyle.getWidth(10.0),
+                                          height: CustomStyle.getHeight(10.0),
+                                          color: styleBaseCol1,
+                                        )
+                                    ) : const SizedBox()
+                                    ),
+                                    item.manCargo == "R" && item.driverState == "01" ?
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomStyle.getWidth(6),
+                                                vertical: CustomStyle.getHeight(6)),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle
+                                            ),
+                                            child: Text(
+                                              "배차\n확정",
+                                              style: CustomStyle.CustomFont(styleFontSize8, Colors.white, font_weight: FontWeight.w500),
+                                            )
+                                        )
+                                    ) : item.manCargo == "R" && item.driverState != "01" ?
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomStyle.getWidth(8),
+                                                vertical: CustomStyle.getHeight(8)),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle
+                                            ),
+                                            child: Text(
+                                              "배차",
+                                              style: CustomStyle.CustomFont(
+                                                  styleFontSize9, Colors.white,
+                                                  font_weight: FontWeight.w500),
+                                            )
+                                        )
+                                    ) : const SizedBox()
+                                  ])
+                          ),
+                      //원콜
+                      SizedBox(
+                              width: CustomStyle.getWidth(100),
+                              height: CustomStyle.getHeight(85),
+                              child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          manState.value = false;
+                                          call24State.value = false;
+                                          oneCallState.value = !oneCallState.value;
+                                        },
+                                        child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Obx(() =>
+                                                  Container(
+                                                    width: CustomStyle.getWidth(80),
+                                                    height: CustomStyle.getHeight(65),
+                                                    padding: EdgeInsets.symmetric(
+                                                        vertical: CustomStyle.getHeight(3.h)),
+                                                    decoration: BoxDecoration(
+                                                        color: statMsg(oneCallLinkModel.value.linkStat, oneCallLinkModel.value.jobStat) == ""
+                                                            ? card_background
+                                                            : oneCallLinkModel.value.linkStat == "D" && oneCallLinkModel.value.jobStat == "F"
+                                                            ? styleGreyCol1 : card_background,
+                                                        borderRadius: const BorderRadius.all(Radius.circular(5))
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+                                                        Text(
+                                                          "원콜",
+                                                          style: CustomStyle.CustomFont(styleFontSize13, main_color, font_weight: FontWeight.w500),
+                                                        ),
+                                                        Text(
+                                                            "${Util.getInCodeCommaWon(item.oneCharge)}원",
+                                                            style: statMsg(oneCallLinkModel.value.linkStat, oneCallLinkModel.value.jobStat) == ""
+                                                                ?  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
+                                                                : oneCallLinkModel.value.linkStat == "D" && oneCallLinkModel.value.jobStat == "F"
+                                                                ?   TextStyle(decoration: TextDecoration.lineThrough, fontSize: styleFontSize13)
+                                                                :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
+                                                        ),
+                                                        Text(
+                                                          "${statMsg(oneCallLinkModel.value.linkStat, oneCallLinkModel.value.jobStat)}",
+                                                          style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent,font_weight: FontWeight.w800),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                              )
+                                            ])
+                                    ),
+                                    Obx(() =>
+                                    oneCallState.value ? Positioned(
+                                        bottom: 0,
+                                        child: Image.asset(
+                                          "assets/image/down-arrow.png",
+                                          width: CustomStyle.getWidth(10.0),
+                                          height: CustomStyle.getHeight(10.0),
+                                          color: styleBaseCol1,
+                                        )
+                                    ) : const SizedBox()
+                                    ),
+                                    item.oneCargo == "R" && item.driverState == "01" ?
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomStyle.getWidth(6),
+                                                vertical: CustomStyle.getHeight(6)),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle
+                                            ),
+                                            child: Text(
+                                              "배차\n확정",
+                                              style: CustomStyle.CustomFont(
+                                                  styleFontSize8, Colors.white,
+                                                  font_weight: FontWeight.w500),
+                                            )
+                                        )
+                                    ) : item.oneCargo == "R" && item.driverState != "01" ?
+                                    Positioned(
+                                        right: 0,
+                                        top: 0,
+                                        child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: CustomStyle.getWidth(8),
+                                                vertical: CustomStyle.getHeight(8)),
+                                            decoration: const BoxDecoration(
+                                                color: Colors.black,
+                                                shape: BoxShape.circle
+                                            ),
+                                            child: Text(
+                                              "배차",
+                                              style: CustomStyle.CustomFont(styleFontSize9, Colors.white, font_weight: FontWeight.w500),
+                                            )
+                                        )
+                                    ) : const SizedBox()
+                                  ])
+                          ),
+                    ],
+                  ),
+
+                  Obx((){
+                    final _selected = false.obs;
+                    if(call24State.value || manState.value || oneCallState.value) _selected.value = true;
+                    if(item.orderState == "09") _selected.value = false;
+
+                    return AnimatedContainer(
+                        width: double.infinity,
+                        height: _selected.value ? CustomStyle.getHeight(55) : CustomStyle.getHeight(30),
+                        margin: EdgeInsets.only(bottom: CustomStyle.getHeight(5)),
+                        duration: const Duration(milliseconds: 700),
+                        curve: Curves.fastOutSlowIn,
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                top: BorderSide(color: light_gray4, width: 1),
+                                bottom: BorderSide(color: light_gray4, width: 1)
+                            )
+                        ),
+                        child:
+                        Obx(() =>
+                          // 24시콜 OpenInfo
+                          call24State.value ?
+                            clickRpaInfoWidget(call24LinkModel.value,userRpaData.value, item,Const.CALL_24_KEY_NAME)
+                          // 화물맨 OpenInfo
+                          : manState.value ?
+                            clickRpaInfoWidget(hwaMullLinkModel.value,userRpaData.value,item,Const.HWA_MULL_KEY_NAME)
+                          // 원콜 OpenInfo
+                          : oneCallState.value ?
+                            clickRpaInfoWidget(oneCallLinkModel.value,userRpaData.value,item,Const.ONE_CALL_KEY_NAME)
+                          : const SizedBox()
+                        )
+                    );
+                  })
+                ]
+            )
+        ) : const SizedBox()
+    );
+
+  }
+
+  Widget clickRpaInfoWidget(OrderLinkCurrentModel linkModel,UserRpaModel user_Rpa_Data, OrderModel orderItem, String link_type) {
+
+    var link_name = "";
+
+    final link_model = OrderLinkCurrentModel().obs;
+    link_model.value = linkModel;
+    final userRpaData = UserRpaModel().obs;
+    userRpaData.value = user_Rpa_Data;
+    final item = OrderModel().obs;
+    item.value = orderItem;
+
+    switch(link_type) {
+      case "03" :
+        link_name = "24시콜";
+        break;
+      case "21" :
+        link_name = "화물맨";
+        break;
+      case "18" :
+        link_name = "원콜";
+        break;
+    }
+
+
+    return Obx(() => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                statMsg(link_model.value.linkStat, link_model.value.jobStat) == "" ?
+                link_model.value.linkStat == "R" ?
+                item.value.orderStateName == "접수" ?
+                InkWell(
+                    onTap:(){
+                      openRpaInfoDialog(context, item.value, "02",link_type,link_model: link_model.value);
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                        margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                        decoration: const BoxDecoration(
+                            color: main_color,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 배차확정",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                ) :  InkWell(
+                    onTap:(){
+                      openRpaInfoDialog(context, item.value, "01",link_type);
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                        decoration: const BoxDecoration(
+                            color: main_color,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 배차정보",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                )
+                    : const SizedBox()
+                    : link_model.value.linkStat == "D" && link_model.value.jobStat == "F" ?
+                const SizedBox()
+                    : const SizedBox(),
+
+                // 전체 조건문 시작
+                ((link_model.value.allocCharge != "" && link_model.value.allocCharge != null) && (link_model.value.linkStat != "D" && link_model.value.jobStat != "F") && (link_model.value.linkStat != "I" && link_model.value.jobStat != "E")
+                    || (link_model.value.linkStat == "D" && link_model.value.jobStat == "E") || (link_model.value.linkStat == "I" && link_model.value.jobStat == "W")
+                    || (link_model.value.linkStat == "I" && link_model.value.jobStat == "F") || (link_model.value.linkStat == "R" && link_model.value.jobStat == "W")
+                    || (link_model.value.linkStat == "R" && link_model.value.jobStat == "F") || link_model.value.linkStat == "U") ?
+                link_type == Const.CALL_24_KEY_NAME ?
+                (userRpaData.value.link24Id?.isNotEmpty == true && userRpaData.value.link24Id != "") && (userRpaData.value.link24Pass?.isNotEmpty == true && userRpaData.value.link24Pass != "") ? // link24Id와 link24Pass이 등록되어 있는 상태
+                item.value.orderStateName == "접수" ? // 24시콜 OrderStateName = "접수" 상태
+                item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ? // 24시콜 인수증, 선불, 착불 상태
+                Row(
+                    children: [
+                      InkWell(
+                          onTap:(){
+                            openRpaModiDialog(context, item.value, link_type);
+                          },
+                          child: Container(
+                              width: CustomStyle.getWidth(80),
+                              height: CustomStyle.getHeight(25),
+                              decoration: const BoxDecoration(
+                                  color: rpa_btn_modify,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${link_name} 수정",
+                                style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                              )
+                          )
+                      ),
+                      InkWell(
+                          onTap:(){
+
+                          },
+                          child: Container(
+                              width: CustomStyle.getWidth(80),
+                              height: CustomStyle.getHeight(25),
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                              decoration: const BoxDecoration(
+                                  color: rpa_btn_cancle,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${link_name} 취소",
+                                style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                              )
+                          )
+                      ),
+                    ]
+                )  : const SizedBox()
+                    : InkWell(  // 24시콜 OrderStateName = "접수" 아닐때
+                    onTap:(){
+
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                        decoration: const BoxDecoration(
+                            color: rpa_btn_cancle,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 취소",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                ) : const SizedBox()
+
+                    : link_type == Const.ONE_CALL_KEY_NAME ?
+                (userRpaData.value.one24Id?.isNotEmpty == true && userRpaData.value.one24Id != "") && (userRpaData.value.one24Pass?.isNotEmpty == true && userRpaData.value.one24Pass != "") ? // one24Id와 one24Pass이 등록되어 있는 상태
+                item.value.orderStateName == "접수" && link_model.value.linkStat != "R" ? // 원콜 OrderStateName = "접수"상태고 linkStat 값이 R(배차 확정)이 아닌 상태
+                item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ? // 원콜 인수증, 선불, 착불 상태
+                Row(
+                    children: [
+                      InkWell(
+                          onTap:(){
+                            openRpaModiDialog(context, item.value, link_type);
+                          },
+                          child: Container(
+                              width: CustomStyle.getWidth(80),
+                              height: CustomStyle.getHeight(25),
+                              decoration: const BoxDecoration(
+                                  color: rpa_btn_modify,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${link_name} 수정",
+                                style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                              )
+                          )
+                      ),
+                      InkWell(
+                          onTap:() async {
+                            await cancelRpa(item.value.orderId, link_model.value);
+                          },
+                          child: Container(
+                              width: CustomStyle.getWidth(80),
+                              height: CustomStyle.getHeight(25),
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                              decoration: const BoxDecoration(
+                                  color: rpa_btn_cancle,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${link_name} 취소",
+                                style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                              )
+                          )
+                      ),
+                    ]
+                ) : const SizedBox()
+                    : InkWell( // 원콜 OrderStateName = "접수" 상태가 아니거나 linkStat 값이 R(배차 확정)인 상태
+                    onTap:() async {
+                      await cancelRpa(item.value.orderId, link_model.value);
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                        decoration: const BoxDecoration(
+                            color: rpa_btn_cancle,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 취소",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                )
+                    : const SizedBox()
+
+                    : (userRpaData.value.man24Id?.isNotEmpty == true && userRpaData.value.man24Id != "") && (userRpaData.value.man24Pass?.isNotEmpty == true && userRpaData.value.man24Pass != "") ? // man24Id와 man24Pass이 등록되어 있는 상태
+                item.value.chargeType == "01" ? // 화물맨
+                Row(
+                    children: [
+                      InkWell(
+                          onTap:(){
+                            openRpaModiDialog(context, item.value, link_type);
+                          },
+                          child: Container(
+                              width: CustomStyle.getWidth(80),
+                              height: CustomStyle.getHeight(25),
+                              decoration: const BoxDecoration(
+                                  color: rpa_btn_modify,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${link_name} 수정",
+                                style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                              )
+                          )
+                      ),
+                      InkWell(
+                          onTap:() async {
+                            await cancelRpa(item.value.orderId, link_model.value);
+                          },
+                          child: Container(
+                              width: CustomStyle.getWidth(80),
+                              height: CustomStyle.getHeight(25),
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                              decoration: const BoxDecoration(
+                                  color: rpa_btn_cancle,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                "${link_name} 취소",
+                                style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                              )
+                          )
+                      ),
+                    ]
+                )  : const SizedBox()
+                    : const SizedBox()
+                // 전체 조건문 아닐 경우
+                    : item.value.orderStateName == "접수" ?
+                link_type == Const.HWA_MULL_KEY_NAME ? // 전체 조건문이 맞지 않을때(화물맨)
+                (userRpaData.value.man24Id?.isNotEmpty == true && userRpaData.value.man24Id != "") && (userRpaData.value.man24Pass?.isNotEmpty == true && userRpaData.value.man24Pass != "") ? // man24Id와 man24Pass이 등록되어 있는 상태
+                item.value.chargeType == "01" ? // 시작(1)
+                InkWell(
+                    onTap: () {
+                      openRpaModiDialog(context, item.value, link_type,flag: "D");
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        decoration: const BoxDecoration(
+                            color: rpa_btn_regist,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 등록",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                ) :  const SizedBox() // 끝(1)
+                    : const SizedBox()
+                    :link_type == Const.CALL_24_KEY_NAME ? // 전체 조건문이 맞지 않을때(24시콜)
+                (userRpaData.value.link24Id?.isNotEmpty == true && userRpaData.value.link24Id != "") && (userRpaData.value.link24Pass?.isNotEmpty == true && userRpaData.value.link24Pass != "") ? // link24Id와 link24Pass이 등록되어 있는 상태
+                item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ?
+                InkWell(
+                    onTap: () {
+                      openRpaModiDialog(context, item.value, link_type,flag: "D");
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        decoration: const BoxDecoration(
+                            color: rpa_btn_regist,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 등록",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                ) :  const SizedBox()
+                    : const SizedBox()
+
+                // 전체 조건문이 맞지 않을때(원콜)
+                    : (userRpaData.value.one24Id?.isNotEmpty == true && userRpaData.value.one24Id != "") && (userRpaData.value.one24Pass?.isNotEmpty == true && userRpaData.value.one24Pass != "") ? // one24Id와 one24Pass이 등록되어 있는 상태
+                item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ?
+                InkWell(
+                    onTap: () {
+                      openRpaModiDialog(context, item.value, link_type,flag: "D");
+                    },
+                    child: Container(
+                        width: CustomStyle.getWidth(80),
+                        height: CustomStyle.getHeight(25),
+                        decoration: const BoxDecoration(
+                            color: rpa_btn_regist,
+                            borderRadius: BorderRadius.all(Radius.circular(5))
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${link_name} 등록",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
+                        )
+                    )
+                )
+                    :  const SizedBox()
+                    : const SizedBox()
+
+                    : const SizedBox()
+              ]),
+          link_model.value.linkStat != "D" && link_model.value.jobStat != "F" ?
+          link_model.value.rpaMsg != null && link_model.value.rpaMsg?.isNotEmpty == true ?
+            Flexible(
+                child: Container(
+                    margin: EdgeInsets.only(top: CustomStyle.getHeight(5)
+                    ),
+                    child: RichText(
+                        overflow: TextOverflow.visible,
+                        text: TextSpan(
+                          text: "${link_model.value.rpaMsg}",
+                          style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent),
+                        )
+                    )
+                )
+            ) : const SizedBox()
+          : const SizedBox()
+        ])
+    );
+  }
+
   void showGuestDialog(){
     openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+  }
+
+  Future<OrderLinkCurrentModel> currentLink(String? orderId, String? link_type) async {
+    // link_type = 03: 24시콜, 18: 원콜, 21: 화물맨
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    OrderLinkCurrentModel returnModel = OrderLinkCurrentModel();
+
+    await DioService.dioClient(header: true).currentNewLink(
+      user.authorization,
+      orderId,
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("main currentLink() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              var mList = _response.resultMap?["data"] as List;
+              if(mList.length > 0) {
+                List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
+                for(var list in itemsList) {
+                  if(list.allocCd?.isNotEmpty == true && list.allocCd != null && list.linkCd == link_type) {
+                    returnModel = list;
+                  }
+                }
+              }
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("main currentLink() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("main currentLink() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("main currentLink() getOrder Default => ");
+          break;
+      }
+    });
+    return returnModel;
+  }
+
+  Future<void> openRpaInfoDialog(BuildContext context,OrderModel item,String alloc_type, String? link_type,{OrderLinkCurrentModel? link_model})  async {
+    // alloc_type: 01 = 배차 확정된 상태, 02 = 배차 미확정 상태
+
+    var currend_link = await currentLink(item.orderId,link_type);
+
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: AlertDialog(
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0))
+                ),
+                insetPadding: EdgeInsets.all(CustomStyle.getHeight(10.0)),
+                contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getWidth(10.0)),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: "차주님 정보",
+                            style: CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w500),
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_carplate.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "차량번호",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      item.linkType == "99" ? "${currend_link.carNum}" : "${item.carNum}",
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ),
+
+                      item.linkType == "99" ?
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_truck.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "요청차종",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      "${item.carTypeName}",
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ) : const SizedBox(),
+
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_truck.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "차종",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      "${currend_link.carType}",
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ),
+
+                      item.linkType == "99" ?
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_scales.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "요청톤수",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      "${item.carTonName}",
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ) : const SizedBox(),
+
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_scales.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "톤수",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      "${currend_link.carTon}",
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ),
+
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_name.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "차주명",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      item.linkType == "99" ? currend_link.driverName??"" : item.driverName??"",
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ),
+
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal:CustomStyle.getWidth(10)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal:CustomStyle.getWidth(5)),
+                          decoration: const BoxDecoration(
+                              color: Color(0xffEDEEF0),
+                              borderRadius: BorderRadius.all(Radius.circular(5))
+                          ),
+                          child: Row(
+                              children: [
+                                Expanded(
+                                    flex:1,
+                                    child: Row(
+                                        children: [
+                                          Container(
+                                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                                              child: Image.asset(
+                                                "assets/image/icon_phone.png",
+                                                width: CustomStyle.getWidth(20.0),
+                                                height: CustomStyle.getHeight(20.0),
+                                              )
+                                          ),
+                                          Text(
+                                            "차주핸드폰번호",
+                                            textAlign: TextAlign.start,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                          )
+                                        ])
+                                ),
+                                Expanded(
+                                    flex:1,
+                                    child: Text(
+                                      item.linkType == "99" ? Util.makePhoneNumber(currend_link.driverTel??"") : Util.makePhoneNumber(item.driverTel??""),
+                                      textAlign: TextAlign.end,
+                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
+                                    )
+                                )
+                              ]
+                          )
+                      ),
+
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: (){
+                                Navigator.of(context).pop(false);
+                              },
+                              child: Container(
+                                width: CustomStyle.getWidth(100),
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(14.0), bottom: CustomStyle.getHeight(14.0), right: CustomStyle.getWidth(10.0)),
+                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.0)),
+                                decoration: const BoxDecoration(
+                                    color: copy_btn,
+                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                ),
+                                child: Text(
+                                  "닫기",
+                                  style: CustomStyle.CustomFont(styleFontSize11, Colors.white,font_weight: FontWeight.w700),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            // 배차확정 버튼
+                            alloc_type == "02" ?
+                            InkWell(
+                              onTap: () async {
+                                await confirmLink(link_model);
+                              },
+                              child: Container(
+                                width: CustomStyle.getWidth(100),
+                                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
+                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.0)),
+                                decoration: const BoxDecoration(
+                                    color: rpa_btn_regist,
+                                    borderRadius: BorderRadius.all(Radius.circular(10))
+                                ),
+                                child: Text(
+                                  "배차 확정",
+                                  style: CustomStyle.CustomFont(styleFontSize11, Colors.white,font_weight: FontWeight.w700),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ) : const SizedBox()
+                          ]
+                      )
+                    ],
+                  ),
+                )
+            ),
+          );
+        });
+  }
+
+  String getPadvalue(index) {
+    if (index < 9) {
+      return (index + 1).toString();
+    } else if (index == 9) {
+      return '초기화';
+    } else if (index == 10) {
+      return '0';
+    } else {
+      return '<';
+    }
+  }
+
+  Future<void> registRpa(OrderModel item, String? linkCd, String? rpaPay) async {
+    if(rpaPay == "0" || rpaPay == "" || rpaPay == null) {
+      Util.toast("지불운임을 입력해 주세요.");
+      return;
+    }
+
+    String cd;
+    String text = "";
+
+    if(Const.CALL_24_KEY_NAME == linkCd) {
+      cd = "24Cargo";
+      text = "24시콜 정보망에 등록하시겠습니까?";
+    }else if(Const.ONE_CALL_KEY_NAME == linkCd) {
+      cd = "oneCargo";
+      text = "원콜 정보망에 등록하시겠습니까?";
+    }else if(Const.HWA_MULL_KEY_NAME == linkCd) {
+      cd = "manCargo";
+      text = "화물맨 정보망에 등록하시겠습니까?";
+    }else{
+      cd = "";
+    }
+
+    await openCommonConfirmBox(
+        context,
+        "금액: ${rpaPay}원\n$text",
+        Strings.of(context)?.get("cancel")??"Not Found",
+        Strings.of(context)?.get("confirm")??"Not Found",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await modLink("N",item, rpaPay, cd,true);
+        }
+    );
+
+  }
+
+  Future<void> cancelRpa(String? orderId, OrderLinkCurrentModel data) async {
+    String? res = data.allocCharge;
+    String? cd;
+    String? text;
+
+    if(Const.CALL_24_KEY_NAME == data.linkCd) {
+      cd = "24Cargo";
+      text = "24시콜 정보망 전송 \n\n취소하시겠습니까?";
+    }else if(Const.ONE_CALL_KEY_NAME == data.linkCd) {
+      cd = "oneCargo";
+      text = "원콜 정보망 전송\n\n취소하시겠습니까?";
+    }else if(Const.HWA_MULL_KEY_NAME == data.linkCd) {
+      cd = "manCargo";
+      text = "화물맨 정보망 전송\n\n취소하시겠습니까?";
+    }else{
+      cd = "";
+      text ="";
+    }
+
+    openCommonConfirmBox(
+        context,
+        "${text}",
+        Strings.of(context)?.get("no") ?? "아니오_",
+        Strings.of(context)?.get("yes") ?? "예_",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          await cancelLink(orderId, res, cd, true);
+        }
+    );
+
+  }
+
+  Future<void> cancelLink(String? orderId, String? rpaPay,String? linkCd, bool flag) async {
+
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).cancelNewLink(
+        user.authorization,
+        orderId,
+        rpaPay,
+        "09",
+        linkCd
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("cancelLink() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            Util.snackbar(context, "정보망 전송이 취소되었습니다.");
+            await refresh();
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("cancelLink() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("cancelLink() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("cancelLink() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> modLink(String allocChargeYn,OrderModel item,String rpaPay, String linkCd, bool flag) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).modNewLink(
+        user.authorization,
+        item.orderId,
+        rpaPay,
+        item.orderState,
+        linkCd,
+        allocChargeYn
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("modLink() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if(flag) {
+              Navigator.of(context).pop(false);
+              var link_name = '';
+              if(linkCd == Const.CALL_24_KEY_NAME) link_name = "24시콜";
+              else if(linkCd == Const.HWA_MULL_KEY_NAME) link_name = "화물맨";
+              else if(linkCd == Const.ONE_CALL_KEY_NAME) link_name = "원콜";
+
+              Util.snackbar(context, "${link_name} 지불운임이 수정되었습니다.");
+              await getOrder();
+              //await getOrder(now_scroller: scrollController.position.pixels);
+            }
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("modLink() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("modLink() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("modLink() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> confirmLink(OrderLinkCurrentModel? data) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).confirmNewLink(
+        user.authorization,
+        data?.orderId,
+        data?.allocCharge,
+        data?.linkCd,
+        data?.carNum,
+        data?.carType,
+        data?.carTon,
+        data?.driverName,
+        data?.driverTel
+    ).then((it) async {
+      try {
+        Navigator.of(context).pop(false);
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("confirmLink() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            Util.snackbar(context, "배차 확정이 완료되었습니다.");
+            await refresh();
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }
+      }catch(e) {
+        print("confirmLink() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("confirmLink() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("confirmLink() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  String statMsg(String? link_stat, String? job_stat){
+
+    var msg = "";
+    if(job_stat=="W"){
+      if(link_stat=="I"){
+        msg ="(등록중)";
+      }else if(link_stat=="D"){
+        msg ="(취소중)";
+      }else if(link_stat=="U"){
+        msg ="(수정중)";
+      }else{
+        msg ="";
+      }
+    }else if(job_stat=="E"){
+      if(link_stat=="I"){
+        msg ="(등록실패)";
+      }else if(link_stat=="D"){
+        msg ="(취소실패)";
+      }else if(link_stat=="U"){
+        msg ="(수정실패)";
+      }else{
+        msg ="";
+      }
+    }else if(job_stat=="F"){
+      if(link_stat=="D"){
+        msg ="(취소완료)";
+      }else{
+        msg ="";
+      }
+    }else if(job_stat=="C"){
+      if(link_stat=="U"){
+        msg ="(수정중)";
+      }else{
+        msg ="";
+      }
+    }else if(job_stat=="R"){
+      msg ="(화망처리중)";
+    }else{
+      msg ="";
+    }
+    return msg;
+  }
+
+  Future<void> openRpaModiDialog(BuildContext context, OrderModel item, String? link_type,{String? flag}) async {
+    var currend_link = await currentLink(item.orderId, link_type);
+    final SelectNumber = "0".obs;
+    if(flag != "D") {
+      SelectNumber.value =
+      Const.CALL_24_KEY_NAME == link_type ? item.call24Charge ?? "0" : Const
+          .HWA_MULL_KEY_NAME == link_type ? item.manCharge ?? "0" : item
+          .oneCharge ?? "0";
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      enableDrag: true,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(
+              topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+          side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return FractionallySizedBox(
+            heightFactor: 0.70,
+            child: Container(
+              width: double.infinity,
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  color: Colors.white
+              ),
+              child: Column(
+                  children: [
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                              "assets/image/icon_won.png",
+                              width: CustomStyle.getWidth(25),
+                              height: CustomStyle.getHeight(25)
+                          ),
+                          Container(
+                              margin: EdgeInsets.only(
+                                  left: CustomStyle.getWidth(10)),
+                              child: Text(
+                                "${link_type == "03" ? "24시콜" : link_type == "21" ? "화물맨" : link_type == "18" ? "원콜" : ""}\n금액을 ${flag == "D" ? "등록" : "변경"}해주세요.",
+                                style: CustomStyle.CustomFont(
+                                    styleFontSize16, Colors.black,
+                                    font_weight: FontWeight.w600),
+                              )
+                          )
+                        ]
+                    ),
+                    Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: CustomStyle.getHeight(15)),
+                        child: Obx(() =>
+                            Text(
+                              "${Util.getInCodeCommaWon(SelectNumber.value)} 원",
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize28, Colors.black,
+                                  font_weight: FontWeight.w600),
+                            ))
+                    ),
+                    // 숫자 키패드
+                    GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: 12,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
+                          childAspectRatio: 1.5 / 1, //item 의 가로 1, 세로 1 의 비율
+                          mainAxisSpacing: 5, //수평 Padding
+                          crossAxisSpacing: 5, //수직 Padding
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          // return Text(index.toString());
+                          return InkWell(
+                              onTap: () {
+                                switch (index) {
+                                  case 9:
+                                  //reset
+                                    SelectNumber.value = '0';
+                                    return;
+                                  case 10:
+                                    if(SelectNumber.value.length >= 8) return;
+                                    if (SelectNumber.value == '0') return;
+                                    else SelectNumber.value = '${SelectNumber.value}0';
+                                    return;
+                                  case 11:
+                                  //remove
+                                    if (SelectNumber.value.length == 1) SelectNumber.value = '0';
+                                    else
+                                      SelectNumber.value = SelectNumber.value.substring(0, SelectNumber.value.length - 1);
+                                    return;
+
+                                  default:
+                                    if(SelectNumber.value.length >= 8) return;
+                                    if (SelectNumber.value == '0') SelectNumber.value = '${index + 1}';
+                                    else SelectNumber.value = '${SelectNumber.value}${index + 1}';
+                                    return;
+                                }
+                              },
+                              child: Ink(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(4)),
+                                    child: Center(
+                                        child: Text(getPadvalue(index),
+                                            style: TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold)
+                                        )
+                                    ),
+                                  )
+                              )
+                          );
+                        }
+                    ),
+
+                    Container(
+                        width: double.infinity,
+                        height: CustomStyle.getHeight(45),
+                        margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: rpa_btn_regist,
+                        ),
+                        child: TextButton(
+                            onPressed: () async {
+                              if(SelectNumber.value == null || SelectNumber.value.isEmpty == true) SelectNumber.value = "0";
+                              var cd = "";
+                              if(Const.CALL_24_KEY_NAME == link_type) {
+                                cd = "24Cargo";
+                              }else if(Const.ONE_CALL_KEY_NAME == link_type) {
+                                cd = "oneCargo";
+                              }else if(Const.HWA_MULL_KEY_NAME == link_type) {
+                                cd = "manCargo";
+                              }else{
+                                cd = "";
+                              }
+                              if(flag == "D") {
+                                await registRpa(item,link_type,SelectNumber.value);
+                              }else {
+                                await modLink("N", item, SelectNumber.value, cd, true);
+                              }
+                            },
+                            child: Text(
+                              flag == "D" ? "등록" : "수정",
+                              style: CustomStyle.CustomFont(styleFontSize18, Colors.white),
+                            )
+                        )
+                    )
+                  ]
+              ),
+            ));
+      },
+    );
   }
 
   @override
@@ -1812,8 +3508,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       appBar: AppBar(
         backgroundColor: main_color,
         title: Text(
-            "로지스링크 주선사/운송사용",
-            style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
+          "로지스링크 주선사/운송사용",
+          style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
         ),
         toolbarHeight: 50.h,
         centerTitle: true,
@@ -1843,15 +3539,15 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       drawer: getAppBarMenu(),
       body: SafeArea(
           child: Obx(() {
-        return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children :[
-              calendarPanelWidget(),
-              orderCategoryWidget(),
-              orderItemFuture()
-        ]);
-      })),
+            return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children :[
+                  calendarPanelWidget(),
+                  orderCategoryWidget(),
+                  orderItemFuture()
+                ]);
+          })),
       bottomNavigationBar: SizedBox(
           height: CustomStyle.getHeight(60.h),
           child: Row(
@@ -1864,10 +3560,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                       onTap: () async {
 
                         var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
-                              if(guest) {
-                                showGuestDialog();
-                                return;
-                                }
+                        if(guest) {
+                          showGuestDialog();
+                          return;
+                        }
                         await goToRegOrder();
                         //await goToRegOrderSample();
                       },
@@ -1889,7 +3585,11 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                   style: CustomStyle.CustomFont(
                                       styleFontSize16, styleWhiteCol),
                                 ),
-                              ])))),
+                              ]
+                          )
+                      )
+                  )
+              ),
             ],
           )),
     );
