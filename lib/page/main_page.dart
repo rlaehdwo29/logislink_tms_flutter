@@ -2409,8 +2409,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                           )
                       ),
                       InkWell(
-                          onTap:(){
-
+                          onTap:() async {
+                            await cancelRpa(item.value.orderId, link_model.value);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2430,8 +2430,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     ]
                 )  : const SizedBox()
                     : InkWell(  // 24시콜 OrderStateName = "접수" 아닐때
-                    onTap:(){
-
+                    onTap:() async {
+                      await cancelRpa(item.value.orderId, link_model.value);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -3221,7 +3221,14 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         logger.d("cancelLink() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-
+            if(flag == true) {
+              var link_name = '';
+              if(linkCd == Const.CALL_24_KEY_NAME) link_name = "24시콜";
+              else if(linkCd == Const.HWA_MULL_KEY_NAME) link_name = "화물맨";
+              else if(linkCd == Const.ONE_CALL_KEY_NAME) link_name = "원콜";
+              Util.snackbar(context, "${link_name} 지불운임이 취소되었습니다.");
+              await getOrder();
+            }
 
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -3532,10 +3539,14 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               }else{
                                 cd = "";
                               }
-                              if(flag == "D") {
-                                await registRpa(item,link_type,SelectNumber.value);
-                              }else {
-                                await modLink("N", item, SelectNumber.value, cd, true);
+                              if(int.parse(SelectNumber.value) > 20000){
+                                if(flag == "D") {
+                                  await registRpa(item,link_type,SelectNumber.value);
+                                }else {
+                                  await modLink("N", item, SelectNumber.value, cd, true);
+                                }
+                              }else{
+                                Util.toast("지불운임은 20,000원이상입니다.");
                               }
                             },
                             child: Text(
