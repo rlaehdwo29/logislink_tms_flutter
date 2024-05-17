@@ -189,6 +189,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
       }
+      refresh();
     }
   }
 
