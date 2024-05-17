@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 import 'package:fbroadcast/fbroadcast.dart' as fbroad;
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -8,10 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_awesome_bottom_sheet/flutter_awesome_bottom_sheet.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_main_widget.dart';
@@ -45,6 +44,7 @@ import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/rendering.dart';
 import 'package:dio/dio.dart';
@@ -72,6 +72,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   late final PullToRefreshController pullToRefreshController;
 
   final orderList = List.empty(growable: true).obs;
+  final userRpaModel = UserRpaModel().obs;
   final myOrder = "N".obs;
   final orderState = "".obs;
   final allocState = "".obs;
@@ -92,7 +93,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
 
-  ScrollController scrollController = ScrollController();
+  AutoScrollController  scrollController = AutoScrollController();
   final page = 1.obs;
   final api24Data = Map<String, dynamic>().obs;
   final prev_page = 1.obs;
@@ -101,10 +102,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   final ivTop = false.obs;
   final ivBottom = true.obs;
   final maxScroller = 0.obs;
-  final lastScrollPosition = 0.0.obs;
+  final lastPositionItem = 0.obs;
 
   late TextEditingController searchOrderController;
-  final AwesomeBottomSheet _awesomeBottomSheet = AwesomeBottomSheet();
 
   late AppDataBase db;
 
@@ -118,7 +118,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     fbroad.FBroadcast.instance().register(Const.INTENT_ORDER_REFRESH, (value, callback) async {
       UserModel? user = await controller.getUserInfo();
       mUser.value = user;
-      await getOrder();
     },context: this);
     pullToRefreshController = (kIsWeb
         ? null
@@ -150,10 +149,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         }else{
           ivBottom.value = false;
         }
-        if((max_scroll - now_scroll) <= 300){
+        if((max_scroll - now_scroll) <= 50){
           if(page.value < totalPage.value){
+            lastPositionItem.value = orderList.value.length;
             page.value++;
-            lastScrollPosition.value = max_scroll;
           }
         }
       });
@@ -165,6 +164,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
       dropDownList?.add(CodeModel(code: "carNum",codeName: "차량번호"));
       dropDownList?.add(CodeModel(code: "driverName",codeName: "차주명"));
       dropDownList?.add(CodeModel(code: "sellCustName",codeName: "거래처명"));
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Util.notificationDialog(context,"기본",webViewKey);
     });
 
     super.initState();
@@ -199,76 +202,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     }
   }
 
-  Future<void> getOrder({double? now_scroller}) async {
-    Logger logger = Logger();
-    UserModel? user = await App().getUserInfo();
-
-    await pr?.show();
-    await DioService.dioClient(header: true).getOrder(
-        user.authorization,
-        Util.getTextDate(mCalendarStartDate.value),
-        Util.getTextDate(mCalendarEndDate.value),
-        categoryOrderCode.value,
-        categoryVehicCode.value,
-        myOrderSelect.value == true? "Y":"N",
-        page.value,
-        select_value.value.code??"",
-        searchValue.value
-    ).then((it) async {
-      await pr?.hide();
-      ReturnMap _response = DioService.dioResponse(it);
-      logger.d("getOrder() _response -> ${_response.status} // ${_response.resultMap}");
-      //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
-      if(_response.status == "200") {
-        if(_response.resultMap?["result"] == true) {
-          if(_response.resultMap?["api24Data"] != null) api24Data.value =  _response.resultMap?["api24Data"];
-          if (_response.resultMap?["data"] != null) {
-            try {
-              var list = _response.resultMap?["data"] as List;
-              List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
-              var db = App().getRepository();
-              if(itemsList.length > 0){
-                await db.insertAll(context,itemsList);
-              }else{
-                await db.deleteAll();
-              }
-              if(orderList.isNotEmpty) orderList.clear();
-              var reposi_order = await db.getOrderList(context);
-              orderList.addAll(reposi_order);
-
-              if(now_scroller != null) {
-                scrollController.animateTo(now_scroller, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
-              }
-              int total = 0;
-              if(_response.resultMap?["total"].runtimeType.toString() == "String") {
-                total = int.parse(_response.resultMap?["total"]);
-              }else{
-                total = _response.resultMap?["total"];
-              }
-              totalPage.value = Util.getTotalPage(total);
-            } catch (e) {
-              print(e);
-            }
-          }
-        }else{
-          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
-        }
-      }
-    }).catchError((Object obj) async {
-      await pr?.hide();
-      switch (obj.runtimeType) {
-        case DioError:
-        // Here's the sample to get the failed response error code and message
-          final res = (obj as DioError).response;
-          print("getOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
-          break;
-        default:
-          print("getOrder() getOrder Default => ");
-          break;
-      }
-    });
-  }
-
   void handleDeepLink() async {
 
     FirebaseDynamicLinks.instance.getInitialLink().then(
@@ -301,7 +234,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     Future.delayed(const Duration(milliseconds: 300), () {
       Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
       exit(0);
-      //SystemNavigator.pop();
     });
   }
 
@@ -324,7 +256,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     Future.delayed(const Duration(milliseconds: 300), () {
       Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
       exit(0);
-      //SystemNavigator.pop();
     });
   }
 
@@ -470,7 +401,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     );
   }
 
-  Future<void> goToOrderDetail(OrderModel item) async {
+  Future<void> goToOrderDetail(OrderModel item,int index) async {
     var user = await controller.getUserInfo();
     await FirebaseAnalytics.instance.logEvent(
       name: Platform.isAndroid ? "inquire_order_aos" : "inquire_order_ios",
@@ -486,24 +417,25 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
-        await setRegResult(results);
+        await setRegResult(results,item_index: index);
       }
     }
+    setState(() {
+      lastPositionItem.value = index;
+    });
   }
 
-  Widget getListCardView(OrderModel item) {
-
+  Widget getListCardView(OrderModel item,int item_index) {
 
     return Container(
         padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),top: CustomStyle.getHeight(10.0.h)),
         child: InkWell(
             onTap: () async {
-              await goToOrderDetail(item);
+              await goToOrderDetail(item,item_index);
             },
             child: Card(
                 elevation: 2.0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(0.0)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
                 color: styleWhiteCol,
                 child: Column(children: [
                   Container(
@@ -698,29 +630,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         item.orderState != "09" && item.driverState != null? CustomStyle.getDivider1(): const SizedBox(),
                         item.orderState != "09" && item.driverState != null? CustomStyle.sizedBoxHeight(5.0.h): const SizedBox(),
                         //RPA
-                        /*Column(
-                          children: [
-                            Text("orderId => ${item.orderId}"),
-                            Text("call24Cargo => ${item.call24Cargo}"),
-                            Text("manCargo => ${item.manCargo}"),
-                            Text("oneCargo => ${item.oneCargo}"),
-                            Text("linkCode => ${item.linkCode}"),
-                            Text("linkType => ${item.linkType}"),
-                            Text("linkCodeName => ${item.linkCodeName}"),
-                            Text("driverState => ${item.driverState}"),
-                            Text("allocState => ${item.allocState}"),
-                            Text("allocStateName => ${item.allocStateName}"),
-                            Text("orderState => ${item.orderState}"),
-                            Text("orderStateName => ${item.orderStateName}"),
-                            //Text("linkList[0].linkStat => ${linkList[0].linkStat}"),
-                            //Text("linkList[0].jobStat => ${linkList[0].jobStat}"),
-                            //Text("linkList[1].linkStat => ${linkList[1].linkStat}"),
-                            //Text("linkList[1].jobStat => ${linkList[1].jobStat}"),
-                            //Text("linkList[2].linkStat => ${linkList[2].linkStat}"),
-                            //Text("linkList[2].jobStat => ${linkList[2].jobStat}"),
-                          ],
-                        ),*/
-                        item.orderState != "09" ? rpaFunctionFuture(item) : const SizedBox(),
+                        item.orderState != "09" ? rpaFunctionFuture(item,item_index) : const SizedBox(),
                         item.call24Cargo == "R" || item.manCargo == "R" || item.oneCargo == "R" ? CustomStyle.getDivider1(): const SizedBox(),
                         Container(
                             padding: EdgeInsets.symmetric(vertical:CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(8.w)),
@@ -1045,7 +955,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                       }
                                     },
                                     onRangeSelected: (start, end, focusedDay) {
-                                      //print("onRangeSelected => ${start} // $end // ${focusedDay}");
                                       setState(() {
                                         _tempSelectedDay = start;
                                         mCalendarNowDate = focusedDay;
@@ -1103,9 +1012,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                               }
                                               mCalendarStartDate.value = _tempRangeStart!;
                                               mCalendarEndDate.value = _tempRangeEnd!;
-                                              page.value = 1;
-                                              lastScrollPosition.value = 0;
                                               Navigator.of(context).pop(false);
+                                              await refresh();
                                             },
                                             child: Text(
                                               Strings.of(context)?.get("confirm")??"Not Found",
@@ -1141,7 +1049,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   backgroundColor: text_color_03,
                   headerBuilder: (BuildContext context, bool isExpanded) {
                     return Container(
-                      //margin: EdgeInsets.only(left: CustomStyle.getWidth(40.h)),
                         height: CustomStyle.getHeight(25.h),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -1208,8 +1115,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               ],
               expansionCallback: (int _index, bool status) {
                 isExpanded[index] = !isExpanded[index];
-                //for (int i = 0; i < isExpanded.length; i++)
-                //  if (i != index) isExpanded[i] = false;
               },
             );
           }),
@@ -1265,10 +1170,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               InkWell(
-                  onTap: (){
-                    page.value = 1;
+                  onTap: () async {
                     myOrderSelect.value = !myOrderSelect.value;
-                    scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                    await refresh();
                   },
                   child: Container(
                     decoration: CustomStyle.customBoxDeco(Colors.white,radius: 5.0, border_color: myOrderSelect.value?text_box_color_01:text_box_color_02),
@@ -1294,171 +1198,176 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   Future<void> search(CodeModel search_value) async {
     var mSearchValue = searchOrderController.text.trim();
+    Navigator.of(context).pop();
     if(mSearchValue.length != 1) {
       select_value.value = search_value;
       searchValue.value = mSearchValue;
-      await refresh();
+      setState(() async {
+        await refresh();
+      });
     }else{
+      searchOrderController.text = "";
       Util.toast("검색어를 2글자 이상 입력해주세요.");
     }
   }
 
   Future<void> refresh() async {
-    await db.deleteAll();
-    page.value = 1;
-    await getOrder();
+    setState(() {
+      page.value = 1;
+      lastPositionItem.value = 0;
+    });
   }
 
   Future<void> showSearchDialog() async {
-    var temp_search_column = dropDownList![0];
-    return showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return WillPopScope(
-            onWillPop: () async => false,
-            child: AlertDialog(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(0.0))),
-                insetPadding: EdgeInsets.all(CustomStyle.getHeight(10.0)),
-                contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
-                content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
-                            color: main_color,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Container(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      "오더 검색",
-                                      style: CustomStyle.CustomFont(styleFontSize16, Colors.white),
-                                      textAlign: TextAlign.center,
-                                    )),
-                                Positioned(
-                                  right: 5.w,
-                                  child: IconButton(
-                                      onPressed: (){
-                                        Navigator.of(context).pop(false);
-                                      },
-                                      icon: Icon(Icons.close,size: 24.h,color: Colors.white)
-                                  ),
-                                )
-                              ],
-                            )),
-                        Padding(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(30.h),horizontal: CustomStyle.getWidth(15.w)),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                    flex: 2,
-                                    child: DropdownButton(
-                                        value: temp_search_column,
-                                        items: dropDownList?.map((value) {
-                                          return DropdownMenuItem(
-                                            value: value,
-                                            child: Text(
-                                                "${value.codeName}",
-                                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01)
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            temp_search_column = value!;
-                                          });
-                                        }
-                                    )),
-                                Expanded(
-                                    flex: 5,
-                                    child: Container(
-                                        padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w)),
-                                        //height: CustomStyle.getHeight(40.h),
-                                        child: TextField(
-                                          style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
-                                          textAlign: TextAlign.start,
-                                          keyboardType: TextInputType.text,
-                                          controller: searchOrderController,
-                                          maxLines: null,
-                                          decoration: searchOrderController.text.isNotEmpty
-                                              ? InputDecoration(
-                                            counterText: '',
-                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                                borderRadius: BorderRadius.circular(5.h)
-                                            ),
-                                            disabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                                borderRadius: BorderRadius.circular(5.h)
-                                            ),
-                                            suffixIcon: IconButton(
-                                              onPressed: () {
-                                                searchOrderController.clear();
-                                              },
-                                              icon: Icon(
-                                                Icons.clear,
-                                                size: 18.h,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          )
-                                              : InputDecoration(
-                                            counterText: '',
-                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                                borderRadius: BorderRadius.circular(5.h)
-                                            ),
-                                            disabledBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
-                                            ),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                                borderRadius: BorderRadius.circular(5.h)
-                                            ),
-                                          ),
-                                          onChanged: (value){
+    final temp_search_column = select_value.value.code == null || select_value.value.code?.isEmpty == true ? dropDownList![0].obs : select_value.value.obs;
 
-                                          },
-                                          maxLength: 50,
-                                        )
-                                    ))
-                              ],
-                            )
-                        ),
-                        InkWell(
-                          onTap: () async {
-                            await search(temp_search_column);
-                            Navigator.of(context).pop(false);
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+          side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+           child: Container(
+              width: double.infinity,
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15),vertical:  CustomStyle.getWidth(10)),
+              padding: EdgeInsets.only(left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  color: Colors.white
+              ),
+              child: Obx(() => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                              "assets/image/ic_order_search.png",
+                              width: CustomStyle.getWidth(25),
+                              height: CustomStyle.getHeight(25)
+                          ),
+                          Container(
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                              child: Text(
+                                "오더를 검색해 주세요.",
+                                style: CustomStyle.CustomFont(
+                                    styleFontSize16, Colors.black,
+                                    font_weight: FontWeight.w600),
+                              )
+                          )
+                        ]
+                    ),
+                    Row(
+                      children: dropDownList!.map((value) {
+                        return InkWell(
+                          onTap: (){
+                            temp_search_column.value = value;
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
-                            decoration: BoxDecoration(
-                              color: sub_btn,
-                              border: CustomStyle.borderAllBase(),
-                            ),
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(8), vertical: CustomStyle.getHeight(5)),
+                          margin: EdgeInsets.only(top: CustomStyle.getHeight(15),left: CustomStyle.getWidth(5), right: CustomStyle.getWidth(5)),
+                          decoration: BoxDecoration(
+                            color: temp_search_column.value.code == value.code ? rpa_btn_regist : sub_color,
+                            borderRadius: const BorderRadius.all(Radius.circular(20))
+                          ),
                             child: Text(
-                              Strings.of(context)?.get("confirm") ?? "Not Found",
-                              style: CustomStyle.whiteFont15B(),
-                              textAlign: TextAlign.center,
+                            "${value.codeName}",
+                            style: CustomStyle.CustomFont(styleFontSize14, temp_search_column.value.code == value.code ? Colors.white : text_color_01,font_weight: FontWeight.w500)
+                          )
+                        )
+                        );
+                      }).toList()
+                    ),
+                    Container(
+                        margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15)),
+                        child: TextField(
+                          style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                          textAlign: TextAlign.start,
+                          keyboardType: TextInputType.text,
+                          controller: searchOrderController,
+                          maxLines: null,
+                          decoration: searchOrderController.text.isNotEmpty
+                              ? InputDecoration(
+                            counterText: '',
+                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                borderRadius: BorderRadius.circular(5.h)
+                            ),
+                            disabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                borderRadius: BorderRadius.circular(5.h)
+                            ),
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                searchOrderController.clear();
+                                },
+                              icon: Icon(
+                                Icons.clear,
+                                size: 18.h,
+                                color: Colors.black,
+                              ),
+                            ),
+                          )
+                              : InputDecoration(
+                            counterText: '',
+                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0),vertical: CustomStyle.getHeight(5.0)),
+                            hintText: "검색어를 입력해주세요.",
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                borderRadius: BorderRadius.circular(5.h)
+                            ),
+                            disabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                                borderRadius: BorderRadius.circular(5.h)
                             ),
                           ),
+                          onChanged: (value){
+
+                            },
+                          maxLength: 50,
+                        )
+                    ),
+
+                    Container(
+                        width: double.infinity,
+                        height: CustomStyle.getHeight(45),
+                        margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: rpa_btn_regist,
                         ),
-                      ],
+                        child: TextButton(
+                            onPressed: () async {
+                              await search(temp_search_column.value);
+                            },
+                            child: Text(
+                              "검색",
+                              style: CustomStyle.CustomFont(styleFontSize18, Colors.white),
+                            )
+                        )
                     )
-                )),
-          );
-        });
+                  ]
+              )),
+            ));
+      },
+    );
+
   }
 
   Widget orderItemFuture() {
@@ -1478,16 +1387,28 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         builder: (context, snapshot) {
           if(snapshot.connectionState != ConnectionState.done) {
             return Expanded(
-                child: Container(
-                    alignment: Alignment.center,
-                    child: Center(child: CircularProgressIndicator())
-                ));
+                child: Center(
+                    child: LoadingAnimationWidget.discreteCircle(
+                      color: Colors.white,
+                      size: 45,
+                    ),
+                )
+            );
           }else {
             if (snapshot.hasData) {
               if (orderList.isNotEmpty) orderList.clear();
               orderList.addAll(snapshot.data["list"]);
               api24Data.value = snapshot.data?["api24Data"];
               totalPage.value = snapshot.data?["total"];
+
+              if(lastPositionItem.value > 0) {
+                scrollController.scrollToIndex(
+                  lastPositionItem.value,
+                  duration: const Duration(milliseconds: 1000),
+                  preferPosition: AutoScrollPosition.begin,
+                );
+              }
+
               return Obx(()=> orderListWidget());
             } else if (snapshot.hasError) {
               return Container(
@@ -1516,8 +1437,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               Positioned(
                   child: RefreshIndicator(
                       onRefresh: () async {
-                        lastScrollPosition.value = 0;
-                        await refresh();
+                        return Future(() {
+                          refresh();
+                        });
                       },
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
@@ -1526,11 +1448,12 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         itemCount: orderList.length,
                         itemBuilder: (context, index) {
                           var item = orderList[index];
-                          if(page.value != prev_page.value) {
-                            scrollController.animateTo(lastScrollPosition.value, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
-                            prev_page.value = page.value;
-                          }
-                          return getListCardView(item);
+                          return AutoScrollTag (
+                              key: ValueKey(index),
+                              controller: scrollController,
+                              index: index,
+                              child: getListCardView(item,index)
+                          );
                         },
                       )
                   )
@@ -1539,10 +1462,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 return ivTop.value == true ?
                 Positioned(
                     right: 10.w,
-                    bottom: ivBottom.value == false ? 10.h : 60.h,
+                    bottom: ivBottom.value == false ? 60.h : 110.h,
                     child: InkWell(
                         onTap: () async {
-                          scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                          scrollController.animateTo(0, duration: const Duration(milliseconds: 1000), curve: Curves.ease);
                         },
                         child: Container(
                             padding: EdgeInsets.all(10.w),
@@ -1560,6 +1483,33 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 ) : const SizedBox();
               }),
 
+              Positioned(
+                  right: 10.w,
+                  bottom: ivBottom.value == false ? 10.h : 60.h,
+                  child: InkWell(
+                      onTap: () async {
+                        Future(() {
+                          setState(() {
+                            var item_index = scrollController.position.pixels / (scrollController.position.maxScrollExtent / orderList.length);
+                            lastPositionItem.value = item_index.toInt();
+                          });
+                        });
+                      },
+                      child: Container(
+                          padding: EdgeInsets.all(10.w),
+                          decoration: const BoxDecoration(
+                            color: Color(0x9965656D),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.refresh,
+                            size: 21.h,
+                            color: Colors.white,
+                          )
+                      )
+                  )
+              ),
+
               Obx((){
                 return ivBottom.value == true ?
                 Positioned(
@@ -1567,7 +1517,11 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     bottom: 10.h,
                     child: InkWell(
                         onTap: () async {
-                          scrollController.animateTo(scrollController.position.maxScrollExtent-800, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+                          scrollController.scrollToIndex(
+                            orderList.value.length-2,
+                            duration: const Duration(milliseconds: 1000),
+                            preferPosition: AutoScrollPosition.begin,
+                          );
                         },
                         child: Container(
                             padding: EdgeInsets.all(10.w),
@@ -1626,7 +1580,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
           return IconsButton(
             onPressed: () async {
               if(smartOrderCode.value == "") {
-                //Util.snackbar(context,"등록할 오더를 선택해주세요.");
                 return Util.toast("등록할 오더 방법을 선택해주세요.");
               }
               if(smartOrderCode.value == "01") {
@@ -1775,16 +1728,14 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     );
   }
 
-  Future<void> setRegResult(Map<String,dynamic> results) async {
+  Future<void> setRegResult(Map<String,dynamic> results, {int? item_index}) async {
     if(mounted) {
-      setState(() {
-        refresh();
         Util.toast("오더 등록이 완료되었습니다.");
         if (results["allocId"] != null) {
           String allocId = results["allocId"].toString();
           showOrderTrans(allocId);
         }
-      });
+        await refresh();
     }
   }
 
@@ -1811,7 +1762,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     ).then((it) async {
       await pr?.hide();
       ReturnMap _response = DioService.dioResponse(it);
-      logger.d("getOrderDetail() _response -> ${_response.status} // ${_response.resultMap}");
+      logger.d("getOrderDetail() _response -> ${_response.status} | ${_response.resultMap}");
       //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       if(_response.status == "200") {
         if(_response.resultMap?["result"] == true) {
@@ -1874,7 +1825,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     });
   }
 
-  Widget rpaFunctionFuture(OrderModel item) {
+  Widget rpaFunctionFuture(OrderModel item,int item_index) {
     final orderService = Provider.of<OrderService>(context);
     return FutureBuilder(
         future: orderService.currentLink(
@@ -1886,7 +1837,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             return const SizedBox();
           }else {
             if (snapshot.hasData) {
-              return rpaFunctionWidget(item, snapshot);
+              return rpaFunctionWidget(item, snapshot,item_index);
             } else if (snapshot.hasError) {
               return const SizedBox();
             }
@@ -1901,7 +1852,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     );
   }
 
-  Widget rpaFunctionWidget(OrderModel item, AsyncSnapshot snapshot) {
+  Widget rpaFunctionWidget(OrderModel item, AsyncSnapshot snapshot,item_index) {
     final call24State = false.obs;
     final manState = false.obs;
     final oneCallState = false.obs;
@@ -1922,8 +1873,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
     final userRpaData = UserRpaModel().obs;
     userRpaData.value = snapshot.data["rpa"];
-
-    //var msg = statMsg(link_data.value.linkStat, link_data.value.jobStat);
 
     return InkWell(
         onTap: () {
@@ -2282,13 +2231,13 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                         Obx(() =>
                           // 24시콜 OpenInfo
                           call24State.value ?
-                            clickRpaInfoWidget(call24LinkModel.value,userRpaData.value, item,Const.CALL_24_KEY_NAME)
+                            clickRpaInfoWidget(call24LinkModel.value,userRpaData.value, item,Const.CALL_24_KEY_NAME,item_index)
                           // 화물맨 OpenInfo
                           : manState.value ?
-                            clickRpaInfoWidget(hwaMullLinkModel.value,userRpaData.value,item,Const.HWA_MULL_KEY_NAME)
+                            clickRpaInfoWidget(hwaMullLinkModel.value,userRpaData.value,item,Const.HWA_MULL_KEY_NAME,item_index)
                           // 원콜 OpenInfo
                           : oneCallState.value ?
-                            clickRpaInfoWidget(oneCallLinkModel.value,userRpaData.value,item,Const.ONE_CALL_KEY_NAME)
+                            clickRpaInfoWidget(oneCallLinkModel.value,userRpaData.value,item,Const.ONE_CALL_KEY_NAME,item_index)
                           : const SizedBox()
                         )
                     );
@@ -2300,7 +2249,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   }
 
-  Widget clickRpaInfoWidget(OrderLinkCurrentModel linkModel,UserRpaModel user_Rpa_Data, OrderModel orderItem, String link_type) {
+  Widget clickRpaInfoWidget(OrderLinkCurrentModel linkModel,UserRpaModel user_Rpa_Data, OrderModel orderItem, String link_type,int item_index) {
 
     var link_name = "";
 
@@ -2338,7 +2287,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 item.value.orderStateName == "접수" ?
                 InkWell(
                     onTap:(){
-                      openRpaInfoDialog(context, item.value, "02",link_type,link_model: link_model.value);
+                      openRpaInfoDialog(context, item.value, "02",link_type,item_index,link_model: link_model.value);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2357,7 +2306,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     )
                 ) :  InkWell(
                     onTap:(){
-                      openRpaInfoDialog(context, item.value, "01",link_type);
+                      openRpaInfoDialog(context, item.value, "01",link_type,item_index);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2392,7 +2341,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     children: [
                       InkWell(
                           onTap:(){
-                            openRpaModiDialog(context, item.value, link_type);
+                            openRpaModiDialog(context, item.value, link_type,item_index);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2410,7 +2359,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                       ),
                       InkWell(
                           onTap:() async {
-                            await cancelRpa(item.value.orderId, link_model.value);
+                            await cancelRpa(item.value.orderId, link_model.value,item_index);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2431,7 +2380,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 )  : const SizedBox()
                     : InkWell(  // 24시콜 OrderStateName = "접수" 아닐때
                     onTap:() async {
-                      await cancelRpa(item.value.orderId, link_model.value);
+                      await cancelRpa(item.value.orderId, link_model.value,item_index);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2457,7 +2406,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     children: [
                       InkWell(
                           onTap:(){
-                            openRpaModiDialog(context, item.value, link_type);
+                            openRpaModiDialog(context, item.value, link_type,item_index);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2475,7 +2424,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                       ),
                       InkWell(
                           onTap:() async {
-                            await cancelRpa(item.value.orderId, link_model.value);
+                            await cancelRpa(item.value.orderId, link_model.value,item_index);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2496,7 +2445,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 ) : const SizedBox()
                     : InkWell( // 원콜 OrderStateName = "접수" 상태가 아니거나 linkStat 값이 R(배차 확정)인 상태
                     onTap:() async {
-                      await cancelRpa(item.value.orderId, link_model.value);
+                      await cancelRpa(item.value.orderId, link_model.value,item_index);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2521,7 +2470,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                     children: [
                       InkWell(
                           onTap:(){
-                            openRpaModiDialog(context, item.value, link_type);
+                            openRpaModiDialog(context, item.value, link_type,item_index);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2539,7 +2488,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                       ),
                       InkWell(
                           onTap:() async {
-                            await cancelRpa(item.value.orderId, link_model.value);
+                            await cancelRpa(item.value.orderId, link_model.value,item_index);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -2566,7 +2515,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 item.value.chargeType == "01" ? // 시작(1)
                 InkWell(
                     onTap: () {
-                      openRpaModiDialog(context, item.value, link_type,flag: "D");
+                      openRpaModiDialog(context, item.value, link_type,item_index,flag: "D");
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2588,7 +2537,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ?
                 InkWell(
                     onTap: () {
-                      openRpaModiDialog(context, item.value, link_type,flag: "D");
+                      openRpaModiDialog(context, item.value, link_type,item_index,flag: "D");
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2611,7 +2560,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ?
                 InkWell(
                     onTap: () {
-                      openRpaModiDialog(context, item.value, link_type,flag: "D");
+                      openRpaModiDialog(context, item.value, link_type,item_index,flag: "D");
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -2661,6 +2610,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     Map<String,dynamic> result = {};
+    UserRpaModel rpa = UserRpaModel();
     OrderLinkCurrentModel returnModel = OrderLinkCurrentModel();
 
     await DioService.dioClient(header: true).currentNewLink(
@@ -2672,16 +2622,28 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         logger.d("main currentLink() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
+            if(_response.resultMap?["rpa"] != null) {
+              rpa = UserRpaModel(
+                  link24Id: _response.resultMap?["rpa"]["link24Id"],
+                  link24Pass: _response.resultMap?["rpa"]["link24Pass"],
+                  man24Id: _response.resultMap?["rpa"]["man24Id"],
+                  man24Pass: _response.resultMap?["rpa"]["man24Pass"],
+                  one24Id: _response.resultMap?["rpa"]["one24Id"],
+                  one24Pass: _response.resultMap?["rpa"]["one24Pass"]
+              );
+            }
+            userRpaModel.value = rpa;
             if (_response.resultMap?["data"] != null) {
               var mList = _response.resultMap?["data"] as List;
               if(mList.length > 0) {
                 List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
-                for(var list in itemsList) {
-                  if(list.allocCd?.isNotEmpty == true && list.allocCd != null && list.linkCd == link_type) {
-                    returnModel = list;
+                  for (var list in itemsList) {
+                    if (list.allocCd?.isNotEmpty == true &&
+                        list.allocCd != null && list.linkCd == link_type) {
+                      returnModel = list;
+                    }
                   }
-                }
-                result = {"currentList" : itemsList, "currentItem" : returnModel};
+                  result = {"currentList": itemsList, "currentItem": returnModel};
               }
             }
           } else {
@@ -2709,7 +2671,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     return result;
   }
 
-  Future<void> carConfirmRpa(Map<String,dynamic> data_map) async {
+  Future<void> carConfirmRpa(Map<String,dynamic> data_map,int item_index) async {
     String textHeader = "${data_map["currentItem"].carNum}\t\t${data_map["currentItem"].carType}\t\t${data_map["currentItem"].carTon}";
     String textSub = "${data_map["currentItem"].driverName}\t\t${Util.makePhoneNumber(data_map["currentItem"].driverTel)}";
     String text = "배차 확정 하시겠습니까?";
@@ -2729,33 +2691,35 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               if(value.linkCd == data_map["currentItem"].linkCd) {
                 await confirmLink(data_map["currentItem"]);
               }else{
-                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "24Cargo", false);
+                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "24Cargo", false,item_index);
               }
             }
             if(value.linkCd == Const.ONE_CALL_KEY_NAME) {
               if(value.linkCd == data_map["currentItem"].linkCd) {
                 await confirmLink(data_map["currentItem"]);
               }else{
-                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "oneCargo", false);
+                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "oneCargo", false,item_index);
               }
             }
             if(value.linkCd == Const.HWA_MULL_KEY_NAME) {
               if(value.linkCd == data_map["currentItem"].linkCd) {
                 await confirmLink(data_map["currentItem"]);
               }else{
-                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "manCargo", false);
+                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "manCargo", false,item_index);
               }
             }
           }
-          await refresh();
+          setState(() {
+            lastPositionItem.value = item_index;
+          });
         }
     );
   }
 
-  Future<void> openRpaInfoDialog(BuildContext context,OrderModel item,String alloc_type, String? link_type,{OrderLinkCurrentModel? link_model})  async {
+  Future<void> openRpaInfoDialog(BuildContext context,OrderModel item,String alloc_type, String? link_type,int item_index,{OrderLinkCurrentModel? link_model})  async {
     // alloc_type: 01 = 배차 확정된 상태, 02 = 배차 미확정 상태
 
-    Map<String,dynamic> currend_link = await currentLink(item.orderId,link_type);
+    Map<String,dynamic> currend_link = await currentLink(item.orderId, link_type);
 
     showDialog(
         barrierDismissible: false,
@@ -2816,7 +2780,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     flex:1,
                                     child: Text(
                                       item.allocState == "00" ? "${currend_link["currentItem"].carNum}" : "${item.carNum}",
-                                      //"${currend_link["currentItem"].carNum}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -3019,7 +2982,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     flex:1,
                                     child: Text(
                                       item.allocState == "00" ? currend_link["currentItem"].driverName??"" : item.driverName??"",
-                                      //currend_link["currentItem"].driverName??"",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -3060,7 +3022,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     flex:1,
                                     child: Text(
                                       item.allocState == "00" ? Util.makePhoneNumber(currend_link["currentItem"].driverTel??"") : Util.makePhoneNumber(item.driverTel??""),
-                                      //Util.makePhoneNumber(currend_link["currentItem"].driverTel??""),
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -3096,8 +3057,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                             alloc_type == "02" ?
                             InkWell(
                               onTap: () async {
-                                await carConfirmRpa(currend_link);
-                                //await confirmLink(link_model);
+                                await carConfirmRpa(currend_link,item_index);
                               },
                               child: Container(
                                 width: CustomStyle.getWidth(100),
@@ -3136,7 +3096,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     }
   }
 
-  Future<void> registRpa(OrderModel item, String? linkCd, String? rpaPay) async {
+  Future<void> registRpa(OrderModel item, String? linkCd, String? rpaPay,int item_index) async {
     if(rpaPay == "0" || rpaPay == "" || rpaPay == null) {
       Util.toast("지불운임을 입력해 주세요.");
       return;
@@ -3166,13 +3126,13 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
-          await modLink("N",item, rpaPay, cd,true);
+          await modLink("N",item, rpaPay, cd,"D",item_index);
         }
     );
 
   }
 
-  Future<void> cancelRpa(String? orderId, OrderLinkCurrentModel data) async {
+  Future<void> cancelRpa(String? orderId, OrderLinkCurrentModel data,int item_index) async {
     String? allocCharge = data.allocCharge;
     String? cd;
     String? text;
@@ -3199,13 +3159,13 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
-          await cancelLink(orderId, allocCharge, cd, true);
+          await cancelLink(orderId, allocCharge, cd, true,item_index);
         }
     );
 
   }
 
-  Future<void> cancelLink(String? orderId, String? rpaPay,String? linkCd, bool flag) async {
+  Future<void> cancelLink(String? orderId, String? rpaPay,String? linkCd, bool flag,int item_index) async {
 
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
@@ -3227,7 +3187,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               else if(linkCd == Const.HWA_MULL_KEY_NAME) link_name = "화물맨";
               else if(linkCd == Const.ONE_CALL_KEY_NAME) link_name = "원콜";
               Util.snackbar(context, "${link_name} 지불운임이 취소되었습니다.");
-              await getOrder();
+              await refresh();
             }
 
           } else {
@@ -3254,7 +3214,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     });
   }
 
-  Future<void> modLink(String allocChargeYn,OrderModel item,String rpaPay, String linkCd, bool flag) async {
+  Future<void> modLink(String allocChargeYn,OrderModel item,String rpaPay, String linkCd, String flag, int item_index) async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).modNewLink(
@@ -3270,17 +3230,20 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
         logger.d("modLink() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            if(flag) {
               Navigator.of(context).pop(false);
               var link_name = '';
               if(linkCd == Const.CALL_24_KEY_NAME) link_name = "24시콜";
               else if(linkCd == Const.HWA_MULL_KEY_NAME) link_name = "화물맨";
               else if(linkCd == Const.ONE_CALL_KEY_NAME) link_name = "원콜";
 
-              Util.snackbar(context, "${link_name} 지불운임이 수정되었습니다.");
-              await getOrder();
-              //await getOrder(now_scroller: scrollController.position.pixels);
-            }
+              Util.snackbar(context, "${link_name} 지불운임이 ${flag == "D" ? "등록" : "수정"}되었습니다.");
+              if(flag == "D") { // D: 등록일 경우 리스트 최상단 이동
+                await refresh();
+              }else{ // U: 수정일 경우 현재 리스트 위치 이동
+                setState(() {
+                  lastPositionItem.value = item_index;
+                });
+              }
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -3394,7 +3357,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     return msg;
   }
 
-  Future<void> openRpaModiDialog(BuildContext context, OrderModel item, String? link_type,{String? flag}) async {
+  Future<void> openRpaModiDialog(BuildContext context, OrderModel item, String? link_type,int item_index, {String? flag}) async {
 
     final SelectNumber = "0".obs;
     if(flag != "D") {
@@ -3541,9 +3504,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               }
                               if(int.parse(SelectNumber.value) > 20000){
                                 if(flag == "D") {
-                                  await registRpa(item,link_type,SelectNumber.value);
+                                  await registRpa(item,link_type,SelectNumber.value,item_index);
                                 }else {
-                                  await modLink("N", item, SelectNumber.value, cd, true);
+                                  await modLink("N", item, SelectNumber.value, cd, "U",item_index);
                                 }
                               }else{
                                 Util.toast("지불운임은 20,000원이상입니다.");
@@ -3564,11 +3527,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
 
   @override
   Widget build(BuildContext context) {
-    Util.notificationDialog(context,"기본",webViewKey);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: order_item_background,
-      resizeToAvoidBottomInset:false,
+      resizeToAvoidBottomInset:true,
       appBar: AppBar(
         backgroundColor: main_color,
         title: Text(
@@ -3629,7 +3591,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                           return;
                         }
                         await goToRegOrder();
-                        //await goToRegOrderSample();
                       },
                       child: Container(
                           height: CustomStyle.getHeight(80),

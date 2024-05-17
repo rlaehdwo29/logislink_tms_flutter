@@ -327,16 +327,15 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
         var password = Util.encryption(userPassword.value);
         password.replaceAll("\n", "");
         await pr?.show();
-        await DioService.dioClient(header: true)
-            .login(userID.value, password)
-            .then((it) async {
+        await DioService.dioClient(header: true).login(userID.value, password).then((it) async {
           await pr?.hide();
           ReturnMap _response = DioService.dioResponse(it);
           logger.i("userLogin() _response -> ${_response.status} // ${_response.resultMap}");
           if (_response.status == "200") {
             if (_response.resultMap?["result"] == true) {
-              if (_response.resultMap?["data"] != null) {
-                  UserModel userInfo = UserModel.fromJSON(it.response.data["data"]);
+                if (_response.resultMap?["data"] != null) {
+                  UserModel userInfo = UserModel.fromJSON(
+                      it.response.data["data"]);
                   if (userInfo != null) {
                     userInfo.authorization =
                     it.response.headers["authorization"]?[0];

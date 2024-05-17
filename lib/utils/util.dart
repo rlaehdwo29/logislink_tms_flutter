@@ -474,7 +474,7 @@ class Util {
     if(first_screen == pageName) {
       if(!controller.isIsNoticeOpen.value) {
         controller.isIsNoticeOpen.value = true;
-        getNotice(context, pageName, webviewKey);
+        await getNotice(context, pageName, webviewKey);
       }
     }else{
       return;

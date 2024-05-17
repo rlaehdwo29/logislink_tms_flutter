@@ -155,13 +155,10 @@ class OrderService with ChangeNotifier {
             );
             if (_response.resultMap?["data"] != null) {
               var mList = _response.resultMap?["data"] as List;
+              if(orderLinkList.length > 0) orderLinkList.clear();
               if(mList.length > 0) {
-                var mList = _response.resultMap?["data"] as List;
-                if(orderLinkList.length > 0) orderLinkList.clear();
-                if(mList.length > 0) {
                   List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
                   orderLinkList.addAll(itemsList);
-                }
               }
             }
           } else {
@@ -188,7 +185,6 @@ class OrderService with ChangeNotifier {
     });
     Map<String,dynamic> maps = {"rpa":rpa,"list":orderLinkList};
     return maps;
-    //return orderLinkList;
   }
 
   Future getOrderList2(context, String? auth, String? allocId, String? orderId) async {
