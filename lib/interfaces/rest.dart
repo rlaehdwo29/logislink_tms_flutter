@@ -466,6 +466,13 @@ abstract class Rest {
       @Field("orderId") String? orderId);
 
   /**
+   * New: 정보망 계정 정보
+   */
+  @FormUrlEncoded()
+  @POST(URL_LINK_USER_INFO)
+  Future<HttpResponse> rpaLinkInfo(@Header("Authorization") String? Authorization);
+
+  /**
    * New: 정보망 현황 : 기본 데이터
    */
   @FormUrlEncoded()

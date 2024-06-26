@@ -14,6 +14,8 @@ import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/login_page.dart';
 import 'package:logislink_tms_flutter/page/main_page.dart';
 import 'package:logislink_tms_flutter/page/permission_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/renew_login_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/renew_main_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
@@ -43,6 +45,8 @@ class _BridgePageState extends State<BridgePage> {
     super.initState();
 
     Future.delayed(Duration.zero, () async {
+      controller.renew_value.value = await controller.getRenewValue();
+
       bool? chkPermission = await checkPermission();
       if(chkPermission == true){
         await checkVersion();
@@ -187,9 +191,9 @@ class _BridgePageState extends State<BridgePage> {
   Future<void> getUserInfo() async {
     Logger logger = Logger();
     UserModel? nowUser = await controller.getUserInfo();
-    await pr?.show();
+    //await pr?.show();
     await DioService.dioClient(header: true).getUserInfo(nowUser?.authorization).then((it) async {
-      await pr?.hide();
+      //await pr?.hide();
       ReturnMap _response = DioService.dioResponse(it);
       logger.i("getUserInfo() _response -> ${_response.status} // ${_response.resultMap}");
       if (_response.status == "200") {
@@ -207,7 +211,7 @@ class _BridgePageState extends State<BridgePage> {
         }
       }
     }).catchError((Object obj) async {
-      await pr?.hide();
+      //await pr?.hide();
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
@@ -225,7 +229,7 @@ class _BridgePageState extends State<BridgePage> {
   Future<void> sendDeviceInfo() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    await pr?.show();
+    //await pr?.show();
     var push_id = await SP.get(Const.KEY_PUSH_ID)??"";
     var setting_push = await SP.getDefaultTrueBoolean(Const.KEY_SETTING_PUSH);
     var setting_talk = await  SP.getDefaultTrueBoolean(Const.KEY_SETTING_TALK);
@@ -239,7 +243,7 @@ class _BridgePageState extends State<BridgePage> {
         controller.device_info["deviceOs"],
         app_version
     ).then((it) async {
-      await pr?.hide();
+      //await pr?.hide();
       ReturnMap _response = DioService.dioResponse(it);
       logger.i("sendDeviceInfo() _response -> ${_response.status} // ${_response.resultMap}");
       if(_response.status == "200") {
@@ -250,7 +254,7 @@ class _BridgePageState extends State<BridgePage> {
         Util.toast("${_response.message}");
       }
     }).catchError((Object obj) async {
-      await pr?.hide();
+     // await pr?.hide();
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
@@ -266,13 +270,19 @@ class _BridgePageState extends State<BridgePage> {
   }
 
   void goToMain() {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (BuildContext context) => const MainPage()), (route) => false);
+    if(controller.renew_value.value) {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const RenewMainPage()), (route) => false);
+    }else {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const MainPage()), (route) => false);
+    }
   }
 
   Future<void> goToLogin() async {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (BuildContext context) => const LoginPage()), (route) => false);
+    if(controller.renew_value.value) {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const ReNewLoginPage()), (route) => false);
+    }else {
+      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()), (route) => false);
+    }
   }
 
   @override

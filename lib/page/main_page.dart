@@ -396,6 +396,31 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               onTap: () async {
                 await goToExit();
               },
+            ),ListTile(
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              title: Row(
+                  children:[
+                    Container(
+                        margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                        child: Text(
+                            "신버전",
+                            style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w600)
+                        )
+                    ),
+                    Obx(() =>
+                        Transform.scale(
+                            scale: 0.7,
+                            child: CupertinoSwitch(
+                              value:  controller.renew_value.value,
+                              activeColor: renew_main_color2,
+                              onChanged: (bool? value){
+                                controller.setRenewValue(value ?? false);
+                              },
+                            )
+                        )
+                    )
+                  ]
+              ),
             )
           ],
         )
@@ -438,7 +463,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 elevation: 2.0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
                 color: styleWhiteCol,
-                child: Column(children: [
+                child: Column(
+                    children: [
                   Container(
                       padding: EdgeInsets.all(10.0.h),
                       color: Colors.white,
@@ -449,32 +475,34 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                           children: [
                             Flexible(
                                 flex: 3,
-                                child: Row(children: [
-                                  item.orderState == "09" ?
-                                  Container(
-                                      decoration: CustomStyle.baseBoxDecoWhite(),
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: CustomStyle.getHeight(5.0.h),
-                                          horizontal: CustomStyle.getWidth(10.0.w)),
-                                      child: Text(
-                                        item.orderStateName??"",
-                                        style: CustomStyle.CustomFont(
-                                            styleFontSize12,
-                                            Util.getOrderStateColor(item.orderStateName)),
-                                      )) : const SizedBox(),
-                                  Container(
-                                      child: Text(
+                                child: Row(
+                                    children: [
+                                      item.orderState == "09" ?
+                                      Container(
+                                          decoration: CustomStyle.baseBoxDecoWhite(),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: CustomStyle.getHeight(5.0.h),
+                                              horizontal: CustomStyle.getWidth(10.0.w)),
+                                          child: Text(
+                                            item.orderStateName??"",
+                                            style: CustomStyle.CustomFont(
+                                                styleFontSize12,
+                                                Util.getOrderStateColor(item.orderStateName)),
+                                          )
+                                      ) : const SizedBox(),
+                                      Text(
                                         item.sellCustName??"",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             main_color),
-                                      )),
-                                  Text(
-                                    item.sellDeptName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize10, main_color),
+                                      ),
+                                      Text(
+                                        item.sellDeptName??"",
+                                        style: CustomStyle.CustomFont(styleFontSize10, main_color),
+                                      )
+                                    ]
                                   )
-                                ])),
+                              ),
                             Flexible(
                                 flex: 1,
                                 child: Container(
@@ -487,7 +515,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         text_color_01,
                                         font_weight: FontWeight.w700),
                                   ),
-                                ))
+                                )
+                            )
                           ],
                         ),
                         Row(
@@ -505,23 +534,22 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         CustomStyle.getHeight(5.0.h),),
                                       child: Text(
                                         "${item.allocStateName}",
-                                        style: CustomStyle.CustomFont(
-                                            styleFontSize14,
-                                            order_state_01),
-                                      )) : const SizedBox(),
+                                        style: CustomStyle.CustomFont(styleFontSize14, order_state_01),
+                                      )
+                                  ) : const SizedBox(),
                                   item.linkName?.isEmpty == false && item.linkName != "" ?
                                   (item.call24Cargo == null || item.call24Cargo?.isEmpty == true)
                                       && (item.manCargo == null || item.manCargo?.isEmpty == true)
                                       && (item.oneCargo == null || item.oneCargo?.isEmpty == true) ?
                                   Container(
-                                      padding: EdgeInsets.only(
-                                          right: CustomStyle.getWidth(5.0.w)),
+                                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                       child: Text(
                                         "지불운임",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             text_color_01),
-                                      )) :
+                                      )
+                                  ) :
                                   Container(
                                       padding: EdgeInsets.only(
                                           right: CustomStyle.getWidth(5.0.w)),
@@ -530,21 +558,21 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             text_color_01),
-                                      ))
-                                      : const SizedBox(),
+                                      )
+                                  ) : const SizedBox(),
                                   item.buyCustName?.isEmpty == false && item.buyCustName != "" ?
                                   Text(
                                     item.buyCustName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize12, text_color_01),
+                                    style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                                   ) : const SizedBox(),
                                   item.buyDeptName?.isEmpty == false && item.buyDeptName != "" ?
                                   Text(
                                     item.buyDeptName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize10, text_color_01),
+                                    style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
                                   ) : const SizedBox()
-                                ])),
+                                ]
+                                )
+                            ),
                             Flexible(
                                 flex: 1,
                                 child: (item.call24Cargo != "" && item.call24Cargo != null) ||
@@ -1409,7 +1437,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   preferPosition: AutoScrollPosition.begin,
                 );
               }
-
+              print("dddddddddddd=> ${mUser.value}");
               return Obx(()=> orderListWidget());
             } else if (snapshot.hasError) {
               return Container(

@@ -799,7 +799,7 @@ class OrderModel extends ResultModel {
       "reqPayYN": reqPayYN,
       "reqPayDate": reqPayDate,
       "talkYn": talkYn,
-      "orderStopList": jsonEncode(orderStopList),
+      "orderStopList": jsonEncode(orderStopList??List.empty(growable: true)),
       "reqStaffName":reqStaffName,
       "call24Cargo": call24Cargo,
       "manCargo": manCargo,

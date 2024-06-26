@@ -4,8 +4,7 @@
 //public static String SERVER_URL = "https://app.logis-link.co.kr";   // PRO URL
 
 const String m_ServerRelease = "https://app.logis-link.co.kr";    // 운영서버
-//const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
-const String m_ServerDebug = "http://192.168.68.64:8080";         // Local
+const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
 //const String m_ServerDebug = "http://192.168.0.2:8080";
 const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
@@ -110,6 +109,8 @@ const String URL_LINK_RPA_CANCEL = "/cust/order/cancelLink";
 const String URL_LINK_RPA_CURRENT= "/cust/order/linkCurrent";
 // New : 정보망 현황 : 기본 데이터
 const String URL_LINK_RPA_STATUS = "/cust/order/linkStatus";
+// New : 정보망 계정 정보
+const String URL_LINK_USER_INFO = "/cust/linkInfo";
 // New : 정보망 현황 : 정보망 각 상태 및 금액 얼마 있는지 만 추출 - orderId 위주
 const String URL_LINK_RPA_STATUS_SUB = "/cust/order/rpa/getOrderStatusSub";
 // New : 정보망 현황 : 정보망 각 상태 및 금액 얼마 있는지 만 추출 - allocId 위주

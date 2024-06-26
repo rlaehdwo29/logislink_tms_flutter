@@ -1,3 +1,4 @@
+
 import 'package:json_annotation/json_annotation.dart';
 import 'package:logislink_tms_flutter/common/model/result_model.dart';
 
@@ -5,6 +6,7 @@ part 'user_rpa_model.g.dart';
 
 @JsonSerializable()
 class UserRpaModel extends ResultModel {
+
   String? link24Id;
   String? link24Pass;
   String? man24Id;

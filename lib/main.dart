@@ -233,8 +233,8 @@ class _MyAppState extends State<MyApp> {
             theme: ThemeData(
               appBarTheme: ThemeData.light()
                   .appBarTheme
-                  .copyWith(backgroundColor: main_color),
-              primaryColor: main_color,
+                  .copyWith(backgroundColor: light_gray24),
+              primaryColor: light_gray24,
               backgroundColor: styleWhiteCol,
               textTheme: TextTheme(bodyText1: CustomStyle.baseFont()),
               visualDensity: VisualDensity.adaptivePlatformDensity,

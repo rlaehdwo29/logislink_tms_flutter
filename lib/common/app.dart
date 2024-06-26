@@ -9,6 +9,7 @@ class App extends GetxController{
   final app_info = <String,dynamic>{}.obs;
   final user = UserModel().obs;
   final isIsNoticeOpen = false.obs;
+  final renew_value = true.obs;
 
   Future<void> setUserInfo(UserModel userInfo) async {
     await SP.putUserModel(Const.KEY_USER_INFO, userInfo);
@@ -18,6 +19,24 @@ class App extends GetxController{
   Future<UserModel> getUserInfo() async {
     user.value = await SP.getUserInfo(Const.KEY_USER_INFO)??UserModel();
     return user.value;
+  }
+
+  Future<void> setRenewValue(bool value) async {
+    await SP.putBool(Const.RENEW_APP, value);
+    renew_value.value = value;
+    update();
+  }
+
+  Future<bool> getRenewValue() async {
+    bool state = await SP.getBoolean(Const.RENEW_APP);
+    if(state == null) {
+      await setRenewValue(true);
+      renew_value.value = true;
+    }else{
+      renew_value.value = state;
+    }
+
+    return renew_value.value;
   }
 
 

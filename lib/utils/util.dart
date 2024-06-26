@@ -90,6 +90,7 @@ class Util {
   }
 
   static snackbar(BuildContext context, String msg){
+    final controller = Get.find<App>();
     return ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           duration: const Duration(milliseconds: 1500),
@@ -105,7 +106,7 @@ class Util {
             top: CustomStyle.getHeight(14.0),
             bottom: CustomStyle.getHeight(14.0),
           ),
-          backgroundColor: main_color,
+          backgroundColor: controller.renew_value == "Y" ? renew_main_color2 : main_color,
           content: SizedBox(
             child: Text(
               msg,

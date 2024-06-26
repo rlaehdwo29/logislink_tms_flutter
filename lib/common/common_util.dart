@@ -50,46 +50,48 @@ openCommonConfirmBox(BuildContext context, String msg, String cancelTxt,
     context,
     msg,
     Row(
-      children: <Widget>[
-        Expanded(
-          child: InkWell(
-            onTap: cancelEvent,
-            child: Container(
-              padding:
-              EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
-              decoration: BoxDecoration(
-                color: cancel_btn,
-              ),
-              child: Text(
-                cancelTxt,
-                style: CustomStyle.whiteFont(),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: InkWell(
-            onTap: okEvent,
-            child: Container(
-              padding:
-              EdgeInsets.symmetric(vertical: CustomStyle.getHeight(14.0)),
-              decoration: BoxDecoration(
-                color: main_color,
-              ),
-              child: Text(
-                okTxt,
-                style: CustomStyle.whiteFont(),
-                textAlign: TextAlign.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          InkWell(
+              onTap: cancelEvent,
+              child: Container(
+                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.3,
+                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(8.0)),
+                decoration: const BoxDecoration(
+                  color: light_gray1,
+                  borderRadius: BorderRadius.all(Radius.circular(5))
+                ),
+                child: Text(
+                  cancelTxt,
+                  style: CustomStyle.blackFont(),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
-          ),
-        )
-      ],
+            Container(
+              width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.05,
+            ),
+            InkWell(
+              onTap: okEvent,
+              child: Container(
+                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.3,
+                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(8.0)),
+                decoration: const BoxDecoration(
+                  color: renew_main_color2,
+                  borderRadius: BorderRadius.all(Radius.circular(5))
+                ),
+                child: Text(
+                  okTxt,
+                  style: CustomStyle.whiteFont(),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+        ],
     ),
   );
 }
-
 
 openDialogBox(BuildContext context, String msg, Widget button) {
   return showDialog(
@@ -100,16 +102,21 @@ openDialogBox(BuildContext context, String msg, Widget button) {
           onWillPop: () async => false,
           child: AlertDialog(
               shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(0.0))
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))
               ),
-            insetPadding: EdgeInsets.all(CustomStyle.getHeight(10.0)),
-            contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+            contentPadding: EdgeInsets.all(CustomStyle.getWidth(15.0)),
             content: SingleChildScrollView(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(CustomStyle.getWidth(30.0)),
+                  const Icon(
+                      Icons.info,
+                      size: 48,
+                      color: Color(0xffC7CBDE)
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal: CustomStyle.getWidth(10)),
+                    margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
                     child: RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
