@@ -283,7 +283,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
             call24Charge: order.call24Charge,
             manCharge: order.manCharge,
             oneCharge: order.oneCharge
-        );;
+        );
       }else{
         mData.value = OrderModel();
       }
@@ -339,6 +339,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       await getOrderOption();
     }
     etBuyChargeController.text = mData.value.buyCharge??"0";
+    etOtherAddMemoController.text = mData.value.driverMemo??"";
     await setTotal();
   }
 
@@ -401,7 +402,6 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
   }
 
   Future<void> setTransType() async {
-    print("setTransType => ${transType.value}");
     switch(transType.value) {
       case TRANS_TYPE_01 :
         // 운송사
@@ -477,6 +477,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       if (results["code"] == 200) {
         if(results["cust"] != null) {
           await setCustomer(results["cust"]);
+          setState(() {});
         }
       }
     }
@@ -492,8 +493,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
        if(results["custUser"] != null) {
-         await setCustUser(results["custUser"]);
-         setState(() {});
+           await setCustUser(results["custUser"]);
+           setState(() {});
        }
       }
     }
@@ -800,7 +801,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       await DioService.dioClient(header: true).orderAlloc(
           user.authorization,
           mData.value.orderId,
-          user.custId, user.deptId, user.userId, user.mobile,
+          mData.value.custId, mData.value.deptId, user.userId, user.mobile,
           "", "", "", "", mData.value.buyCharge, mData.value.buyFee,
           mData.value.vehicId, mData.value.driverId, mData.value.carNum, mData.value.carTonCode,
           mData.value.carTypeCode,mData.value.driverName,mData.value.driverTel,mData.value.driverMemo,

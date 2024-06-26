@@ -879,7 +879,7 @@ Future<void> getCustUser() async {
           appBar: AppBar(
                 title: Text(
                     Strings.of(context)?.get("order_request_info_title")??"Not Found",
-                    style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                    style: CustomStyle.appBarTitleFont(styleFontSize16,styleBlackCol1)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -889,7 +889,7 @@ Future<void> getCustUser() async {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(

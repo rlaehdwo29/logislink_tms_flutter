@@ -213,7 +213,7 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
             if(mList.length > 0) mList.clear();
             if(list.length > 0) {
               List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
-              mList.value.addAll(itemsList);
+              mList.addAll(itemsList);
             }
           }else{
             mList.value = List.empty(growable: true);
