@@ -111,7 +111,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
   Future<void> getAddr() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).getAddr(user.authorization, "").then((it) async {
+    await DioService.dioClient(header: true).getAddr(user.authorization, search_text.value).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
         logger.d("getAddr() _response -> ${_response.status} // ${_response
