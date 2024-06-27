@@ -16,10 +16,12 @@ import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_confirm_
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_reg_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_confirm_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
+import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 
 class OrderAddrPage extends StatefulWidget {
 
@@ -68,15 +70,15 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
   }
 
   Future<void> initView() async {
-    await getAddr();
+
   }
 
   Future<void> setOptionAddr() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).setOptionAddr(user.authorization, "Y",
-    mData.value.sComName, mData.value.sSido, mData.value.sGungu, mData.value.sDong, mData.value.sAddr,mData.value.sAddrDetail,
-    mData.value.sStaff,mData.value.sTel, mData.value.sMemo, mData.value.sLat, mData.value.sLon).then((it) async {
+        mData.value.sComName, mData.value.sSido, mData.value.sGungu, mData.value.sDong, mData.value.sAddr,mData.value.sAddrDetail,
+        mData.value.sStaff,mData.value.sTel, mData.value.sMemo, mData.value.sLat, mData.value.sLon).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
         logger.d("setOptionAddr() _response -> ${_response.status} // ${_response
@@ -114,8 +116,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
     await DioService.dioClient(header: true).getAddr(user.authorization, search_text.value).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
-        logger.d("getAddr() _response -> ${_response.status} // ${_response
-            .resultMap}");
+        logger.d("getAddr() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             if (_response.resultMap?["data"] != null) {
@@ -163,19 +164,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                 keyboardType: TextInputType.text,
                 onChanged: (value) async {
                   search_text.value = value;
-                  if(size != 0) {
-                    if(search_text.value.length == 0) {
-                        mList.value.addAll(tempList.value);
-                    }else {
-                      for (var data in tempList) {
-                        String name = data.addrName;
-                        if (name.toLowerCase().contains(search_text.toLowerCase())) {
-                          mList.add(data);
-                        }
-                      }
-                    }
-                  }
-                  await getAddr();
                 },
                 decoration: InputDecoration(
                   counterText: '',
@@ -208,9 +196,9 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
 
   Widget selfInputWidget() {
     return InkWell(
-      onTap: () async {
-        await goToAddrInput();
-      },
+        onTap: () async {
+          await goToAddrInput();
+        },
         child: Container(
             padding: EdgeInsets.symmetric(
                 vertical: CustomStyle.getHeight(5.h),
@@ -226,11 +214,49 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                   Text(
                     "직접입력",
                     style:
-                        CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                    CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
                   Icon(Icons.keyboard_arrow_right,
                       size: 24.h, color: text_color_03)
                 ])));
+  }
+
+  Widget addrItemFuture() {
+    final orderService = Provider.of<OrderService>(context);
+    return FutureBuilder(
+        future: orderService.getAddr(
+            context,
+            search_text.value
+        ),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState != ConnectionState.done) {
+            return Expanded(child: Container(
+                alignment: Alignment.center,
+                child: const Center(child: CircularProgressIndicator())
+            ));
+          }else {
+            if (snapshot.hasData) {
+              if (mList.isNotEmpty) mList.clear();
+              mList.addAll(snapshot.data);
+              return searchListWidget();
+            } else if (snapshot.hasError) {
+              return Container(
+                padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
+                alignment: Alignment.center,
+                child: Text(
+                    "${Strings.of(context)?.get("empty_list")}",
+                    style: CustomStyle.baseFont()),
+              );
+            }
+          }
+          return Container(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              backgroundColor: styleGreyCol1,
+            ),
+          );
+        }
+    );
   }
 
   Widget searchListWidget(){
@@ -259,32 +285,32 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
   }
 
   Future<void> confirmStopPoint(AddrModel addr) async {
-      StopPointModel data = StopPointModel();
-      data.eComName = addr.addrName;
-      data.eAddr = addr.addr;
-      data.eAddrDetail = addr.addrDetail;
-      data.eStaff = addr.staffName;
-      data.eTel = addr.staffTel;
-      data.eLat = double.parse(addr.lat??"0");
-      data.eLon = double.parse(addr.lon??"0");
+    StopPointModel data = StopPointModel();
+    data.eComName = addr.addrName;
+    data.eAddr = addr.addr;
+    data.eAddrDetail = addr.addrDetail;
+    data.eStaff = addr.staffName;
+    data.eTel = addr.staffTel;
+    data.eLat = double.parse(addr.lat??"0");
+    data.eLon = double.parse(addr.lon??"0");
 
-      Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointConfirmPage(result_work_stopPoint:data,code:"confirm")));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointConfirmPage(result_work_stopPoint:data,code:"confirm")));
 
-      if(results != null && results.containsKey("code")){
-        if(results["code"] == 200) {
-          print("confirmStopPoint() -> ${results[Const.RESULT_WORK_STOP_POINT]}");
-          if(results[Const.RESULT_WORK_STOP_POINT] != null) {
-            List<StopPointModel>? dataList = mData.value.orderStopList??List.empty(growable: true);
-            if(dataList?.length == 0) {
-              dataList = List.empty(growable: true);
-            }
-            StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
-            dataList?.add(data);
-            mData.value.orderStopList = dataList;
-            Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+        print("confirmStopPoint() -> ${results[Const.RESULT_WORK_STOP_POINT]}");
+        if(results[Const.RESULT_WORK_STOP_POINT] != null) {
+          List<StopPointModel>? dataList = mData.value.orderStopList??List.empty(growable: true);
+          if(dataList?.length == 0) {
+            dataList = List.empty(growable: true);
           }
+          StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
+          dataList?.add(data);
+          mData.value.orderStopList = dataList;
+          Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
         }
       }
+    }
 
   }
 
@@ -356,14 +382,14 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
               mData.value.eLon = double.parse(addr.lon??"0.0");
               work_state = Const.RESULT_WORK_EADDR;
             }else{
-                List<StopPointModel>? dataList = mData.value.orderStopList;
-                if(dataList == null) {
-                  dataList = List.empty(growable: true);
-                }
-                StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
-                dataList.add(data);
-                mData.value.orderStopList = dataList;
-                work_state = Const.RESULT_WORK_STOP_POINT;
+              List<StopPointModel>? dataList = mData.value.orderStopList;
+              if(dataList == null) {
+                dataList = List.empty(growable: true);
+              }
+              StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
+              dataList.add(data);
+              mData.value.orderStopList = dataList;
+              work_state = Const.RESULT_WORK_STOP_POINT;
             }
             Navigator.of(context).pop({'code':200,Const.RESULT_WORK:work_state, Const.ORDER_VO:mData.value});
           }
@@ -436,14 +462,14 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                         children: [
                           Flexible(
                               child: RichText(
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
-                            text: TextSpan(
-                              text: item.addrName ?? "",
-                              style: CustomStyle.CustomFont(
-                                  styleFontSize14, text_color_01),
-                            ),
-                          )),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                text: TextSpan(
+                                  text: item.addrName ?? "",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize14, text_color_01),
+                                ),
+                              )),
                           Flexible(
                               child: Container(
                                   padding: EdgeInsets.only(
@@ -469,8 +495,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
         print("goToAddrReg() -> ${results[Const.RESULT_WORK]}");
-        //await addStopPointResult(results);
-        await getAddr();
         setState(() {});
       }
     }
@@ -488,27 +512,27 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
-                title: Obx(() {
-                  return Text(
-                      mTitle.value,
-                      style: CustomStyle.appBarTitleFont(
-                          styleFontSize16, styleWhiteCol)
-                  );
-                }),
-                toolbarHeight: 50.h,
-                centerTitle: true,
-                automaticallyImplyLeading: false,
-                leading: IconButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop({'code':100});
-                  },
-                  color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
-                ),
-              ),
+            title: Obx(() {
+              return Text(
+                  mTitle.value,
+                  style: CustomStyle.appBarTitleFont(
+                      styleFontSize16, styleWhiteCol)
+              );
+            }),
+            toolbarHeight: 50.h,
+            centerTitle: true,
+            automaticallyImplyLeading: false,
+            leading: IconButton(
+              onPressed: () async {
+                Navigator.of(context).pop({'code':100});
+              },
+              color: styleWhiteCol,
+              icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
+            ),
+          ),
           body: SafeArea(
               child: Obx((){
-                 return SizedBox(
+                return SizedBox(
                     child: Stack(
                       children: [
                         Column(
@@ -517,7 +541,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                           children: [
                             searchBoxWidget(),
                             selfInputWidget(),
-                            searchListWidget()
+                            addrItemFuture()
                           ],
                         ),
                         Positioned(

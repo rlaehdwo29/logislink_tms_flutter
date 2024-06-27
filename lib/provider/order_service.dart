@@ -4,6 +4,7 @@ import 'package:logger/logger.dart';
 import 'package:dio/dio.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/model/addr_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
@@ -22,6 +23,7 @@ class OrderService with ChangeNotifier {
   List<StopPointModel> stopPointList = List.empty(growable: true);
   List<OrderModel> historyList = List.empty(growable: true);
   final orderLinkList = List.empty(growable: true).obs;
+  final addrList = List.empty(growable: true).obs;
 
   OrderService() {
     orderList.value = List.empty(growable: true);
@@ -29,6 +31,7 @@ class OrderService with ChangeNotifier {
     stopPointList = List.empty(growable: true);
     historyList = List.empty(growable: true);
     orderLinkList.value = List.empty(growable: true);
+    addrList.value = List.empty(growable: true);
   }
 
   void init() {
@@ -37,6 +40,7 @@ class OrderService with ChangeNotifier {
     stopPointList = List.empty(growable: true);
     historyList = List.empty(growable: true);
     orderLinkList.value = List.empty(growable: true);
+    addrList.value = List.empty(growable: true);
   }
 
   Future getStopPoint(BuildContext? context, String? orderId) async {
@@ -88,7 +92,7 @@ class OrderService with ChangeNotifier {
       //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       if(_response.status == "200") {
         if(_response.resultMap?["result"] == true) {
-           if(_response.resultMap?["api24Data"] != null) api24Data = _response.resultMap?["api24Data"];
+          if(_response.resultMap?["api24Data"] != null) api24Data = _response.resultMap?["api24Data"];
           if (_response.resultMap?["data"] != null) {
             try {
               var list = _response.resultMap?["data"] as List;
@@ -146,19 +150,19 @@ class OrderService with ChangeNotifier {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             if(_response.resultMap?["rpa"] != null) rpa = UserRpaModel(
-              link24Id: _response.resultMap?["rpa"]["link24Id"],
-              link24Pass: _response.resultMap?["rpa"]["link24Pass"],
-              man24Id: _response.resultMap?["rpa"]["man24Id"],
-              man24Pass: _response.resultMap?["rpa"]["man24Pass"],
-              one24Id: _response.resultMap?["rpa"]["one24Id"],
-              one24Pass: _response.resultMap?["rpa"]["one24Pass"]
+                link24Id: _response.resultMap?["rpa"]["link24Id"],
+                link24Pass: _response.resultMap?["rpa"]["link24Pass"],
+                man24Id: _response.resultMap?["rpa"]["man24Id"],
+                man24Pass: _response.resultMap?["rpa"]["man24Pass"],
+                one24Id: _response.resultMap?["rpa"]["one24Id"],
+                one24Pass: _response.resultMap?["rpa"]["one24Pass"]
             );
             if (_response.resultMap?["data"] != null) {
               var mList = _response.resultMap?["data"] as List;
               if(orderLinkList.length > 0) orderLinkList.clear();
               if(mList.length > 0) {
-                  List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
-                  orderLinkList.addAll(itemsList);
+                List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
+                orderLinkList.addAll(itemsList);
               }
             }
           } else {
@@ -264,5 +268,44 @@ class OrderService with ChangeNotifier {
     Map<String,dynamic> maps = {"total":totalPage,"list":orderRecentList};
     return maps;
   }
+
+  Future getAddr(context, String? search_text) async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    addrList.value = List.empty(growable: true);
+    await DioService.dioClient(header: true).getAddr(user.authorization, search_text).then((it) async {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getAddr() _response -> ${_response.status} // ${_response.resultMap}");
+      if(_response.status == "200") {
+        if(_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["data"] != null) {
+            var list = _response.resultMap?["data"] as List;
+            if (list.length > 0) {
+              List<AddrModel> itemsList = list.map((i) => AddrModel.fromJSON(i)).toList();
+              if(addrList.length > 0) addrList.clear();
+              addrList.addAll(itemsList);
+            }
+          } else {
+            addrList.value = List.empty(growable: true);
+          }
+        }else{
+          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+        }
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getAddr() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getAddr() getOrder Default => ");
+          break;
+      }
+    });
+    return addrList;
+  }
+
 
 }
