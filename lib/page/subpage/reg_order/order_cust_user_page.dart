@@ -173,7 +173,16 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
             if(mList.length > 0) mList.clear();
             if(list.length > 0) {
               List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
-              mList.value.addAll(itemsList);
+              if(search_text.value.length == 0 ){
+                mList.addAll(itemsList);
+              } else {
+                for(CustUserModel user in itemsList) {
+                  String name = user.userName??"";
+                  if(name.toLowerCase().contains(search_text.value.toLowerCase())) {
+                    mList.add(user);
+                  }
+                }
+              }
             }
           }else{
             mList.value = List.empty(growable: true);
@@ -213,7 +222,16 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
             if(mList.length > 0) mList.clear();
             if(list.length > 0) {
               List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
-              mList.addAll(itemsList);
+              if(search_text.value.length == 0 ){
+                mList.addAll(itemsList);
+              } else {
+                for(CustUserModel user in itemsList) {
+                  String name = user.userName??"";
+                  if(name.toLowerCase().contains(search_text.value.toLowerCase())) {
+                    mList.add(user);
+                  }
+                }
+              }
             }
           }else{
             mList.value = List.empty(growable: true);
