@@ -16,10 +16,12 @@ import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_confirm_
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_reg_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_confirm_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
+import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 
 class OrderAddrPage extends StatefulWidget {
 
@@ -68,7 +70,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
   }
 
   Future<void> initView() async {
-    await getAddr();
+
   }
 
   Future<void> setOptionAddr() async {
@@ -114,8 +116,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
     await DioService.dioClient(header: true).getAddr(user.authorization, search_text.value).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
-        logger.d("getAddr() _response -> ${_response.status} // ${_response
-            .resultMap}");
+        logger.d("getAddr() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             if (_response.resultMap?["data"] != null) {
@@ -163,19 +164,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                 keyboardType: TextInputType.text,
                 onChanged: (value) async {
                   search_text.value = value;
-                  if(size != 0) {
-                    if(search_text.value.length == 0) {
-                        mList.value.addAll(tempList.value);
-                    }else {
-                      for (var data in tempList) {
-                        String name = data.addrName;
-                        if (name.toLowerCase().contains(search_text.toLowerCase())) {
-                          mList.add(data);
-                        }
-                      }
-                    }
-                  }
-                  await getAddr();
                 },
                 decoration: InputDecoration(
                   counterText: '',
@@ -231,6 +219,44 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                   Icon(Icons.keyboard_arrow_right,
                       size: 24.h, color: text_color_03)
                 ])));
+  }
+
+  Widget addrItemFuture() {
+    final orderService = Provider.of<OrderService>(context);
+    return FutureBuilder(
+        future: orderService.getAddr(
+           context,
+           search_text.value
+        ),
+        builder: (context, snapshot) {
+          if(snapshot.connectionState != ConnectionState.done) {
+            return Expanded(child: Container(
+                alignment: Alignment.center,
+                child: const Center(child: CircularProgressIndicator())
+            ));
+          }else {
+            if (snapshot.hasData) {
+              if (mList.isNotEmpty) mList.clear();
+              mList.addAll(snapshot.data);
+              return searchListWidget();
+            } else if (snapshot.hasError) {
+              return Container(
+                padding: EdgeInsets.only(top: CustomStyle.getHeight(40.0)),
+                alignment: Alignment.center,
+                child: Text(
+                    "${Strings.of(context)?.get("empty_list")}",
+                    style: CustomStyle.baseFont()),
+              );
+            }
+          }
+          return Container(
+            alignment: Alignment.center,
+            child: CircularProgressIndicator(
+              backgroundColor: styleGreyCol1,
+            ),
+          );
+        }
+    );
   }
 
   Widget searchListWidget(){
@@ -469,8 +495,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
         print("goToAddrReg() -> ${results[Const.RESULT_WORK]}");
-        //await addStopPointResult(results);
-        await getAddr();
         setState(() {});
       }
     }
@@ -517,7 +541,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                           children: [
                             searchBoxWidget(),
                             selfInputWidget(),
-                            searchListWidget()
+                            addrItemFuture()
                           ],
                         ),
                         Positioned(
