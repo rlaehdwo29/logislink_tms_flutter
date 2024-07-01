@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -40,6 +42,7 @@ class RenewOrderTransInfoPage extends StatefulWidget {
 
 class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with TickerProviderStateMixin {
 
+  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter( locale: 'ko', decimalDigits: 0, symbol: '￦',);
   ProgressDialog? pr;
 
   final code = "".obs;
@@ -53,7 +56,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   late TabController _tabController;
 
   final mData = OrderModel().obs;
-  final mTempData = OrderModel().obs;
   final mOrderOption = OrderModel().obs;
   final userInfo = UserModel().obs;
   final mCustData = CustomerModel().obs;
@@ -92,14 +94,23 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
   //추가 운임 EditText
   late TextEditingController etWayPointController;
+  final wayPointChecked = false.obs;
   late TextEditingController etWayPointMemoController;
+
   late TextEditingController etStayChargeController;
+  final stayChargeChecked = false.obs;
   late TextEditingController etStayChargeMemoController;
+
   late TextEditingController etHandWorkChargeController;
+  final handWorkChecked = false.obs;
   late TextEditingController ethandWorkMemoController;
+
   late TextEditingController etRoundChargeController;
+  final roundChargeChecked = false.obs;
   late TextEditingController etRoundMemoController;
+
   late TextEditingController etOtherAddChargeController;
+  final otherAddChargeChecked = false.obs;
   late TextEditingController etOtherAddMemoController;
 
   @override
@@ -119,193 +130,22 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     etKeeperController = TextEditingController();
     etCarNumController = TextEditingController();
 
-    //추가 운임 EditText
-    etWayPointController = TextEditingController();
-    etWayPointMemoController = TextEditingController();
-    etStayChargeController = TextEditingController();
-    etStayChargeMemoController = TextEditingController();
-    etHandWorkChargeController = TextEditingController();
-    ethandWorkMemoController = TextEditingController();
-    etRoundChargeController = TextEditingController();
-    etRoundMemoController = TextEditingController();
-    etOtherAddChargeController = TextEditingController();
-    etOtherAddMemoController = TextEditingController();
-
-
     Future.delayed(Duration.zero, () async {
 
       userInfo.value = await controller.getUserInfo();
       if(widget.order_vo != null) {
         var order = widget.order_vo;
-        mData.value = OrderModel(
-            orderId: order.orderId,
-            reqCustId: order.reqCustId,
-            reqCustName: order.reqCustName,
-            reqDeptId: order.reqDeptId,
-            reqDeptName: order.reqDeptName,
-            reqStaff: order.reqStaff,
-            reqTel: order.reqTel,
-            reqAddr: order.reqAddr,
-            reqAddrDetail: order.reqAddrDetail,
-            custId: order.custId,
-            custName: order.custName,
-            deptId: order.deptId,
-            deptName: order.deptName,
-            inOutSctn: order.inOutSctn,
-            inOutSctnName: order.inOutSctnName,
-            truckTypeCode: order.truckTypeCode,
-            truckTypeName: order.truckTypeName,
-            sComName: order.sComName,
-            sSido: order.sSido,
-            sGungu: order.sGungu,
-            sDong: order.sDong,
-            sAddr: order.sAddr,
-            sAddrDetail: order.sAddrDetail,
-            sDate: order.sDate,
-            sStaff: order.sStaff,
-            sTel: order.sTel,
-            sMemo: order.sMemo,
-            eComName: order.eComName,
-            eSido: order.eSido,
-            eGungu: order.eGungu,
-            eDong: order.eDong,
-            eAddr: order.eAddr,
-            eAddrDetail: order.eAddrDetail,
-            eDate: order.eDate,
-            eStaff: order.eStaff,
-            eTel: order.eTel,
-            eMemo: order.eMemo,
-            sLat: order.sLat,
-            sLon: order.sLon,
-            eLat: order.eLat,
-            eLon: order.eLon,
-            goodsName: order.goodsName,
-            goodsWeight: order.goodsWeight,
-            weightUnitCode: order.weightUnitCode,
-            weightUnitName: order.weightUnitName,
-            goodsQty: order.goodsQty,
-            qtyUnitCode: order.qtyUnitCode,
-            qtyUnitName: order.qtyUnitName,
-            sWayCode: order.sWayCode,
-            sWayName: order.sWayName,
-            eWayCode: order.eWayCode,
-            eWayName: order.eWayName,
-            mixYn: order.mixYn,
-            mixSize: order.mixSize,
-            returnYn: order.returnYn,
-            carTonCode: order.carTonCode,
-            carTonName: order.carTonName,
-            carTypeCode: order.carTypeCode,
-            carTypeName: order.carTypeName,
-            chargeType: order.chargeType,
-            chargeTypeName: order.chargeTypeName,
-            distance: order.distance,
-            time: order.time,
-            reqMemo: order.reqMemo,
-            driverMemo: order.driverMemo,
-            itemCode: order.itemCode,
-            itemName: order.itemName,
-            orderState: order.orderState,
-            orderStateName: order.orderStateName,
-            regid: order.regid,
-            regdate: order.regdate,
-            stopCount: order.stopCount,
-            sellAllocId: order.sellAllocId,
-            sellCustId: order.sellCustId,
-            sellDeptId: order.sellDeptId,
-            sellStaff: order.sellStaff,
-            sellStaffName: order.sellStaffName,
-            sellStaffTel: order.sellStaffTel,
-            sellCustName: order.sellCustName,
-            sellDeptName: order.sellDeptName,
-            sellCharge: order.sellCharge,
-            sellFee: order.sellFee,
-            sellWeight: order.sellWeight,
-            sellWayPointMemo: order.sellWayPointMemo,
-            sellWayPointCharge: order.sellWayPointCharge,
-            sellStayMemo: order.sellStayMemo,
-            sellStayCharge: order.sellStayCharge,
-            sellHandWorkMemo: order.sellHandWorkMemo,
-            sellHandWorkCharge: order.sellHandWorkCharge,
-            sellRoundMemo: order.sellRoundMemo,
-            sellRoundCharge: order.sellRoundCharge,
-            sellOtherAddMemo: order.sellOtherAddMemo,
-            sellOtherAddCharge: order.sellOtherAddCharge,
-            custPayType: order.custPayType,
-            allocId: order.allocId,
-            allocState: order.allocState,
-            allocStateName: order.allocStateName,
-            buyCustId: order.buyCustId,
-            buyDeptId: order.buyDeptId,
-            buyCustName: order.buyCustName,
-            buyDeptName: order.buyDeptName,
-            buyStaff: order.buyStaff,
-            buyStaffName: order.buyStaffName,
-            buyStaffTel: order.buyStaffTel,
-            buyCharge: order.buyCharge,
-            buyFee: order.buyFee,
-            allocDate: order.allocDate,
-            driverState: order.driverState,
-            vehicId: order.vehicId,
-            driverId: order.driverId,
-            carNum: order.carNum,
-            driverName: order.driverName,
-            driverTel: order.driverTel,
-            driverStateName: order.driverStateName,
-            carMngName: order.carMngName,
-            carMngMemo: order.carMngMemo,
-            receiptYn: order.receiptYn,
-            receiptPath: order.receiptPath,
-            receiptDate: order.receiptDate,
-            charge: order.charge,
-            startDate: order.startDate,
-            finishDate: order.finishDate,
-            enterDate: order.enterDate,
-            payDate: order.payDate,
-            linkCode: order.linkCode,
-            linkCodeName: order.linkCodeName,
-            linkType: order.linkType,
-            buyLinkYn: order.buyLinkYn,
-            linkName: order.linkName,
-            wayPointMemo: order.wayPointMemo,
-            wayPointCharge: order.wayPointCharge,
-            stayMemo: order.stayMemo,
-            stayCharge: order.stayCharge,
-            handWorkMemo: order.handWorkMemo,
-            handWorkCharge: order.handWorkCharge,
-            roundMemo: order.roundMemo,
-            roundCharge: order.roundCharge,
-            otherAddMemo: order.otherAddMemo,
-            otherAddCharge: order.otherAddCharge,
-            unitPrice: order.unitPrice,
-            unitPriceType: order.unitPriceType,
-            unitPriceTypeName: order.unitPriceTypeName,
-            custMngName: order.custMngName,
-            custMngMemo: order.custMngMemo,
-            payType: order.payType,
-            reqPayYN: order.reqPayYN,
-            reqPayDate: order.reqPayDate,
-            talkYn: order.talkYn,
-            orderStopList: order.orderStopList,
-            reqStaffName: order.reqStaffName,
-            call24Cargo: order.call24Cargo,
-            manCargo: order.manCargo,
-            oneCargo: order.oneCargo,
-            call24Charge: order.call24Charge,
-            manCharge: order.manCharge,
-            oneCharge: order.oneCharge
-        );
+        mData.value = OrderModel.fromJSON(order.toMap());
       }else{
         mData.value = OrderModel();
       }
-      mTempData.value = OrderModel.fromJSON(mData.value.toMap());
       if(widget.code != null) {
         code.value = widget.code!;
       }
       mCustData.value = CustomerModel();
 
-      orderCarTonCode.value = mTempData.value.carTonCode??"";
-      orderCarTypeCode.value = mTempData.value.carTypeCode??"";
+      orderCarTonCode.value = mData.value.carTonCode??"";
+      orderCarTypeCode.value = mData.value.carTypeCode??"";
       orderBuyCharge.value = "";
 
       await initView();
@@ -369,9 +209,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               ]
                           ),
                           Text(
-                            mTempData.value.buyCustName?.isEmpty == true || mTempData.value.buyCustName == null ?
-                            Strings.of(context)?.get("order_trans_info_cust_hint")??"운송사를 지정해 주세요._" : mTempData.value.buyCustName!,
-                            style: CustomStyle.CustomFont(styleFontSize14,  mTempData.value.buyCustName?.isEmpty == true || mTempData.value.buyCustName == null ? styleDefaultGrey : text_color_01),
+                            mData.value.buyCustName?.isEmpty == true || mData.value.buyCustName == null ?
+                            Strings.of(context)?.get("order_trans_info_cust_hint")??"운송사를 지정해 주세요._" : mData.value.buyCustName!,
+                            style: CustomStyle.CustomFont(styleFontSize14,  mData.value.buyCustName?.isEmpty == true || mData.value.buyCustName == null ? styleDefaultGrey : text_color_01),
                           ),
                         ],
                       )
@@ -413,8 +253,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                             ]
                         ),
                         Text(
-                          mTempData.value.buyStaffName == null || mTempData.value.buyStaffName?.isNotEmpty == true ? "담당자를 선택해주세요.":  mTempData.value.buyStaffName??"",
-                          style: CustomStyle.CustomFont(styleFontSize14,  mTempData.value.buyStaffName == null || mTempData.value.buyStaffName?.isNotEmpty == true ? styleDefaultGrey : text_color_01),
+                          mData.value.buyStaffName == null || mData.value.buyStaffName?.isNotEmpty == true ? "담당자를 선택해주세요.":  mData.value.buyStaffName??"",
+                          style: CustomStyle.CustomFont(styleFontSize14,  mData.value.buyStaffName == null || mData.value.buyStaffName?.isNotEmpty == true ? styleDefaultGrey : text_color_01),
                         ),
                       ],
                     )
@@ -452,7 +292,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                           ]
                       ),
                       Text(
-                        Util.makePhoneNumber(mTempData.value.buyStaffTel),
+                        Util.makePhoneNumber(mData.value.buyStaffTel),
                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                     ],
@@ -462,7 +302,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
               // 지불운임
               InkWell(
                 onTap: () async {
-                  await openRpaModiDialog(context,mTempData.value);
+                  await openRpaModiDialog(context);
                 },
                 child: Container(
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(10)),
@@ -493,9 +333,11 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               )
                             ]
                         ),
-                        Text(
-                          "${Util.getInCodeCommaWon(mTempData.value.buyCharge??"0")}   원",
-                          style: CustomStyle.CustomFont(styleFontSize14, text_color_01, font_weight: FontWeight.w700),
+                        Obx(() =>
+                          Text(
+                            "${Util.getInCodeCommaWon(mData.value.buyCharge??"0")}   원",
+                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01, font_weight: FontWeight.w700),
+                          )
                         )
                       ],
                     )
@@ -539,7 +381,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                     ],
                   )
               ),
-              !isOption.value ? transInfoPannelWidget(mTempData.value) : const SizedBox(),
+              !isOption.value ? transInfoPannelWidget(mData.value) : const SizedBox(),
               etcPannelWidget()
         ]
       )
@@ -588,9 +430,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                     ]
                   ),
                   Text(
-                    mTempData.value.carNum?.isEmpty == true || mTempData.value.carNum == null ?
-                    Strings.of(context)?.get("order_trans_info_driver_hint")??"차량을 지정해 주세요._": mTempData.value.carNum!,
-                    style: CustomStyle.CustomFont(styleFontSize14,  mTempData.value.carNum?.isEmpty == true || mTempData.value.carNum == null ? styleDefaultGrey : text_color_01),
+                    mData.value.carNum?.isEmpty == true || mData.value.carNum == null ?
+                    Strings.of(context)?.get("order_trans_info_driver_hint")??"차량을 지정해 주세요._": mData.value.carNum!,
+                    style: CustomStyle.CustomFont(styleFontSize14,  mData.value.carNum?.isEmpty == true || mData.value.carNum == null ? styleDefaultGrey : text_color_01),
                   ),
                 ],
               )
@@ -628,7 +470,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                       ]
                   ),
                   Text(
-                    mTempData.value.driverName??"",
+                    mData.value.driverName??"",
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
                 ],
@@ -666,7 +508,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                       ]
                   ),
                   Text(
-                    Util.makePhoneNumber(mTempData.value.driverTel),
+                    Util.makePhoneNumber(mData.value.driverTel),
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
                 ],
@@ -704,7 +546,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                       ]
                   ),
                   Text(
-                    mTempData.value.carTypeName??"",
+                    mData.value.carTypeName??"",
                     style: CustomStyle.CustomFont(styleFontSize14,  text_color_01),
                   ),
                 ],
@@ -742,7 +584,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                       ]
                   ),
                   Text(
-                    mTempData.value.carTonName??"",
+                    mData.value.carTonName??"",
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   ),
                 ],
@@ -750,41 +592,48 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
           ),
 
           // 지불운임
-          Container(
-              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(10)),
-              margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color:Colors.white,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/image/ic_trans_pay.png",
-                          width: CustomStyle.getWidth(17.0),
-                          height: CustomStyle.getHeight(17.0),
-                        ),
-                        Container(
-                            margin: EdgeInsets.only(left: CustomStyle.getWidth(5)),
-                            child: Text(
-                                Strings.of(context)?.get("order_trans_info_charge")??"지불운임_",
-                                style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500)
-                            )
-                        )
-                      ]
-                  ),
-                  Text(
-                    "${Util.getInCodeCommaWon(mTempData.value.buyCharge??"0")} 원",
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01, font_weight: FontWeight.w700),
-                  ),
-                ],
-              )
+         InkWell(
+           onTap: () async {
+             await openRpaModiDialog(context);
+           },
+            child: Container(
+                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(10)),
+                margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color:Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/image/ic_trans_pay.png",
+                            width: CustomStyle.getWidth(17.0),
+                            height: CustomStyle.getHeight(17.0),
+                          ),
+                          Container(
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(5)),
+                              child: Text(
+                                  Strings.of(context)?.get("order_trans_info_charge")??"지불운임_",
+                                  style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500)
+                              )
+                          )
+                        ]
+                    ),
+                    Obx(() =>
+                      Text(
+                        "${Util.getInCodeCommaWon(mData.value.buyCharge??"0")} 원",
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01, font_weight: FontWeight.w700),
+                      )
+                    ),
+                  ],
+                )
+            )
           ),
 
           // 빠른지급여부
@@ -849,7 +698,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         Container(
                             margin: EdgeInsets.only(left: CustomStyle.getWidth(5)),
                             child: Text(
-                                Strings.of(context)?.get("order_trans_info_regist")??"빠른지급여부_",
+                                Strings.of(context)?.get("order_trans_info_regist")??"운전자 주민번호_",
                                 style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500)
                             )
                         )
@@ -862,7 +711,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                 ],
               )
           ),
-          !isOption.value ? transInfoPannelWidget(mTempData.value) : const SizedBox(),
+          !isOption.value ? transInfoPannelWidget(mData.value) : const SizedBox(),
           etcPannelWidget()
         ]
       )
@@ -944,740 +793,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     etRoundMemoController.dispose();
     etOtherAddChargeController.dispose();
     etOtherAddMemoController.dispose();
-  }
 
-  Widget mainBodyWidget() {
-
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
-      child: Column(
-        children: [
-          Container(
-              decoration: BoxDecoration(
-                  border: Border(
-                      bottom: BorderSide(
-                          color: line,
-                          width: 1.w
-                      )
-                  )
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                      padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                      child: Text(
-                        Strings.of(context)?.get("order_trans_info_sub_title_01")??"배차_",
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  ),
-                  !isOption.value?
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                          child: Text(
-                            Strings.of(context)?.get("order_trans_info_sub_title_05")??"카카오톡 수신여부_",
-                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                          )
-                      ),
-                      Switch(
-                          value: talkYn.value,
-                          onChanged: (value) {
-                            if (kakaoPushEnable.value) {
-                              setState(() async {
-                                talkYn.value = value;
-                              });
-                            }
-                          }
-                      )
-                    ],
-                  ) : const SizedBox()
-                ],
-              )),
-          !isOption.value?
-          Container(
-              padding: EdgeInsets.only(top: CustomStyle.getHeight(15.h)),
-              child: Row(
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child: InkWell(
-                          onTap: () async {
-                            transType.value = TRANS_TYPE_01;
-                            await setTransType();
-                            etBuyChargeController.text = orderBuyCharge.value;
-                            mTempData.value.buyCharge = orderBuyCharge.value;
-                            await setTotal();
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: tvTransType01.value?text_box_color_01 : text_box_color_02, width: 1.w),
-                              borderRadius: BorderRadius.all(Radius.circular(5.w)),
-                            ),
-                            child: Text(
-                              Strings.of(context)?.get("order_trans_info_type_01")??"운송사_",
-                              textAlign: TextAlign.center,
-                              style: CustomStyle.CustomFont(styleFontSize12, tvTransType01.value?text_box_color_01 : text_box_color_02),
-                            ),
-                          )
-                      )
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: InkWell(
-                          onTap: () async {
-                            transType.value = TRANS_TYPE_02;
-                            await setTransType();
-                            etBuyChargeController.text = orderBuyCharge.value;
-                            mTempData.value.buyCharge = orderBuyCharge.value;
-                            await setTotal();
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: tvTransType02.value?text_box_color_01 : text_box_color_02, width: 1.w),
-                              borderRadius: BorderRadius.all(Radius.circular(5.w)),
-                            ),
-                            child: Text(
-                              Strings.of(context)?.get("order_trans_info_type_02")??"차량_",
-                              textAlign: TextAlign.center,
-                              style: CustomStyle.CustomFont(styleFontSize12, tvTransType02.value?text_box_color_01 : text_box_color_02),
-                            ),
-                          )
-                      )
-                  )
-                ],
-              )) : const SizedBox(),
-          // 운송사(필수)
-          !isOption.value && llTransType01.value ?
-          Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      Strings.of(context)?.get("order_trans_info_cust")??"운송사_",
-                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                    ),
-                    Container(
-                        padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                        child: Text(
-                          Strings.of(context)?.get("essential")??"(필수)_",
-                          style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                        )
-                    )
-                  ],
-                ),
-                InkWell(
-                    onTap: () async {
-                      await goToCustomer();
-                    },
-                    child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
-                        margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                        height: CustomStyle.getHeight(35.h),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: text_box_color_02, width: 1.w),
-                            borderRadius: BorderRadius.all(Radius.circular(5.w))
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              mTempData.value.buyCustName?.isEmpty == true || mTempData.value.buyCustName == null ?
-                              Strings.of(context)?.get("order_trans_info_cust_hint")??"운송사를 지정해 주세요._" : mTempData.value.buyCustName!,
-                              style: CustomStyle.CustomFont(styleFontSize14, mTempData.value.buyCustName?.isEmpty == true || mTempData.value.buyCustName == null ? styleDefaultGrey : text_color_01),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Icon(
-                                Icons.search,
-                                size: 24.h,
-                                color: text_color_03,
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                )
-              ],
-            ),
-          ) : const SizedBox(),
-          // 담당자(필수) / 연락처(필수)
-          !isOption.value && llTransType01.value ?
-          Container(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_company_keeper")??"담당자_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      InkWell(
-                          onTap: () async {
-                            await goToCompanyKeeper();
-                          },
-                          child: Container(
-                              alignment: Alignment.centerLeft,
-                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                              height: CustomStyle.getHeight(35.h),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: text_box_color_02, width: 1.w),
-                                  borderRadius: BorderRadius.all(Radius.circular(5.w))
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    mTempData.value.buyStaffName??"",
-                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                                    child: Icon(
-                                      Icons.search,
-                                      size: 24.h,
-                                      color: text_color_03,
-                                    ),
-                                  )
-                                ],
-                              )
-                          )
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex:1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_company_tel")??"연락처_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
-                          height: CustomStyle.getHeight(35.h),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: text_box_color_02, width: 1.w),
-                              borderRadius: BorderRadius.all(Radius.circular(5.w))
-                          ),
-                          child: Text(
-                            Util.makePhoneNumber(mTempData.value.buyStaffTel),
-                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                          )
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ) : const SizedBox(),
-          // 차량번호(필수)
-          !isOption.value &&llTransType02.value ?
-          Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      Strings.of(context)?.get("order_trans_info_car_num")??"차량번호_",
-                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                    ),
-                    Container(
-                        padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                        child: Text(
-                          Strings.of(context)?.get("essential")??"(필수)_",
-                          style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                        )
-                    )
-                  ],
-                ),
-                InkWell(
-                    onTap: () async {
-                      await goToCarSearch();
-                    },
-                    child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                        margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                        height: CustomStyle.getHeight(35.h),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: text_box_color_02, width: 1.w),
-                            borderRadius: BorderRadius.all(Radius.circular(5.w))
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              mTempData.value.carNum?.isEmpty == true || mTempData.value.carNum == null ?
-                              Strings.of(context)?.get("order_trans_info_driver_hint")??"차량을 지정해 주세요._": mTempData.value.carNum!,
-                              style: CustomStyle.CustomFont(styleFontSize14,  mTempData.value.carNum?.isEmpty == true || mTempData.value.carNum == null ? styleDefaultGrey : text_color_01),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Icon(
-                                Icons.search,
-                                size: 24.h,
-                                color: text_color_03,
-                              ),
-                            )
-                          ],
-                        )
-                    )
-                )
-              ],
-            ),
-          ) : const SizedBox(),
-          // 차주성명(필수) / 연락처(필수)
-          !isOption.value && llTransType02.value ?
-          Container(
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_driver_name")??"차주성명",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
-                        margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                        height: CustomStyle.getHeight(35.h),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: text_box_color_02, width: 1.w),
-                            borderRadius: BorderRadius.all(Radius.circular(5.w))
-                        ),
-                        child: Text(
-                          mTempData.value.driverName??"",
-                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex:1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_driver_tel")??"연락처_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
-                          height: CustomStyle.getHeight(35.h),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: text_box_color_02, width: 1.w),
-                              borderRadius: BorderRadius.all(Radius.circular(5.w))
-                          ),
-                          child: Text(
-                            Util.makePhoneNumber(mTempData.value.driverTel),
-                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                          )
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ) : const SizedBox(),
-          // 차종/ 톤급
-          !isOption.value && llTransType02.value ?
-          Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_car_type_name")??"차종_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                        margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                        height: CustomStyle.getHeight(35.h),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: text_box_color_02, width: 1.w),
-                            borderRadius: BorderRadius.all(Radius.circular(5.w))
-                        ),
-                        child: Text(
-                          mTempData.value.carTypeName??"",
-                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex:1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_car_ton_name")??"톤급_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
-                          height: CustomStyle.getHeight(35.h),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: text_box_color_02, width: 1.w),
-                              borderRadius: BorderRadius.all(Radius.circular(5.w))
-                          ),
-                          child: Text(
-                            Util.makePhoneNumber(mTempData.value.carTonName),
-                            style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                          )
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ) : const SizedBox(),
-          // 지불운임(필수) / 빠른지급여부
-          Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            Strings.of(context)?.get("order_trans_info_charge")??"지불운임_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
-                              child: Text(
-                                Strings.of(context)?.get("essential")??"(필수)_",
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
-                              )
-                          )
-                        ],
-                      ),
-                      Container(
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                          height: CustomStyle.getHeight(34.h),
-                          child: TextField(
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                            textAlign: TextAlign.start,
-                            keyboardType: TextInputType.number,
-                            controller: etBuyChargeController,
-                            maxLines: 1,
-                            decoration: etBuyChargeController.text.isNotEmpty
-                                ? InputDecoration(
-                              counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                              disabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  etBuyChargeController.clear();
-                                  mTempData.value.buyCharge = "0";
-                                },
-                                icon: Icon(
-                                  Icons.clear,
-                                  size: 18.h,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              suffix: Text(
-                                "원",
-                                textAlign: TextAlign.center,
-                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                              ),
-                            )
-                                : InputDecoration(
-                              counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                              disabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                            ),
-                            onChanged: (value) async {
-                              if(value.length > 0) {
-                                etBuyChargeController.text = Util.getInCodeCommaWon(int.parse(value.trim().replaceAll(",", "")).toString());
-                                mTempData.value.buyCharge = etBuyChargeController.text.replaceAll(",", "");
-                              }else{
-                                mTempData.value.buyCharge = "0";
-                                etBuyChargeController.text = "0";
-                              }
-                              await setTotal();
-                            },
-                            maxLength: 50,
-                          )
-                      )
-                    ],
-                  ),
-                ),
-                !isOption.value ?
-                Expanded(
-                  flex:1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                          child: Text(
-                            Strings.of(context)?.get("order_trans_info_pay")??"빠른지급여부_",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                          )
-                      ),
-                      InkWell(
-                          onTap: () async {
-                            await showPayTypeDialog();
-                          },
-                          child: Container(
-                              alignment: Alignment.centerLeft,
-                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(5.w)),
-                              height: CustomStyle.getHeight(35.h),
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: text_box_color_02, width: 1.w),
-                                  borderRadius: BorderRadius.all(Radius.circular(5.w))
-                              ),
-                              child: Text(
-                                tvPayType.value,
-                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                              )
-                          )
-                      )
-                    ],
-                  ),
-                ) : const SizedBox(),
-              ],
-            ),
-          ),
-          // 운전자 주민번호
-          registType.value && !isOption.value?
-          Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        Strings.of(context)?.get("order_trans_info_regist")??"운전자 주민번호_",
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      ),
-                      Container(
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h),right: CustomStyle.getWidth(5.w)),
-                          height: CustomStyle.getHeight(34.h),
-                          child: TextField(
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                            textAlign: TextAlign.start,
-                            keyboardType: TextInputType.number,
-                            controller: etRegistController,
-                            maxLines: 1,
-                            decoration: etRegistController.text.isNotEmpty
-                                ? InputDecoration(
-                              counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                              disabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  etRegistController.clear();
-                                },
-                                icon: Icon(
-                                  Icons.clear,
-                                  size: 18.h,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            )
-                                : InputDecoration(
-                              counterText: '',
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                              disabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                  borderRadius: BorderRadius.circular(5.h)
-                              ),
-                            ),
-                            onChanged: (value){
-                              etRegistController.text = (value != null ?  value?.replaceAllMapped(RegExp(r'(\d{6})(\d{6,7})'), (m) => '${m[1]}-${m[2]}') : "")!;
-                            },
-                            maxLength: 14,
-                          )
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex:1,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "",
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      ),
-                      Text(
-                        Strings.of(context)?.get("order_trans_info_regit_explain")??"*산재보험 적용 시 주민번호 입력_",
-                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                      )
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ) : const SizedBox(),
-        ],
-      ),
-    );
   }
 
   Widget transInfoPannelWidget(OrderModel temp) {
     isTransInfoExpanded.value = List.filled(1, false);
+
     return Flex(
       direction: Axis.vertical,
       children: List.generate(1, (index) {
@@ -1699,7 +820,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                       children: [
                         Text(
                             Strings.of(context)?.get("order_trans_info_sub_title_03")??"추가운임_",
-                            style: CustomStyle.CustomFont(styleFontSize16, text_color_01)
+                            style: CustomStyle.CustomFont(styleFontSize18, text_color_01, font_weight: FontWeight.w700)
                         )
                       ],
                     ));
@@ -1722,81 +843,109 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 Strings.of(context)?.get("order_trans_info_way_point_charge")??"경유비(지불)",
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
-                              Container(
-                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  height: CustomStyle.getHeight(35.h),
-                                  child: TextField(
-                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                    textAlign: TextAlign.start,
-                                    keyboardType: TextInputType.number,
-                                    controller: etWayPointController,
-                                    maxLines: 1,
-                                    decoration: etWayPointController.text.isNotEmpty
-                                        ? InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      suffix: Text(
-                                        "원",
-                                        textAlign: TextAlign.center,
+                              Row(
+                                children : [
+                                  Expanded(
+                                    flex: 4,
+                                  child: Container(
+                                      margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                      height: CustomStyle.getHeight(35.h),
+                                      child: TextField(
+                                        inputFormatters: <TextInputFormatter>[
+                                          CurrencyTextInputFormatter(
+                                            locale: 'ko',
+                                            decimalDigits: 0,
+                                            symbol: '￦',
+                                          ),
+                                        ],
                                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          etWayPointController.clear();
-                                          temp.wayPointCharge = "0";
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          size: 18.h,
-                                          color: Colors.black,
+                                        textAlign: TextAlign.start,
+                                        keyboardType: TextInputType.number,
+                                        controller: etWayPointController,
+                                        maxLines: 1,
+                                        decoration: etWayPointController.text.isNotEmpty
+                                            ? InputDecoration(
+                                          counterText: '',
+                                          contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                          enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                          ),
+                                          disabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                          ),
+                                          focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                          ),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              etWayPointController.clear();
+                                              temp.wayPointCharge = "0";
+                                            },
+                                            icon: Icon(
+                                              Icons.clear,
+                                              size: 18.h,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        )
+                                            : InputDecoration(
+                                            counterText: '',
+                                            contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                            hintText: Strings.of(context)?.get("order_trans_info_way_point_charge_hint")??"경유비를 입력해주세요._",
+                                            hintStyle: CustomStyle.greyDefFont(),
+                                            enabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                            ),
+                                            disabledBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                                borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                            )
                                         ),
-                                      ),
+                                        onChanged: (value) async {
+                                          if(value.length > 0) {
+                                            temp.wayPointCharge = int.parse(value.trim()).toString();
+                                            etWayPointController.text = _formatter.format(int.parse(value.trim()).toString());
+                                          }else{
+                                            temp.wayPointCharge = "0";
+                                            etWayPointController.text = "0";
+                                          }
+                                          await setTotal();
+                                        },
+                                        maxLength: 50,
+                                      )
                                     )
-                                        : InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      hintText: Strings.of(context)?.get("order_trans_info_way_point_charge_hint")??"경유비를 입력해주세요._",
-                                      hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                    ),
-                                    onChanged: (value) async {
-                                      if(value.length > 0) {
-                                        temp.wayPointCharge = int.parse(value.trim()).toString();
-                                        etWayPointController.text = int.parse(value.trim()).toString();
-                                      }else{
-                                        temp.wayPointCharge = "0";
-                                        etWayPointController.text = "0";
-                                      }
-                                      await setTotal();
-                                    },
-                                    maxLength: 50,
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                   child: Container(
+                                      margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                                      child:Row(
+                                        children: [
+                                          Text(
+                                            "메모작성",
+                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                          ),
+                                        Checkbox(
+                                          value: wayPointChecked.value,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              wayPointChecked.value = value!;
+                                            });
+                                          },
+                                        ),
+                                        ]
+                                      )
+                                    )
                                   )
+                                ]
                               )
                             ],
                           )
                       ),
                       //경유비 메모
+                     wayPointChecked.value ?
                       Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1807,8 +956,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
                               Container(
-                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  height: CustomStyle.getHeight(35.h),
+                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                  height: CustomStyle.getHeight(35),
                                   child: TextField(
                                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                     textAlign: TextAlign.start,
@@ -1818,22 +967,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     decoration: etWayPointMemoController.text.isNotEmpty
                                         ? InputDecoration(
                                       counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      suffix: Text(
-                                        "원",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       suffixIcon: IconButton(
                                         onPressed: () {
@@ -1848,20 +990,18 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     )
                                         : InputDecoration(
                                       counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
                                       hintText: Strings.of(context)?.get("order_trans_info_way_point_memo_hint")??"경유비 메모를 입력해주세요._",
                                       hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
+                                        enabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                        ),
+                                        disabledBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                        )
                                     ),
                                     onChanged: (value){
                                     },
@@ -1870,7 +1010,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               )
                             ],
                           )
-                      ),
+                        ):const SizedBox(),
                       //대기료(지불)
                       Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -1882,80 +1022,108 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 Strings.of(context)?.get("order_trans_info_stay_charge")??"대기료(지불)_",
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
-                              Container(
-                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  height: CustomStyle.getHeight(35.h),
-                                  child: TextField(
-                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                    textAlign: TextAlign.start,
-                                    keyboardType: TextInputType.number,
-                                    controller: etStayChargeController,
-                                    maxLines: 1,
-                                    decoration: etStayChargeController.text.isNotEmpty
-                                        ? InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      suffix: Text(
-                                        "원",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          etStayChargeController.clear();
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          size: 18.h,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    )
-                                        : InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      hintText: Strings.of(context)?.get("order_trans_info_stay_charge_hint")??"대기료를 입력해주세요._",
-                                      hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
+                              Row(
+                                  children: [
+                                    Expanded(
+                                        flex: 4,
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                            height: CustomStyle.getHeight(35.h),
+                                            child: TextField(
+                                              inputFormatters: <TextInputFormatter>[
+                                                CurrencyTextInputFormatter(
+                                                  locale: 'ko',
+                                                  decimalDigits: 0,
+                                                  symbol: '￦',
+                                                ),
+                                              ],
+                                              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                              textAlign: TextAlign.start,
+                                              keyboardType: TextInputType.number,
+                                              controller: etStayChargeController,
+                                              maxLines: 1,
+                                              decoration: etStayChargeController.text.isNotEmpty
+                                                  ? InputDecoration(
+                                                counterText: '',
+                                                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                                enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                disabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    etStayChargeController.clear();
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    size: 18.h,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              )
+                                                  : InputDecoration(
+                                                counterText: '',
+                                                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                                hintText: Strings.of(context)?.get("order_trans_info_stay_charge_hint")??"대기료를 입력해주세요._",
+                                                hintStyle: CustomStyle.greyDefFont(),
+                                                enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                disabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                              ),
+                                              onChanged: (value) async {
+                                                if(value.length > 0) {
+                                                  temp.stayCharge = int.parse(value.trim()).toString();
+                                                  etStayChargeController.text = _formatter.format(int.parse(value.trim()).toString());
+                                                }else{
+                                                  temp.stayCharge = "0";
+                                                  etStayChargeController.text = "0";
+                                                }
+                                                await setTotal();
+                                              },
+                                              maxLength: 50,
+                                            )
+                                        )
                                     ),
-                                    onChanged: (value) async {
-                                      if(value.length > 0) {
-                                        temp.stayCharge = int.parse(value.trim()).toString();
-                                        etStayChargeController.text = int.parse(value.trim()).toString();
-                                      }else{
-                                        temp.stayCharge = "0";
-                                        etStayChargeController.text = "0";
-                                      }
-                                      await setTotal();
-                                    },
-                                    maxLength: 50,
-                                  )
+                                    Expanded(
+                                        flex: 3,
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                                            child:Row(
+                                                children: [
+                                                  Text(
+                                                    "메모작성",
+                                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                                  ),
+                                                  Checkbox(
+                                                    value: stayChargeChecked.value,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        stayChargeChecked.value = value!;
+                                                      });
+                                                    },
+                                                  ),
+                                                ]
+                                            )
+                                        )
+                                    )
+                                  ]
                               )
                             ],
                           )
                       ),
                       //대기료 메모
+                      stayChargeChecked.value ?
                       Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1977,17 +1145,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     decoration: etStayChargeMemoController.text.isNotEmpty
                                         ? InputDecoration(
                                       counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       suffixIcon: IconButton(
                                         onPressed: () {
@@ -2002,19 +1168,17 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     )
                                         : InputDecoration(
                                       counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
                                       hintText: Strings.of(context)?.get("order_trans_info_stay_memo_hint")??"대기료 메모를 입력해주세요._",
                                       hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                     ),
                                     onChanged: (value){
@@ -2024,7 +1188,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               )
                             ],
                           )
-                      ),
+                      ) : const SizedBox(),
                       //수작업비(지불)
                       Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -2036,72 +1200,100 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 Strings.of(context)?.get("order_trans_info_hand_work_charge")??"수작업비(지불)_",
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
-                              Container(
-                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  height: CustomStyle.getHeight(35.h),
-                                  child: TextField(
-                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                    textAlign: TextAlign.start,
-                                    keyboardType: TextInputType.number,
-                                    controller: etHandWorkChargeController,
-                                    maxLines: 1,
-                                    decoration: etHandWorkChargeController.text.isNotEmpty
-                                        ? InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      suffix: Text(
-                                        "원",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          etHandWorkChargeController.clear();
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          size: 18.h,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    )
-                                        : InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      hintText: Strings.of(context)?.get("order_trans_info_hand_work_charge_hint")??"수작업비를 입력해주세요._",
-                                      hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                    ),
-                                    onChanged: (value){
-                                    },
-                                    maxLength: 50,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 4,
+                                      child: Container(
+                                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                          height: CustomStyle.getHeight(35.h),
+                                          child: TextField(
+                                            inputFormatters: <TextInputFormatter>[
+                                              CurrencyTextInputFormatter(
+                                                locale: 'ko',
+                                                decimalDigits: 0,
+                                                symbol: '￦',
+                                              ),
+                                            ],
+                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                            textAlign: TextAlign.start,
+                                            keyboardType: TextInputType.number,
+                                            controller: etHandWorkChargeController,
+                                            maxLines: 1,
+                                            decoration: etHandWorkChargeController.text.isNotEmpty
+                                                ? InputDecoration(
+                                              counterText: '',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                              enabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              disabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              focusedBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              suffixIcon: IconButton(
+                                                onPressed: () {
+                                                  etHandWorkChargeController.clear();
+                                                },
+                                                icon: Icon(
+                                                  Icons.clear,
+                                                  size: 18.h,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            )
+                                                : InputDecoration(
+                                              counterText: '',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                              hintText: Strings.of(context)?.get("order_trans_info_hand_work_charge_hint")??"수작업비를 입력해주세요._",
+                                              hintStyle: CustomStyle.greyDefFont(),
+                                              enabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              disabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              focusedBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                            ),
+                                            onChanged: (value){
+                                            },
+                                            maxLength: 50,
+                                          )
+                                      )
+                                  ),
+                                  Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                          margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                                          child:Row(
+                                              children: [
+                                                Text(
+                                                  "메모작성",
+                                                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                                ),
+                                                Checkbox(
+                                                  value: handWorkChecked.value,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      handWorkChecked.value = value!;
+                                                    });
+                                                  },
+                                                ),
+                                              ]
+                                          )
+                                      )
                                   )
+                                ]
                               )
                             ],
                           )
                       ),
                       //수작업비 메모
+                      handWorkChecked.value ?
                       Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2123,17 +1315,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     decoration: ethandWorkMemoController.text.isNotEmpty
                                         ? InputDecoration(
                                       counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       suffixIcon: IconButton(
                                         onPressed: () {
@@ -2148,19 +1338,17 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     )
                                         : InputDecoration(
                                       counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
                                       hintText: Strings.of(context)?.get("order_trans_info_hand_work_memo_hint")??"수작업비 메모를 입력해주세요._",
                                       hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                     ),
                                     onChanged: (value){
@@ -2170,7 +1358,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               )
                             ],
                           )
-                      ),
+                      ) : const SizedBox(),
                       //회차료(지불)
                       Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -2182,80 +1370,108 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 Strings.of(context)?.get("order_trans_info_round_charge")??"회차료(지불)_",
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
-                              Container(
-                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  height: CustomStyle.getHeight(35.h),
-                                  child: TextField(
-                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                    textAlign: TextAlign.start,
-                                    keyboardType: TextInputType.number,
-                                    controller: etRoundChargeController,
-                                    maxLines: 1,
-                                    decoration: etRoundChargeController.text.isNotEmpty
-                                        ? InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      suffix: Text(
-                                        "원",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          etRoundChargeController.clear();
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          size: 18.h,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    )
-                                        : InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      hintText: Strings.of(context)?.get("order_trans_info_round_charge_hint")??"회차료를 입력해주세요._",
-                                      hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                    ),
-                                    onChanged: (value) async {
-                                      if(value.length > 0) {
-                                        temp.roundCharge = int.parse(value.trim()).toString();
-                                        etRoundChargeController.text = int.parse(value.trim()).toString();
-                                      }else{
-                                        temp.roundCharge = "0";
-                                        etRoundChargeController.text = "0";
-                                      }
-                                      await setTotal();
-                                    },
-                                    maxLength: 50,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 4,
+                                      child: Container(
+                                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                          height: CustomStyle.getHeight(35.h),
+                                          child: TextField(
+                                            inputFormatters: <TextInputFormatter>[
+                                              CurrencyTextInputFormatter(
+                                                locale: 'ko',
+                                                decimalDigits: 0,
+                                                symbol: '￦',
+                                              ),
+                                            ],
+                                            style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                            textAlign: TextAlign.start,
+                                            keyboardType: TextInputType.number,
+                                            controller: etRoundChargeController,
+                                            maxLines: 1,
+                                            decoration: etRoundChargeController.text.isNotEmpty
+                                                ? InputDecoration(
+                                              counterText: '',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                              enabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              disabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              focusedBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              suffixIcon: IconButton(
+                                                onPressed: () {
+                                                  etRoundChargeController.clear();
+                                                },
+                                                icon: Icon(
+                                                  Icons.clear,
+                                                  size: 18.h,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            )
+                                                : InputDecoration(
+                                              counterText: '',
+                                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(5)),
+                                              hintText: Strings.of(context)?.get("order_trans_info_round_charge_hint")??"회차료를 입력해주세요._",
+                                              hintStyle: CustomStyle.greyDefFont(),
+                                              enabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              disabledBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                              focusedBorder: UnderlineInputBorder(
+                                                  borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                              ),
+                                            ),
+                                            onChanged: (value) async {
+                                              if(value.length > 0) {
+                                                temp.roundCharge = int.parse(value.trim()).toString();
+                                                etRoundChargeController.text = _formatter.format(int.parse(value.trim()).toString());
+                                              }else{
+                                                temp.roundCharge = "0";
+                                                etRoundChargeController.text = "0";
+                                              }
+                                              await setTotal();
+                                            },
+                                            maxLength: 50,
+                                          )
+                                      )
+                                  ),
+                                  Expanded(
+                                      flex: 3,
+                                      child: Container(
+                                          margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                                          child:Row(
+                                              children: [
+                                                Text(
+                                                  "메모작성",
+                                                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                                ),
+                                                Checkbox(
+                                                  value: roundChargeChecked.value,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      roundChargeChecked.value = value!;
+                                                    });
+                                                  },
+                                                ),
+                                              ]
+                                          )
+                                      )
                                   )
+                                ]
                               )
                             ],
                           )
                       ),
                       //회차료 메모
+                      roundChargeChecked.value ?
                       Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2305,16 +1521,14 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                       hintText: Strings.of(context)?.get("order_trans_info_round_memo_hint")??"회차료 메모를 입력해주세요._",
                                       hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                     ),
                                     onChanged: (value){
@@ -2324,7 +1538,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               )
                             ],
                           )
-                      ),
+                      ) : const SizedBox(),
                       //기타추가비(지불)
                       Container(
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h)),
@@ -2336,80 +1550,108 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 Strings.of(context)?.get("order_trans_info_other_add_charge")??"기타추가비(지불)_",
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
-                              Container(
-                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
-                                  height: CustomStyle.getHeight(35.h),
-                                  child: TextField(
-                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                    textAlign: TextAlign.start,
-                                    keyboardType: TextInputType.number,
-                                    controller: etOtherAddChargeController,
-                                    maxLines: 1,
-                                    decoration: etOtherAddChargeController.text.isNotEmpty
-                                        ? InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      suffix: Text(
-                                        "원",
-                                        textAlign: TextAlign.center,
-                                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                                      ),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          etOtherAddChargeController.clear();
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          size: 18.h,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    )
-                                        : InputDecoration(
-                                      counterText: '',
-                                      contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      hintText: Strings.of(context)?.get("order_trans_info_other_add_charge_hint")??"기타 추가비를 입력해주세요._",
-                                      hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
-                                      disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
-                                      ),
+                              Row(
+                                  children :[
+                                    Expanded(
+                                      flex: 4,
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                            height: CustomStyle.getHeight(35.h),
+                                            child: TextField(
+                                              inputFormatters: <TextInputFormatter>[
+                                                CurrencyTextInputFormatter(
+                                                  locale: 'ko',
+                                                  decimalDigits: 0,
+                                                  symbol: '￦',
+                                                ),
+                                              ],
+                                              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                              textAlign: TextAlign.start,
+                                              keyboardType: TextInputType.number,
+                                              controller: etOtherAddChargeController,
+                                              maxLines: 1,
+                                              decoration: etOtherAddChargeController.text.isNotEmpty
+                                                  ? InputDecoration(
+                                                counterText: '',
+                                                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                                enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                disabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                suffixIcon: IconButton(
+                                                  onPressed: () {
+                                                    etOtherAddChargeController.clear();
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    size: 18.h,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              )
+                                                  : InputDecoration(
+                                                counterText: '',
+                                                contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                                                hintText: Strings.of(context)?.get("order_trans_info_other_add_charge_hint")??"기타 추가비를 입력해주세요._",
+                                                hintStyle: CustomStyle.greyDefFont(),
+                                                enabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                disabledBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
+                                                ),
+                                              ),
+                                              onChanged: (value) async {
+                                                if(value.length > 0) {
+                                                  temp.otherAddCharge = int.parse(value.trim()).toString();
+                                                  etOtherAddChargeController.text = _formatter.format(int.parse(value.trim()).toString());
+                                                }else{
+                                                  temp.otherAddCharge = "0";
+                                                  etOtherAddChargeController.text = "0";
+                                                }
+                                                await setTotal();
+                                              },
+                                              maxLength: 50,
+                                            )
+                                        )
                                     ),
-                                    onChanged: (value) async {
-                                      if(value.length > 0) {
-                                        temp.otherAddCharge = int.parse(value.trim()).toString();
-                                        etOtherAddChargeController.text = int.parse(value.trim()).toString();
-                                      }else{
-                                        temp.otherAddCharge = "0";
-                                        etOtherAddChargeController.text = "0";
-                                      }
-                                      await setTotal();
-                                    },
-                                    maxLength: 50,
-                                  )
+                                    Expanded(
+                                        flex: 3,
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                                            child:Row(
+                                                children: [
+                                                  Text(
+                                                    "메모작성",
+                                                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                                  ),
+                                                  Checkbox(
+                                                    value: otherAddChargeChecked.value,
+                                                    onChanged: (value) {
+                                                      setState(() {
+                                                        otherAddChargeChecked.value = value!;
+                                                      });
+                                                    },
+                                                  ),
+                                                ]
+                                            )
+                                        )
+                                    )
+                                  ]
                               )
                             ],
                           )
                       ),
                       //기타 추가비 메모
+                      otherAddChargeChecked.value ?
                       Container(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2432,16 +1674,14 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         ? InputDecoration(
                                       counterText: '',
                                       contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       suffixIcon: IconButton(
                                         onPressed: () {
@@ -2460,16 +1700,14 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
                                       hintText: Strings.of(context)?.get("order_trans_info_other_add_memo_hint")??"기타 추가비를 입력해주세요._",
                                       hintStyle: CustomStyle.greyDefFont(),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                     ),
                                     onChanged: (value){
@@ -2480,7 +1718,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               )
                             ],
                           )
-                      ),
+                      ) : const SizedBox(),
 
                     ],
                   )
@@ -2508,7 +1746,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
-            color: Colors.white,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+              color: Colors.white,
+            ),
             child: Text(
                 "기타",
                 textAlign: TextAlign.start,
@@ -2518,13 +1759,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         CustomStyle.getDivider1(),
         Container(
             padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                    top: BorderSide(
-                        color: line, width: 1.w
-                    )
-                )
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -2560,7 +1797,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         suffixIcon: IconButton(
                           onPressed: () {
                             etOtherAddMemoController.clear();
-                            mTempData.value.driverMemo = "";
+                            mData.value.driverMemo = "";
                           },
                           icon: Icon(
                             Icons.clear,
@@ -2587,7 +1824,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         ),
                       ),
                       onChanged: (value){
-                        mTempData.value.driverMemo = value;
+                        mData.value.driverMemo = value;
                       },
                     )
                 )
@@ -2611,10 +1848,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     }
   }
 
-  Future<void> openRpaModiDialog(BuildContext context, OrderModel item) async {
+  Future<void> openRpaModiDialog(BuildContext context) async {
 
     final SelectNumber = "0".obs;
-    SelectNumber.value = item.buyCharge??"0";
+    SelectNumber.value = mData.value.buyCharge??"0";
 
     showModalBottomSheet(
       context: context,
@@ -2665,12 +1902,13 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                     Container(
                         padding: EdgeInsets.symmetric(
                             vertical: CustomStyle.getHeight(15)),
-                        child: Text(
+                        child: Obx(() => Text(
                               "${Util.getInCodeCommaWon(SelectNumber.value)} 원",
                               style: CustomStyle.CustomFont(
                                   styleFontSize28, Colors.black,
                                   font_weight: FontWeight.w600),
                             )
+                        )
                     ),
                     // 숫자 키패드
                     GridView.builder(
@@ -2741,9 +1979,167 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               if(SelectNumber.value == null || SelectNumber.value.isEmpty == true) SelectNumber.value = "0";
 
                               if(int.parse(SelectNumber.value) > 20000){
-                                Navigator.of(context).pop({buyCharge: SelectNumber.value});
+                                mData.value.buyCharge = SelectNumber.value;
+                                setState(() {
+                                  mData.value.buyCharge = SelectNumber.value;
+                                });
+                                await setTotal();
+                                Navigator.of(context).pop();
                               }else{
                                 Util.toast("지불운임은 20,000원이상입니다.");
+                              }
+                            },
+                            child: Text(
+                              "등록",
+                              style: CustomStyle.CustomFont(styleFontSize18, Colors.white),
+                            )
+                        )
+                    )
+                  ]
+              ),
+            ));
+      },
+    );
+  }
+
+  Future<void> openIdentityNumberDialog(BuildContext context) async {
+
+    final iDentityNumber = "0".obs;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      enableDrag: true,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(
+              topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+          side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return FractionallySizedBox(
+            heightFactor: 0.70,
+            child: Container(
+              width: double.infinity,
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+              padding: const EdgeInsets.all(10),
+              decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  color: Colors.white
+              ),
+              child: Column(
+                  children: [
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Image.asset(
+                              "assets/image/icon_won.png",
+                              width: CustomStyle.getWidth(25),
+                              height: CustomStyle.getHeight(25)
+                          ),
+                          Container(
+                              margin: EdgeInsets.only(
+                                  left: CustomStyle.getWidth(10)),
+                              child: Text(
+                                "지불운임\n금액을 등록해주세요.",
+                                style: CustomStyle.CustomFont(
+                                    styleFontSize16, Colors.black,
+                                    font_weight: FontWeight.w600),
+                              )
+                          )
+                        ]
+                    ),
+                    Container(
+                        padding: EdgeInsets.symmetric(
+                            vertical: CustomStyle.getHeight(15)),
+                        child: Obx(() => Text(
+                          "",
+                          style: CustomStyle.CustomFont(
+                              styleFontSize28, Colors.black,
+                              font_weight: FontWeight.w600),
+                        )
+                        )
+                    ),
+                    // 숫자 키패드
+                    GridView.builder(
+                        shrinkWrap: true,
+                        itemCount: 12,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
+                          childAspectRatio: 1.5 / 1, //item 의 가로 1, 세로 1 의 비율
+                          mainAxisSpacing: 5, //수평 Padding
+                          crossAxisSpacing: 5, //수직 Padding
+                        ),
+                        itemBuilder: (BuildContext context, int index) {
+                          // return Text(index.toString());
+                          return InkWell(
+                              onTap: () {
+                                switch (index) {
+                                  case 9:
+                                  //reset
+                                    iDentityNumber.value = '0';
+                                    return;
+                                  case 10:
+                                    if(iDentityNumber.value.length >= 8) return;
+                                    if (iDentityNumber.value == '0') return;
+                                    else iDentityNumber.value = '${iDentityNumber.value}0';
+                                    return;
+                                  case 11:
+                                  //remove
+                                    if (iDentityNumber.value.length == 1) iDentityNumber.value = '0';
+                                    else iDentityNumber.value = iDentityNumber.value.substring(0, iDentityNumber.value.length - 1);
+                                    return;
+
+                                  default:
+                                    if(iDentityNumber.value.length >= 8) return;
+                                    if (iDentityNumber.value == '0') iDentityNumber.value = '${index + 1}';
+                                    else iDentityNumber.value = '${iDentityNumber.value}${index + 1}';
+                                    return;
+                                }
+                              },
+                              child: Ink(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(4)),
+                                    child: Center(
+                                        child: Text(getPadvalue(index),
+                                            style: const TextStyle(
+                                                color: Colors.black54,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold)
+                                        )
+                                    ),
+                                  )
+                              )
+                          );
+                        }
+                    ),
+
+                    Container(
+                        width: double.infinity,
+                        height: CustomStyle.getHeight(45),
+                        margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(20)),
+                          color: rpa_btn_regist,
+                        ),
+                        child: TextButton(
+                            onPressed: () async {
+                              if(iDentityNumber.value == null || iDentityNumber.value.isEmpty == true) iDentityNumber.value = "0";
+
+                              if(iDentityNumber.value.length == 13){
+                                mData.value.buyCharge = iDentityNumber.value;
+                                setState(() {
+                                  mData.value.buyCharge = iDentityNumber.value;
+                                });
+                                await setTotal();
+                                Navigator.of(context).pop();
+                              }else{
+                                Util.toast("주민등록번호는 13자리만 작성 가능합니다.");
                               }
                             },
                             child: Text(
@@ -2765,10 +2161,23 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   // Function Start
 
   Future<void> initView() async {
+
+    //추가 운임 EditText
+    etWayPointController = TextEditingController( text: _formatter.format(mData.value.wayPointCharge??""));
+    etWayPointMemoController = TextEditingController( text: mData.value.wayPointMemo??"");
+    etStayChargeController = TextEditingController( text: _formatter.format(mData.value.stayCharge??""));
+    etStayChargeMemoController = TextEditingController( text: mData.value.stayMemo??"");
+    etHandWorkChargeController = TextEditingController( text: _formatter.format(mData.value.handWorkCharge??""));
+    ethandWorkMemoController = TextEditingController( text: mData.value.handWorkMemo??"");
+    etRoundChargeController = TextEditingController( text: _formatter.format(mData.value.roundCharge??""));
+    etRoundMemoController = TextEditingController( text: mData.value.roundMemo??"");
+    etOtherAddChargeController = TextEditingController( text: _formatter.format(mData.value.otherAddCharge??""));
+    etOtherAddMemoController = TextEditingController( text: mData.value.otherAddMemo??"");
+
     await setTransType();
     llChargeInfo.value = isCharge.value;
 
-    if(mTempData.value.talkYn == "Y") {
+    if(mData.value.talkYn == "Y") {
       talkYn.value = true;
     }else{
       talkYn.value = false;
@@ -2779,8 +2188,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     }else{
       await getOrderOption();
     }
-    etBuyChargeController.text = mTempData.value.buyCharge??"0";
-    etOtherAddMemoController.text = mTempData.value.driverMemo??"";
+    etBuyChargeController.text = mData.value.buyCharge??"0";
+    etOtherAddMemoController.text = mData.value.driverMemo??"";
     await setTotal();
   }
 
@@ -2792,12 +2201,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       switch(selectedTabIndex) {
         case 0 :
           mTabCode.value = "01";
-          mTempData.value = OrderModel.fromJSON(mData.value.toMap());
+          mData.value = OrderModel.fromJSON(mData.value.toMap());
           await initView();
           break;
         case 1 :
           mTabCode.value = "02";
-          mTempData.value = OrderModel.fromJSON(mData.value.toMap());
+          mData.value = OrderModel.fromJSON(mData.value.toMap());
           await initView();
           break;
       }
@@ -2817,11 +2226,13 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
               var list = _response.resultMap?["data"] as List;
               if (list.length > 0) {
                 List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
-                mOrderOption.value = itemsList[0];
-                mTempData.value.buyCharge = mOrderOption.value.buyCharge??"0";
-                orderBuyCharge.value = mOrderOption.value.buyCharge??"";
+                setState(() {
+                  mOrderOption.value = itemsList[0];
+                  mData.value.buyCharge = mOrderOption.value.buyCharge??"0";
+                  orderBuyCharge.value = mOrderOption.value.buyCharge??"";
+                });
                 if(!(mOrderOption.value.driverMemo?.isEmpty == true) && !(mOrderOption.value.driverMemo == null)) {
-                  mTempData.value.driverMemo = mOrderOption.value.driverMemo;
+                  mData.value.driverMemo = mOrderOption.value.driverMemo;
                 }
               }
             }
@@ -2850,12 +2261,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   }
 
   Future<void> setTotal() async {
-    int buyCharge = mTempData.value.buyCharge?.isEmpty == true || mTempData.value.buyCharge == null ? 0 : int.parse(mTempData.value.buyCharge!);
-    int wayPointCharge = mTempData.value.wayPointCharge?.isEmpty == true || mTempData.value.wayPointCharge == null ? 0 : int.parse(mTempData.value.wayPointCharge!);
-    int stayCharge = mTempData.value.stayCharge?.isEmpty == true || mTempData.value.stayCharge == null ? 0 : int.parse(mTempData.value.stayCharge!);
-    int handWorkCharge = mTempData.value.handWorkCharge?.isEmpty == true || mTempData.value.handWorkCharge == null ? 0 : int.parse(mTempData.value.handWorkCharge!);
-    int roundCharge = mTempData.value.roundCharge?.isEmpty == true || mTempData.value.roundCharge == null ? 0 : int.parse(mTempData.value.roundCharge!);
-    int otherAddCharge = mTempData.value.otherAddCharge?.isEmpty == true || mTempData.value.otherAddCharge == null ? 0 : int.parse(mTempData.value.otherAddCharge!);
+    int buyCharge = mData.value.buyCharge?.isEmpty == true || mData.value.buyCharge == null ? 0 : int.parse(mData.value.buyCharge!);
+    int wayPointCharge = mData.value.wayPointCharge?.isEmpty == true || mData.value.wayPointCharge == null ? 0 : int.parse(mData.value.wayPointCharge!);
+    int stayCharge = mData.value.stayCharge?.isEmpty == true || mData.value.stayCharge == null ? 0 : int.parse(mData.value.stayCharge!);
+    int handWorkCharge = mData.value.handWorkCharge?.isEmpty == true || mData.value.handWorkCharge == null ? 0 : int.parse(mData.value.handWorkCharge!);
+    int roundCharge = mData.value.roundCharge?.isEmpty == true || mData.value.roundCharge == null ? 0 : int.parse(mData.value.roundCharge!);
+    int otherAddCharge = mData.value.otherAddCharge?.isEmpty == true || mData.value.otherAddCharge == null ? 0 : int.parse(mData.value.otherAddCharge!);
 
     int total = buyCharge + wayPointCharge + stayCharge + handWorkCharge + handWorkCharge + roundCharge + otherAddCharge;
     print("뭐지 => $buyCharge // $wayPointCharge // $stayCharge // $handWorkCharge// $handWorkCharge // $roundCharge // $otherAddCharge // ${total}");
@@ -2878,18 +2289,18 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         payType.value = "N";
         driverPayType.value = "N";
 
-        mTempData.value.vehicId = null;
-        mTempData.value.driverId = null;
-        mTempData.value.carNum = null;
-        mTempData.value.driverName = null;
-        mTempData.value.driverTel = null;
-        mTempData.value.carMngName = null;
-        mTempData.value.carMngMemo = null;
+        mData.value.vehicId = null;
+        mData.value.driverId = null;
+        mData.value.carNum = null;
+        mData.value.driverName = null;
+        mData.value.driverTel = null;
+        mData.value.carMngName = null;
+        mData.value.carMngMemo = null;
 
-        mTempData.value.carTonCode = null;
-        mTempData.value.carTonName = null;
-        mTempData.value.carTypeCode = null;
-        mTempData.value.carTypeName = null;
+        mData.value.carTonCode = null;
+        mData.value.carTonName = null;
+        mData.value.carTypeCode = null;
+        mData.value.carTypeName = null;
 
         talkYn.value = false;
         kakaoPushEnable.value = false;
@@ -2906,15 +2317,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
         registType.value = true;
 
-        mTempData.value.buyCustId = null;
-        mTempData.value.buyCustName = null;
+        mData.value.buyCustId = null;
+        mData.value.buyCustName = null;
 
-        mTempData.value.buyDeptId = null;
-        mTempData.value.buyDeptName = null;
+        mData.value.buyDeptId = null;
+        mData.value.buyDeptName = null;
 
-        mTempData.value.buyStaffTel = null;
-        mTempData.value.buyStaffName = null;
-        mTempData.value.buyStaff = null;
+        mData.value.buyStaffTel = null;
+        mData.value.buyStaffName = null;
+        mData.value.buyStaff = null;
 
         talkYn.value = false;
         kakaoPushEnable.value = false;
@@ -2962,26 +2373,26 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   }
 
   Future<void> setCustomer(CustomerModel data) async {
-    mTempData.value.buyCustId = data.custId;
-    mTempData.value.buyCustName = data.custName;
-    mTempData.value.buyDeptId = data.deptId;
-    mTempData.value.buyDeptName = data.deptName;
+    mData.value.buyCustId = data.custId;
+    mData.value.buyCustName = data.custName;
+    mData.value.buyDeptId = data.deptId;
+    mData.value.buyDeptName = data.deptName;
 
     mCustData.value = data;
 
-    mTempData.value.buyStaffTel = null;
-    mTempData.value.buyStaffName = null;
-    mTempData.value.buyStaff = null;
+    mData.value.buyStaffTel = null;
+    mData.value.buyStaffName = null;
+    mData.value.buyStaff = null;
 
     UserModel user = await controller.getUserInfo();
 
-    await getUnitChargeComp(user.custId, user.deptId,mTempData.value.buyCustId, mTempData.value.buyDeptId);
+    await getUnitChargeComp(user.custId, user.deptId,mData.value.buyCustId, mData.value.buyDeptId);
   }
 
   Future<void> setCustUser(CustUserModel data) async {
-    mTempData.value.buyStaff = data.userId;
-    mTempData.value.buyStaffTel = data.mobile;
-    mTempData.value.buyStaffName = data.userName;
+    mData.value.buyStaff = data.userId;
+    mData.value.buyStaffTel = data.mobile;
+    mData.value.buyStaffName = data.userName;
 
     kakaoPushEnable.value = true;
 
@@ -3006,23 +2417,23 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   }
 
   Future<void> setCar(CarModel data) async {
-    mTempData.value.vehicId = data.vehicId;
-    mTempData.value.driverId = data.driverId;
-    mTempData.value.carNum = data.carNum;
-    mTempData.value.driverName = data.driverName;
-    mTempData.value.driverTel = data.mobile;
-    mTempData.value.carMngName = data.carMngName;
-    mTempData.value.carMngMemo = data.carMngMemo;
+    mData.value.vehicId = data.vehicId;
+    mData.value.driverId = data.driverId;
+    mData.value.carNum = data.carNum;
+    mData.value.driverName = data.driverName;
+    mData.value.driverTel = data.mobile;
+    mData.value.carMngName = data.carMngName;
+    mData.value.carMngMemo = data.carMngMemo;
 
     // 차량 데이터 부르고 Setting 다시 하는 모듈
     // 해당 업데이트 설정 시 Side Effect 있는지 확인
-    mTempData.value.carTypeCode = data.carTypeCode;
-    mTempData.value.carTypeName = data.carTypeName;
-    mTempData.value.carTonCode = data.carTonCode;
-    mTempData.value.carTonName = data.carTonName;
+    mData.value.carTypeCode = data.carTypeCode;
+    mData.value.carTypeName = data.carTypeName;
+    mData.value.carTonCode = data.carTonCode;
+    mData.value.carTonName = data.carTonName;
 
     //차주 알림톡 여부 추가
-    mTempData.value.talkYn = data.talkYn;
+    mData.value.talkYn = data.talkYn;
     if(data.talkYn == "Y") {
       talkYn.value = true;
     }else{
@@ -3032,8 +2443,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
     driverPayType.value = data.payType??"";
 
-    if(Util.ynToBoolean(mTempData.value.custPayType)) {
-      if(!(mTempData.value.chargeType == "01")) {
+    if(Util.ynToBoolean(mData.value.custPayType)) {
+      if(!(mData.value.chargeType == "01")) {
         await setPayType("N","미사용");
       }else{
         await setPayType(Util.ynToBoolean(data.payType) ? "Y" : "N", Util.ynToBoolean(data.payType) ? "사용" : "미사용");
@@ -3063,9 +2474,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   }
 
   Future<void> showPayTypeDialog() async {
-    if(Util.ynToBoolean(mTempData.value.custPayType)) {
+    if(Util.ynToBoolean(mData.value.custPayType)) {
       if(Util.ynToBoolean(driverPayType.value)) {
-        if(mTempData.value.chargeType == "01") {
+        if(mData.value.chargeType == "01") {
           ShowCodeDialogWidget(context:context, mTitle: "검색 조건", codeType: Const.USE_YN, mFilter: "", callback: searchItem).showDialog();
         }
       }
@@ -3112,7 +2523,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
     var result = await validation();
     if(result) {
-      if(mTempData.value.allocState == "11") {
+      if(mData.value.allocState == "11") {
         await showCancelLink();
       }else{
         await orderAlloc();
@@ -3122,22 +2533,22 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
   Future<bool> validation() async {
     if(transType.value == TRANS_TYPE_01) {
-      if(mTempData.value.buyCustName?.isEmpty == true || mTempData.value.buyCustName == null) {
+      if(mData.value.buyCustName?.isEmpty == true || mData.value.buyCustName == null) {
         Util.toast(Strings.of(context)?.get("order_trans_info_cust_hint")??"운송사를 지정해주세요._");
         return false;
       }
 
-      if(mTempData.value.buyStaffName?.isEmpty == true || mTempData.value.buyStaffName == null) {
+      if(mData.value.buyStaffName?.isEmpty == true || mData.value.buyStaffName == null) {
         Util.toast(Strings.of(context)?.get("order_trans_info_keeper_hint")??"담당자를 지정해주세요._");
         return false;
       }
     }else{
-      if(mTempData.value.carNum?.trim().isEmpty == true || mTempData.value.carNum?.trim() == null) {
+      if(mData.value.carNum?.trim().isEmpty == true || mData.value.carNum?.trim() == null) {
         Util.toast(Strings.of(context)?.get("order_trans_info_driver_hint")??"차량을 지정해주세요._");
         return false;
       }
     }
-    if(mTempData.value.buyCharge?.trim().isEmpty == true || mTempData.value.buyCharge?.trim() == null) {
+    if(mData.value.buyCharge?.trim().isEmpty == true || mData.value.buyCharge?.trim() == null) {
       Util.toast(Strings.of(context)?.get("order_trans_info_charge_hint")??"운임비를 입력해주세요._");
       return false;
     }
@@ -3154,16 +2565,16 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       sellDeptId??"",
       buyCustId??"",
       buyDeptId??"",
-        mTempData.value.sSido,
-        mTempData.value.sGungu,
-        mTempData.value.sDong,
-        mTempData.value.eSido,
-        mTempData.value.eGungu,
-        mTempData.value.eDong,
+        mData.value.sSido,
+        mData.value.sGungu,
+        mData.value.sDong,
+        mData.value.eSido,
+        mData.value.eGungu,
+        mData.value.eDong,
       orderCarTonCode.value,
       orderCarTypeCode.value,
-        mTempData.value.sDate,
-        mTempData.value.eDate
+        mData.value.sDate,
+        mData.value.eDate
 
     ).then((it) async {
       try {
@@ -3173,11 +2584,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
           if (_response.resultMap?["result"] == true) {
             if(_response.resultMap?["data"] != null) {
               UnitChargeModel value = UnitChargeModel.fromJSON(it.response.data["data"]);
-              mTempData.value.buyCharge = value.unit_charge;
-              etBuyChargeController.text = value.unit_charge??"0";
+              setState(() {
+                mData.value.buyCharge = value.unit_charge;
+                etBuyChargeController.text = value.unit_charge??"0";
+              });
             }else{
-              mTempData.value.buyCharge = orderBuyCharge.value??"0";
-              etBuyChargeController.text = orderBuyCharge.value??"0";
+              setState(() {
+                mData.value.buyCharge = orderBuyCharge.value;
+                etBuyChargeController.text = orderBuyCharge.value;
+              });
             }
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -3210,14 +2625,14 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     if(transType.value == TRANS_TYPE_01) {
       await DioService.dioClient(header: true).orderAlloc(
           user.authorization,
-          mTempData.value.orderId,
+          mData.value.orderId,
           user.custId, user.deptId, user.userId, user.mobile,
-          mTempData.value.buyCustId, mTempData.value.buyDeptId, mTempData.value.buyStaff, mTempData.value.buyStaffTel,
-          mTempData.value.buyCharge, mTempData.value.buyFee, "", "", "",
-          mTempData.value.carTonCode, mTempData.value.carTypeCode,"","",mTempData.value.driverMemo,
-          mTempData.value.wayPointMemo, mTempData.value.wayPointCharge, mTempData.value.stayMemo, mTempData.value.stayCharge,
-          mTempData.value.handWorkMemo, mTempData.value.handWorkCharge, mTempData.value.roundMemo, mTempData.value.roundCharge,
-          mTempData.value.otherAddMemo,mTempData.value.otherAddCharge, "",talkYn.value ? "Y" : "N",buyDrivLicNum.value
+          mData.value.buyCustId, mData.value.buyDeptId, mData.value.buyStaff, mData.value.buyStaffTel,
+          mData.value.buyCharge, mData.value.buyFee, "", "", "",
+          mData.value.carTonCode, mData.value.carTypeCode,"","",mData.value.driverMemo,
+          mData.value.wayPointMemo, mData.value.wayPointCharge, mData.value.stayMemo, mData.value.stayCharge,
+          mData.value.handWorkMemo, mData.value.handWorkCharge, mData.value.roundMemo, mData.value.roundCharge,
+          mData.value.otherAddMemo,mData.value.otherAddCharge, "",talkYn.value ? "Y" : "N",buyDrivLicNum.value
       ).then((it) async {
         try {
           ReturnMap _response = DioService.dioResponse(it);
@@ -3230,9 +2645,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                   "user_id": user.userId,
                   "user_custId" : user.custId,
                   "user_deptId": user.deptId,
-                  "orderId" : mTempData.value.orderId,
-                  "buyCustId" : mTempData.value.buyCustId,
-                  "buyDeptId" : mTempData.value.buyDeptId
+                  "orderId" : mData.value.orderId,
+                  "buyCustId" : mData.value.buyCustId,
+                  "buyDeptId" : mData.value.buyDeptId
                 },
               );
               Navigator.of(context).pop({'code': 200});
@@ -3261,14 +2676,14 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     }else{
       await DioService.dioClient(header: true).orderAlloc(
           user.authorization,
-          mTempData.value.orderId,
-          mTempData.value.custId, mTempData.value.deptId, user.userId, user.mobile,
-          "", "", "", "", mTempData.value.buyCharge, mTempData.value.buyFee,
-          mTempData.value.vehicId, mTempData.value.driverId, mTempData.value.carNum, mTempData.value.carTonCode,
-          mTempData.value.carTypeCode,mTempData.value.driverName,mTempData.value.driverTel,mTempData.value.driverMemo,
-          mTempData.value.wayPointMemo, mTempData.value.wayPointCharge, mTempData.value.stayMemo, mTempData.value.stayCharge,
-          mTempData.value.handWorkMemo, mTempData.value.handWorkCharge, mTempData.value.roundMemo, mTempData.value.roundCharge,
-          mTempData.value.otherAddMemo,mTempData.value.otherAddCharge, payType.value,talkYn.value ? "Y" : "N",buyDrivLicNum.value
+          mData.value.orderId,
+          mData.value.custId, mData.value.deptId, user.userId, user.mobile,
+          "", "", "", "", mData.value.buyCharge, mData.value.buyFee,
+          mData.value.vehicId, mData.value.driverId, mData.value.carNum, mData.value.carTonCode,
+          mData.value.carTypeCode,mData.value.driverName,mData.value.driverTel,mData.value.driverMemo,
+          mData.value.wayPointMemo, mData.value.wayPointCharge, mData.value.stayMemo, mData.value.stayCharge,
+          mData.value.handWorkMemo, mData.value.handWorkCharge, mData.value.roundMemo, mData.value.roundCharge,
+          mData.value.otherAddMemo,mData.value.otherAddCharge, payType.value,talkYn.value ? "Y" : "N",buyDrivLicNum.value
       ).then((it) async {
         try {
           ReturnMap _response = DioService.dioResponse(it);
@@ -3320,7 +2735,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
       await DioService.dioClient(header: true).cancelAllLink(
-          user.authorization, mTempData.value.orderId
+          user.authorization, mData.value.orderId
       ).then((it) async {
         await pr?.hide();
       try {
@@ -3328,7 +2743,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         logger.d("cancelLink() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            mTempData.value.allocState == "00";
+            mData.value.allocState == "00";
             await orderAlloc();
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -3359,8 +2774,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     await pr?.show();
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).setOptionTrans(
-        user.authorization, "Y",mTempData.value.buyCharge,mTempData.value.driverMemo
+    await DioService.dioClient(header: true).setOptionTrans(user.authorization, "Y",mData.value.buyCharge,mData.value.driverMemo
     ).then((it) async {
       await pr?.hide();
       try {
@@ -3465,7 +2879,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
           appBar: AppBar(
                 title: Text(
                     Strings.of(context)?.get("order_trans_info_title")??"Not Found",
-                    style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
+                    style: CustomStyle.appBarTitleFont(styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -3475,7 +2889,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -3518,10 +2932,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       Strings.of(context)?.get("order_trans_info_total_charge")??"지불운임(소계)_",
                                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w700),
                                     ),
-                                    Text(
-                                      "총 ${Util.getInCodeCommaWon(tvTotal.value.toString())} 원",
-                                      style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w700),
-                                    )
+                                      Text(
+                                        "총 ${Util.getInCodeCommaWon(tvTotal.value.toString())} 원",
+                                        style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w700),
+                                      )
                                   ],
                                 )
                               )
