@@ -32,6 +32,13 @@ import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_page.dar
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
+import 'package:page_animation_transition/animations/fade_animation_transition.dart';
+import 'package:page_animation_transition/animations/left_to_right_faded_transition.dart';
+import 'package:page_animation_transition/animations/left_to_right_transition.dart';
+import 'package:page_animation_transition/animations/right_to_left_faded_transition.dart';
+import 'package:page_animation_transition/animations/rotate_animation_transition.dart';
+import 'package:page_animation_transition/animations/scale_animation_transition.dart';
+import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:phone_call/phone_call.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1008,7 +1015,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
   }
 
   Future<void> goToAlloc() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewOrderTransInfoPage(order_vo: mData.value)));
+    Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewOrderTransInfoPage(order_vo: mData.value), pageAnimationType: LeftToRightTransition()));
 
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
@@ -1022,7 +1029,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
     openCommonConfirmBox(
         context,
         "오더를 취소하시겠습니까?",
-        Strings.of(context)?.get("cancel")??"Not Found",
+        "닫기",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
             () async {
@@ -1070,7 +1077,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
       try {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.toast("오더가 접수되었습니다.");
+            Util.snackbar(context, "오더가 접수되었습니다.");
             await getOrderDetail(mData.value.sellAllocId);
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1116,7 +1123,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.toast("오더가 취소되었습니다.");
+            Util.snackbar(context,"오더가 취소되었습니다.");
             await getOrderDetail(mData.value.sellAllocId);
 
             if(mLinkStatusSub != null) {
@@ -2004,7 +2011,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         child: Column(
       children: [
         Container(
-          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(15)),
+          padding:  tvAllocState.value ? EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(15), right: CustomStyle.getWidth(15)) : EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(15)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -2013,7 +2020,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                 children: [
                   mData.value.sellCustName?.isNotEmpty == true?
                   Container(
-                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                         child: Text(
                           mData.value.sellCustName??"",
                           style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w800),
@@ -2021,7 +2028,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                       ) : const SizedBox(),
                   mData.value.sellDeptName?.isNotEmpty == true?
                   Container(
-                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                         child: Text(
                           mData.value.sellDeptName??"",
                           style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
@@ -2031,7 +2038,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               ),
               tvOrderState.value ?
               Container(
-                  padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                  padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                   child: Text(
                     mData.value.orderStateName??"접수_",
                     style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
@@ -2043,16 +2050,16 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         // 운송사 접수
         tvAllocState.value ?
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(15), right: CustomStyle.getWidth(15), top: CustomStyle.getHeight(5),bottom: CustomStyle.getHeight(5)),
           child: Row(
             children: [
               Expanded(
                   flex: 3,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                       child: Text(
                         mData.value.allocStateName??"운송사접수",
-                        style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
+                        style: CustomStyle.CustomFont(styleFontSize15, order_state_01,font_weight: FontWeight.w700),
                       )
                   )
               ),
@@ -2060,7 +2067,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               Expanded(
                   flex: 2,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                     child: Text(
                       mData.value.linkName??"",
                       style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
@@ -2164,7 +2171,16 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                         style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       )
                   )
-              ) : const SizedBox(),
+              ) : Expanded(
+                  flex: 3,
+                  child: Container(
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                      child: Text(
+                        "지불운임",
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                      )
+                  )
+              ) ,
               mData.value.linkName?.isNotEmpty == true ?
               Expanded(
                   flex: 2,
@@ -3227,15 +3243,17 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                               await showReOrder();
                             },
                             child: Container(
-                                height: CustomStyle.getHeight(60),
-                                alignment: Alignment.center,
-                                decoration: const BoxDecoration(color: main_color),
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  Strings.of(context)?.get("order_detail_re_order")??"Not Found",
-                                  style: CustomStyle.CustomFont(
-                                      styleFontSize16, styleWhiteCol),
-                                ),
+                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(40)),
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                  color: renew_main_color2,
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              child: Text(
+                                textAlign: TextAlign.center,
+                                Strings.of(context)?.get("order_detail_re_order")??"Not Found",
+                                style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol, font_weight: FontWeight.w700),
+                              ),
                             )
                         )
                     ) : const SizedBox(),

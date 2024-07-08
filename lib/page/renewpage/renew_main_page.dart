@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
@@ -27,12 +28,16 @@ import 'package:logislink_tms_flutter/db/appdatabase.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_setting_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_detail_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
+import 'package:page_animation_transition/animations/left_to_right_transition.dart';
+import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
@@ -112,7 +117,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   //Sample
   final smartOrderCode = "".obs;
 
-  // Function Start
+  /**
+   * Function Start
+   */
 
   @override
   void initState() {
@@ -556,7 +563,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                             )
                         ),
                         Expanded(
-                            child: GridView.builder(
+                            child: AnimationLimiter(
+                                child: GridView.builder(
                                 itemCount: mCodeList?.length,
                                 physics: const ScrollPhysics(),
                                 scrollDirection: Axis.vertical,
@@ -568,7 +576,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                   crossAxisSpacing: 10, //수직 Padding
                                 ),
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Obx(() =>  InkWell(
+                                  return AnimationConfiguration.staggeredGrid(
+                                      position: index,
+                                      duration: const Duration(milliseconds: 400),
+                                      columnCount: 4,
+                                      child: ScaleAnimation(
+                                          child: FadeInAnimation(
+                                              child: Obx(() =>  InkWell(
                                       onTap: () {
                                         temp_codeModel.value = CodeModel(code: mCodeList?[index].code,codeName: mCodeList?[index].codeName);
                                       },
@@ -588,9 +602,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                             ),
                                           )
                                       )
-                                  ));
+                                  )))));
                                 }
-                            )
+                            ))
                         ),
                         InkWell(
                             onTap: () async {
@@ -662,7 +676,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                             )
                         ),
                         Expanded(
-                            child: GridView.builder(
+                            child: AnimationLimiter(
+                                child: GridView.builder(
                                 itemCount: mStaffList?.length,
                                 physics: const ScrollPhysics(),
                                 scrollDirection: Axis.vertical,
@@ -674,7 +689,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                   crossAxisSpacing: 10, //수직 Padding
                                 ),
                                 itemBuilder: (BuildContext context, int index) {
-                                  return Obx(() =>  InkWell(
+                                  return AnimationConfiguration.staggeredGrid(
+                                      position: index,
+                                      duration: const Duration(milliseconds: 400),
+                                      columnCount: 4,
+                                      child: ScaleAnimation(
+                                          child: FadeInAnimation(
+                                              child: Obx(() =>  InkWell(
                                       onTap: () {
                                         temp_staffModel.value = mStaffList?[index];
                                       },
@@ -694,9 +715,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                             ),
                                           )
                                       )
-                                  ));
+                                  )))));
                                 }
-                            )
+                            ))
                         ),
                         InkWell(
                             onTap: (){
@@ -893,6 +914,288 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                   ]
               ),
             ));
+      },
+    );
+  }
+
+  Future<void> openSelectRegOrderDialog(BuildContext context) async {
+
+    final select_reg_order = "".obs;
+
+      showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      enableDrag: true,
+      barrierLabel: "어떤 방법으로\n오더를 등록하시겠어요?",
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+          side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return FractionallySizedBox(
+            heightFactor: 0.7,
+            child: Container(
+                width: double.infinity,
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+                padding: EdgeInsets.only(right: CustomStyle.getWidth(10),left: CustomStyle.getWidth(10),top: CustomStyle.getHeight(10)),
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    color: Colors.white
+                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
+                          child: Text(
+                              "어떤 방법으로\n오더를 등록하시겠어요?",
+                              style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800)
+                          )
+                      ),
+                       Row(
+                         crossAxisAlignment: CrossAxisAlignment.center,
+                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                           children: [
+                             Obx(() => InkWell(
+                               onTap: (){
+                                 select_reg_order.value = "01";
+                               },
+                               child: Container(
+                                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.4,
+                                  height: CustomStyle.getHeight(180),
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: select_reg_order.value == "01" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
+                                  borderRadius: const BorderRadius.all(Radius.circular(10))
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      flex: 1,
+                                        child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                            border: Border.all(color: const Color(0xffD9D9D9),width: 1),
+                                            borderRadius: const BorderRadius.all(Radius.circular(5))
+                                        ),
+                                        child: Image.asset(
+                                          "assets/image/ic_smart_order.png",
+                                          width: CustomStyle.getWidth(25.0),
+                                          height: CustomStyle.getHeight(25.0),
+                                          color: select_reg_order.value == "01" ? renew_main_color2 : const Color(0xffC8C8C8),
+                                        )
+                                      )
+                                    ),
+                                    Expanded(
+                                      flex: 1,
+                                      child: Container(
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                          child: Column(
+                                                children: [
+                                                  Text(
+                                                      "스마트오더",
+                                                      style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                  ),
+                                                  Text(
+                                                      "신속한 오더 등록이\n가능해요",
+                                                      textAlign: TextAlign.center,
+                                                      style: CustomStyle.CustomFont(styleFontSize13,select_reg_order.value == "01" ? renew_main_color2 :  Colors.black,font_weight: FontWeight.w400)
+                                                  ),
+                                                ],
+                                          )
+                                      )
+                                    )
+                                    ],
+                                  )
+                                )
+                             )),
+                             Obx(() => InkWell(
+                               onTap: (){
+                                 select_reg_order.value = "02";
+                               },
+                               child: Container(
+                                   width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.4,
+                                   height: CustomStyle.getHeight(180),
+                                   padding: const EdgeInsets.all(10),
+                                   decoration: BoxDecoration(
+                                       border: Border.all(color: select_reg_order.value == "02" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
+                                       borderRadius: const BorderRadius.all(Radius.circular(10))
+                                   ),
+                                   child: Column(
+                                     crossAxisAlignment: CrossAxisAlignment.stretch,
+                                     mainAxisAlignment: MainAxisAlignment.center,
+                                     children: [
+                                       Expanded(
+                                           flex: 1,
+                                           child: Container(
+                                               padding: const EdgeInsets.all(10),
+                                               decoration: BoxDecoration(
+                                                   border: Border.all(color: const Color(0xffD9D9D9),width: 1),
+                                                   borderRadius: const BorderRadius.all(Radius.circular(5))
+                                               ),
+                                               child: Image.asset(
+                                                 "assets/image/ic_hwa.png",
+                                                 width: CustomStyle.getWidth(25.0),
+                                                 height: CustomStyle.getHeight(25.0),
+                                                 color: select_reg_order.value == "02" ? renew_main_color2 : const Color(0xffC8C8C8),
+                                               )
+                                           )
+                                       ),
+                                       Expanded(
+                                           flex: 1,
+                                           child: Container(
+                                               alignment: Alignment.center,
+                                               padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                               child: Column(
+                                                 children: [
+                                                   Text(
+                                                       "일반오더",
+                                                       style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                   ),
+                                                   Text(
+                                                       "상세한 오더 등록이\n가능해요",
+                                                       textAlign: TextAlign.center,
+                                                       style: CustomStyle.CustomFont(styleFontSize13, select_reg_order.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w400)
+                                                   ),
+                                                 ],
+                                               )
+                                           )
+                                       )
+                                     ],
+                                   )
+                                )
+                              )),
+                            ]
+                       ),
+                       Container(
+                         margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(20)),
+                         child: AnimationLimiter(
+                             child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start ,
+                             mainAxisAlignment: MainAxisAlignment.center,
+                              children: AnimationConfiguration.toStaggeredList(
+                              duration: const Duration(milliseconds: 600),
+                              childAnimationBuilder: (widget) => SlideAnimation(
+                              horizontalOffset: 50.0,
+                              child: FadeInAnimation(
+                              child: widget,
+                              ),
+                              ),
+                           children:[
+                             Container(
+                               margin: EdgeInsets.only(bottom: CustomStyle.getHeight(10)),
+                               child:Text(
+                                 "이런 분들께 추천해요",
+                                 style:CustomStyle.CustomFont(styleFontSize20, Colors.black,font_weight: FontWeight.w500)
+                               )
+                             ),
+                             Container(
+                                 margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
+                                 child: Row(
+                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                     mainAxisAlignment: MainAxisAlignment.start,
+                                children :[
+                                  Container(
+                                     margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                                      child: Image.asset(
+                                        "assets/image/ic_info1.png",
+                                        width: CustomStyle.getWidth(15.0),
+                                        height: CustomStyle.getHeight(15.0),
+                                      )
+                                  ),
+                                  Text(
+                                      "많은 정보 입력은 귀찮아요",
+                                      style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                    )
+                                  ]
+                                )
+                             ),
+                             Container(
+                                 margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
+                                 child: Row(
+                                     crossAxisAlignment: CrossAxisAlignment.center,
+                                     mainAxisAlignment: MainAxisAlignment.start,
+                                     children :[
+                                       Container(
+                                           margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                                           child: Image.asset(
+                                             "assets/image/ic_info2.png",
+                                             width: CustomStyle.getWidth(15.0),
+                                             height: CustomStyle.getHeight(15.0),
+                                           )
+                                       ),
+                                       Text(
+                                           "중요하지 않은 조건은, 알아서 넣어주세요",
+                                           style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                       ),
+                                     ]
+                                 )
+                             ),
+                             Container(
+                                 margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
+                                 child: Row(
+                                     crossAxisAlignment: CrossAxisAlignment.center,
+                                     mainAxisAlignment: MainAxisAlignment.start,
+                                     children :[
+                                       Container(
+                                           margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                                           child: Image.asset(
+                                             "assets/image/ic_info3.png",
+                                             width: CustomStyle.getWidth(15.0),
+                                             height: CustomStyle.getHeight(15.0),
+                                           )
+                                       ),
+                                        Text(
+                                          "최소한의 조건",
+                                            style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
+                                        ),
+                                       Text(
+                                           "으로 빠르게 오더를 등록하고 싶어요",
+                                           style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                       )
+                                     ]
+                                 )
+                             )
+                           ]
+                         )))
+                       ),
+                       Obx(() => InkWell(
+                          onTap: () async {
+                            Future.delayed(const Duration(milliseconds: 300), () {
+                              if(select_reg_order.value == "") {
+                                Util.toast("오더 방법을 선택해주세요.");
+                              }else{
+                                Navigator.of(context).pop();
+                                goToRegOrderPage(select_reg_order.value);
+                              }
+                            });
+                          },
+                          child: Center(
+                              child: Container(
+                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                height: CustomStyle.getHeight(50),
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: select_reg_order.value == "" ? const Color(0xffD9D9D9) : renew_main_color2),
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  "다음",
+                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                ),
+                              )
+                          )
+                      ))
+                    ]
+                )
+            )
+        );
       },
     );
   }
@@ -1698,7 +2001,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 ),
                                 Container(
                                     margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
-                                    child: GridView.builder(
+                                    child: AnimationLimiter(
+                                        child: GridView.builder(
                                         itemCount: dropDownList?.length,
                                         physics: const ScrollPhysics(),
                                         scrollDirection: Axis.vertical,
@@ -1710,7 +2014,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           crossAxisSpacing: 10, //수직 Padding
                                         ),
                                         itemBuilder: (BuildContext context, int index) {
-                                          return Obx(() =>  InkWell(
+                                          return AnimationConfiguration.staggeredGrid(
+                                              position: index,
+                                              duration: const Duration(milliseconds: 400),
+                                              columnCount: 4,
+                                              child: ScaleAnimation(
+                                                  child: FadeInAnimation(
+                                                      child: Obx(() =>  InkWell(
                                               onTap: () {
                                                 temp_search_column.value = CodeModel(code: dropDownList?[index].code,codeName: dropDownList?[index].codeName);
                                               },
@@ -1729,9 +2039,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     ),
                                                   )
                                               )
-                                          ));
+                                          )))));
                                         }
-                                    )
+                                    ))
                                 ),
                                 Container(
                                     margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
@@ -1805,7 +2115,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                            ),
                             Container(
                               margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
-                              child: GridView.builder(
+                              child: AnimationLimiter(
+                                  child: GridView.builder(
                                   itemCount: mOrderList?.length,
                                   physics: const ScrollPhysics(),
                                   scrollDirection: Axis.vertical,
@@ -1817,7 +2128,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     crossAxisSpacing: 10, //수직 Padding
                                   ),
                                   itemBuilder: (BuildContext context, int index) {
-                                    return Obx(() =>  InkWell(
+                                    return AnimationConfiguration.staggeredGrid(
+                                        position: index,
+                                        duration: const Duration(milliseconds: 400),
+                                        columnCount: 4,
+                                        child: ScaleAnimation(
+                                            child: FadeInAnimation(
+                                            child: Obx(() =>  InkWell(
                                         onTap: () {
                                           temp_stateCode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
                                         },
@@ -1837,9 +2154,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                               ),
                                             )
                                         )
-                                    ));
+                                    )))));
                                   }
-                              )
+                              ))
                             ),
                             CustomStyle.getDivider2()
                           ]
@@ -1857,7 +2174,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 ),
                                 Container(
                                     margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
-                                    child: GridView.builder(
+                                    child: AnimationLimiter(
+                                        child: GridView.builder(
                                         itemCount: mOrderList?.length,
                                         physics: const ScrollPhysics(),
                                         scrollDirection: Axis.vertical,
@@ -1869,7 +2187,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           crossAxisSpacing: 10, //수직 Padding
                                         ),
                                         itemBuilder: (BuildContext context, int index) {
-                                          return Obx(() =>  InkWell(
+                                          return AnimationConfiguration.staggeredGrid(
+                                              position: index,
+                                              duration: const Duration(milliseconds: 400),
+                                              columnCount: 4,
+                                              child: ScaleAnimation(
+                                                  child: FadeInAnimation(
+                                                  child: Obx(() =>  InkWell(
                                               onTap: () {
                                                 temp_stateCode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
                                               },
@@ -1889,9 +2213,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     ),
                                                   )
                                               )
-                                          ));
+                                          )))));
                                         }
-                                    )
+                                    ))
                                 ),
                                 CustomStyle.getDivider2()
                               ]
@@ -1910,7 +2234,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 Container(
                                     height:CustomStyle.getHeight(140),
                                     margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
-                                    child: GridView.builder(
+                                    child: AnimationLimiter(
+                                        child: GridView.builder(
                                         itemCount: mStaffList?.length,
                                         physics: const ScrollPhysics(),
                                         scrollDirection: Axis.vertical,
@@ -1922,7 +2247,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           crossAxisSpacing: 10, //수직 Padding
                                         ),
                                         itemBuilder: (BuildContext context, int index) {
-                                          return Obx(() =>  InkWell(
+                                          return AnimationConfiguration.staggeredGrid(
+                                              position: index,
+                                              duration: const Duration(milliseconds: 400),
+                                              columnCount: 4,
+                                              child: ScaleAnimation(
+                                                  child: FadeInAnimation(
+                                                  child: Obx(() =>  InkWell(
                                               onTap: () {
                                                   temp_staffModel.value = mStaffList?[index];
                                               },
@@ -1942,9 +2273,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     ),
                                                   )
                                               )
-                                          ));
+                                          )))));
                                         }
-                                    )
+                                    ))
                                 ),
                                 CustomStyle.getDivider2()
                               ]
@@ -2070,7 +2401,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       },
     );
 
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewOrderDetailPage(order_vo: item)));
+    Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewOrderDetailPage(order_vo: item), pageAnimationType: LeftToRightTransition()));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
@@ -2149,7 +2480,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderTransInfoPage(order_vo: data)));
   }
 
-  // Function End
+  void showGuestDialog(){
+    openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+  }
+
+  /**
+   * Function End
+   */
 
 
 
@@ -2158,9 +2495,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
 
 
+  /**
+  * Widget Start
+  */
 
-
-  // Widget Start
 
   @override
   Widget build(BuildContext mContext) {
@@ -2776,21 +3114,32 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           refresh();
                         });
                       },
-                      child: ListView.builder(
+                      child: AnimationLimiter(
+                        child: ListView.builder(
                         scrollDirection: Axis.vertical,
                         controller: scrollController,
                         shrinkWrap: true,
                         itemCount: orderList.length,
                         itemBuilder: (context, index) {
                           var item = orderList[index];
-                          return AutoScrollTag (
-                              key: ValueKey(index),
-                              controller: scrollController,
-                              index: index,
-                              child: getListCardView(item,index)
+                          return AnimationConfiguration.staggeredList(
+                              position: index,
+                              duration: const Duration(milliseconds: 600),
+                            child: SlideAnimation(
+                              verticalOffset: 50.0,
+                              child: FadeInAnimation(
+                                child: AutoScrollTag (
+                                    key: ValueKey(index),
+                                    controller: scrollController,
+                                    index: index,
+                                    child: getListCardView(item,index)
+                                )
+                              )
+                            )
                           );
                         },
                       )
+                    )
                   )
               ),
               // 검색 필터 상태 View
@@ -2964,10 +3313,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       onTap: () async {
                         var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
                         if(guest) {
-                          //showGuestDialog();
+                          showGuestDialog();
                             return;
                         }
                         //await goToRegOrder();
+                        openSelectRegOrderDialog(context);
                       },
                       child: Container(
                           width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
@@ -3124,6 +3474,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 return;
                               }
                               //await goToRegOrder();
+                              openSelectRegOrderDialog(context);
                             },
                             child: Container(
                                 width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
@@ -4397,6 +4748,32 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
   }
 
-// Widget End
+  Future goToRegOrder() async {
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(flag: "R")));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+        await setRegResult(results);
+      }
+    }
+  }
+
+  Future goToRegOrderPage(String type) async {
+    if(type == "01") {
+
+    }else{
+      Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RegistOrderPage(flag: "R"), pageAnimationType: LeftToRightTransition()));
+
+      if(results != null && results.containsKey("code")){
+        if(results["code"] == 200) {
+          await setRegResult(results);
+        }
+      }
+    }
+  }
+
+  /**
+   * Widget End
+   */
 
 }

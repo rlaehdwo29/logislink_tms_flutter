@@ -1226,7 +1226,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
       appBar: AppBar(
             title: Text(
                 widget.flag == "M" ? Strings.of(context)?.get("order_detail_order_modify")??"오더수정_" : Strings.of(context)?.get("order_reg_title")??"오더 등록_",
-                style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
             ),
             toolbarHeight: 50.h,
             centerTitle: true,
@@ -1239,7 +1239,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                 }
               },
               color: styleWhiteCol,
-              icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+              icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
             ),
           ),
       body: SafeArea(

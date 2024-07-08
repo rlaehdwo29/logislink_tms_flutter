@@ -106,7 +106,7 @@ class Util {
             top: CustomStyle.getHeight(14.0),
             bottom: CustomStyle.getHeight(14.0),
           ),
-          backgroundColor: controller.renew_value == "Y" ? renew_main_color2 : main_color,
+          backgroundColor: controller.renew_value.value ? renew_main_color2 : main_color,
           content: SizedBox(
             child: Text(
               msg,

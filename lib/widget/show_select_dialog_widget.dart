@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
@@ -69,7 +70,8 @@ class ShowSelectDialogWidget {
             ],
             automaticallyImplyLeading: false,
           ),
-          body: GridView.builder(
+          body: AnimationLimiter(
+              child: GridView.builder(
               itemCount: mList?.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4, //1 개의 행에 보여줄 item 개수
@@ -78,7 +80,13 @@ class ShowSelectDialogWidget {
                 crossAxisSpacing: 2, //수직 Padding
               ),
               itemBuilder: (BuildContext context, int index) {
-                return InkWell(
+                return AnimationConfiguration.staggeredGrid(
+                    position: index,
+                    duration: const Duration(milliseconds: 400),
+                    columnCount: 4,
+                    child: ScaleAnimation(
+                        child: FadeInAnimation(
+                            child: InkWell(
                     onTap: () {
                       callback(mList?[index],codeType: codeType, value: value??0);
                       Future.delayed(const Duration(milliseconds: 300), () {
@@ -109,9 +117,9 @@ class ShowSelectDialogWidget {
                           ),
                         )
                     )
-                );
+                ))));
               }
-          ),
+          )),
         );
       },
       barrierDismissible: true,

@@ -87,7 +87,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   final ivChargeExpand = false.obs;
 
   late TextEditingController etBuyChargeController;
-  late TextEditingController etRegistController;
   late TextEditingController etCustNameController;
   late TextEditingController etKeeperController;
   late TextEditingController etCarNumController;
@@ -113,6 +112,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   final otherAddChargeChecked = false.obs;
   late TextEditingController etOtherAddMemoController;
 
+  late TextEditingController etDriverMemoController;
+
   @override
   void initState() {
     super.initState();
@@ -125,10 +126,23 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     _tabController.addListener(_handleTabSelection);
 
     etBuyChargeController = TextEditingController();
-    etRegistController = TextEditingController();
     etCustNameController = TextEditingController();
     etKeeperController = TextEditingController();
     etCarNumController = TextEditingController();
+
+    //추가 운임 EditText
+    etWayPointController = TextEditingController();
+    etWayPointMemoController = TextEditingController();
+    etStayChargeController = TextEditingController();
+    etStayChargeMemoController = TextEditingController();
+    etHandWorkChargeController = TextEditingController();
+    ethandWorkMemoController = TextEditingController();
+    etRoundChargeController = TextEditingController();
+    etRoundMemoController = TextEditingController();
+    etOtherAddChargeController = TextEditingController();
+    etOtherAddMemoController = TextEditingController();
+
+    etDriverMemoController = TextEditingController();
 
     Future.delayed(Duration.zero, () async {
 
@@ -381,7 +395,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                     ],
                   )
               ),
-              !isOption.value ? transInfoPannelWidget(mData.value) : const SizedBox(),
+              !isOption.value ? transInfoPannelWidget() : const SizedBox(),
               etcPannelWidget()
         ]
       )
@@ -675,43 +689,48 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
           ),
 
           // 운전자 주민번호
-          Container(
-              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(10)),
-              margin: EdgeInsets.only(top: CustomStyle.getHeight(10), bottom: CustomStyle.getHeight(10)),
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                color:Colors.white,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/image/ic_trans_idcard.png",
-                          width: CustomStyle.getWidth(17.0),
-                          height: CustomStyle.getHeight(17.0),
-                        ),
-                        Container(
-                            margin: EdgeInsets.only(left: CustomStyle.getWidth(5)),
-                            child: Text(
-                                Strings.of(context)?.get("order_trans_info_regist")??"운전자 주민번호_",
-                                style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500)
-                            )
-                        )
-                      ]
-                  ),
-                  Text(
-                    etRegistController.text,
-                    style: CustomStyle.CustomFont(styleFontSize14,  text_color_01),
-                  ),
-                ],
-              )
+          InkWell(
+            onTap: (){
+              openIdentityNumberDialog(context);
+            },
+            child: Container(
+                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(10)),
+                margin: EdgeInsets.only(top: CustomStyle.getHeight(10), bottom: CustomStyle.getHeight(10)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color:Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            "assets/image/ic_trans_idcard.png",
+                            width: CustomStyle.getWidth(17.0),
+                            height: CustomStyle.getHeight(17.0),
+                          ),
+                          Container(
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(5)),
+                              child: Text(
+                                  Strings.of(context)?.get("order_trans_info_regist")??"운전자 주민번호_",
+                                  style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500)
+                              )
+                          )
+                        ]
+                    ),
+                    Text(
+                      (buyDrivLicNum.value != '' ?  buyDrivLicNum.value?.replaceAllMapped(RegExp(r'(\d{6})(\d{6,7})'), (m) => '${m[1]}-${m[2]}') : "")!,
+                      style: CustomStyle.CustomFont(styleFontSize14,  text_color_01),
+                    ),
+                  ],
+                )
+            )
           ),
-          !isOption.value ? transInfoPannelWidget(mData.value) : const SizedBox(),
+          !isOption.value ? transInfoPannelWidget() : const SizedBox(),
           etcPannelWidget()
         ]
       )
@@ -777,7 +796,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   void dispose() {
     super.dispose();
     etBuyChargeController.dispose();
-    etRegistController.dispose();
     etCustNameController.dispose();
     etKeeperController.dispose();
     etCarNumController.dispose();
@@ -794,9 +812,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     etOtherAddChargeController.dispose();
     etOtherAddMemoController.dispose();
 
+    etDriverMemoController.dispose();
   }
 
-  Widget transInfoPannelWidget(OrderModel temp) {
+  Widget transInfoPannelWidget() {
     isTransInfoExpanded.value = List.filled(1, false);
 
     return Flex(
@@ -879,7 +898,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                           suffixIcon: IconButton(
                                             onPressed: () {
                                               etWayPointController.clear();
-                                              temp.wayPointCharge = "0";
+                                              mData.value.wayPointCharge = "0";
                                             },
                                             icon: Icon(
                                               Icons.clear,
@@ -905,10 +924,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         ),
                                         onChanged: (value) async {
                                           if(value.length > 0) {
-                                            temp.wayPointCharge = int.parse(value.trim()).toString();
-                                            etWayPointController.text = _formatter.format(int.parse(value.trim()).toString());
+                                            mData.value.wayPointCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
+                                            etWayPointController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                           }else{
-                                            temp.wayPointCharge = "0";
+                                            mData.value.wayPointCharge = "0";
                                             etWayPointController.text = "0";
                                           }
                                           await setTotal();
@@ -980,6 +999,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           etWayPointMemoController.clear();
+                                          mData.value.wayPointMemo = "";
                                         },
                                         icon: Icon(
                                           Icons.clear,
@@ -1004,6 +1024,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         )
                                     ),
                                     onChanged: (value){
+                                      mData.value.wayPointMemo = value;
                                     },
                                     maxLength: 50,
                                   )
@@ -1058,6 +1079,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                                 suffixIcon: IconButton(
                                                   onPressed: () {
                                                     etStayChargeController.clear();
+                                                    mData.value.stayCharge = "0";
                                                   },
                                                   icon: Icon(
                                                     Icons.clear,
@@ -1083,10 +1105,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                               ),
                                               onChanged: (value) async {
                                                 if(value.length > 0) {
-                                                  temp.stayCharge = int.parse(value.trim()).toString();
-                                                  etStayChargeController.text = _formatter.format(int.parse(value.trim()).toString());
+                                                  mData.value.stayCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
+                                                  etStayChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                                 }else{
-                                                  temp.stayCharge = "0";
+                                                  mData.value.stayCharge = "0";
                                                   etStayChargeController.text = "0";
                                                 }
                                                 await setTotal();
@@ -1158,6 +1180,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           etStayChargeMemoController.clear();
+                                          mData.value.stayMemo = "";
                                         },
                                         icon: Icon(
                                           Icons.clear,
@@ -1182,6 +1205,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       ),
                                     ),
                                     onChanged: (value){
+                                      mData.value.stayMemo = value;
                                     },
                                     maxLength: 50,
                                   )
@@ -1236,6 +1260,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                               suffixIcon: IconButton(
                                                 onPressed: () {
                                                   etHandWorkChargeController.clear();
+                                                  mData.value.handWorkCharge = "0";
                                                 },
                                                 icon: Icon(
                                                   Icons.clear,
@@ -1259,7 +1284,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                                   borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                               ),
                                             ),
-                                            onChanged: (value){
+                                            onChanged: (value) async {
+                                              if(value.length > 0) {
+                                                mData.value.handWorkCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
+                                                etHandWorkChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
+                                              }else{
+                                                mData.value.handWorkCharge = "0";
+                                                etHandWorkChargeController.text = "0";
+                                              }
+                                              await setTotal();
                                             },
                                             maxLength: 50,
                                           )
@@ -1328,6 +1361,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           ethandWorkMemoController.clear();
+                                          mData.value.handWorkMemo = "";
                                         },
                                         icon: Icon(
                                           Icons.clear,
@@ -1352,6 +1386,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       ),
                                     ),
                                     onChanged: (value){
+                                      mData.value.handWorkMemo = value;
                                     },
                                     maxLength: 50,
                                   )
@@ -1406,6 +1441,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                               suffixIcon: IconButton(
                                                 onPressed: () {
                                                   etRoundChargeController.clear();
+                                                  mData.value.roundCharge = "0";
                                                 },
                                                 icon: Icon(
                                                   Icons.clear,
@@ -1431,10 +1467,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                             ),
                                             onChanged: (value) async {
                                               if(value.length > 0) {
-                                                temp.roundCharge = int.parse(value.trim()).toString();
-                                                etRoundChargeController.text = _formatter.format(int.parse(value.trim()).toString());
+                                                mData.value.roundCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
+                                                etRoundChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                               }else{
-                                                temp.roundCharge = "0";
+                                                mData.value.roundCharge = "0";
                                                 etRoundChargeController.text = "0";
                                               }
                                               await setTotal();
@@ -1494,20 +1530,19 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         ? InputDecoration(
                                       counterText: '',
                                       contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
-                                      enabledBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       disabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w))
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                                          borderRadius: BorderRadius.circular(5.h)
+                                      focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(0.5))
                                       ),
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           etRoundMemoController.clear();
+                                          mData.value.roundMemo = "";
                                         },
                                         icon: Icon(
                                           Icons.clear,
@@ -1532,6 +1567,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       ),
                                     ),
                                     onChanged: (value){
+                                      mData.value.roundMemo = value;
                                     },
                                     maxLength: 50,
                                   )
@@ -1586,6 +1622,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                                 suffixIcon: IconButton(
                                                   onPressed: () {
                                                     etOtherAddChargeController.clear();
+                                                    mData.value.otherAddCharge = "0";
                                                   },
                                                   icon: Icon(
                                                     Icons.clear,
@@ -1611,10 +1648,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                               ),
                                               onChanged: (value) async {
                                                 if(value.length > 0) {
-                                                  temp.otherAddCharge = int.parse(value.trim()).toString();
-                                                  etOtherAddChargeController.text = _formatter.format(int.parse(value.trim()).toString());
+                                                  mData.value.otherAddCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
+                                                  etOtherAddChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                                 }else{
-                                                  temp.otherAddCharge = "0";
+                                                  mData.value.otherAddCharge = "0";
                                                   etOtherAddChargeController.text = "0";
                                                 }
                                                 await setTotal();
@@ -1686,7 +1723,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           etOtherAddMemoController.clear();
-                                          temp.driverMemo = "";
+                                          mData.value.otherAddMemo = "";
                                         },
                                         icon: Icon(
                                           Icons.clear,
@@ -1711,7 +1748,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       ),
                                     ),
                                     onChanged: (value){
-                                      temp.driverMemo = value;
+                                      mData.value.otherAddMemo = value;
                                     },
                                     maxLength: 50,
                                   )
@@ -1777,9 +1814,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                       style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       textAlign: TextAlign.start,
                       keyboardType: TextInputType.text,
-                      controller: etOtherAddMemoController,
+                      controller: etDriverMemoController,
                       maxLines: null,
-                      decoration: etOtherAddMemoController.text.isNotEmpty
+                      decoration: etDriverMemoController.text.isNotEmpty
                           ? InputDecoration(
                         counterText: '',
                         contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
@@ -1796,7 +1833,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
-                            etOtherAddMemoController.clear();
+                            etDriverMemoController.clear();
                             mData.value.driverMemo = "";
                           },
                           icon: Icon(
@@ -2004,7 +2041,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
   Future<void> openIdentityNumberDialog(BuildContext context) async {
 
-    final iDentityNumber = "0".obs;
+    final iDentityNumber = buyDrivLicNum.value.obs;
 
     showModalBottomSheet(
       context: context,
@@ -2036,7 +2073,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Image.asset(
-                              "assets/image/icon_won.png",
+                              "assets/image/ic_trans_idcard.png",
                               width: CustomStyle.getWidth(25),
                               height: CustomStyle.getHeight(25)
                           ),
@@ -2044,7 +2081,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                               margin: EdgeInsets.only(
                                   left: CustomStyle.getWidth(10)),
                               child: Text(
-                                "지불운임\n금액을 등록해주세요.",
+                                "운전자\n주민등록번호를 입력해주세요.",
                                 style: CustomStyle.CustomFont(
                                     styleFontSize16, Colors.black,
                                     font_weight: FontWeight.w600),
@@ -2056,11 +2093,11 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         padding: EdgeInsets.symmetric(
                             vertical: CustomStyle.getHeight(15)),
                         child: Obx(() => Text(
-                          "",
+                          (iDentityNumber.value != '' ?  iDentityNumber.value?.replaceAllMapped(RegExp(r'(\d{6})(\d{6,7})'), (m) => '${m[1]}-${m[2]}') : "")!,
                           style: CustomStyle.CustomFont(
                               styleFontSize28, Colors.black,
                               font_weight: FontWeight.w600),
-                        )
+                          )
                         )
                     ),
                     // 숫자 키패드
@@ -2080,10 +2117,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                 switch (index) {
                                   case 9:
                                   //reset
-                                    iDentityNumber.value = '0';
+                                    iDentityNumber.value = '';
                                     return;
                                   case 10:
-                                    if(iDentityNumber.value.length >= 8) return;
+                                    if(iDentityNumber.value.length >= 13) return;
                                     if (iDentityNumber.value == '0') return;
                                     else iDentityNumber.value = '${iDentityNumber.value}0';
                                     return;
@@ -2094,7 +2131,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                     return;
 
                                   default:
-                                    if(iDentityNumber.value.length >= 8) return;
+                                    if(iDentityNumber.value.length >= 13) return;
                                     if (iDentityNumber.value == '0') iDentityNumber.value = '${index + 1}';
                                     else iDentityNumber.value = '${iDentityNumber.value}${index + 1}';
                                     return;
@@ -2129,14 +2166,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         ),
                         child: TextButton(
                             onPressed: () async {
-                              if(iDentityNumber.value == null || iDentityNumber.value.isEmpty == true) iDentityNumber.value = "0";
+                              if(iDentityNumber.value == null || iDentityNumber.value.isEmpty == true) iDentityNumber.value = "";
 
                               if(iDentityNumber.value.length == 13){
-                                mData.value.buyCharge = iDentityNumber.value;
                                 setState(() {
-                                  mData.value.buyCharge = iDentityNumber.value;
+                                  buyDrivLicNum.value = iDentityNumber.value;
                                 });
-                                await setTotal();
                                 Navigator.of(context).pop();
                               }else{
                                 Util.toast("주민등록번호는 13자리만 작성 가능합니다.");
@@ -2163,16 +2198,21 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   Future<void> initView() async {
 
     //추가 운임 EditText
-    etWayPointController = TextEditingController( text: _formatter.format(mData.value.wayPointCharge??""));
-    etWayPointMemoController = TextEditingController( text: mData.value.wayPointMemo??"");
-    etStayChargeController = TextEditingController( text: _formatter.format(mData.value.stayCharge??""));
-    etStayChargeMemoController = TextEditingController( text: mData.value.stayMemo??"");
-    etHandWorkChargeController = TextEditingController( text: _formatter.format(mData.value.handWorkCharge??""));
-    ethandWorkMemoController = TextEditingController( text: mData.value.handWorkMemo??"");
-    etRoundChargeController = TextEditingController( text: _formatter.format(mData.value.roundCharge??""));
-    etRoundMemoController = TextEditingController( text: mData.value.roundMemo??"");
-    etOtherAddChargeController = TextEditingController( text: _formatter.format(mData.value.otherAddCharge??""));
-    etOtherAddMemoController = TextEditingController( text: mData.value.otherAddMemo??"");
+    etWayPointController.text = _formatter.format(mData.value.wayPointCharge??"");
+    etWayPointMemoController.text = mData.value.wayPointMemo??"";
+    if(mData.value.wayPointMemo != "" && mData.value.wayPointMemo != null) wayPointChecked.value = true;
+    etStayChargeController.text = _formatter.format(mData.value.stayCharge??"");
+    etStayChargeMemoController.text = mData.value.stayMemo??"";
+    if(mData.value.stayMemo != "" && mData.value.stayMemo != null) stayChargeChecked.value = true;
+    etHandWorkChargeController.text = _formatter.format(mData.value.handWorkCharge??"");
+    ethandWorkMemoController.text = mData.value.handWorkMemo??"";
+    if(mData.value.handWorkMemo != "" && mData.value.handWorkMemo != null) handWorkChecked.value = true;
+    etRoundChargeController.text = _formatter.format(mData.value.roundCharge??"");
+    etRoundMemoController.text = mData.value.roundMemo??"";
+    if(mData.value.roundCharge != "" && mData.value.roundCharge != null) roundChargeChecked.value = true;
+    etOtherAddChargeController.text = _formatter.format(mData.value.otherAddCharge??"");
+    etOtherAddMemoController.text = mData.value.otherAddMemo??"";
+    if(mData.value.otherAddMemo != "" && mData.value.otherAddMemo != null) otherAddChargeChecked.value = true;
 
     await setTransType();
     llChargeInfo.value = isCharge.value;
@@ -2189,7 +2229,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       await getOrderOption();
     }
     etBuyChargeController.text = mData.value.buyCharge??"0";
-    etOtherAddMemoController.text = mData.value.driverMemo??"";
+    etDriverMemoController.text = mData.value.driverMemo??"";
     await setTotal();
   }
 
@@ -2201,12 +2241,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       switch(selectedTabIndex) {
         case 0 :
           mTabCode.value = "01";
-          mData.value = OrderModel.fromJSON(mData.value.toMap());
+          mData.value = OrderModel.fromJSON(widget.order_vo.toMap());
           await initView();
           break;
         case 1 :
           mTabCode.value = "02";
-          mData.value = OrderModel.fromJSON(mData.value.toMap());
+          mData.value = OrderModel.fromJSON(widget.order_vo.toMap());
           await initView();
           break;
       }
@@ -2268,7 +2308,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     int roundCharge = mData.value.roundCharge?.isEmpty == true || mData.value.roundCharge == null ? 0 : int.parse(mData.value.roundCharge!);
     int otherAddCharge = mData.value.otherAddCharge?.isEmpty == true || mData.value.otherAddCharge == null ? 0 : int.parse(mData.value.otherAddCharge!);
 
-    int total = buyCharge + wayPointCharge + stayCharge + handWorkCharge + handWorkCharge + roundCharge + otherAddCharge;
+    int total = buyCharge + wayPointCharge + stayCharge + handWorkCharge + roundCharge + otherAddCharge;
     print("뭐지 => $buyCharge // $wayPointCharge // $stayCharge // $handWorkCharge// $handWorkCharge // $roundCharge // $otherAddCharge // ${total}");
     tvTotal.value = total;
   }
@@ -2305,7 +2345,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         talkYn.value = false;
         kakaoPushEnable.value = false;
 
-        etRegistController.text = "";
+        buyDrivLicNum.value = "";
         break;
       case TRANS_TYPE_02 :
       //차량
@@ -2330,7 +2370,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         talkYn.value = false;
         kakaoPushEnable.value = false;
 
-        etRegistController.text = "";
+        buyDrivLicNum.value = "";
         mCustData.value = CustomerModel();
         break;
     }
@@ -2463,13 +2503,13 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
       if (dncStr != null) {
         if (dncStr.length > 6) {
-          etRegistController.text = dncStr;
+          buyDrivLicNum.value = dncStr;
         }else{
-          etRegistController.text = dncStr;
+          buyDrivLicNum.value = dncStr;
         }
       }
     }else{
-      etRegistController.text = "";
+      buyDrivLicNum.value = "";
     }
   }
 
@@ -2502,7 +2542,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
   Future<void> encodeBuyDLN() async {
     String? encStr = null;
-    String value = etRegistController.text.trim();
+    String value = buyDrivLicNum.trim();
     if(value == "" || value == null) {
       return;
     }
@@ -2534,22 +2574,22 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   Future<bool> validation() async {
     if(transType.value == TRANS_TYPE_01) {
       if(mData.value.buyCustName?.isEmpty == true || mData.value.buyCustName == null) {
-        Util.toast(Strings.of(context)?.get("order_trans_info_cust_hint")??"운송사를 지정해주세요._");
+        Util.snackbar(context,Strings.of(context)?.get("order_trans_info_cust_hint")??"운송사를 지정해주세요._");
         return false;
       }
 
       if(mData.value.buyStaffName?.isEmpty == true || mData.value.buyStaffName == null) {
-        Util.toast(Strings.of(context)?.get("order_trans_info_keeper_hint")??"담당자를 지정해주세요._");
+        Util.snackbar(context,Strings.of(context)?.get("order_trans_info_keeper_hint")??"담당자를 지정해주세요._");
         return false;
       }
     }else{
       if(mData.value.carNum?.trim().isEmpty == true || mData.value.carNum?.trim() == null) {
-        Util.toast(Strings.of(context)?.get("order_trans_info_driver_hint")??"차량을 지정해주세요._");
+        Util.snackbar(context,Strings.of(context)?.get("order_trans_info_driver_hint")??"차량을 지정해주세요._");
         return false;
       }
     }
     if(mData.value.buyCharge?.trim().isEmpty == true || mData.value.buyCharge?.trim() == null) {
-      Util.toast(Strings.of(context)?.get("order_trans_info_charge_hint")??"운임비를 입력해주세요._");
+      Util.snackbar(context,Strings.of(context)?.get("order_trans_info_charge_hint")??"운임비를 입력해주세요._");
       return false;
     }
     return true;
