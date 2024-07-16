@@ -801,7 +801,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       await DioService.dioClient(header: true).orderAlloc(
           user.authorization,
           mData.value.orderId,
-          mData.value.custId, mData.value.deptId, user.userId, user.mobile,
+          mData.value.custId,mData.value.deptId, user.userId, user.mobile,
           "", "", "", "", mData.value.buyCharge, mData.value.buyFee,
           mData.value.vehicId, mData.value.driverId, mData.value.carNum, mData.value.carTonCode,
           mData.value.carTypeCode,mData.value.driverName,mData.value.driverTel,mData.value.driverMemo,

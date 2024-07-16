@@ -10,7 +10,8 @@ import 'package:sqflite/sqflite.dart';
 
 //Table
 const String orderTable = "order_table";
-// Column
+const String templateTable = 'template_table';
+// Order Columns
 const String orderId = "orderId";                //오더 ID
 const String reqCustId = "reqCustId";            //화주 거래처 ID
 const String reqCustName = "reqCustName";            //화주 거래처명
@@ -184,6 +185,9 @@ const String oneCargo = "oneCargo";
 const String call24Charge = "call24Charge";
 const String manCharge = "manCharge";
 const String oneCharge = "oneCharge";
+
+// Template Colums
+const String templateTitle = "templateTitle"; // 탬플릿명
 
 class AppDataBase {
 

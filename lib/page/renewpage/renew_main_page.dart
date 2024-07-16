@@ -20,6 +20,7 @@ import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/cust_user_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_current_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
+import 'package:logislink_tms_flutter/common/model/template_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_rpa_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
@@ -75,6 +76,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final orderList = List.empty(growable: true).obs;
   final custUserList = List.empty(growable: true).obs;
   final userRpaModel = UserRpaModel().obs;
+  final template_list = List.empty(growable: true).obs;
   final myOrder = "N".obs;
   final orderState = "".obs;
   final allocState = "".obs;
@@ -190,6 +192,491 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       if(orderList.isNotEmpty) orderList.clear();
       orderList.addAll(list);
     }
+
+      template_list.add(
+          TemplateModel(
+              templateTitle: "템플릿 테스트",
+              templateId: "TP20240711095643",
+              reqCustId: "temp_test1",
+              reqCustName: "테스트 화주",
+              reqDeptId: "dept_test",
+              reqDeptName: "배차팀",
+              reqStaff: "김담당",
+              reqTel: "010-1111-5222",
+              reqAddr: "경기도 고양시 일산대로",
+              reqAddrDetail: "화정트릴파크움 102동 1102호",
+              custId: "C2024070900000",
+              custName: "테스트 주선사",
+              deptId: "tms_test",
+              deptName: "관리자",
+              inOutSctn: "01",
+              inOutSctnName: "내수",
+              truckTypeCode: "TR",
+              truckTypeName: "트럭",
+              sComName: "테스트 상차지",
+              sSido: "경기도 고양시",
+              sGungu: "일산서구",
+              sDong: "풍산동",
+              sAddr: "가내로 184-2길",
+              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
+              sStaff: "곰담당",
+              sTel: "010-9999-8888",
+              sMemo: "상차지 테스트 메모",
+              eComName: "하차지 테스트",
+              eSido: "부산광역시",
+              eGungu: "중구",
+              eDong: "광산동",
+              eAddr: "하천읍17-7길",
+              eAddrDetail: "해운드릴터파크 202동 202호",
+              eStaff: "쿠담당",
+              eTel: "010-9999-7777",
+              eMemo: "하차지 테스트 메모",
+              sLat: 39.99152432,
+              sLon: 72.79536515,
+              eLat: 42.24884351,
+              eLon: 135.5132484,
+              goodsName: "화물정보 테스트",
+              goodsWeight: "5톤",
+              weightUnitCode: "TON",
+              weightUnitName: "톤",
+              goodsQty: "11",
+              qtyUnitCode: "R/L",
+              qtyUnitName: "qtyUnitName",
+              sWayCode: "수",
+              sWayName: "수작업",
+              eWayCode: "지",
+              eWayName: "지금",
+              mixYn: "N",
+              mixSize: "",
+              returnYn: "N",
+              carTonCode: "5",
+              carTonName: "5톤",
+              carTypeCode: "06",
+              carTypeName: "몰루",
+              chargeType: "01",
+              chargeTypeName: "인수증",
+              distance: 17.12,
+              time: 27,
+              reqMemo: "요청사항 뭔데?",
+              driverMemo: "차주 요청 사항 뭔데?",
+              itemCode: "27",
+              itemName: "응애",
+              stopCount: 0,
+
+              sellCharge: "65000",
+              sellFee: "6500",
+              sellWeight: "1",
+              sellWayPointMemo: "매출경유비 메모",
+              sellWayPointCharge: "10000",
+              sellStayMemo: "매출 대기료 메모",
+              sellStayCharge: "10100",
+              sellHandWorkMemo: "매출 수작업비 메모",
+              sellHandWorkCharge: "10200",
+              sellRoundMemo: "매출 회차료 메모",
+              sellRoundCharge: "10300",
+              sellOtherAddMemo: "매출 기타추가비 메모",
+              sellOtherAddCharge: "10400",
+              custPayType: "Y",
+
+              buyCharge: "75000",
+              buyFee: "7500",
+
+              linkCode: "F",
+              linkCodeName: "접수",
+              linkType: "03",
+              wayPointMemo: "ㅇㅇㅇ",
+              wayPointCharge: "11",
+              stayMemo: "ㄴㄴㄴㄴ",
+              stayCharge: "22",
+              handWorkMemo: "ㄷㄷㄷㄷ",
+              handWorkCharge: "33",
+              roundMemo: "ㄹㄹㄹㄹ",
+              roundCharge: "44",
+              otherAddMemo: "ㅁㅁㅁㅁ",
+              otherAddCharge: "55",
+              unitPrice: "",
+              unitPriceType: "01",
+              unitPriceTypeName: "대당단가",
+              custMngName: "정상",
+              custMngMemo: "정상입니다.",
+              payType: "N",
+              reqPayYN: "N",
+              reqPayDate: "",
+              talkYn: "Y",
+              orderStopList: List.empty(growable: true),
+              reqStaffName: "요담당",
+              call24Cargo: "D",
+              manCargo: "D",
+              oneCargo: "R",
+              call24Charge: "20000",
+              manCharge: "15000",
+              oneCharge: "16000"
+          )
+      );
+
+      template_list.add(
+          TemplateModel(
+              templateTitle: "템플릿 테스트222",
+              templateId: "TP20240710022141",
+              reqCustId: "temp_test1",
+              reqCustName: "테스트 화주",
+              reqDeptId: "dept_test",
+              reqDeptName: "배차팀",
+              reqStaff: "김담당",
+              reqTel: "010-1111-5222",
+              reqAddr: "경기도 고양시 일산대로",
+              reqAddrDetail: "화정트릴파크움 102동 1102호",
+              custId: "C2024070900000",
+              custName: "테스트 주선사",
+              deptId: "tms_test",
+              deptName: "관리자",
+              inOutSctn: "01",
+              inOutSctnName: "내수",
+              truckTypeCode: "TR",
+              truckTypeName: "트럭",
+              sComName: "테스트 상차지",
+              sSido: "경기도 고양시",
+              sGungu: "일산서구",
+              sDong: "풍산동",
+              sAddr: "가내로 184-2길",
+              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
+              sStaff: "곰담당",
+              sTel: "010-9999-8888",
+              sMemo: "상차지 테스트 메모",
+              eComName: "하차지 테스트",
+              eSido: "부산광역시",
+              eGungu: "중구",
+              eDong: "광산동",
+              eAddr: "하천읍17-7길",
+              eAddrDetail: "해운드릴터파크 202동 202호",
+              eStaff: "쿠담당",
+              eTel: "010-9999-7777",
+              eMemo: "하차지 테스트 메모",
+              sLat: 39.99152432,
+              sLon: 72.79536515,
+              eLat: 42.24884351,
+              eLon: 135.5132484,
+              goodsName: "화물정보 테스트",
+              goodsWeight: "5톤",
+              weightUnitCode: "TON",
+              weightUnitName: "톤",
+              goodsQty: "11",
+              qtyUnitCode: "R/L",
+              qtyUnitName: "qtyUnitName",
+              sWayCode: "수",
+              sWayName: "수작업",
+              eWayCode: "지",
+              eWayName: "지금",
+              mixYn: "N",
+              mixSize: "",
+              returnYn: "N",
+              carTonCode: "5",
+              carTonName: "5톤",
+              carTypeCode: "06",
+              carTypeName: "몰루",
+              chargeType: "01",
+              chargeTypeName: "인수증",
+              distance: 17.12,
+              time: 27,
+              reqMemo: "요청사항 뭔데?",
+              driverMemo: "차주 요청 사항 뭔데?",
+              itemCode: "27",
+              itemName: "응애",
+              stopCount: 0,
+
+              sellCharge: "65000",
+              sellFee: "6500",
+              sellWeight: "1",
+              sellWayPointMemo: "매출경유비 메모",
+              sellWayPointCharge: "10000",
+              sellStayMemo: "매출 대기료 메모",
+              sellStayCharge: "10100",
+              sellHandWorkMemo: "매출 수작업비 메모",
+              sellHandWorkCharge: "10200",
+              sellRoundMemo: "매출 회차료 메모",
+              sellRoundCharge: "10300",
+              sellOtherAddMemo: "매출 기타추가비 메모",
+              sellOtherAddCharge: "10400",
+              custPayType: "Y",
+
+              buyCharge: "75000",
+              buyFee: "7500",
+
+              linkCode: "F",
+              linkCodeName: "접수",
+              linkType: "03",
+              wayPointMemo: "ㅇㅇㅇ",
+              wayPointCharge: "11",
+              stayMemo: "ㄴㄴㄴㄴ",
+              stayCharge: "22",
+              handWorkMemo: "ㄷㄷㄷㄷ",
+              handWorkCharge: "33",
+              roundMemo: "ㄹㄹㄹㄹ",
+              roundCharge: "44",
+              otherAddMemo: "ㅁㅁㅁㅁ",
+              otherAddCharge: "55",
+              unitPrice: "",
+              unitPriceType: "01",
+              unitPriceTypeName: "대당단가",
+              custMngName: "정상",
+              custMngMemo: "정상입니다.",
+              payType: "N",
+              reqPayYN: "N",
+              reqPayDate: "",
+              talkYn: "Y",
+              orderStopList: List.empty(growable: true),
+              reqStaffName: "요담당",
+              call24Cargo: "D",
+              manCargo: "D",
+              oneCargo: "R",
+              call24Charge: "20000",
+              manCharge: "15000",
+              oneCharge: "16000"
+          )
+      );
+
+      template_list.add(
+          TemplateModel(
+              templateTitle: "템플릿 테스트333",
+              templateId: "TP20240713032153",
+              reqCustId: "temp_test1",
+              reqCustName: "테스트 화주",
+              reqDeptId: "dept_test",
+              reqDeptName: "배차팀",
+              reqStaff: "김담당",
+              reqTel: "010-1111-5222",
+              reqAddr: "경기도 고양시 일산대로",
+              reqAddrDetail: "화정트릴파크움 102동 1102호",
+              custId: "C2024070900000",
+              custName: "테스트 주선사",
+              deptId: "tms_test",
+              deptName: "관리자",
+              inOutSctn: "01",
+              inOutSctnName: "내수",
+              truckTypeCode: "TR",
+              truckTypeName: "트럭",
+              sComName: "테스트 상차지",
+              sSido: "경기도 고양시",
+              sGungu: "일산서구",
+              sDong: "풍산동",
+              sAddr: "가내로 184-2길",
+              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
+              sStaff: "곰담당",
+              sTel: "010-9999-8888",
+              sMemo: "상차지 테스트 메모",
+              eComName: "하차지 테스트",
+              eSido: "부산광역시",
+              eGungu: "중구",
+              eDong: "광산동",
+              eAddr: "하천읍17-7길",
+              eAddrDetail: "해운드릴터파크 202동 202호",
+              eStaff: "쿠담당",
+              eTel: "010-9999-7777",
+              eMemo: "하차지 테스트 메모",
+              sLat: 39.99152432,
+              sLon: 72.79536515,
+              eLat: 42.24884351,
+              eLon: 135.5132484,
+              goodsName: "화물정보 테스트",
+              goodsWeight: "5톤",
+              weightUnitCode: "TON",
+              weightUnitName: "톤",
+              goodsQty: "11",
+              qtyUnitCode: "R/L",
+              qtyUnitName: "qtyUnitName",
+              sWayCode: "수",
+              sWayName: "수작업",
+              eWayCode: "지",
+              eWayName: "지금",
+              mixYn: "N",
+              mixSize: "",
+              returnYn: "N",
+              carTonCode: "5",
+              carTonName: "5톤",
+              carTypeCode: "06",
+              carTypeName: "몰루",
+              chargeType: "01",
+              chargeTypeName: "인수증",
+              distance: 17.12,
+              time: 27,
+              reqMemo: "요청사항 뭔데?",
+              driverMemo: "차주 요청 사항 뭔데?",
+              itemCode: "27",
+              itemName: "응애",
+              stopCount: 0,
+
+              sellCharge: "65000",
+              sellFee: "6500",
+              sellWeight: "1",
+              sellWayPointMemo: "매출경유비 메모",
+              sellWayPointCharge: "10000",
+              sellStayMemo: "매출 대기료 메모",
+              sellStayCharge: "10100",
+              sellHandWorkMemo: "매출 수작업비 메모",
+              sellHandWorkCharge: "10200",
+              sellRoundMemo: "매출 회차료 메모",
+              sellRoundCharge: "10300",
+              sellOtherAddMemo: "매출 기타추가비 메모",
+              sellOtherAddCharge: "10400",
+              custPayType: "Y",
+
+              buyCharge: "75000",
+              buyFee: "7500",
+
+              linkCode: "F",
+              linkCodeName: "접수",
+              linkType: "03",
+              wayPointMemo: "ㅇㅇㅇ",
+              wayPointCharge: "11",
+              stayMemo: "ㄴㄴㄴㄴ",
+              stayCharge: "22",
+              handWorkMemo: "ㄷㄷㄷㄷ",
+              handWorkCharge: "33",
+              roundMemo: "ㄹㄹㄹㄹ",
+              roundCharge: "44",
+              otherAddMemo: "ㅁㅁㅁㅁ",
+              otherAddCharge: "55",
+              unitPrice: "",
+              unitPriceType: "01",
+              unitPriceTypeName: "대당단가",
+              custMngName: "정상",
+              custMngMemo: "정상입니다.",
+              payType: "N",
+              reqPayYN: "N",
+              reqPayDate: "",
+              talkYn: "Y",
+              orderStopList: List.empty(growable: true),
+              reqStaffName: "요담당",
+              call24Cargo: "D",
+              manCargo: "D",
+              oneCargo: "R",
+              call24Charge: "20000",
+              manCharge: "15000",
+              oneCharge: "16000"
+          )
+      );
+
+      template_list.add(
+          TemplateModel(
+              templateTitle: "템플릿 테스트444",
+              templateId: "TP202407141201772",
+              reqCustId: "temp_test1",
+              reqCustName: "테스트 화주",
+              reqDeptId: "dept_test",
+              reqDeptName: "배차팀",
+              reqStaff: "김담당",
+              reqTel: "010-1111-5222",
+              reqAddr: "경기도 고양시 일산대로",
+              reqAddrDetail: "화정트릴파크움 102동 1102호",
+              custId: "C2024070900000",
+              custName: "테스트 주선사",
+              deptId: "tms_test",
+              deptName: "관리자",
+              inOutSctn: "01",
+              inOutSctnName: "내수",
+              truckTypeCode: "TR",
+              truckTypeName: "트럭",
+              sComName: "테스트 상차지",
+              sSido: "경기도 고양시",
+              sGungu: "일산서구",
+              sDong: "풍산동",
+              sAddr: "가내로 184-2길",
+              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
+              sStaff: "곰담당",
+              sTel: "010-9999-8888",
+              sMemo: "상차지 테스트 메모",
+              eComName: "하차지 테스트",
+              eSido: "부산광역시",
+              eGungu: "중구",
+              eDong: "광산동",
+              eAddr: "하천읍17-7길",
+              eAddrDetail: "해운드릴터파크 202동 202호",
+              eStaff: "쿠담당",
+              eTel: "010-9999-7777",
+              eMemo: "하차지 테스트 메모",
+              sLat: 39.99152432,
+              sLon: 72.79536515,
+              eLat: 42.24884351,
+              eLon: 135.5132484,
+              goodsName: "화물정보 테스트",
+              goodsWeight: "5톤",
+              weightUnitCode: "TON",
+              weightUnitName: "톤",
+              goodsQty: "11",
+              qtyUnitCode: "R/L",
+              qtyUnitName: "qtyUnitName",
+              sWayCode: "수",
+              sWayName: "수작업",
+              eWayCode: "지",
+              eWayName: "지금",
+              mixYn: "N",
+              mixSize: "",
+              returnYn: "N",
+              carTonCode: "5",
+              carTonName: "5톤",
+              carTypeCode: "06",
+              carTypeName: "몰루",
+              chargeType: "01",
+              chargeTypeName: "인수증",
+              distance: 17.12,
+              time: 27,
+              reqMemo: "요청사항 뭔데?",
+              driverMemo: "차주 요청 사항 뭔데?",
+              itemCode: "27",
+              itemName: "응애",
+              stopCount: 0,
+
+              sellCharge: "65000",
+              sellFee: "6500",
+              sellWeight: "1",
+              sellWayPointMemo: "매출경유비 메모",
+              sellWayPointCharge: "10000",
+              sellStayMemo: "매출 대기료 메모",
+              sellStayCharge: "10100",
+              sellHandWorkMemo: "매출 수작업비 메모",
+              sellHandWorkCharge: "10200",
+              sellRoundMemo: "매출 회차료 메모",
+              sellRoundCharge: "10300",
+              sellOtherAddMemo: "매출 기타추가비 메모",
+              sellOtherAddCharge: "10400",
+              custPayType: "Y",
+
+              buyCharge: "75000",
+              buyFee: "7500",
+
+              linkCode: "F",
+              linkCodeName: "접수",
+              linkType: "03",
+              wayPointMemo: "ㅇㅇㅇ",
+              wayPointCharge: "11",
+              stayMemo: "ㄴㄴㄴㄴ",
+              stayCharge: "22",
+              handWorkMemo: "ㄷㄷㄷㄷ",
+              handWorkCharge: "33",
+              roundMemo: "ㄹㄹㄹㄹ",
+              roundCharge: "44",
+              otherAddMemo: "ㅁㅁㅁㅁ",
+              otherAddCharge: "55",
+              unitPrice: "",
+              unitPriceType: "01",
+              unitPriceTypeName: "대당단가",
+              custMngName: "정상",
+              custMngMemo: "정상입니다.",
+              payType: "N",
+              reqPayYN: "N",
+              reqPayDate: "",
+              talkYn: "Y",
+              orderStopList: List.empty(growable: true),
+              reqStaffName: "요담당",
+              call24Cargo: "D",
+              manCargo: "D",
+              oneCargo: "R",
+              call24Charge: "20000",
+              manCharge: "15000",
+              oneCharge: "16000"
+          )
+      );
+
   }
 
   void handleDeepLink() async {
@@ -519,6 +1006,72 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       msg = "";
     }
     return msg;
+  }
+
+  Future<void> openRegOrderTemplateSheet(BuildContext context, String title) async {
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      enableDrag: true,
+      barrierLabel: title,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+          side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return FractionallySizedBox(
+            heightFactor: template_list.length > 2 ? 0.70 : 0.4,
+            child: Container(
+                width: double.infinity,
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+                padding: EdgeInsets.only(right: CustomStyle.getWidth(10),left: CustomStyle.getWidth(10),top: CustomStyle.getHeight(10)),
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    color: Colors.white
+                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
+                          child: Text(
+                              title,
+                              style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800)
+                          )
+                      ),
+                      templateListWidget(),
+                      InkWell(
+                          onTap: () async {
+                            Future.delayed(const Duration(milliseconds: 300), () {
+                              Navigator.of(context).pop();
+                            });
+                          },
+                          child: Center(
+                              child: Container(
+                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                height: CustomStyle.getHeight(50),
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  "적용",
+                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                ),
+                              )
+                          )
+                      )
+                    ]
+                )
+            )
+        );
+      },
+    );
   }
 
   Future<void> openCodeBottomSheet(BuildContext context, String title, String codeType, Function(String codeType,{CodeModel codeModel,CustUserModel custUserModel,int value}) callback) async {
@@ -999,9 +1552,24 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                                           child: Column(
                                                 children: [
-                                                  Text(
-                                                      "스마트오더",
-                                                      style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                  Row(
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    children: [
+                                                      select_reg_order.value == "01" ?
+                                                      Container(
+                                                        margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                                                        child: const Icon(
+                                                            Icons.check_circle_outline_rounded,
+                                                          color: renew_main_color2,
+                                                          size: 18,
+                                                        )
+                                                      ) : const SizedBox(),
+                                                      Text(
+                                                          "스마트오더",
+                                                          style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                      ),
+                                                    ]
                                                   ),
                                                   Text(
                                                       "신속한 오더 등록이\n가능해요",
@@ -1055,9 +1623,24 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                                                child: Column(
                                                  children: [
-                                                   Text(
-                                                       "일반오더",
-                                                       style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                   Row(
+                                                       crossAxisAlignment: CrossAxisAlignment.center,
+                                                       mainAxisAlignment: MainAxisAlignment.center,
+                                                       children: [
+                                                         select_reg_order.value == "02" ?
+                                                         Container(
+                                                             margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                                                             child: const Icon(
+                                                               Icons.check_circle_outline_rounded,
+                                                               color: renew_main_color2,
+                                                               size: 18,
+                                                             )
+                                                         ) : const SizedBox(),
+                                                         Text(
+                                                             "일반오더",
+                                                             style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                         ),
+                                                       ]
                                                    ),
                                                    Text(
                                                        "상세한 오더 등록이\n가능해요",
@@ -2482,6 +3065,27 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   void showGuestDialog(){
     openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+  }
+
+  int chargeTotal(String? chargeFlag,TemplateModel mData) {
+    int total = 0;
+    if(chargeFlag == "S") {
+      total = int.parse(mData.sellCharge ?? "0") +
+          int.parse(mData.sellWayPointCharge ?? "0") +
+          int.parse(mData.sellStayCharge ?? "0") +
+          int.parse(mData.sellHandWorkCharge ?? "0") +
+          int.parse(mData.sellRoundCharge ?? "0") +
+          int.parse(mData.sellOtherAddCharge ?? "0");
+    }else {
+      total = int.parse(mData.buyCharge ?? "0") +
+          int.parse(mData.wayPointCharge ?? "0") +
+          int.parse(mData.stayCharge ?? "0") +
+          int.parse(mData.handWorkCharge ?? "0") +
+          int.parse(mData.roundCharge ?? "0") +
+          int.parse(mData.otherAddCharge ?? "0") -
+          int.parse(mData.sellFee ?? "0");
+    }
+    return total;
   }
 
   /**
@@ -4760,7 +5364,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   Future goToRegOrderPage(String type) async {
     if(type == "01") {
-
+      openRegOrderTemplateSheet(context, "등록할\n탬플릿을 선택해주세요.");
     }else{
       Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RegistOrderPage(flag: "R"), pageAnimationType: LeftToRightTransition()));
 
@@ -4771,6 +5375,383 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       }
     }
   }
+
+  Widget templateListWidget(){
+
+    return Obx(() => Container(
+      child: template_list.isNotEmpty
+          ? Expanded(
+          child: AnimationLimiter(
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: template_list.length,
+                itemBuilder: (context, index) {
+                  var item = template_list[index];
+                  return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 375),
+                      child: SlideAnimation(
+                          verticalOffset: 50.0,
+                          child: FadeInAnimation(
+                              child: getListItemView(item)
+                          )
+                      )
+                  );
+                },
+              )
+          )
+      ):Expanded(
+          child: Container(
+              alignment: Alignment.center,
+              child: Text(
+                Strings.of(context)?.get("empty_list") ?? "Not Found",
+                style: CustomStyle.baseFont(),
+              )
+          )
+      ),
+    ));
+  }
+
+  Widget getListItemView(TemplateModel item) {
+
+    final selected = false.obs;
+
+    return InkWell(
+        onTap: (){
+          selected.value = !selected.value;
+        },
+        child: Obx(() => Container(
+            margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20),vertical: CustomStyle.getHeight(10)),
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(20)),
+                border: Border.all(color: selected.value ? renew_main_color2 : Colors.white,width: 2)
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Obx(() =>
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                            margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal: CustomStyle.getWidth(15)),
+                            child:Text(
+                                "${item.templateTitle}",
+                                style:CustomStyle.CustomFont(styleFontSize18, renew_main_color2,font_weight: FontWeight.w600)
+                            )
+                        ),
+                      ],
+                    )),
+                CustomStyle.getDivider1(),
+                Container(
+                    margin: EdgeInsets.only(top: CustomStyle.getHeight(5),left: CustomStyle.getWidth(15),right: CustomStyle.getWidth(15)),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                                "${item.custName}",
+                                style:CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w500)
+                            ),
+                            Text(
+                                "${item.deptId}",
+                                style:CustomStyle.CustomFont(styleFontSize13, Colors.black,font_weight: FontWeight.w300)
+                            )
+                          ],
+                        ),
+                        Util.ynToBoolean(item.payType)?
+                        Text(
+                          "빠른지급",
+                          textAlign: TextAlign.center,
+                          style: CustomStyle.CustomFont(styleFontSize14, Colors.red,font_weight: FontWeight.w700),
+                        ) : const SizedBox()
+                      ],
+                    )
+                ),
+                Column(
+                    children:[
+                      Container(
+                          margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                      width: 2,
+                                      color: light_gray24
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: Container(
+                                    child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                    padding:const EdgeInsets.all(3),
+                                                    margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                                    decoration: const BoxDecoration(
+                                                        color: renew_main_color2,
+                                                        shape: BoxShape.circle
+                                                    ),
+                                                    child: Text("상",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
+                                                ),
+                                                Text(
+                                                  "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+                                                  style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ]
+                                          ),
+                                          Flexible(
+                                              child: RichText(
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
+                                                  textAlign:TextAlign.center,
+                                                  text: TextSpan(
+                                                    text: item.sComName??"",
+                                                    style:  CustomStyle.CustomFont(styleFontSize16, main_color, font_weight: FontWeight.w800),
+                                                  )
+                                              )
+                                          ),
+                                          CustomStyle.sizedBoxHeight(5.0.h),
+                                          Flexible(
+                                              child: RichText(
+                                                  overflow: TextOverflow.ellipsis,
+                                                  maxLines: 2,
+                                                  textAlign:TextAlign.center,
+                                                  text: TextSpan(
+                                                    text: item.sAddr??"",
+                                                    style: CustomStyle.CustomFont(styleFontSize11, main_color),
+                                                  )
+                                              )
+                                          ),
+                                        ]
+                                    )
+                                ),
+                              ),
+                              Expanded(
+                                  flex: 2,
+                                  child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          "assets/image/ic_arrow.png",
+                                          width: CustomStyle.getWidth(32.0),
+                                          height: CustomStyle.getHeight(32.0),
+                                          color: const Color(0xffC7CBDE),
+                                        ),
+                                        Text(
+                                          "${Util.makeDistance(item.distance)}",
+                                          style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
+                                        ),
+                                        Text(
+                                          "${Util.makeTime(item.time??0)}",
+                                          style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
+                                        )
+                                      ]
+                                  )
+                              ),
+                              Expanded(
+                                  flex: 4,
+                                  child: Container(
+                                      decoration: const BoxDecoration(
+                                        borderRadius:  BorderRadius.all(Radius.circular(10)),
+                                      ),
+                                      child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                      padding:const EdgeInsets.all(3),
+                                                      margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                                      decoration: const BoxDecoration(
+                                                          color: rpa_btn_cancle,
+                                                          shape: BoxShape.circle
+                                                      ),
+                                                      child: Text("하",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
+                                                  ),
+                                                  Text(
+                                                    "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
+                                                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ]
+                                            ),
+                                            Flexible(
+                                                child: RichText(
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                    textAlign: TextAlign.center,
+                                                    text: TextSpan(
+                                                      text:
+                                                      item.eComName ?? "",
+                                                      style: CustomStyle.CustomFont(styleFontSize16, main_color, font_weight: FontWeight.w800),
+                                                    )
+                                                )
+                                            ),
+                                            CustomStyle.sizedBoxHeight(5.h),
+                                            Flexible(
+                                                child: RichText(
+                                                    overflow: TextOverflow.ellipsis,
+                                                    maxLines: 2,
+                                                    textAlign: TextAlign.center,
+                                                    text: TextSpan(
+                                                        text: item.eAddr??"",
+                                                        style:CustomStyle.CustomFont(styleFontSize11, main_color)
+                                                    )
+                                                )
+                                            ),
+                                          ]
+                                      )
+                                  )
+                              )
+                            ],
+                          )
+                      ) ,
+                      Container(
+                          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15), vertical: CustomStyle.getHeight(5)),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "청구운임",
+                                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                                  ),
+                                  Text(
+                                    "${Util.getInCodeCommaWon(chargeTotal("S",item).toString())} 원",
+                                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w700),
+                                  )
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "지불운임",
+                                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+                                  ),
+                                  Text(
+                                    "${Util.getInCodeCommaWon(chargeTotal("T",item).toString())} 원",
+                                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w700),
+                                  )
+                                ],
+                              )
+                            ],
+                          )
+                      ),
+                      Container(
+                          padding: EdgeInsets.only(left: CustomStyle.getWidth(15), right: CustomStyle.getWidth(15), bottom: CustomStyle.getHeight(10),top: CustomStyle.getHeight(5)),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                  children:[
+                                    Container(
+                                        padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(15)),
+                                        margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xffDBD1FF),
+                                            borderRadius: BorderRadius.circular(3)
+                                        ),
+                                        child: Text(
+                                          "${item.carTonName}",
+                                          style: CustomStyle.CustomFont(styleFontSize10, const Color(0xff8674C7),font_weight: FontWeight.w600),
+                                        )
+                                    ),
+                                    Container(
+                                        padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(15)),
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xffDBD1FF),
+                                            borderRadius: BorderRadius.circular(3)
+                                        ),
+                                        child: Text(
+                                          "${item.carTypeName}",
+                                          style: CustomStyle.CustomFont(styleFontSize10, const Color(0xff8674C7),font_weight: FontWeight.w600),
+                                        )
+                                    ),
+                                  ]
+                              ),
+                              Row(
+                                  children: [
+                                    item.truckTypeName != null || item.truckTypeName?.isNotEmpty == true?
+                                    Container(
+                                        padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(15)),
+                                        margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xffD2DAF5),
+                                            borderRadius: BorderRadius.circular(3)
+                                        ),
+                                        child: Text(
+                                          "${item.truckTypeName}",
+                                          style: CustomStyle.CustomFont(styleFontSize10, const Color(0xff5C67C1),font_weight: FontWeight.w600),
+                                        )
+                                    ) : const SizedBox(),
+                                    Container(
+                                        padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(15)),
+                                        margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xffADEFD1),
+                                            borderRadius: BorderRadius.circular(3)
+                                        ),
+                                        child: Text(
+                                          "${item.mixYn == "Y" ? "혼적" : "독차"}",
+                                          style: CustomStyle.CustomFont(styleFontSize10, const Color(0xff5EAD89),font_weight: FontWeight.w600),
+                                        )
+                                    ),
+                                    Container(
+                                        padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(15)),
+                                        margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
+                                        decoration: BoxDecoration(
+                                            color: const Color(0xffADEFD1),
+                                            borderRadius: BorderRadius.circular(3)
+                                        ),
+                                        child: Text(
+                                          item.returnYn == "Y" ? "왕복" : "편도",
+                                          style: CustomStyle.CustomFont(styleFontSize10, const Color(0xff5EAD89),font_weight: FontWeight.w600),
+                                        )
+                                    ),
+                                  ])
+                            ],
+                          )
+                      ),
+                    ]
+                ),
+              ],
+            )
+        ))
+    );
+  }
+
 
   /**
    * Widget End

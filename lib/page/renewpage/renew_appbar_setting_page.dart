@@ -9,15 +9,19 @@ import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
+import 'package:logislink_tms_flutter/page/renewpage/template_manage_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_request_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cargo_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_charge_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/webview_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
+import 'package:page_animation_transition/animations/left_to_right_transition.dart';
+import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
@@ -515,8 +519,8 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
                       )
                   ),
                   InkWell(
-                      onTap: (){
-
+                      onTap: () async {
+                        await Navigator.of(context).push(PageAnimationTransition(page: TemplateManagePage(), pageAnimationType: LeftToRightTransition()));
                       },
                       child: Container(
                           width:CustomStyle.getWidth(90),
