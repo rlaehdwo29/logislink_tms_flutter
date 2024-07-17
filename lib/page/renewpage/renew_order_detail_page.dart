@@ -230,7 +230,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         child: Container(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-                final dashCount = (constraints.constrainWidth().toInt() / 8.0).floor();
+                final dashCount = App().isTablet(context) ? (constraints.constrainWidth().toInt() / 15.0).floor() : (constraints.constrainWidth().toInt() / 8.0).floor();
                 return Flex(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   direction: Axis.horizontal,
@@ -2491,7 +2491,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Container(
-                                        padding:const EdgeInsets.all(3),
+                                        padding: App().isTablet(context) ? const EdgeInsets.all(10) : const EdgeInsets.all(3),
                                         margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                         decoration: const BoxDecoration(
                                             color: renew_main_color2,
@@ -2572,7 +2572,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                          padding:const EdgeInsets.all(3),
+                                          padding: App().isTablet(context) ? const EdgeInsets.all(10) : const EdgeInsets.all(3),
                                           margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                           decoration: const BoxDecoration(
                                               color: rpa_btn_cancle,
@@ -2981,7 +2981,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                                 style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w500),
                               ),
                               Container(
-                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(50),
+                                width: App().isTablet(context) ? MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(80) : MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(50),
                                 padding: const EdgeInsets.all(10),
                                 margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
                                 child: Text(
@@ -2997,7 +2997,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                                 )
                               ),
                               Container(
-                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(50),
+                                width: App().isTablet(context) ? MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(80) : MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(50),
                                 padding: const EdgeInsets.all(10),
                                 margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
                                 child: Text(

@@ -122,7 +122,7 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
       backgroundColor: Colors.white,
       builder: (context) {
         return FractionallySizedBox(
-            heightFactor: 0.35,
+            heightFactor: App().isTablet(context) ? 0.5 :  0.35,
             child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,

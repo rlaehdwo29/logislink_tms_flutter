@@ -29,8 +29,6 @@ import 'package:logislink_tms_flutter/db/appdatabase.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_setting_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_detail_page.dart';
-import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
-import 'package:logislink_tms_flutter/page/subpage/appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
@@ -101,7 +99,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   AutoScrollController  scrollController = AutoScrollController();
   final page = 1.obs;
-  final api24Data = Map<String, dynamic>().obs;
+  final api24Data = <String, dynamic>{}.obs;
   final prev_page = 1.obs;
   final totalPage = 1.obs;
   final mPoint = 0.obs;
@@ -119,9 +117,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   //Sample
   final smartOrderCode = "".obs;
 
-  /**
-   * Function Start
-   */
+  /// Function Start
 
   @override
   void initState() {
@@ -147,19 +143,19 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       //  Navigator.push(context, MaterialPageRoute(builder: (context) => OrderDetailPage(allocId: widget.allocId)));
       }
       scrollController.addListener(() {
-        var now_scroll = scrollController.position.pixels;
-        var max_scroll = scrollController.position.maxScrollExtent;
-        if(now_scroll >= 300) {
+        var nowScroll = scrollController.position.pixels;
+        var maxScroll = scrollController.position.maxScrollExtent;
+        if(nowScroll >= 300) {
           ivTop.value = true;
         } else {
           ivTop.value = false;
         }
-        if(now_scroll < (max_scroll-800)) {
+        if(nowScroll < (maxScroll-800)) {
           ivBottom.value = true;
         }else{
           ivBottom.value = false;
         }
-        if((max_scroll - now_scroll) <= 50){
+        if((maxScroll - nowScroll) <= 50){
           if(page.value < totalPage.value){
             lastPositionItem.value = orderList.value.length;
             page.value++;
@@ -188,7 +184,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     await getCustUser();
     mUser.value = await controller.getUserInfo();
     List<OrderModel> list = await db.getOrderList(context);
-    if(list != null && list.length != 0) {
+    if(list.isNotEmpty) {
       if(orderList.isNotEmpty) orderList.clear();
       orderList.addAll(list);
     }
@@ -743,46 +739,40 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   Future openCalendarDialog() {
     mCalendarNowDate = DateTime.now();
-    DateTime? _tempSelectedDay = null;
-    DateTime? _tempRangeStart = mCalendarStartDate.value;
-    DateTime? _tempRangeEnd = mCalendarEndDate.value;
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return AlertDialog(
-                    contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
-                    titlePadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(0.0))
-                    ),
-                    title: Container(
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15.0),horizontal: CustomStyle.getWidth(15.0)),
-                        color: main_color,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "시작 날짜 : ${_tempRangeStart == null?"-":"${_tempRangeStart?.year}년 ${_tempRangeStart?.month}월 ${_tempRangeStart?.day}일"}",
-                                style: CustomStyle.CustomFont(
-                                    styleFontSize16, styleWhiteCol),
-                              ),
-                              CustomStyle.sizedBoxHeight(5.0),
-                              Text(
-                                "종료 날짜 : ${_tempRangeEnd == null?"-":"${_tempRangeEnd?.year}년 ${_tempRangeEnd?.month}월 ${_tempRangeEnd?.day}일"}",
-                                style: CustomStyle.CustomFont(
-                                    styleFontSize16, styleWhiteCol),
-                              ),
-                            ]
-                        )
-                    ),
-                    content: SingleChildScrollView(
+    DateTime? tempSelectedDay;
+    final tempRangeStart = mCalendarStartDate.value.obs;
+    final tempRangeEnd = mCalendarEndDate.value.obs;
+
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      enableDrag: true,
+      barrierLabel: "ㅇㅇㅇㅇㅇ",
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+          side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return FractionallySizedBox(
+            heightFactor: 0.65,
+            child: Container(
+                width: double.infinity,
+                alignment: Alignment.centerLeft,
+                margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+                padding: EdgeInsets.only(right: CustomStyle.getWidth(10),left: CustomStyle.getWidth(10),top: CustomStyle.getHeight(10)),
+                decoration: const BoxDecoration(
+                    color: Colors.white
+                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SingleChildScrollView(
                         child: SizedBox(
-                            width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
-                            height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height * 0.6,
+                            width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width,
+                            height: MediaQueryData.fromView(WidgetsBinding.instance.window).size.height * 0.6,
                             child: Column(
                                 children: [
                                   TableCalendar(
@@ -810,53 +800,49 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                       isTodayHighlighted: false,
                                       // 캘린더의 평일 배경 스타일링(default면 평일을 의미)
                                       defaultDecoration: const BoxDecoration(
-                                        color: order_item_background,
-                                        shape: BoxShape.rectangle,
+                                        color: Colors.white,
                                       ),
                                       // 캘린더의 주말 배경 스타일링
                                       weekendDecoration:  const BoxDecoration(
-                                        color: order_item_background,
-                                        shape: BoxShape.rectangle,
+                                        color: Colors.white,
                                       ),
                                       // 선택한 날짜 배경 스타일링
                                       selectedDecoration: BoxDecoration(
                                           color: styleWhiteCol,
-                                          shape: BoxShape.rectangle,
+                                          shape: BoxShape.circle,
                                           border: Border.all(color: main_color,width: 1.w)
 
                                       ),
-                                      defaultTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize14, Colors.black),
+                                      defaultTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w600),
                                       weekendTextStyle:
-                                      CustomStyle.CustomFont(styleFontSize14, Colors.red),
-                                      selectedTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize14, Colors.black),
+                                      CustomStyle.CustomFont(styleFontSize14, Colors.red,font_weight: FontWeight.w600),
+                                      selectedTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w600),
                                       // range 크기 조절
                                       rangeHighlightScale: 1.0,
 
                                       // range 색상 조정
-                                      rangeHighlightColor: const Color(0xFFBBDDFF),
+                                      rangeHighlightColor: const Color(0xFFDFE8F4),
 
                                       // rangeStartDay 글자 조정
                                       rangeStartTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize14, Colors.black),
+                                          styleFontSize16, Colors.black,font_weight: FontWeight.w600),
 
                                       // rangeStartDay 모양 조정
                                       rangeStartDecoration: BoxDecoration(
-                                          color: styleWhiteCol,
-                                          shape: BoxShape.rectangle,
-                                          border: Border.all(color: main_color,width: 1.w)
+                                          color: const Color(0xFFDFE8F4),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.black,width: 1.w)
                                       ),
 
                                       // rangeEndDay 글자 조정
                                       rangeEndTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize14, Colors.black),
+                                          styleFontSize16, Colors.black,font_weight: FontWeight.w600),
 
                                       // rangeEndDay 모양 조정
                                       rangeEndDecoration: BoxDecoration(
-                                          color: styleWhiteCol,
-                                          shape: BoxShape.rectangle,
-                                          border: Border.all(color: main_color,width: 1.w)
+                                          color:  const Color(0xFFDFE8F4),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.black,width: 1.w)
                                       ),
 
                                       // startDay, endDay 사이의 글자 조정
@@ -870,16 +856,16 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     //locale: 'ko_KR',
                                     focusedDay: mCalendarNowDate,
                                     selectedDayPredicate: (day) {
-                                      return isSameDay(_tempSelectedDay, day);
+                                      return isSameDay(tempSelectedDay, day);
                                     },
-                                    rangeStartDay: _tempRangeStart,
-                                    rangeEndDay: _tempRangeEnd,
+                                    rangeStartDay: tempRangeStart.value,
+                                    rangeEndDay: tempRangeEnd.value,
                                     calendarFormat: _calendarFormat,
                                     rangeSelectionMode: _rangeSelectionMode,
                                     onDaySelected: (selectedDay, focusedDay) {
-                                      if (!isSameDay(_tempSelectedDay, selectedDay)) {
+                                      if (!isSameDay(tempSelectedDay, selectedDay)) {
                                         setState(() {
-                                          _tempSelectedDay = selectedDay;
+                                          tempSelectedDay = selectedDay;
                                           mCalendarNowDate = focusedDay;
                                           _rangeSelectionMode = RangeSelectionMode.toggledOff;
                                         });
@@ -887,10 +873,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     },
                                     onRangeSelected: (start, end, focusedDay) {
                                       setState(() {
-                                        _tempSelectedDay = start;
+                                        tempSelectedDay = start;
                                         mCalendarNowDate = focusedDay;
-                                        _tempRangeStart = start;
-                                        _tempRangeEnd = end;
+                                        tempRangeStart.value = start!;
+                                        tempRangeEnd.value = end!;
                                         _rangeSelectionMode = RangeSelectionMode.toggledOn;
                                       });
                                     },
@@ -906,101 +892,95 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                       mCalendarNowDate = focusedDay;
                                     },
                                   ),
-                                  Container(
-                                    margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        TextButton(
-                                            onPressed: (){
-                                              dateSelectValue.value = 3;
-                                              mCalendarStartDate.value = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
-                                              mCalendarEndDate.value = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day+1);
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text(
-                                              Strings.of(context)?.get("cancel")??"Not Found",
-                                              style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
-                                            )
-                                        ),
-                                        CustomStyle.sizedBoxWidth(CustomStyle.getWidth(15.0)),
-                                        TextButton(
-                                            onPressed: () async {
-                                              int? diff_day = _tempRangeEnd?.difference(_tempRangeStart!).inDays;
-                                              if(_tempRangeStart == null || _tempRangeEnd == null){
-                                                if(_tempRangeStart == null && _tempRangeEnd != null) {
-                                                  _tempRangeStart = _tempRangeEnd?.add(const Duration(days: -30));
-                                                }else if(_tempRangeStart != null &&_tempRangeEnd == null) {
-                                                  DateTime? _tempDate = _tempRangeStart?.add(const Duration(days: 30));
-                                                  int start_diff_day = _tempDate!.difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)).inDays;
-                                                  if(start_diff_day > 0) {
-                                                    _tempRangeEnd = _tempRangeStart;
-                                                    _tempRangeStart = _tempRangeEnd?.add(const Duration(days: -30));
+                                   InkWell(
+                          onTap: () async {
+                          
+                          int? diffDay = tempRangeEnd.value.difference(tempRangeStart.value).inDays;
+                                              if(tempRangeStart == null || tempRangeEnd == null){
+                                                if(tempRangeStart == null && tempRangeEnd != null) {
+                                                  tempRangeStart.value = tempRangeEnd.value.add(const Duration(days: -30));
+                                                }else if(tempRangeStart != null &&tempRangeEnd == null) {
+                                                  DateTime? tempDate = tempRangeStart.value.add(const Duration(days: 30));
+                                                  int startDiffDay = tempDate!.difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)).inDays;
+                                                  if(startDiffDay > 0) {
+                                                    tempRangeEnd.value = tempRangeStart.value;
+                                                    tempRangeStart.value = tempRangeEnd.value.add(const Duration(days: -30));
                                                   }else{
-                                                    _tempRangeEnd = _tempRangeStart?.add(const Duration(days: 30));
+                                                    tempRangeEnd.value = tempRangeStart.value.add(const Duration(days: 30));
                                                   }
                                                 }else{
                                                   return Util.toast("시작 날짜 또는 종료 날짜를 선택해주세요.");
                                                 }
                                               }
-                                              mCalendarStartDate.value = _tempRangeStart!;
-                                              mCalendarEndDate.value = _tempRangeEnd!;
+                                              mCalendarStartDate.value = tempRangeStart.value;
+                                              mCalendarEndDate.value = tempRangeEnd.value;
                                               Navigator.of(context).pop(false);
                                               await refresh();
-                                            },
-                                            child: Text(
-                                              Strings.of(context)?.get("confirm")??"Not Found",
-                                              style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
-                                            )
-                                        )
-                                      ],
-                                    ),
-                                  )
+
+                            
+                          },
+                          child: Center(
+                              child: Container(
+      
+                                height: CustomStyle.getHeight(50),
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  "적용",
+                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                ),
+                              )
+                          )
+                      )
                                 ]
                             )
                         )
                     )
-                );
-              });
-        });
+                    ]
+                )
+            )
+        );
+      },
+    );
   }
 
-  String statMsg(String? link_stat, String? job_stat) {
+  String statMsg(String? linkStat, String? jobStat) {
     var msg = "";
-    if (job_stat == "W") {
-      if (link_stat == "I") {
+    if (jobStat == "W") {
+      if (linkStat == "I") {
         msg = "(등록중)";
-      } else if (link_stat == "D") {
+      } else if (linkStat == "D") {
         msg = "(취소중)";
-      } else if (link_stat == "U") {
+      } else if (linkStat == "U") {
         msg = "(수정중)";
       } else {
         msg = "";
       }
-    } else if (job_stat == "E") {
-      if (link_stat == "I") {
+    } else if (jobStat == "E") {
+      if (linkStat == "I") {
         msg = "(등록실패)";
-      } else if (link_stat == "D") {
+      } else if (linkStat == "D") {
         msg = "(취소실패)";
-      } else if (link_stat == "U") {
+      } else if (linkStat == "U") {
         msg = "(수정실패)";
       } else {
         msg = "";
       }
-    } else if (job_stat == "F") {
-      if (link_stat == "D") {
+    } else if (jobStat == "F") {
+      if (linkStat == "D") {
         msg = "(취소완료)";
       } else {
         msg = "";
       }
-    } else if (job_stat == "C") {
-      if (link_stat == "U") {
+    } else if (jobStat == "C") {
+      if (linkStat == "U") {
         msg = "(수정중)";
       } else {
         msg = "";
       }
-    } else if (job_stat == "R") {
+    } else if (jobStat == "R") {
       msg = "(화망처리중)";
     } else {
       msg = "";
@@ -1009,6 +989,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   }
 
   Future<void> openRegOrderTemplateSheet(BuildContext context, String title) async {
+
+    final selectItem = TemplateModel().obs;
 
     showModalBottomSheet(
       context: context,
@@ -1037,33 +1019,66 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                          margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
-                          child: Text(
-                              title,
-                              style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                        Expanded(
+                          flex: 5,
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
+                            child: Text(
+                                title,
+                                style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800)
+                            )
                           )
-                      ),
-                      templateListWidget(),
+                        ),
+                        Expanded(
+                        flex:2,
+                          child: InkWell(
+                            onTap:(){
+                                
+                            },
+                            child: Container(
+                            margin: EdgeInsets.only(right: CustomStyle.getWidth(15)),
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(2),horizontal: CustomStyle.getWidth(15)),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: renew_main_color2, width: 1.5)
+                            ),
+                            child: Text(
+                                "관리",
+                                textAlign: TextAlign.center,
+                                style: CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w600),
+                              )
+                            )
+                          )
+                        )
+                      ]),
+                      templateListWidget(selectItem),
                       InkWell(
                           onTap: () async {
-                            Future.delayed(const Duration(milliseconds: 300), () {
-                              Navigator.of(context).pop();
-                            });
+                            if(selectItem.value.templateId.isNull == true || selectItem.value.templateId?.isEmpty == true) {
+                                  Util.toast("등록할 탬플릿을 선택해주세요.");
+                            }else{
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                Navigator.of(context).pop();
+                              });
+                            }
                           },
                           child: Center(
-                              child: Container(
-                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                              child: Obx(() => Container(
+                                width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                                 height: CustomStyle.getHeight(50),
                                 alignment: Alignment.center,
                                 margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: selectItem.value.templateId.isNull == true || selectItem.value.templateId?.isEmpty == true ? light_gray24 : renew_main_color2),
                                 child: Text(
                                   textAlign: TextAlign.center,
                                   "적용",
                                   style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
                                 ),
-                              )
+                              ))
                           )
                       )
                     ]
@@ -1077,7 +1092,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   Future<void> openCodeBottomSheet(BuildContext context, String title, String codeType, Function(String codeType,{CodeModel codeModel,CustUserModel custUserModel,int value}) callback) async {
 
     if (codeType == Const.ORDER_STATE_CD) {
-      final temp_codeModel = CodeModel(code: categoryOrderCode.value ,codeName:  categoryOrderState.value).obs;
+      final tempCodemodel = CodeModel(code: categoryOrderCode.value ,codeName:  categoryOrderState.value).obs;
       List<CodeModel>? mCodeList = SP.getCodeList(codeType);
       mCodeList?.insert(0, CodeModel(code: "",codeName:  "오더전체"));
 
@@ -1094,7 +1109,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         backgroundColor: Colors.white,
         builder: (context) {
           return FractionallySizedBox(
-              heightFactor: mCodeList!.length > 16 ? 0.50 : mCodeList!.length > 12 ? 0.4 : 0.3,
+              heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.60 : mCodeList.length > 12 ? 0.5 : 0.4 :  mCodeList!.length > 16 ? 0.50 : mCodeList.length > 12 ? 0.4 : 0.3,
               child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
@@ -1118,7 +1133,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         Expanded(
                             child: AnimationLimiter(
                                 child: GridView.builder(
-                                itemCount: mCodeList?.length,
+                                itemCount: mCodeList.length,
                                 physics: const ScrollPhysics(),
                                 scrollDirection: Axis.vertical,
                                 shrinkWrap: true,
@@ -1137,21 +1152,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           child: FadeInAnimation(
                                               child: Obx(() =>  InkWell(
                                       onTap: () {
-                                        temp_codeModel.value = CodeModel(code: mCodeList?[index].code,codeName: mCodeList?[index].codeName);
+                                        tempCodemodel.value = CodeModel(code: mCodeList[index].code,codeName: mCodeList[index].codeName);
                                       },
                                       child: Container(
                                           height: CustomStyle.getHeight(70.0),
                                           decoration: BoxDecoration(
-                                              color: temp_codeModel.value.code  == mCodeList?[index].code ? renew_main_color2 : light_gray24,
+                                              color: tempCodemodel.value.code  == mCodeList[index].code ? renew_main_color2 : light_gray24,
                                               borderRadius: BorderRadius.circular(30)
                                           ),
                                           child: Center(
                                             child: Text(
-                                              "${mCodeList?[index].codeName}",
+                                              "${mCodeList[index].codeName}",
                                               textAlign: TextAlign.center,
                                               style: CustomStyle.CustomFont(
-                                                  styleFontSize12, temp_codeModel.value.code  == mCodeList?[index].code ? Colors.white: text_color_01,
-                                                  font_weight: temp_codeModel.value.code  == mCodeList?[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                  styleFontSize12, tempCodemodel.value.code  == mCodeList[index].code ? Colors.white: text_color_01,
+                                                  font_weight: tempCodemodel.value.code  == mCodeList[index].code ? FontWeight.w800 : FontWeight.w600),
                                             ),
                                           )
                                       )
@@ -1161,14 +1176,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         InkWell(
                             onTap: () async {
-                              callback(codeType,codeModel: temp_codeModel.value);
+                              callback(codeType,codeModel: tempCodemodel.value);
                               Future.delayed(const Duration(milliseconds: 300), () {
                                 Navigator.of(context).pop();
                               });
                             },
                             child: Center(
                                 child: Container(
-                                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                  width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                                   height: CustomStyle.getHeight(50),
                                   alignment: Alignment.center,
                                   margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
@@ -1192,7 +1207,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
     } else if(codeType == Const.STAFF_STATE_CD) {
 
-      final temp_staffModel = categoryStaffModel.value.obs;
+      final tempStaffmodel = categoryStaffModel.value.obs;
       final mStaffList = custUserList;
       showModalBottomSheet(
         context: context,
@@ -1207,7 +1222,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         backgroundColor: Colors.white,
         builder: (context) {
           return FractionallySizedBox(
-              heightFactor: mStaffList!.length > 16 ? 0.50 : mStaffList!.length > 12 ? 0.4 : 0.3,
+              heightFactor: mStaffList.length > 16 ? 0.50 : mStaffList.length > 12 ? 0.4 : 0.3,
               child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
@@ -1231,7 +1246,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         Expanded(
                             child: AnimationLimiter(
                                 child: GridView.builder(
-                                itemCount: mStaffList?.length,
+                                itemCount: mStaffList.length,
                                 physics: const ScrollPhysics(),
                                 scrollDirection: Axis.vertical,
                                 shrinkWrap: true,
@@ -1250,21 +1265,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           child: FadeInAnimation(
                                               child: Obx(() =>  InkWell(
                                       onTap: () {
-                                        temp_staffModel.value = mStaffList?[index];
+                                        tempStaffmodel.value = mStaffList[index];
                                       },
                                       child: Container(
                                           height: CustomStyle.getHeight(70.0),
                                           decoration: BoxDecoration(
-                                              color: (temp_staffModel.value.mobile  == mStaffList?[index].mobile) && (temp_staffModel.value.userName  == mStaffList?[index].userName) ? renew_main_color2 : light_gray24,
+                                              color: (tempStaffmodel.value.mobile  == mStaffList[index].mobile) && (tempStaffmodel.value.userName  == mStaffList[index].userName) ? renew_main_color2 : light_gray24,
                                               borderRadius: BorderRadius.circular(30)
                                           ),
                                           child: Center(
                                             child: Text(
-                                              "${mStaffList?[index].userName}",
+                                              "${mStaffList[index].userName}",
                                               textAlign: TextAlign.center,
                                               style: CustomStyle.CustomFont(
-                                                  styleFontSize12, (temp_staffModel.value.mobile  == mStaffList?[index].mobile) && (temp_staffModel.value.userName  == mStaffList?[index].userName) ? Colors.white: text_color_01,
-                                                  font_weight: (temp_staffModel.value.mobile  == mStaffList?[index].mobile) && (temp_staffModel.value.userName  == mStaffList?[index].userName) ? FontWeight.w800 : FontWeight.w600),
+                                                  styleFontSize12, (tempStaffmodel.value.mobile  == mStaffList[index].mobile) && (tempStaffmodel.value.userName  == mStaffList[index].userName) ? Colors.white: text_color_01,
+                                                  font_weight: (tempStaffmodel.value.mobile  == mStaffList[index].mobile) && (tempStaffmodel.value.userName  == mStaffList[index].userName) ? FontWeight.w800 : FontWeight.w600),
                                             ),
                                           )
                                       )
@@ -1274,14 +1289,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         InkWell(
                             onTap: (){
-                              callback(codeType,custUserModel: temp_staffModel.value);
+                              callback(codeType,custUserModel: tempStaffmodel.value);
                               Future.delayed(const Duration(milliseconds: 300), () {
                                 Navigator.of(context).pop();
                               });
                             },
                             child: Center(
                                 child: Container(
-                                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                  width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                                   height: CustomStyle.getHeight(50),
                                   alignment: Alignment.center,
                                   margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
@@ -1303,13 +1318,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     }
   }
 
-  Future<void> openRpaModiDialog(BuildContext context, OrderModel item, String? link_type,int item_index, {String? flag}) async {
+  Future<void> openRpaModiDialog(BuildContext context, OrderModel item, String? linkType,int itemIndex, {String? flag}) async {
 
     final SelectNumber = "0".obs;
     if(flag != "D") {
       SelectNumber.value =
-      Const.CALL_24_KEY_NAME == link_type ? item.call24Charge ?? "0" : Const
-          .HWA_MULL_KEY_NAME == link_type ? item.manCharge ?? "0" : item
+      Const.CALL_24_KEY_NAME == linkType ? item.call24Charge ?? "0" : Const
+          .HWA_MULL_KEY_NAME == linkType ? item.manCharge ?? "0" : item
           .oneCharge ?? "0";
     }
 
@@ -1351,7 +1366,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               margin: EdgeInsets.only(
                                   left: CustomStyle.getWidth(10)),
                               child: Text(
-                                "${link_type == "03" ? "24시콜" : link_type == "21" ? "화물맨" : link_type == "18" ? "원콜" : ""}\n금액을 ${flag == "D" ? "등록" : "변경"}해주세요.",
+                                "${linkType == "03" ? "24시콜" : linkType == "21" ? "화물맨" : linkType == "18" ? "원콜" : ""}\n금액을 ${flag == "D" ? "등록" : "변경"}해주세요.",
                                 style: CustomStyle.CustomFont(
                                     styleFontSize16, Colors.black,
                                     font_weight: FontWeight.w600),
@@ -1391,20 +1406,28 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     return;
                                   case 10:
                                     if(SelectNumber.value.length >= 8) return;
-                                    if (SelectNumber.value == '0') return;
-                                    else SelectNumber.value = '${SelectNumber.value}0';
+                                    if (SelectNumber.value == '0') {
+                                      return;
+                                    } else {
+                                      SelectNumber.value = '${SelectNumber.value}0';
+                                    }
                                     return;
                                   case 11:
                                   //remove
-                                    if (SelectNumber.value.length == 1) SelectNumber.value = '0';
-                                    else
+                                    if (SelectNumber.value.length == 1) {
+                                      SelectNumber.value = '0';
+                                    } else {
                                       SelectNumber.value = SelectNumber.value.substring(0, SelectNumber.value.length - 1);
+                                    }
                                     return;
 
                                   default:
                                     if(SelectNumber.value.length >= 8) return;
-                                    if (SelectNumber.value == '0') SelectNumber.value = '${index + 1}';
-                                    else SelectNumber.value = '${SelectNumber.value}${index + 1}';
+                                    if (SelectNumber.value == '0') {
+                                      SelectNumber.value = '${index + 1}';
+                                    } else {
+                                      SelectNumber.value = '${SelectNumber.value}${index + 1}';
+                                    }
                                     return;
                                 }
                               },
@@ -1415,7 +1438,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         borderRadius: BorderRadius.circular(4)),
                                     child: Center(
                                         child: Text(getPadvalue(index),
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 color: Colors.black54,
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.bold)
@@ -1431,28 +1454,28 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         width: double.infinity,
                         height: CustomStyle.getHeight(45),
                         margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(20)),
                           color: rpa_btn_regist,
                         ),
                         child: TextButton(
                             onPressed: () async {
-                              if(SelectNumber.value == null || SelectNumber.value.isEmpty == true) SelectNumber.value = "0";
+                              if(SelectNumber.value.isEmpty == true) SelectNumber.value = "0";
                               var cd = "";
-                              if(Const.CALL_24_KEY_NAME == link_type) {
+                              if(Const.CALL_24_KEY_NAME == linkType) {
                                 cd = "24Cargo";
-                              }else if(Const.ONE_CALL_KEY_NAME == link_type) {
+                              }else if(Const.ONE_CALL_KEY_NAME == linkType) {
                                 cd = "oneCargo";
-                              }else if(Const.HWA_MULL_KEY_NAME == link_type) {
+                              }else if(Const.HWA_MULL_KEY_NAME == linkType) {
                                 cd = "manCargo";
                               }else{
                                 cd = "";
                               }
                               if(int.parse(SelectNumber.value) > 20000){
                                 if(flag == "D") {
-                                  await registRpa(item,link_type,SelectNumber.value,item_index);
+                                  await registRpa(item,linkType,SelectNumber.value,itemIndex);
                                 }else {
-                                  await modLink("N", item, SelectNumber.value, cd, "U",item_index);
+                                  await modLink("N", item, SelectNumber.value, cd, "U",itemIndex);
                                 }
                               }else{
                                 Util.toast("지불운임은 20,000원이상입니다.");
@@ -1473,7 +1496,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   Future<void> openSelectRegOrderDialog(BuildContext context) async {
 
-    final select_reg_order = "".obs;
+    final selectRegOrder = "".obs;
 
       showModalBottomSheet(
       context: context,
@@ -1515,14 +1538,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                            children: [
                              Obx(() => InkWell(
                                onTap: (){
-                                 select_reg_order.value = "01";
+                                 selectRegOrder.value = "01";
                                },
                                child: Container(
-                                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.4,
+                                  width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
                                   height: CustomStyle.getHeight(180),
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: select_reg_order.value == "01" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
+                                  border: Border.all(color: selectRegOrder.value == "01" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
                                   borderRadius: const BorderRadius.all(Radius.circular(10))
                                 ),
                                 child: Column(
@@ -1541,7 +1564,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           "assets/image/ic_smart_order.png",
                                           width: CustomStyle.getWidth(25.0),
                                           height: CustomStyle.getHeight(25.0),
-                                          color: select_reg_order.value == "01" ? renew_main_color2 : const Color(0xffC8C8C8),
+                                          color: selectRegOrder.value == "01" ? renew_main_color2 : const Color(0xffC8C8C8),
                                         )
                                       )
                                     ),
@@ -1556,7 +1579,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     crossAxisAlignment: CrossAxisAlignment.center,
                                                     mainAxisAlignment: MainAxisAlignment.center,
                                                     children: [
-                                                      select_reg_order.value == "01" ?
+                                                      selectRegOrder.value == "01" ?
                                                       Container(
                                                         margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                                                         child: const Icon(
@@ -1567,14 +1590,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                       ) : const SizedBox(),
                                                       Text(
                                                           "스마트오더",
-                                                          style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                          style: CustomStyle.CustomFont(styleFontSize18, selectRegOrder.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
                                                       ),
                                                     ]
                                                   ),
                                                   Text(
                                                       "신속한 오더 등록이\n가능해요",
                                                       textAlign: TextAlign.center,
-                                                      style: CustomStyle.CustomFont(styleFontSize13,select_reg_order.value == "01" ? renew_main_color2 :  Colors.black,font_weight: FontWeight.w400)
+                                                      style: CustomStyle.CustomFont(styleFontSize13,selectRegOrder.value == "01" ? renew_main_color2 :  Colors.black,font_weight: FontWeight.w400)
                                                   ),
                                                 ],
                                           )
@@ -1586,14 +1609,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                              )),
                              Obx(() => InkWell(
                                onTap: (){
-                                 select_reg_order.value = "02";
+                                 selectRegOrder.value = "02";
                                },
                                child: Container(
-                                   width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.4,
+                                   width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
                                    height: CustomStyle.getHeight(180),
                                    padding: const EdgeInsets.all(10),
                                    decoration: BoxDecoration(
-                                       border: Border.all(color: select_reg_order.value == "02" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
+                                       border: Border.all(color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
                                        borderRadius: const BorderRadius.all(Radius.circular(10))
                                    ),
                                    child: Column(
@@ -1612,7 +1635,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                  "assets/image/ic_hwa.png",
                                                  width: CustomStyle.getWidth(25.0),
                                                  height: CustomStyle.getHeight(25.0),
-                                                 color: select_reg_order.value == "02" ? renew_main_color2 : const Color(0xffC8C8C8),
+                                                 color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffC8C8C8),
                                                )
                                            )
                                        ),
@@ -1627,7 +1650,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                        crossAxisAlignment: CrossAxisAlignment.center,
                                                        mainAxisAlignment: MainAxisAlignment.center,
                                                        children: [
-                                                         select_reg_order.value == "02" ?
+                                                         selectRegOrder.value == "02" ?
                                                          Container(
                                                              margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                                                              child: const Icon(
@@ -1638,14 +1661,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                          ) : const SizedBox(),
                                                          Text(
                                                              "일반오더",
-                                                             style: CustomStyle.CustomFont(styleFontSize18, select_reg_order.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                             style: CustomStyle.CustomFont(styleFontSize18, selectRegOrder.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
                                                          ),
                                                        ]
                                                    ),
                                                    Text(
                                                        "상세한 오더 등록이\n가능해요",
                                                        textAlign: TextAlign.center,
-                                                       style: CustomStyle.CustomFont(styleFontSize13, select_reg_order.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w400)
+                                                       style: CustomStyle.CustomFont(styleFontSize13, selectRegOrder.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w400)
                                                    ),
                                                  ],
                                                )
@@ -1752,21 +1775,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                        Obx(() => InkWell(
                           onTap: () async {
                             Future.delayed(const Duration(milliseconds: 300), () {
-                              if(select_reg_order.value == "") {
+                              if(selectRegOrder.value == "") {
                                 Util.toast("오더 방법을 선택해주세요.");
                               }else{
                                 Navigator.of(context).pop();
-                                goToRegOrderPage(select_reg_order.value);
+                                goToRegOrderPage(selectRegOrder.value);
                               }
                             });
                           },
                           child: Center(
                               child: Container(
-                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                                 height: CustomStyle.getHeight(50),
                                 alignment: Alignment.center,
                                 margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: select_reg_order.value == "" ? const Color(0xffD9D9D9) : renew_main_color2),
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: selectRegOrder.value == "" ? const Color(0xffD9D9D9) : renew_main_color2),
                                 child: Text(
                                   textAlign: TextAlign.center,
                                   "다음",
@@ -1795,7 +1818,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     }
   }
 
-  Future<void> registRpa(OrderModel item, String? linkCd, String? rpaPay,int item_index) async {
+  Future<void> registRpa(OrderModel item, String? linkCd, String? rpaPay,int itemIndex) async {
     if(rpaPay == "0" || rpaPay == "" || rpaPay == null) {
       Util.toast("지불운임을 입력해 주세요.");
       return;
@@ -1819,19 +1842,19 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
     await openCommonConfirmBox(
         context,
-        "금액: ${rpaPay}원\n$text",
+        "금액: $rpaPay원\n$text",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
-          await modLink("N",item, rpaPay, cd,"D",item_index);
+          await modLink("N",item, rpaPay, cd,"D",itemIndex);
         }
     );
 
   }
 
-  Future<void> cancelRpa(String? orderId, OrderLinkCurrentModel data,int item_index) async {
+  Future<void> cancelRpa(String? orderId, OrderLinkCurrentModel data,int itemIndex) async {
     String? allocCharge = data.allocCharge;
     String? cd;
     String? text;
@@ -1852,18 +1875,18 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
     openCommonConfirmBox(
         context,
-        "${text}",
+        text,
         Strings.of(context)?.get("no") ?? "아니오_",
         Strings.of(context)?.get("yes") ?? "예_",
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
-          await cancelLink(orderId, allocCharge, cd, true,item_index);
+          await cancelLink(orderId, allocCharge, cd, true,itemIndex);
         }
     );
   }
 
-  Future<void> cancelLink(String? orderId, String? rpaPay,String? linkCd, bool flag,int item_index) async {
+  Future<void> cancelLink(String? orderId, String? rpaPay,String? linkCd, bool flag,int itemIndex) async {
 
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
@@ -1875,21 +1898,22 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         linkCd
     ).then((it) async {
       try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("cancelLink() _response -> ${_response.status} // ${_response.resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
+        ReturnMap response = DioService.dioResponse(it);
+        logger.d("cancelLink() _response -> ${response.status} // ${response.resultMap}");
+        if (response.status == "200") {
+          if (response.resultMap?["result"] == true) {
             if(flag == true) {
-              var link_name = '';
-              if(linkCd == Const.CALL_24_KEY_NAME) link_name = "24시콜";
-              else if(linkCd == Const.HWA_MULL_KEY_NAME) link_name = "화물맨";
-              else if(linkCd == Const.ONE_CALL_KEY_NAME) link_name = "원콜";
-              Util.snackbar(context, "${link_name} 지불운임이 취소되었습니다.");
+              var linkName = '';
+              if(linkCd == Const.CALL_24_KEY_NAME) {
+                linkName = "24시콜";
+              } else if(linkCd == Const.HWA_MULL_KEY_NAME) linkName = "화물맨";
+              else if(linkCd == Const.ONE_CALL_KEY_NAME) linkName = "원콜";
+              Util.snackbar(context, "$linkName 지불운임이 취소되었습니다.");
               //await refresh();
             }
 
           } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
+            openOkBox(context, "${response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
                   Navigator.of(context).pop(false);
                 });
@@ -1912,7 +1936,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     });
   }
 
-  Future<void> modLink(String allocChargeYn,OrderModel item,String rpaPay, String linkCd, String flag, int item_index) async {
+  Future<void> modLink(String allocChargeYn,OrderModel item,String rpaPay, String linkCd, String flag, int itemIndex) async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).modNewLink(
@@ -1924,26 +1948,27 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         allocChargeYn
     ).then((it) async {
       try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("modLink() _response -> ${_response.status} // ${_response.resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
+        ReturnMap response = DioService.dioResponse(it);
+        logger.d("modLink() _response -> ${response.status} // ${response.resultMap}");
+        if (response.status == "200") {
+          if (response.resultMap?["result"] == true) {
             Navigator.of(context).pop(false);
-            var link_name = '';
-            if(linkCd == Const.CALL_24_KEY_NAME) link_name = "24시콜";
-            else if(linkCd == Const.HWA_MULL_KEY_NAME) link_name = "화물맨";
-            else if(linkCd == Const.ONE_CALL_KEY_NAME) link_name = "원콜";
+            var linkName = '';
+            if(linkCd == Const.CALL_24_KEY_NAME) {
+              linkName = "24시콜";
+            } else if(linkCd == Const.HWA_MULL_KEY_NAME) linkName = "화물맨";
+            else if(linkCd == Const.ONE_CALL_KEY_NAME) linkName = "원콜";
 
-            Util.snackbar(context, "${link_name} 지불운임이 ${flag == "D" ? "등록" : "수정"}되었습니다.");
+            Util.snackbar(context, "$linkName 지불운임이 ${flag == "D" ? "등록" : "수정"}되었습니다.");
             if(flag == "D") { // D: 등록일 경우 리스트 최상단 이동
               //await refresh();
             }else{ // U: 수정일 경우 현재 리스트 위치 이동
               setState(() {
-                lastPositionItem.value = item_index;
+                lastPositionItem.value = itemIndex;
               });
             }
           } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
+            openOkBox(context, "${response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
                   Navigator.of(context).pop(false);
                 });
@@ -1966,10 +1991,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     });
   }
 
-  Future<void> openRpaInfoDialog(BuildContext context,OrderModel item,String alloc_type, String? link_type,int item_index,{OrderLinkCurrentModel? link_model})  async {
+  Future<void> openRpaInfoDialog(BuildContext context,OrderModel item,String allocType, String? linkType,int itemIndex,{OrderLinkCurrentModel? link_model})  async {
     // alloc_type: 01 = 배차 확정된 상태, 02 = 배차 미확정 상태
 
-    Map<String,dynamic> currend_link = await currentLink(item.orderId, link_type);
+    Map<String,dynamic> currendLink = await currentLink(item.orderId, linkType);
 
     showDialog(
         barrierDismissible: false,
@@ -2029,7 +2054,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      item.allocState == "00" ? "${currend_link["currentItem"].carNum}" : "${item.carNum}",
+                                      item.allocState == "00" ? "${currendLink["currentItem"].carNum}" : "${item.carNum}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2110,7 +2135,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      "${currend_link["currentItem"].carType}",
+                                      "${currendLink["currentItem"].carType}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2191,7 +2216,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      "${currend_link["currentItem"].carTon}",
+                                      "${currendLink["currentItem"].carTon}",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2231,7 +2256,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      item.allocState == "00" ? currend_link["currentItem"].driverName??"" : item.driverName??"",
+                                      item.allocState == "00" ? currendLink["currentItem"].driverName??"" : item.driverName??"",
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2271,7 +2296,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 Expanded(
                                     flex:1,
                                     child: Text(
-                                      item.allocState == "00" ? Util.makePhoneNumber(currend_link["currentItem"].driverTel??"") : Util.makePhoneNumber(item.driverTel??""),
+                                      item.allocState == "00" ? Util.makePhoneNumber(currendLink["currentItem"].driverTel??"") : Util.makePhoneNumber(item.driverTel??""),
                                       textAlign: TextAlign.end,
                                       style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w400),
                                     )
@@ -2304,10 +2329,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                             ),
                             // 배차확정 버튼
-                            alloc_type == "02" ?
+                            allocType == "02" ?
                             InkWell(
                               onTap: () async {
-                                await carConfirmRpa(currend_link,item_index);
+                                await carConfirmRpa(currendLink,itemIndex);
                               },
                               child: Container(
                                 width: CustomStyle.getWidth(100),
@@ -2334,7 +2359,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         });
   }
 
-  Future<Map<String,dynamic>> currentLink(String? orderId, String? link_type) async {
+  Future<Map<String,dynamic>> currentLink(String? orderId, String? linkType) async {
     // link_type = 03: 24시콜, 18: 원콜, 21: 화물맨
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
@@ -2347,28 +2372,28 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       orderId,
     ).then((it) async {
       try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("main currentLink() _response -> ${_response.status} // ${_response.resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
-            if(_response.resultMap?["rpa"] != null) {
+        ReturnMap response = DioService.dioResponse(it);
+        logger.d("main currentLink() _response -> ${response.status} // ${response.resultMap}");
+        if (response.status == "200") {
+          if (response.resultMap?["result"] == true) {
+            if(response.resultMap?["rpa"] != null) {
               rpa = UserRpaModel(
-                  link24Id: _response.resultMap?["rpa"]["link24Id"],
-                  link24Pass: _response.resultMap?["rpa"]["link24Pass"],
-                  man24Id: _response.resultMap?["rpa"]["man24Id"],
-                  man24Pass: _response.resultMap?["rpa"]["man24Pass"],
-                  one24Id: _response.resultMap?["rpa"]["one24Id"],
-                  one24Pass: _response.resultMap?["rpa"]["one24Pass"]
+                  link24Id: response.resultMap?["rpa"]["link24Id"],
+                  link24Pass: response.resultMap?["rpa"]["link24Pass"],
+                  man24Id: response.resultMap?["rpa"]["man24Id"],
+                  man24Pass: response.resultMap?["rpa"]["man24Pass"],
+                  one24Id: response.resultMap?["rpa"]["one24Id"],
+                  one24Pass: response.resultMap?["rpa"]["one24Pass"]
               );
             }
             userRpaModel.value = rpa;
-            if (_response.resultMap?["data"] != null) {
-              var mList = _response.resultMap?["data"] as List;
-              if(mList.length > 0) {
+            if (response.resultMap?["data"] != null) {
+              var mList = response.resultMap?["data"] as List;
+              if(mList.isNotEmpty) {
                 List<OrderLinkCurrentModel> itemsList = mList.map((i) => OrderLinkCurrentModel.fromJSON(i)).toList();
                 for (var list in itemsList) {
                   if (list.allocCd?.isNotEmpty == true &&
-                      list.allocCd != null && list.linkCd == link_type) {
+                      list.allocCd != null && list.linkCd == linkType) {
                     returnModel = list;
                   }
                 }
@@ -2376,7 +2401,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               }
             }
           } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
+            openOkBox(context, "${response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
                   Navigator.of(context).pop(false);
                 });
@@ -2400,46 +2425,46 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     return result;
   }
 
-  Future<void> carConfirmRpa(Map<String,dynamic> data_map,int item_index) async {
-    String textHeader = "${data_map["currentItem"].carNum}\t\t${data_map["currentItem"].carType}\t\t${data_map["currentItem"].carTon}";
-    String textSub = "${data_map["currentItem"].driverName}\t\t${Util.makePhoneNumber(data_map["currentItem"].driverTel)}";
+  Future<void> carConfirmRpa(Map<String,dynamic> dataMap,int itemIndex) async {
+    String textHeader = "${dataMap["currentItem"].carNum}\t\t${dataMap["currentItem"].carType}\t\t${dataMap["currentItem"].carTon}";
+    String textSub = "${dataMap["currentItem"].driverName}\t\t${Util.makePhoneNumber(dataMap["currentItem"].driverTel)}";
     String text = "배차 확정 하시겠습니까?";
     String textEtc="(나머지 정보망전송은 취소됩니다)";
 
     openCommonConfirmBox(
         context,
-        "${textHeader}\n${textSub}\n${text}\n${textEtc}",
+        "$textHeader\n$textSub\n$text\n$textEtc",
         Strings.of(context)?.get("no") ?? "아니오_",
         Strings.of(context)?.get("yes") ?? "예_",
             () {Navigator.of(context).pop(false);},
             () async {
           Navigator.of(context).pop(false);
 
-          for(var value in data_map["currentList"]) {
+          for(var value in dataMap["currentList"]) {
             if(value.linkCd == Const.CALL_24_KEY_NAME) {
-              if(value.linkCd == data_map["currentItem"].linkCd) {
-                await confirmLink(data_map["currentItem"]);
+              if(value.linkCd == dataMap["currentItem"].linkCd) {
+                await confirmLink(dataMap["currentItem"]);
               }else{
-                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "24Cargo", false,item_index);
+                await cancelLink(dataMap["currentItem"].orderId, value.allocCharge, "24Cargo", false,itemIndex);
               }
             }
             if(value.linkCd == Const.ONE_CALL_KEY_NAME) {
-              if(value.linkCd == data_map["currentItem"].linkCd) {
-                await confirmLink(data_map["currentItem"]);
+              if(value.linkCd == dataMap["currentItem"].linkCd) {
+                await confirmLink(dataMap["currentItem"]);
               }else{
-                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "oneCargo", false,item_index);
+                await cancelLink(dataMap["currentItem"].orderId, value.allocCharge, "oneCargo", false,itemIndex);
               }
             }
             if(value.linkCd == Const.HWA_MULL_KEY_NAME) {
-              if(value.linkCd == data_map["currentItem"].linkCd) {
-                await confirmLink(data_map["currentItem"]);
+              if(value.linkCd == dataMap["currentItem"].linkCd) {
+                await confirmLink(dataMap["currentItem"]);
               }else{
-                await cancelLink(data_map["currentItem"].orderId, value.allocCharge, "manCargo", false,item_index);
+                await cancelLink(dataMap["currentItem"].orderId, value.allocCharge, "manCargo", false,itemIndex);
               }
             }
           }
           setState(() {
-            lastPositionItem.value = item_index;
+            lastPositionItem.value = itemIndex;
           });
         }
     );
@@ -2461,14 +2486,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     ).then((it) async {
       try {
         Navigator.of(context).pop(false);
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("confirmLink() _response -> ${_response.status} // ${_response.resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
+        ReturnMap response = DioService.dioResponse(it);
+        logger.d("confirmLink() _response -> ${response.status} // ${response.resultMap}");
+        if (response.status == "200") {
+          if (response.resultMap?["result"] == true) {
 
 
           } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
+            openOkBox(context, "${response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
                   Navigator.of(context).pop(false);
                 });
@@ -2513,12 +2538,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   }
 
   Future<void> openFilterBottomSheet(BuildContext context, String title, Function(String codeType ,{CodeModel? codeModel,CustUserModel custUserModel,int value}) callback) async {
-    final temp_search_column = select_value.value.code == null || select_value.value.code?.isEmpty == true ? dropDownList![0].obs : select_value.value.obs; // 오더 검색 카테고리
+    final tempSearchColumn = select_value.value.code == null || select_value.value.code?.isEmpty == true ? dropDownList![0].obs : select_value.value.obs; // 오더 검색 카테고리
     searchOrderController.text = searchValue.value; // 오더 검색창
-    final temp_stateCode = CodeModel(code: categoryOrderCode.value ,codeName:  categoryOrderState.value).obs; // 오더 상태
+    final tempStatecode = CodeModel(code: categoryOrderCode.value ,codeName:  categoryOrderState.value).obs; // 오더 상태
     List<CodeModel>? mOrderList = SP.getCodeList(Const.ORDER_STATE_CD);
     mOrderList?.insert(0, CodeModel(code: "",codeName:  "오더전체"));
-    final temp_staffModel = categoryStaffModel.value.obs;
+    final tempStaffmodel = categoryStaffModel.value.obs;
     final mStaffList = custUserList;
 
     showModalBottomSheet(
@@ -2605,11 +2630,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   child: FadeInAnimation(
                                                       child: Obx(() =>  InkWell(
                                               onTap: () {
-                                                temp_search_column.value = CodeModel(code: dropDownList?[index].code,codeName: dropDownList?[index].codeName);
+                                                tempSearchColumn.value = CodeModel(code: dropDownList?[index].code,codeName: dropDownList?[index].codeName);
                                               },
                                               child: Container(
                                                   decoration: BoxDecoration(
-                                                      color: temp_search_column.value.code  == dropDownList?[index].code ? renew_main_color2 : light_gray24,
+                                                      color: tempSearchColumn.value.code  == dropDownList?[index].code ? renew_main_color2 : light_gray24,
                                                       borderRadius: BorderRadius.circular(30)
                                                   ),
                                                   child: Center(
@@ -2617,8 +2642,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                       "${dropDownList?[index].codeName}",
                                                       textAlign: TextAlign.center,
                                                       style: CustomStyle.CustomFont(
-                                                          styleFontSize12, temp_search_column.value.code  == dropDownList?[index].code ? Colors.white: text_color_01,
-                                                          font_weight: temp_search_column.value.code  == dropDownList?[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                          styleFontSize12, tempSearchColumn.value.code  == dropDownList?[index].code ? Colors.white: text_color_01,
+                                                          font_weight: tempSearchColumn.value.code  == dropDownList?[index].code ? FontWeight.w800 : FontWeight.w600),
                                                     ),
                                                   )
                                               )
@@ -2719,12 +2744,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                             child: FadeInAnimation(
                                             child: Obx(() =>  InkWell(
                                         onTap: () {
-                                          temp_stateCode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
+                                          tempStatecode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
                                         },
                                         child: Container(
                                             height: CustomStyle.getHeight(70.0),
                                             decoration: BoxDecoration(
-                                                color: temp_stateCode.value.code  == mOrderList?[index].code ? renew_main_color2 : light_gray24,
+                                                color: tempStatecode.value.code  == mOrderList?[index].code ? renew_main_color2 : light_gray24,
                                                 borderRadius: BorderRadius.circular(30)
                                             ),
                                             child: Center(
@@ -2732,8 +2757,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                 "${mOrderList?[index].codeName}",
                                                 textAlign: TextAlign.center,
                                                 style: CustomStyle.CustomFont(
-                                                    styleFontSize12, temp_stateCode.value.code  == mOrderList?[index].code ? Colors.white: text_color_01,
-                                                    font_weight: temp_stateCode.value.code  == mOrderList?[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                    styleFontSize12, tempStatecode.value.code  == mOrderList?[index].code ? Colors.white: text_color_01,
+                                                    font_weight: tempStatecode.value.code  == mOrderList?[index].code ? FontWeight.w800 : FontWeight.w600),
                                               ),
                                             )
                                         )
@@ -2778,12 +2803,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   child: FadeInAnimation(
                                                   child: Obx(() =>  InkWell(
                                               onTap: () {
-                                                temp_stateCode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
+                                                tempStatecode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
                                               },
                                               child: Container(
                                                   height: CustomStyle.getHeight(70.0),
                                                   decoration: BoxDecoration(
-                                                      color: temp_stateCode.value.code  == mOrderList?[index].code ? renew_main_color2 : light_gray24,
+                                                      color: tempStatecode.value.code  == mOrderList?[index].code ? renew_main_color2 : light_gray24,
                                                       borderRadius: BorderRadius.circular(30)
                                                   ),
                                                   child: Center(
@@ -2791,8 +2816,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                       "${mOrderList?[index].codeName}",
                                                       textAlign: TextAlign.center,
                                                       style: CustomStyle.CustomFont(
-                                                          styleFontSize12, temp_stateCode.value.code  == mOrderList?[index].code ? Colors.white: text_color_01,
-                                                          font_weight: temp_stateCode.value.code  == mOrderList?[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                          styleFontSize12, tempStatecode.value.code  == mOrderList?[index].code ? Colors.white: text_color_01,
+                                                          font_weight: tempStatecode.value.code  == mOrderList?[index].code ? FontWeight.w800 : FontWeight.w600),
                                                     ),
                                                   )
                                               )
@@ -2819,7 +2844,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
                                     child: AnimationLimiter(
                                         child: GridView.builder(
-                                        itemCount: mStaffList?.length,
+                                        itemCount: mStaffList.length,
                                         physics: const ScrollPhysics(),
                                         scrollDirection: Axis.vertical,
                                         shrinkWrap: true,
@@ -2838,21 +2863,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   child: FadeInAnimation(
                                                   child: Obx(() =>  InkWell(
                                               onTap: () {
-                                                  temp_staffModel.value = mStaffList?[index];
+                                                  tempStaffmodel.value = mStaffList[index];
                                               },
                                               child: Container(
                                                   height: CustomStyle.getHeight(70.0),
                                                   decoration: BoxDecoration(
-                                                      color: (temp_staffModel.value.mobile  == mStaffList?[index].mobile) && (temp_staffModel.value.userName  == mStaffList?[index].userName) ? renew_main_color2 : light_gray24,
+                                                      color: (tempStaffmodel.value.mobile  == mStaffList[index].mobile) && (tempStaffmodel.value.userName  == mStaffList[index].userName) ? renew_main_color2 : light_gray24,
                                                       borderRadius: BorderRadius.circular(30)
                                                   ),
                                                   child: Center(
                                                     child: Text(
-                                                      "${mStaffList?[index].userName}",
+                                                      "${mStaffList[index].userName}",
                                                       textAlign: TextAlign.center,
                                                       style: CustomStyle.CustomFont(
-                                                          styleFontSize12, (temp_staffModel.value.mobile  == mStaffList?[index].mobile) && (temp_staffModel.value.userName  == mStaffList?[index].userName) ? Colors.white: text_color_01,
-                                                          font_weight: (temp_staffModel.value.mobile  == mStaffList?[index].mobile) && (temp_staffModel.value.userName  == mStaffList?[index].userName) ? FontWeight.w800 : FontWeight.w600),
+                                                          styleFontSize12, (tempStaffmodel.value.mobile  == mStaffList[index].mobile) && (tempStaffmodel.value.userName  == mStaffList[index].userName) ? Colors.white: text_color_01,
+                                                          font_weight: (tempStaffmodel.value.mobile  == mStaffList[index].mobile) && (tempStaffmodel.value.userName  == mStaffList[index].userName) ? FontWeight.w800 : FontWeight.w600),
                                                     ),
                                                   )
                                               )
@@ -2872,14 +2897,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               Future.delayed(
                                   const Duration(milliseconds: 300), () {
                                 // 오더 검색
-                                select_value.value = temp_search_column.value; // 오더 검색 카테고리
+                                select_value.value = tempSearchColumn.value; // 오더 검색 카테고리
                                 searchValue.value = searchOrderController.text; // 검색Field
                                 //오더 상태
-                                categoryOrderCode.value = temp_stateCode.value?.code??""; // 오더 상태 Code
-                                categoryOrderState.value = temp_stateCode.value?.codeName??"-"; // 오더 상태 Name
+                                categoryOrderCode.value = tempStatecode.value.code??""; // 오더 상태 Code
+                                categoryOrderState.value = tempStatecode.value.codeName??"-"; // 오더 상태 Name
 
                                 //담당자 선택
-                                categoryStaffModel.value = temp_staffModel.value;
+                                categoryStaffModel.value = tempStaffmodel.value;
 
                                 page.value = 1;
                                 scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
@@ -2892,7 +2917,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           },
                           child: Center(
                               child: Container(
-                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                                 height: CustomStyle.getHeight(50),
                                 alignment: Alignment.center,
                                 margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
@@ -2930,24 +2955,24 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         user.custId,
         user.deptId
     ).then((it) async {
-      ReturnMap _response = DioService.dioResponse(it);
-      logger.d("getCustUser() _response -> ${_response.status} // ${_response.resultMap}");
-      if(_response.status == "200") {
-        if(_response.resultMap?["result"] == true) {
-          if(_response.resultMap?["data"] != null) {
-            var list = _response.resultMap?["data"] as List;
-            if(custUserList.length > 0) custUserList.clear();
+      ReturnMap response = DioService.dioResponse(it);
+      logger.d("getCustUser() _response -> ${response.status} // ${response.resultMap}");
+      if(response.status == "200") {
+        if(response.resultMap?["result"] == true) {
+          if(response.resultMap?["data"] != null) {
+            var list = response.resultMap?["data"] as List;
+            if(custUserList.isNotEmpty) custUserList.clear();
               List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
               custUserList.addAll(itemsList);
-              custUserList?.insert(0, CustUserModel(mobile: user.mobile,userName:  "내오더"));
-              custUserList?.insert(custUserList.length, CustUserModel(mobile: "",userName:  "오더전체"));
+              custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내오더"));
+              custUserList.insert(custUserList.length, CustUserModel(mobile: "",userName:  "오더전체"));
           }else{
             custUserList.value = List.empty(growable: true);
-            custUserList?.insert(0, CustUserModel(mobile: user.mobile,userName:  "내오더"));
-            custUserList?.insert(1, CustUserModel(mobile: "",userName:  "오더전체"));
+            custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내오더"));
+            custUserList.insert(1, CustUserModel(mobile: "",userName:  "오더전체"));
           }
         }else{
-          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+          openOkBox(context,"${response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
         }
       }
     }).catchError((Object obj){
@@ -2986,7 +3011,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
     Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewOrderDetailPage(order_vo: item), pageAnimationType: LeftToRightTransition()));
 
-    if(results != null && results.containsKey("code")){
+    if(results.containsKey("code")){
       if(results["code"] == 200) {
         await setRegResult(results,item_index: index);
       }
@@ -3029,19 +3054,19 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         user.authorization,allocId
     ).then((it) async {
       await pr?.hide();
-      ReturnMap _response = DioService.dioResponse(it);
-      logger.d("getOrderDetail() _response -> ${_response.status} | ${_response.resultMap}");
+      ReturnMap response = DioService.dioResponse(it);
+      logger.d("getOrderDetail() _response -> ${response.status} | ${response.resultMap}");
       //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
-      if(_response.status == "200") {
-        if(_response.resultMap?["result"] == true) {
-          if (_response.resultMap?["data"] != null) {
-            var list = _response.resultMap?["data"] as List;
+      if(response.status == "200") {
+        if(response.resultMap?["result"] == true) {
+          if (response.resultMap?["data"] != null) {
+            var list = response.resultMap?["data"] as List;
             List<OrderModel> itemsList = list.map((i) => OrderModel.fromJSON(i)).toList();
             OrderModel data = itemsList[0];
             await goToTransInfo(data);
           }
         }else{
-          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+          openOkBox(context,"${response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
         }
       }
     }).catchError((Object obj) async {
@@ -3099,9 +3124,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
 
 
-  /**
-  * Widget Start
-  */
+  /// Widget Start
 
 
   @override
@@ -3121,7 +3144,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               size: 30,
               color: Colors.black,
             ),
-            onPressed: () {},
+            onPressed: () {
+
+            },
             tooltip: MaterialLocalizations.of(mContext).openAppDrawerTooltip,
           ),
           IconButton(
@@ -3157,7 +3182,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   Drawer getAppBarMenu() {
     return Drawer(
         backgroundColor: light_gray24,
-        width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
+        width: App().isTablet(context) ? MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7 : MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.8,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(30),
@@ -3170,7 +3195,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
-                  DrawerHeader(
+                  SizedBox(
+                    height: App().isTablet(context) ? 220.h : 200.h,
+                  child: DrawerHeader(
                       decoration: const BoxDecoration(
                         color: renew_main_color2,
                       ),
@@ -3187,17 +3214,27 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         mainAxisAlignment: MainAxisAlignment.end,
                                       children:[
-                                        IconButton(
-                                            onPressed: (){
-                                              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ReNewAppBarSettingPage()));
-                                            },
-                                            icon: const Icon(Icons.settings,size: 25,color: Colors.white)
+                                        Container(
+                                          margin: App().isTablet(context) ?  EdgeInsets.only(right: CustomStyle.getWidth(5.w)) : EdgeInsets.only(right: CustomStyle.getWidth(25.w)),
+                                          width: App().isTablet(context) ? CustomStyle.getWidth(10.w) : CustomStyle.getWidth(15.w),
+                                          height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(30.h),
+                                          child: IconButton(
+                                              onPressed: (){
+                                                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ReNewAppBarSettingPage()));
+                                              },
+                                              icon: Icon(Icons.settings,size: App().isTablet(context) ? 30.h : 25 ,color: Colors.white)
+                                          )
                                         ),
-                                        IconButton(
-                                            onPressed: (){
-                                              _scaffoldKey.currentState!.closeEndDrawer();
-                                            },
-                                            icon: const Icon(Icons.close,size: 25,color: Colors.white)
+                                        Container(
+                                          width: App().isTablet(context) ? CustomStyle.getWidth(10.w) : CustomStyle.getWidth(15.w),
+                                          height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(30.h),
+                                          margin: App().isTablet(context) ?  EdgeInsets.only(right: CustomStyle.getWidth(5.w)) : EdgeInsets.only(right: CustomStyle.getWidth(25.w)),
+                                          child: IconButton(
+                                              onPressed: (){
+                                                _scaffoldKey.currentState!.closeEndDrawer();
+                                              },
+                                              icon: Icon(Icons.close,size: App().isTablet(context) ? 35.h : 25 ,color: Colors.white)
+                                          )
                                         ),
                                       ]
                                     ),
@@ -3208,17 +3245,19 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children:[
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(90),
-                                            child: Container(
-                                              color: Colors.white,
-                                                child: Image.asset(
-                                                  "assets/image/ic_logo.png",
-                                                  width: CustomStyle.getWidth(50.0),
-                                                  height: CustomStyle.getHeight(50.0),
-                                                  color: Colors.black,
-                                                  fit: BoxFit.contain,
-                                                )
+                                          SizedBox(
+                                            width: App().isTablet(context) ? CustomStyle.getWidth(19.w) : CustomStyle.getWidth(50.w),
+                                            height: App().isTablet(context) ? CustomStyle.getHeight(45.h) : CustomStyle.getHeight(45.h),
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(100.0),
+                                              child: Container(
+                                                color: Colors.white,
+                                                  child: Image.asset(
+                                                    "assets/image/ic_logo.png",
+                                                    color: Colors.black,
+                                                    fit: BoxFit.contain,
+                                                  )
+                                              )
                                             )
                                           ),
                                           Container(
@@ -3270,7 +3309,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
                                                   Icon(Icons.notifications,
-                                                      size: 21.h,
+                                                      size: App().isTablet(context) ? 28.h : 21.h,
                                                       color: Colors.white
                                                   ),
                                                   Text(
@@ -3293,7 +3332,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   crossAxisAlignment: CrossAxisAlignment.center,
                                                 children :[
                                                   Icon(Icons.manage_accounts,
-                                                      size: 21.h,
+                                                      size: App().isTablet(context) ? 28.h : 21.h,
                                                       color: Colors.white
                                                   ),
                                                   Text(
@@ -3313,8 +3352,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           ),
                         ],
                       )
-                  ),
-                  mPoint.value != 0 && mPoint.value != null ?
+                  )),
+                  mPoint.value != 0 ?
                   ListTile(
                     contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                     title: Container(
@@ -3372,8 +3411,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               children: [
                                 Image.asset(
                                   "assets/image/ic_report.png",
-                                  width: CustomStyle.getWidth(21.0),
-                                  height: CustomStyle.getHeight(21.0),
+                                  width: CustomStyle.getWidth(21),
+                                  height: CustomStyle.getHeight(21),
                                 ),
                                 Container(
                                     margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
@@ -3430,9 +3469,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.help,
-                            size: 24,
+                            size: 21.h,
                             color: renew_main_color2,
                           ),
                           Container(
@@ -3483,8 +3522,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                   activeColor: renew_main_color2,
                                   onChanged: (bool? value) async {
                                     controller.setRenewValue(value ?? false);
-                                    bool aaa = await controller.getRenewValue();
-                                    print("응 뭐지? => ${aaa}");
                                   },
                               )
                             )
@@ -3499,9 +3536,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         onTap: () async {
                           await goToExit();
                         },
-                        child: const Icon(
+                        child: Icon(
                           Icons.exit_to_app,
-                          size: 28,
+                          size: App().isTablet(context) ? 21.sp : 28.sp,
                           color: Colors.black,
                         )
                     ),
@@ -3619,7 +3656,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               Expanded(
                 flex: 1,
                   child: Text(
-                  mCalendarStartDate.value == null?"-":"${mCalendarStartDate.value?.year}년 ${mCalendarStartDate.value?.month}월 ${mCalendarStartDate.value?.day}일",
+                  mCalendarStartDate.value == null?"-":"${mCalendarStartDate.value.year}년 ${mCalendarStartDate.value.month}월 ${mCalendarStartDate.value.day}일",
                   textAlign: TextAlign.center,
                   style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
                 )
@@ -3635,7 +3672,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               Expanded(
                 flex: 1 ,
                 child: Text(
-                  mCalendarEndDate.value == null?"-":"${mCalendarEndDate.value?.year}년 ${mCalendarEndDate.value?.month}월 ${mCalendarEndDate.value?.day}일",
+                  mCalendarEndDate.value == null?"-":"${mCalendarEndDate.value.year}년 ${mCalendarEndDate.value.month}월 ${mCalendarEndDate.value.day}일",
                   textAlign: TextAlign.center,
                   style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
                 )
@@ -3855,13 +3892,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
               Positioned(
                   right: 15.w,
-                  bottom: ivBottom.value == false ? 80.h : 130.h,
+                  bottom: ivBottom.value == false ? 80.h : App().isTablet(context) ? 140.h : 130.h,
                   child: InkWell(
                       onTap: () async {
                         Future(() {
                           setState(() {
-                            var item_index = scrollController.position.pixels / (scrollController.position.maxScrollExtent / orderList.length);
-                            lastPositionItem.value = item_index.toInt();
+                            var itemIndex = scrollController.position.pixels / (scrollController.position.maxScrollExtent / orderList.length);
+                            lastPositionItem.value = itemIndex.toInt();
                           });
                         });
                       },
@@ -3924,7 +3961,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         openSelectRegOrderDialog(context);
                       },
                       child: Container(
-                          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                          width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                           height: CustomStyle.getHeight(50),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
@@ -3965,8 +4002,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         onTap: () async {
                           Future(() {
                             setState(() {
-                              var item_index = scrollController.position.pixels / (scrollController.position.maxScrollExtent / orderList.length);
-                              lastPositionItem.value = item_index.toInt();
+                              var itemIndex = scrollController.position.pixels / (scrollController.position.maxScrollExtent / orderList.length);
+                              lastPositionItem.value = itemIndex.toInt();
                             });
                           });
                         },
@@ -4081,7 +4118,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               openSelectRegOrderDialog(context);
                             },
                             child: Container(
-                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
+                                width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
                                 height: CustomStyle.getHeight(50),
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
@@ -4115,7 +4152,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       child: Container(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            final dashCount = (constraints.constrainWidth().toInt() / 5.0).floor();
+            print("뭔디아뭔디아 => ${constraints.constrainWidth().toInt()}");
+            final dashCount = App().isTablet(context) ? (constraints.constrainWidth().toInt() / 15.0).floor() : (constraints.constrainWidth().toInt() / 5.0).floor();
             return Flex(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               direction: Axis.horizontal,
@@ -4135,13 +4173,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
   }
 
-  Widget getListCardView(OrderModel item,int item_index) {
+  Widget getListCardView(OrderModel item,int itemIndex) {
 
     return Container(
         padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),top: CustomStyle.getHeight(10.0.h)),
         child: InkWell(
             onTap: () async {
-              await goToOrderDetail(item,item_index);
+              await goToOrderDetail(item,itemIndex);
             },
             child: Card(
                 elevation: 2.0,
@@ -4362,7 +4400,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                  children: [
                                                    Container(
-                                                       padding:const EdgeInsets.all(3),
+                                                       padding:App().isTablet(context) ? const EdgeInsets.all(10) : const EdgeInsets.all(3),
                                                        margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                                        decoration: const BoxDecoration(
                                                           color: renew_main_color2,
@@ -4371,7 +4409,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                        child: Text("상",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
                                                    ),
                                                    Text(
-                                                     "${Util.splitSDate(item.sDate)}",
+                                                     Util.splitSDate(item.sDate),
                                                      style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
                                                      textAlign: TextAlign.center,
                                                    ),
@@ -4417,11 +4455,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   color: const Color(0xffC7CBDE),
                                                 ),
                                                 Text(
-                                                  "${Util.makeDistance(item.distance)}",
+                                                  Util.makeDistance(item.distance),
                                                   style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
                                                 ),
                                                 Text(
-                                                  "${Util.makeTime(item.time??0)}",
+                                                  Util.makeTime(item.time??0),
                                                   style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
                                                 )
                                               ]
@@ -4443,7 +4481,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                         mainAxisAlignment: MainAxisAlignment.center,
                                                         children: [
                                                           Container(
-                                                              padding:const EdgeInsets.all(3),
+                                                              padding:App().isTablet(context) ? const EdgeInsets.all(10) : const EdgeInsets.all(3),
                                                               margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                                               decoration: const BoxDecoration(
                                                                   color: rpa_btn_cancle,
@@ -4452,7 +4490,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                               child: Text("하",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
                                                           ),
                                                           Text(
-                                                            "${Util.splitSDate(item.eDate)}",
+                                                            Util.splitSDate(item.eDate),
                                                             style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
                                                             textAlign: TextAlign.center,
                                                           ),
@@ -4544,7 +4582,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                      borderRadius: BorderRadius.circular(10)
                                                  ),
                                                  child: Text(
-                                                 "${item.mixYn == "Y" ? "혼적" : "독차"}",
+                                                 item.mixYn == "Y" ? "혼적" : "독차",
                                                  style: CustomStyle.CustomFont(styleFontSize10, text_color_02,font_weight: FontWeight.w600),
                                                  )
                                              ),
@@ -4568,7 +4606,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                              ),
                         HorizontalDashedDivider(),
                         //RPA
-                        item.orderState != "09" ? rpaFunctionFuture(item,item_index) : const SizedBox(),
+                        item.orderState != "09" ? rpaFunctionFuture(item,itemIndex) : const SizedBox(),
                       ])
                   ),
                 ]
@@ -4578,7 +4616,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
   }
 
-  Widget rpaFunctionFuture(OrderModel item,int item_index) {
+  Widget rpaFunctionFuture(OrderModel item,int itemIndex) {
     final orderService = Provider.of<OrderService>(context);
     return FutureBuilder(
         future: orderService.currentLink(
@@ -4590,7 +4628,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
             return const SizedBox();
           }else {
             if (snapshot.hasData) {
-              return rpaFunctionWidget(item, snapshot,item_index);
+              return rpaFunctionWidget(item, snapshot,itemIndex);
             } else if (snapshot.hasError) {
               return const SizedBox();
             }
@@ -4605,7 +4643,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
   }
 
-  Widget rpaFunctionWidget(OrderModel item, AsyncSnapshot snapshot,item_index) {
+  Widget rpaFunctionWidget(OrderModel item, AsyncSnapshot snapshot,itemIndex) {
     final call24State = false.obs;
     final manState = false.obs;
     final oneCallState = false.obs;
@@ -4645,7 +4683,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       api24Data.value["apiKey24"] != null && api24Data.value["apiKey24"] != '' ?
                       SizedBox(
                           width: CustomStyle.getWidth(100),
-                          height: CustomStyle.getHeight(85),
+                          height: App().isTablet(context) ? CustomStyle.getHeight(50.h) : CustomStyle.getHeight(85),
                           child: Stack(
                               alignment: Alignment.center,
                               children: [
@@ -4690,7 +4728,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                           :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800),
                                                     ),
                                                     Text(
-                                                      "${statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat)}",
+                                                      statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat),
                                                       style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent,font_weight: FontWeight.w800),
                                                     ),
                                                   ],
@@ -4769,7 +4807,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           Obx(() =>
                                               Container(
                                                 width: CustomStyle.getWidth(80),
-                                                height: CustomStyle.getHeight(65),
+                                                height: App().isTablet(context) ? CustomStyle.getHeight(45.h) : CustomStyle.getHeight(65),
                                                 padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3.h)),
                                                 decoration: BoxDecoration(
                                                     color: statMsg(hwaMullLinkModel.value.linkStat, hwaMullLinkModel.value.jobStat) == ""
@@ -4795,7 +4833,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                             :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
                                                     ),
                                                     Text(
-                                                      "${statMsg(hwaMullLinkModel.value.linkStat, hwaMullLinkModel.value.jobStat)}",
+                                                      statMsg(hwaMullLinkModel.value.linkStat, hwaMullLinkModel.value.jobStat),
                                                       style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent,font_weight: FontWeight.w800),
                                                     ),
                                                   ],
@@ -4874,7 +4912,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           Obx(() =>
                                               Container(
                                                 width: CustomStyle.getWidth(80),
-                                                height: CustomStyle.getHeight(65),
+                                                height: App().isTablet(context) ? CustomStyle.getHeight(45.h) : CustomStyle.getHeight(65),
                                                 padding: EdgeInsets.symmetric(
                                                     vertical: CustomStyle.getHeight(3.h)),
                                                 decoration: BoxDecoration(
@@ -4901,7 +4939,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                             :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
                                                     ),
                                                     Text(
-                                                      "${statMsg(oneCallLinkModel.value.linkStat, oneCallLinkModel.value.jobStat)}",
+                                                      statMsg(oneCallLinkModel.value.linkStat, oneCallLinkModel.value.jobStat),
                                                       style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent,font_weight: FontWeight.w800),
                                                     ),
                                                   ],
@@ -4964,13 +5002,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                   ),
 
                   Obx((){
-                    final _selected = false.obs;
-                    if(call24State.value || manState.value || oneCallState.value) _selected.value = true;
-                    if(item.orderState == "09") _selected.value = false;
+                    final selected = false.obs;
+                    if(call24State.value || manState.value || oneCallState.value) selected.value = true;
+                    if(item.orderState == "09") selected.value = false;
 
                     return AnimatedContainer(
                         width: double.infinity,
-                        height: _selected.value ? CustomStyle.getHeight(55) : CustomStyle.getHeight(30),
+                        height: selected.value ? CustomStyle.getHeight(55) : CustomStyle.getHeight(30),
                         margin: EdgeInsets.only(bottom: CustomStyle.getHeight(5)),
                         duration: const Duration(milliseconds: 700),
                         curve: Curves.fastOutSlowIn,
@@ -4983,13 +5021,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         child: Obx(() =>
                         // 24시콜 OpenInfo
                         call24State.value ?
-                          clickRpaInfoWidget(call24LinkModel.value,userRpaData.value, item,Const.CALL_24_KEY_NAME,item_index)
+                          clickRpaInfoWidget(call24LinkModel.value,userRpaData.value, item,Const.CALL_24_KEY_NAME,itemIndex)
                         // 화물맨 OpenInfo
                         : manState.value ?
-                          clickRpaInfoWidget(hwaMullLinkModel.value,userRpaData.value,item,Const.HWA_MULL_KEY_NAME,item_index)
+                          clickRpaInfoWidget(hwaMullLinkModel.value,userRpaData.value,item,Const.HWA_MULL_KEY_NAME,itemIndex)
                         // 원콜 OpenInfo
                         : oneCallState.value ?
-                          clickRpaInfoWidget(oneCallLinkModel.value,userRpaData.value,item,Const.ONE_CALL_KEY_NAME,item_index)
+                          clickRpaInfoWidget(oneCallLinkModel.value,userRpaData.value,item,Const.ONE_CALL_KEY_NAME,itemIndex)
                         : const SizedBox()
                         )
                     );
@@ -5000,26 +5038,26 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
   }
 
-  Widget clickRpaInfoWidget(OrderLinkCurrentModel linkModel,UserRpaModel user_Rpa_Data, OrderModel orderItem, String link_type,int item_index) {
+  Widget clickRpaInfoWidget(OrderLinkCurrentModel mLinkModel,UserRpaModel mUserRpaData, OrderModel orderItem, String linkType,int itemIndex) {
 
-    var link_name = "";
+    var linkName = "";
 
-    final link_model = OrderLinkCurrentModel().obs;
-    link_model.value = linkModel;
+    final linkModel = OrderLinkCurrentModel().obs;
+    linkModel.value = mLinkModel;
     final userRpaData = UserRpaModel().obs;
-    userRpaData.value = user_Rpa_Data;
+    userRpaData.value = mUserRpaData;
     final item = OrderModel().obs;
     item.value = orderItem;
 
-    switch(link_type) {
+    switch(linkType) {
       case "03" :
-        link_name = "24시콜";
+        linkName = "24시콜";
         break;
       case "21" :
-        link_name = "화물맨";
+        linkName = "화물맨";
         break;
       case "18" :
-        link_name = "원콜";
+        linkName = "원콜";
         break;
     }
 
@@ -5033,12 +5071,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
-                statMsg(link_model.value.linkStat, link_model.value.jobStat) == "" ?
-                link_model.value.linkStat == "R" ?
+                statMsg(linkModel.value.linkStat, linkModel.value.jobStat) == "" ?
+                linkModel.value.linkStat == "R" ?
                 item.value.orderStateName == "접수" ?
                 InkWell(
                     onTap:(){
-                      openRpaInfoDialog(context, item.value, "02",link_type,item_index,link_model: link_model.value);
+                      openRpaInfoDialog(context, item.value, "02",linkType,itemIndex,link_model: linkModel.value);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5051,13 +5089,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 배차확정",
+                          "$linkName 배차확정",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
                 ) :  InkWell(
                     onTap:(){
-                      openRpaInfoDialog(context, item.value, "01",link_type,item_index);
+                      openRpaInfoDialog(context, item.value, "01",linkType,itemIndex);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5069,22 +5107,22 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 배차정보",
+                          "$linkName 배차정보",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
                 )
                     : const SizedBox()
-                    : link_model.value.linkStat == "D" && link_model.value.jobStat == "F" ?
+                    : linkModel.value.linkStat == "D" && linkModel.value.jobStat == "F" ?
                 const SizedBox()
                     : const SizedBox(),
 
                 // 전체 조건문 시작
-                ((link_model.value.allocCharge != "" && link_model.value.allocCharge != null) && (link_model.value.linkStat != "D" && link_model.value.jobStat != "F") && (link_model.value.linkStat != "I" && link_model.value.jobStat != "E")
-                    || (link_model.value.linkStat == "D" && link_model.value.jobStat == "E") || (link_model.value.linkStat == "I" && link_model.value.jobStat == "W")
-                    || (link_model.value.linkStat == "I" && link_model.value.jobStat == "F") || (link_model.value.linkStat == "R" && link_model.value.jobStat == "W")
-                    || (link_model.value.linkStat == "R" && link_model.value.jobStat == "F") || link_model.value.linkStat == "U") ?
-                link_type == Const.CALL_24_KEY_NAME ?
+                ((linkModel.value.allocCharge != "" && linkModel.value.allocCharge != null) && (linkModel.value.linkStat != "D" && linkModel.value.jobStat != "F") && (linkModel.value.linkStat != "I" && linkModel.value.jobStat != "E")
+                    || (linkModel.value.linkStat == "D" && linkModel.value.jobStat == "E") || (linkModel.value.linkStat == "I" && linkModel.value.jobStat == "W")
+                    || (linkModel.value.linkStat == "I" && linkModel.value.jobStat == "F") || (linkModel.value.linkStat == "R" && linkModel.value.jobStat == "W")
+                    || (linkModel.value.linkStat == "R" && linkModel.value.jobStat == "F") || linkModel.value.linkStat == "U") ?
+                linkType == Const.CALL_24_KEY_NAME ?
                 (userRpaData.value.link24Id?.isNotEmpty == true && userRpaData.value.link24Id != "") && (userRpaData.value.link24Pass?.isNotEmpty == true && userRpaData.value.link24Pass != "") ? // link24Id와 link24Pass이 등록되어 있는 상태
                 item.value.orderStateName == "접수" ? // 24시콜 OrderStateName = "접수" 상태
                 item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ? // 24시콜 인수증, 선불, 착불 상태
@@ -5092,7 +5130,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                     children: [
                       InkWell(
                           onTap:(){
-                            openRpaModiDialog(context, item.value, link_type,item_index);
+                            openRpaModiDialog(context, item.value, linkType,itemIndex);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -5103,14 +5141,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "${link_name} 수정",
+                                "$linkName 수정",
                                 style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                               )
                           )
                       ),
                       InkWell(
                           onTap:() async {
-                            await cancelRpa(item.value.orderId, link_model.value,item_index);
+                            await cancelRpa(item.value.orderId, linkModel.value,itemIndex);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -5122,7 +5160,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "${link_name} 취소",
+                                "$linkName 취소",
                                 style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                               )
                           )
@@ -5131,7 +5169,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 )  : const SizedBox()
                     : InkWell(  // 24시콜 OrderStateName = "접수" 아닐때
                     onTap:() async {
-                      await cancelRpa(item.value.orderId, link_model.value,item_index);
+                      await cancelRpa(item.value.orderId, linkModel.value,itemIndex);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5143,21 +5181,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 취소",
+                          "$linkName 취소",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
                 ) : const SizedBox()
 
-                    : link_type == Const.ONE_CALL_KEY_NAME ?
+                    : linkType == Const.ONE_CALL_KEY_NAME ?
                 (userRpaData.value.one24Id?.isNotEmpty == true && userRpaData.value.one24Id != "") && (userRpaData.value.one24Pass?.isNotEmpty == true && userRpaData.value.one24Pass != "") ? // one24Id와 one24Pass이 등록되어 있는 상태
-                item.value.orderStateName == "접수" && link_model.value.linkStat != "R" ? // 원콜 OrderStateName = "접수"상태고 linkStat 값이 R(배차 확정)이 아닌 상태
+                item.value.orderStateName == "접수" && linkModel.value.linkStat != "R" ? // 원콜 OrderStateName = "접수"상태고 linkStat 값이 R(배차 확정)이 아닌 상태
                 item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ? // 원콜 인수증, 선불, 착불 상태
                 Row(
                     children: [
                       InkWell(
                           onTap:(){
-                            openRpaModiDialog(context, item.value, link_type,item_index);
+                            openRpaModiDialog(context, item.value, linkType,itemIndex);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -5168,14 +5206,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "${link_name} 수정",
+                                "$linkName 수정",
                                 style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                               )
                           )
                       ),
                       InkWell(
                           onTap:() async {
-                            await cancelRpa(item.value.orderId, link_model.value,item_index);
+                            await cancelRpa(item.value.orderId, linkModel.value,itemIndex);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -5187,7 +5225,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "${link_name} 취소",
+                                "$linkName 취소",
                                 style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                               )
                           )
@@ -5196,7 +5234,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 ) : const SizedBox()
                     : InkWell( // 원콜 OrderStateName = "접수" 상태가 아니거나 linkStat 값이 R(배차 확정)인 상태
                     onTap:() async {
-                      await cancelRpa(item.value.orderId, link_model.value,item_index);
+                      await cancelRpa(item.value.orderId, linkModel.value,itemIndex);
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5208,7 +5246,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 취소",
+                          "$linkName 취소",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
@@ -5221,7 +5259,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                     children: [
                       InkWell(
                           onTap:(){
-                            openRpaModiDialog(context, item.value, link_type,item_index);
+                            openRpaModiDialog(context, item.value, linkType,itemIndex);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -5232,14 +5270,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "${link_name} 수정",
+                                "$linkName 수정",
                                 style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                               )
                           )
                       ),
                       InkWell(
                           onTap:() async {
-                            await cancelRpa(item.value.orderId, link_model.value,item_index);
+                            await cancelRpa(item.value.orderId, linkModel.value,itemIndex);
                           },
                           child: Container(
                               width: CustomStyle.getWidth(80),
@@ -5251,7 +5289,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ),
                               alignment: Alignment.center,
                               child: Text(
-                                "${link_name} 취소",
+                                "$linkName 취소",
                                 style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                               )
                           )
@@ -5261,12 +5299,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                     : const SizedBox()
                 // 전체 조건문 아닐 경우
                     : item.value.orderStateName == "접수" ?
-                link_type == Const.HWA_MULL_KEY_NAME ? // 전체 조건문이 맞지 않을때(화물맨)
+                linkType == Const.HWA_MULL_KEY_NAME ? // 전체 조건문이 맞지 않을때(화물맨)
                 (userRpaData.value.man24Id?.isNotEmpty == true && userRpaData.value.man24Id != "") && (userRpaData.value.man24Pass?.isNotEmpty == true && userRpaData.value.man24Pass != "") ? // man24Id와 man24Pass이 등록되어 있는 상태
                 item.value.chargeType == "01" ? // 시작(1)
                 InkWell(
                     onTap: () {
-                      openRpaModiDialog(context, item.value, link_type,item_index,flag: "D");
+                      openRpaModiDialog(context, item.value, linkType,itemIndex,flag: "D");
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5277,18 +5315,18 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 등록",
+                          "$linkName 등록",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
                 ) :  const SizedBox() // 끝(1)
                     : const SizedBox()
-                    :link_type == Const.CALL_24_KEY_NAME ? // 전체 조건문이 맞지 않을때(24시콜)
+                    :linkType == Const.CALL_24_KEY_NAME ? // 전체 조건문이 맞지 않을때(24시콜)
                 (userRpaData.value.link24Id?.isNotEmpty == true && userRpaData.value.link24Id != "") && (userRpaData.value.link24Pass?.isNotEmpty == true && userRpaData.value.link24Pass != "") ? // link24Id와 link24Pass이 등록되어 있는 상태
                 item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ?
                 InkWell(
                     onTap: () {
-                      openRpaModiDialog(context, item.value, link_type,item_index,flag: "D");
+                      openRpaModiDialog(context, item.value, linkType,itemIndex,flag: "D");
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5299,7 +5337,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 등록",
+                          "$linkName 등록",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
@@ -5311,7 +5349,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 item.value.chargeType == "01" || item.value.chargeType == "04" || item.value.chargeType == "05" ?
                 InkWell(
                     onTap: () {
-                      openRpaModiDialog(context, item.value, link_type,item_index,flag: "D");
+                      openRpaModiDialog(context, item.value, linkType,itemIndex,flag: "D");
                     },
                     child: Container(
                         width: CustomStyle.getWidth(80),
@@ -5322,7 +5360,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          "${link_name} 등록",
+                          "$linkName 등록",
                           style: CustomStyle.CustomFont(styleFontSize10, Colors.white),
                         )
                     )
@@ -5332,8 +5370,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
                     : const SizedBox()
               ]),
-          link_model.value.linkStat != "D" && link_model.value.jobStat != "F" ?
-          link_model.value.rpaMsg != null && link_model.value.rpaMsg?.isNotEmpty == true ?
+          linkModel.value.linkStat != "D" && linkModel.value.jobStat != "F" ?
+          linkModel.value.rpaMsg != null && linkModel.value.rpaMsg?.isNotEmpty == true ?
           Flexible(
               child: Container(
                   margin: EdgeInsets.only(top: CustomStyle.getHeight(5)
@@ -5341,7 +5379,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                   child: RichText(
                       overflow: TextOverflow.visible,
                       text: TextSpan(
-                        text: "${link_model.value.rpaMsg}",
+                        text: "${linkModel.value.rpaMsg}",
                         style: CustomStyle.CustomFont(styleFontSize10, Colors.redAccent),
                       )
                   )
@@ -5355,7 +5393,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   Future goToRegOrder() async {
     Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(flag: "R")));
 
-    if(results != null && results.containsKey("code")){
+    if(results.containsKey("code")){
       if(results["code"] == 200) {
         await setRegResult(results);
       }
@@ -5368,7 +5406,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     }else{
       Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RegistOrderPage(flag: "R"), pageAnimationType: LeftToRightTransition()));
 
-      if(results != null && results.containsKey("code")){
+      if(results.containsKey("code")){
         if(results["code"] == 200) {
           await setRegResult(results);
         }
@@ -5376,9 +5414,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     }
   }
 
-  Widget templateListWidget(){
+  Widget templateListWidget(Rx<TemplateModel> selectItem){
 
-    return Obx(() => Container(
+    return Container(
       child: template_list.isNotEmpty
           ? Expanded(
           child: AnimationLimiter(
@@ -5394,7 +5432,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       child: SlideAnimation(
                           verticalOffset: 50.0,
                           child: FadeInAnimation(
-                              child: getListItemView(item)
+                              child: getListItemView(item,selectItem)
                           )
                       )
                   );
@@ -5410,43 +5448,45 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               )
           )
       ),
-    ));
+    );
   }
 
-  Widget getListItemView(TemplateModel item) {
-
-    final selected = false.obs;
+  Widget getListItemView(TemplateModel item,Rx<TemplateModel> selectItem) {
 
     return InkWell(
         onTap: (){
-          selected.value = !selected.value;
+          print("응애응에 => ${selectItem.value.templateId}");
+          if(selectItem.value.templateId == item.templateId) {
+            selectItem.value = TemplateModel();
+          }else{
+            selectItem.value = item;
+          }
         },
         child: Obx(() => Container(
-            margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20),vertical: CustomStyle.getHeight(10)),
+            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(10)),
             decoration: BoxDecoration(
-                color: Colors.white,
+                color: light_gray4,
                 borderRadius: const BorderRadius.all(Radius.circular(20)),
-                border: Border.all(color: selected.value ? renew_main_color2 : Colors.white,width: 2)
+                border: Border.all(color: selectItem.value.templateId == item.templateId ? renew_main_color2 : Colors.white,width: 2)
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Obx(() =>
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
                             margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal: CustomStyle.getWidth(15)),
-                            child:Text(
+                            child: Text(
                                 "${item.templateTitle}",
                                 style:CustomStyle.CustomFont(styleFontSize18, renew_main_color2,font_weight: FontWeight.w600)
                             )
-                        ),
+                        )
                       ],
-                    )),
-                CustomStyle.getDivider1(),
+                    ),
+                Container(height: 1,color: light_gray23,),
                 Container(
                     margin: EdgeInsets.only(top: CustomStyle.getHeight(5),left: CustomStyle.getWidth(15),right: CustomStyle.getWidth(15)),
                     child: Row(
@@ -5561,11 +5601,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           color: const Color(0xffC7CBDE),
                                         ),
                                         Text(
-                                          "${Util.makeDistance(item.distance)}",
+                                          Util.makeDistance(item.distance),
                                           style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
                                         ),
                                         Text(
-                                          "${Util.makeTime(item.time??0)}",
+                                          Util.makeTime(item.time??0),
                                           style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
                                         )
                                       ]
@@ -5724,7 +5764,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                             borderRadius: BorderRadius.circular(3)
                                         ),
                                         child: Text(
-                                          "${item.mixYn == "Y" ? "혼적" : "독차"}",
+                                          item.mixYn == "Y" ? "혼적" : "독차",
                                           style: CustomStyle.CustomFont(styleFontSize10, const Color(0xff5EAD89),font_weight: FontWeight.w600),
                                         )
                                     ),

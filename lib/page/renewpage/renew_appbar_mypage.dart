@@ -1166,7 +1166,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                     Navigator.of(context).pop();
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.keyboard_arrow_left,size: 24.h,color: styleWhiteCol),
+                  icon: Icon(Icons.keyboard_arrow_left,size: 24.h,color: Colors.black),
                 ),
           ),
       body: SafeArea(

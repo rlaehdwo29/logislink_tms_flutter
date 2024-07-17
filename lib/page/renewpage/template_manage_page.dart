@@ -561,16 +561,18 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
         if(selectMode.value) {
           print("몇개여몇개여 => ${select_template_list.length}");
           if(select_template_list.length > 0){
-            for (var listItem in select_template_list) {
-              if (listItem.templateId == item.templateId) {
+            select_template_list.forEach((element) { 
+              if (element.templateId == item.templateId) {
                 select_template_list.remove(item);
               } else {
                 select_template_list.add(item);
               }
-            }
+            });
           }else{
             select_template_list.add(item);
           }
+        }else{
+          
         }
       },
         child: Obx(() => Container(
@@ -584,7 +586,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Obx(() =>
+            Obx(() =>                                                     
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

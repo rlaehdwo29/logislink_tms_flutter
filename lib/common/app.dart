@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
@@ -29,6 +30,7 @@ class App extends GetxController{
 
   Future<bool> getRenewValue() async {
     bool state = await SP.getBoolean(Const.RENEW_APP);
+    print("리뉴얼 설정 => ${state}");
     if(state == null) {
       await setRenewValue(true);
       renew_value.value = true;
@@ -39,6 +41,17 @@ class App extends GetxController{
     return renew_value.value;
   }
 
+  bool isTablet(BuildContext context) {
+    bool isTablet;
+    double ratio = MediaQuery.of(context).size.width / MediaQuery.of(context).size.height;
+      if( (ratio >= 0.74) && (ratio < 1.5) )
+      {
+        isTablet = true;
+      } else{
+        isTablet = false;
+      }
+    return isTablet;
+  } 
 
   AppDataBase getRepository() {
     var db = AppDataBase();

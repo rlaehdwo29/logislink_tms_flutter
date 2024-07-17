@@ -65,7 +65,7 @@ class SP extends GetxController {
 
   static Future<bool> getBoolean(String key) async {
     await open();
-    return m_Pref?.getBool(key)??false;
+    return m_Pref?.getBool(key)??true;
   }
 
   static Future<bool> getDefaultTrueBoolean(String key) async {

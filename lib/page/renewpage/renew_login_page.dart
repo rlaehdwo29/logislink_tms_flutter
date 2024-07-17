@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -48,6 +49,7 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
   @override
   void initState() {
     super.initState();
+    m_TermsMode=TERMS.NONE;
   }
 
   Widget _entryField() {
@@ -56,6 +58,8 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
+          height: App().isTablet(context) ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(20.h),
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(50)
@@ -422,6 +426,8 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
                                       Image.asset("assets/image/ic_logo.png"),
                                       CustomStyle.sizedBoxHeight(100.0),
                                       Container(
+                                          height: App().isTablet(context) ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(20.h),
+                                          alignment: Alignment.center,
                                           margin: EdgeInsets.only(bottom: CustomStyle.getHeight(20)),
                                           decoration: BoxDecoration(
                                             color: Colors.white,
@@ -452,11 +458,11 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
                                         },
                                         child: Container(
                                           width: width,
+                                          height:  App().isTablet(context) ? CustomStyle.getHeight(35.h): CustomStyle.getHeight(25.h),
                                           decoration: BoxDecoration(
                                             color: renew_main_color2_sub,
                                             borderRadius: BorderRadius.circular(50)
                                           ),
-                                          height: CustomStyle.getHeight(50.0),
                                           alignment: Alignment.center,
                                           child:Text(
                                             Strings.of(context)?.get("login_btn")??"Not Found",
