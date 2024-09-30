@@ -100,7 +100,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final categoryOrderCode = "".obs;
   final categoryOrderState = "오더전체".obs;
   final categoryRpaCode = "".obs;
-  final categoryRpaState = "화망전송무관".obs;
+  final categoryRpaState = "화망전송전체".obs;
   final categoryStaffModel = CustUserModel(mobile: "",userName: "담당자전체").obs;
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
@@ -1319,8 +1319,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     } else if(codeType == Const.RPA_STATE_CD) {
 
       final tempCodemodel = CodeModel(code: categoryRpaCode.value ,codeName: categoryRpaState.value).obs;
-      List<CodeModel>? mCodeList = SP.getCodeList(codeType);
-      mCodeList?.insert(0, CodeModel(code: "",codeName:  "화망전송무관"));
+      List<CodeModel>? mCodeList = List.empty(growable: true);
+      mCodeList?.insert(0, CodeModel(code: "",codeName:  "화망전송전체"));
+      mCodeList?.insert(1, CodeModel(code: "W",codeName:  "화망배차전"));
+      mCodeList?.insert(2, CodeModel(code: "F",codeName:  "배차확정완료"));
 
       showModalBottomSheet(
         context: context,
@@ -1364,7 +1366,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     scrollDirection: Axis.vertical,
                                     shrinkWrap: true,
                                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 4, //1 개의 행에 보여줄 item 개수
+                                      crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
                                       childAspectRatio: (1 / .5),
                                       mainAxisSpacing: 10, //수평 Padding
                                       crossAxisSpacing: 10, //수직 Padding
