@@ -432,10 +432,10 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
     await FirebaseAnalytics.instance.logEvent(
       name: Platform.isAndroid ? "inquire_order_aos" : "inquire_order_ios",
       parameters: {
-        "user_id": user.userId,
-        "user_custId" : user.custId,
-        "user_deptId": user.deptId,
-        "orderId" : item.orderId,
+        "user_id": user.userId??"",
+        "user_custId" : user.custId??"",
+        "user_deptId": user.deptId??"",
+        "orderId" : item.orderId??"",
       },
     );
 
@@ -888,6 +888,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     locale: 'ko_KR',
                                     firstDay: DateTime.utc(2010, 1, 1),
                                     lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
+                                    daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
                                     headerStyle: HeaderStyle(
                                       // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
                                       formatButtonVisible: false,

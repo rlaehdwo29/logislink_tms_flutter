@@ -3115,8 +3115,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                 toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
-                leading:
-                IconButton(
+                leading: IconButton(
                   onPressed: () async {
                     BroadCast.FBroadcast.instance().broadcast(Const.INTENT_ORDER_REFRESH);
                     Navigator.of(context).pop({'code':100});

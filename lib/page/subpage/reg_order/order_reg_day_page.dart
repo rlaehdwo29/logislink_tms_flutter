@@ -290,6 +290,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
         firstDay:  DateTime.utc(2010, 1, 1),
         locale: 'ko-KR',
         lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
+        daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
         headerStyle: const HeaderStyle(
           // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
           formatButtonVisible: false,
@@ -379,6 +380,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
         firstDay:  DateTime.utc(2010, 1, 1),
         locale: 'ko-KR',
         lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
+        daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
         headerStyle: const HeaderStyle(
           // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
           formatButtonVisible: false,

@@ -26,6 +26,8 @@ import 'package:dio/dio.dart';
 
 class Util {
 
+  static final bool userDebugger = true;
+
   static String booleanToYn(bool value) {
     if (value) {
       return "Y";

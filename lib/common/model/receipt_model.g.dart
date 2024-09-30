@@ -8,16 +8,16 @@ part of 'receipt_model.dart';
 
 ReceiptModel _$ReceiptModelFromJson(Map<String, dynamic> json) => ReceiptModel(
       orderId: json['orderId'] as String?,
-      fileSeq: json['fileSeq'] as int?,
+      fileSeq: (json['fileSeq'] as num?)?.toInt(),
       fileTypeCode: json['fileTypeCode'] as String?,
       fileName: json['fileName'] as String?,
       filePath: json['filePath'] as String?,
-      fileSize: json['fileSize'] as int?,
+      fileSize: (json['fileSize'] as num?)?.toInt(),
       mimeType: json['mimeType'] as String?,
       fileRealName: json['fileRealName'] as String?,
       regid: json['regid'] as String?,
       regdate: json['regdate'] as String?,
-      viewType: json['viewType'] as int?,
+      viewType: (json['viewType'] as num?)?.toInt(),
     )
       ..status = json['status'] as String?
       ..message = json['message'] as String?

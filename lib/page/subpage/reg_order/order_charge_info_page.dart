@@ -67,7 +67,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   final m24Call = "N".obs; // 24시콜 Command
   final mHwaMull = "N".obs; // 화물맨 Command
   final mHwaMullFlag = false.obs; // 화물맨 LinkFlag 값 설정 시 안 꺼지기
-  final mOneCall = "N".obs; // 원콜 Command
+  final mOneCall = "N".obs; // 원콜 Commandf
   final mRpaSalary = "".obs;
 
   final llRpaSection = false.obs;
@@ -809,7 +809,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
             )
         ),
-        // 인수증/선불/착불 버튼
+        /**
+         * 인수증 / 선불 / 착불 버튼
+         */
         !isOption.value ?
     Container(
         padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
@@ -883,7 +885,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                 )),
           ],
         )) : const SizedBox(),
-        // 대당단가/톤당단가 탭 버튼
+        /**
+         * 대당단가/톤당단가 탭 버튼
+         */
         Container(
             padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h), horizontal: CustomStyle.getWidth(10.w)),
             child: Row(
@@ -936,7 +940,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               ],
             )
         ),
-        //톤당단가
+        /**
+         * 톤당단가
+         */
         Container(
             padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10.w)),
           child: Text(
@@ -1028,7 +1034,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               maxLength: 50,
             )
         ),
-        //기본운임(청구)
+        /**
+         * 기본운임(청구)
+         */
         Container(
             padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
             child: Row(
@@ -1121,7 +1129,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               maxLength: 50,
             )
         ),
-        //수수료
+        /**
+         * 수수료
+         */
         !isOption.value ? Container(
             padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h),left: CustomStyle.getWidth(10.w),right: CustomStyle.getWidth(10.w)),
             child: Text(
@@ -1204,7 +1214,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               maxLength: 50,
             )
         ) : const SizedBox(),
-        //청구중량
+        /**
+        * 청구중량
+        */
         !isOption.value?
         Container(
           padding: EdgeInsets.only(top: CustomStyle.getHeight(5.h), left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w)),
@@ -1308,7 +1320,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
               },
               maxLength: 50,
             )
-        ) : const SizedBox()
+        ) : const SizedBox(),
       ],
     );
   }
@@ -1336,9 +1348,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     alignment: Alignment.center,
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                     child: Text(
-                            "${Strings.of(context)?.get("order_trans_info_sub_title_06")}",
-                            style: CustomStyle.CustomFont(styleFontSize14, text_color_06),
-                          ),
+                          "${Strings.of(context)?.get("order_trans_info_sub_title_06")}",
+                          style: CustomStyle.CustomFont(styleFontSize14, text_color_06),
+                        ),
                 );
               },
               body: Container(
@@ -2375,7 +2387,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
           appBar: AppBar(
                 title: Text(
                     Strings.of(context)?.get("order_charge_info_title")??"Not Found",
-                    style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                    style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -2385,7 +2397,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(

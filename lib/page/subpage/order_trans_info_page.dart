@@ -766,12 +766,12 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
               await FirebaseAnalytics.instance.logEvent(
                 name: Platform.isAndroid ? "trans_order_aos" : "trans_order_ios",
                 parameters: {
-                  "user_id": user.userId,
-                  "user_custId" : user.custId,
-                  "user_deptId": user.deptId,
-                  "orderId" : mData.value.orderId,
-                  "buyCustId" : mData.value.buyCustId,
-                  "buyDeptId" : mData.value.buyDeptId
+                  "user_id": user.userId??"",
+                  "user_custId" : user.custId??"",
+                  "user_deptId": user.deptId??"",
+                  "orderId" : mData.value.orderId??"",
+                  "buyCustId" : mData.value.buyCustId??"",
+                  "buyDeptId" : mData.value.buyDeptId??""
                 },
               );
               Navigator.of(context).pop({'code': 200});
@@ -2647,7 +2647,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                 title: Text(
                     Strings.of(context)?.get("order_trans_info_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(
-                        styleFontSize16, styleWhiteCol)
+                        styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -2657,7 +2657,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(

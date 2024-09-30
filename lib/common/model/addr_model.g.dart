@@ -7,7 +7,7 @@ part of 'addr_model.dart';
 // **************************************************************************
 
 AddrModel _$AddrModelFromJson(Map<String, dynamic> json) => AddrModel(
-      addrSeq: json['addrSeq'] as int?,
+      addrSeq: (json['addrSeq'] as num?)?.toInt(),
       addrName: json['addrName'] as String?,
       addr: json['addr'] as String?,
       addrDetail: json['addrDetail'] as String?,

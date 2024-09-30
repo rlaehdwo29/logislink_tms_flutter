@@ -1007,11 +1007,11 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                     ? "regist_order_aos"
                     : "regist_order_ios",
                 parameters: {
-                  "user_id": user.userId,
-                  "user_custId": user.custId,
-                  "user_deptId": user.deptId,
-                  "reqCustId": mData.value.sellCustId,
-                  "sellDeptId": mData.value.sellDeptId
+                  "user_id": user.userId??"",
+                  "user_custId": user.custId??"",
+                  "user_deptId": user.deptId??"",
+                  "reqCustId": mData.value.sellCustId??"",
+                  "sellDeptId": mData.value.sellDeptId??""
                 },
               );
 
@@ -1022,15 +1022,15 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                       ? "regist_order_rpa_aos"
                       : "regist_order_rpa_ios",
                   parameters: {
-                    "user_id": user.userId,
-                    "user_custId": user.custId,
-                    "user_deptId": user.deptId,
-                    "reqCustId": mData.value.sellCustId,
-                    "sellDeptId": mData.value.sellDeptId,
+                    "user_id": user.userId??"",
+                    "user_custId": user.custId??"",
+                    "user_deptId": user.deptId??"",
+                    "reqCustId": mData.value.sellCustId??"",
+                    "sellDeptId": mData.value.sellDeptId??"",
                     "call24Cargo_Status": mData.value.call24Cargo??"",
                     "manCargo_Status": mData.value.manCargo??"",
                     "oneCargo_Status": mData.value.oneCargo??"",
-                    "rpaSalary": mData.value.call24Charge,
+                    "rpaSalary": mData.value.call24Charge??"",
                   },
                 );
               }
@@ -1226,7 +1226,7 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
       appBar: AppBar(
             title: Text(
                 widget.flag == "M" ? Strings.of(context)?.get("order_detail_order_modify")??"오더수정_" : Strings.of(context)?.get("order_reg_title")??"오더 등록_",
-                style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
             ),
             toolbarHeight: 50.h,
             centerTitle: true,
@@ -1239,7 +1239,7 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                 }
               },
               color: styleWhiteCol,
-              icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+              icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
             ),
           ),
       body: SafeArea(

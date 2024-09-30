@@ -404,7 +404,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
     return mainWidget(
       context,
       child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: Container(
             width:width,
@@ -461,8 +461,8 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
                                 height: CustomStyle.getHeight(50.0),
                                 child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        primary: Colors.white,
-                                        onPrimary: Colors.white
+                                        foregroundColor: Colors.white,
+                                        backgroundColor: Colors.white
                                     ),
                                     onPressed: () async {
                                       if(validate()) await userLogin();

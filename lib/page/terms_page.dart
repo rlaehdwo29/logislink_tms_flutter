@@ -393,7 +393,7 @@ class _TermsPageState extends State<TermsPage> {
     final height = MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height;
     final width = MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Colors.white,
         body: SafeArea(
               child: Obx((){
                 return Container(

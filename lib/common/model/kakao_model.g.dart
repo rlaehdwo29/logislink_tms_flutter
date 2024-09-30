@@ -7,7 +7,7 @@ part of 'kakao_model.dart';
 // **************************************************************************
 
 KakaoModel _$KakaoModelFromJson(Map<String, dynamic> json) => KakaoModel(
-      total_count: json['total_count'] as int?,
+      total_count: (json['total_count'] as num?)?.toInt(),
       x: json['x'] as String?,
       y: json['y'] as String?,
       address_name: json['address_name'] as String?,

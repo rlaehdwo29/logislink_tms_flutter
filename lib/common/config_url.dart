@@ -4,11 +4,12 @@
 //public static String SERVER_URL = "https://app.logis-link.co.kr";   // PRO URL
 
 const String m_ServerRelease = "https://app.logis-link.co.kr";    // 운영서버
-const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
+const String m_ServerDebug = "http://192.168.53.51:9080";         // Local
+//const String m_ServerDebug = "http://192.168.68.111:9080";         // Local2
 //const String m_ServerDebug = "http://192.168.0.2:8080";
 const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
-const String SERVER_URL = m_ServerRelease;
+const String SERVER_URL = m_ServerDebug;
 
 const String RECEIPT_PATH = "/files/receipt/";
 
@@ -45,6 +46,10 @@ const String URL_USER_INFO = "/cust/user/info";
 const String URL_USER_UPDATE = "/cust/user/update";
 // 기기 정보 업데이트
 const String URL_DEVICE_UPDATE = "/cust/device/update";
+// 사용자 탬플릿 등록
+const String URL_USER_TEMPLATE_REG = "/cust/user/write/template";
+// 사용자 탬플릿 조회
+const String URL_USER_TEMPLATE_LIST = "/cust/user/templateList";
 // 로그인시 카카오톡 알람 확인
 const String URL_LOGIN_ALARM = "/notice/talk/smsSendLoginService";
 

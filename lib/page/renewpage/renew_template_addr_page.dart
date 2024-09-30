@@ -23,18 +23,17 @@ import 'package:dio/dio.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 
-class OrderAddrPage extends StatefulWidget {
+class RenewTemplateAddrPage extends StatefulWidget {
 
-  OrderModel? order_vo;
   String? code;
 
-  OrderAddrPage({Key? key, this.order_vo,this.code}):super(key:key);
+  RenewTemplateAddrPage({Key? key, this.code}):super(key:key);
 
-  _OrderAddrPageState createState() => _OrderAddrPageState();
+  _RenewTemplateAddrPageState createState() => _RenewTemplateAddrPageState();
 }
 
 
-class _OrderAddrPageState extends State<OrderAddrPage> {
+class _RenewTemplateAddrPageState extends State<RenewTemplateAddrPage> {
   final controller = Get.find<App>();
   ProgressDialog? pr;
 
@@ -52,62 +51,13 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
     super.initState();
 
     Future.delayed(Duration.zero, () async {
-      if(widget.order_vo != null) {
-        mData.value = widget.order_vo!;
-      }
-      if(widget.code == Const.RESULT_WORK_SADDR) {
-        mTitle.value = Strings.of(context)?.get("order_s_addr_title")??"Not Found";
-      }else if(widget.code == Const.RESULT_WORK_EADDR){
-        mTitle.value = Strings.of(context)?.get("order_e_addr_title")??"Not Found";
-      }else if(widget.code == Const.RESULT_SETTING_SADDR) {
-        mTitle.value = Strings.of(context)?.get("order_s_addr_title")??"Not Found";
-        llBottom.value = true;
-      }else{
         mTitle.value = "경유지 선택";
-      }
-      await initView();
+        await initView();
     });
   }
 
   Future<void> initView() async {
 
-  }
-
-  Future<void> setOptionAddr() async {
-    Logger logger = Logger();
-    UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).setOptionAddr(user.authorization, "Y",
-    mData.value.sComName, mData.value.sSido, mData.value.sGungu, mData.value.sDong, mData.value.sAddr,mData.value.sAddrDetail,
-    mData.value.sStaff,mData.value.sTel, mData.value.sMemo, mData.value.sLat, mData.value.sLon).then((it) async {
-      try {
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("setOptionAddr() _response -> ${_response.status} // ${_response
-            .resultMap}");
-        if (_response.status == "200") {
-          if (_response.resultMap?["result"] == true) {
-            Navigator.of(context).pop({'code':200,Const.RESULT_WORK:Const.RESULT_SETTING_SADDR});
-          } else {
-            openOkBox(context, "${_response.resultMap?["msg"]}",
-                Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                  Navigator.of(context).pop(false);
-                });
-          }
-        }
-      }catch(e) {
-        print("setOptionAddr() Exeption =>$e");
-      }
-    }).catchError((Object obj){
-      switch (obj.runtimeType) {
-        case DioError:
-        // Here's the sample to get the failed response error code and message
-          final res = (obj as DioError).response;
-          print("setOptionAddr() Error => ${res?.statusCode} // ${res?.statusMessage}");
-          break;
-        default:
-          print("setOptionAddr() getOrder Default => ");
-          break;
-      }
-    });
   }
 
   Future<void> getAddr() async {
@@ -238,7 +188,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
           }else {
             if (snapshot.hasData) {
               if (mList.isNotEmpty) mList.clear();
-              mList.addAll(snapshot.data);
+              mList.value.addAll(snapshot.data);
               return searchListWidget();
             } else if (snapshot.hasError) {
               return Container(
@@ -350,7 +300,6 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
             mData.value.sMemo = addr.orderMemo;
             mData.value.sLat = double.parse(addr.lat??"0.0");
             mData.value.sLon = double.parse(addr.lon??"0.0");
-            await setOptionAddr();
           }
         }else{
           var work_state = "";

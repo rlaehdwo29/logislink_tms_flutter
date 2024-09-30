@@ -435,7 +435,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
           });
         },
         child: Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
                 toolbarHeight: 50.h,
                 leading: IconButton(

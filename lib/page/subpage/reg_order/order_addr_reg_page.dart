@@ -6,11 +6,13 @@ import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/addr_model.dart';
 import 'package:logislink_tms_flutter/common/model/kakao_model.dart';
+import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/addr_search_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_confirm_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -20,9 +22,10 @@ class OrderAddrRegPage extends StatefulWidget {
 
   AddrModel? addr_vo;
   String? code;
+  String? flag;
   int? position;
 
-  OrderAddrRegPage({Key? key,this.addr_vo, this.code, this.position}):super(key:key);
+  OrderAddrRegPage({Key? key,this.addr_vo, this.code, this.flag, this.position}):super(key:key);
 
   _OrderAddrRegPageState createState() => _OrderAddrRegPageState();
 }
@@ -91,10 +94,18 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
       tvEdit.value = false;
       if(code != "") {
         tvReg.value = false;
-        mTitle.value = Strings.of(context)?.get("order_addr_input_title")??"Not Found";
+        mTitle.value = Strings.of(context)?.get("order_addr_input_title") ?? "Not Found";
       }else{
         tvInput.value = false;
-        mTitle.value = Strings.of(context)?.get("order_addr_reg_title")??"Not Found";
+        if(widget.flag == Const.RESULT_WORK_SADDR){
+          mTitle.value = "상차지 입력";
+        }else if(widget.flag == Const.RESULT_WORK_EADDR){
+          mTitle.value = "하차지 입력";
+        } else if(widget.flag == Const.RESULT_WORK_STOP_POINT){
+          mTitle.value = "경유지 입력";
+        }else {
+          mTitle.value = Strings.of(context)?.get("order_addr_reg_title")??"Not Found";
+        }
       }
     }
   }
@@ -134,8 +145,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
       ).then((it) async {
         try {
           ReturnMap _response = DioService.dioResponse(it);
-          logger.d("regAddr() _response -> ${_response.status} // ${_response
-              .resultMap}");
+          logger.d("regAddr() _response -> ${_response.status} // ${_response.resultMap}");
           if (_response.status == "200") {
             if (_response.resultMap?["result"] == true) {
               Util.toast("${Strings.of(context)?.get("order_addr_reg_title")}${Strings.of(context)?.get("reg_success")}");
@@ -220,6 +230,30 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
       return false;
     }
     return true;
+  }
+
+  Future<void> confirmStopPoint(AddrModel addr) async {
+    StopPointModel data = StopPointModel();
+    data.eComName = addr.addrName;
+    data.eAddr = addr.addr;
+    data.eAddrDetail = addr.addrDetail;
+    data.eStaff = addr.staffName;
+    data.eTel = addr.staffTel;
+    data.eLat = double.parse(addr.lat??"0");
+    data.eLon = double.parse(addr.lon??"0");
+
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => StopPointConfirmPage(result_work_stopPoint:data,code:"confirm")));
+
+    if(results != null && results.containsKey("code")){
+      if(results["code"] == 200) {
+        print("confirmStopPoint() -> ${results[Const.RESULT_WORK_STOP_POINT]}");
+        if(results[Const.RESULT_WORK_STOP_POINT] != null) {
+          StopPointModel data = results[Const.RESULT_WORK_STOP_POINT];
+          Navigator.of(context).pop({'code':200,"flag":Const.RESULT_WORK_STOP_POINT,"data":data});
+        }
+      }
+    }
+
   }
 
   Widget bodyWidget() {
@@ -639,7 +673,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   return Text(
                       mTitle.value,
                       style: CustomStyle.appBarTitleFont(
-                          styleFontSize16, styleWhiteCol)
+                          styleFontSize16, Colors.black)
                   );
                 }),
                 toolbarHeight: 50.h,
@@ -650,7 +684,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -674,12 +708,20 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
-                              await regAddr();
+                              if(widget.flag != null && widget.flag?.isNotEmpty == true) {
+                                if(widget.flag == Const.RESULT_WORK_STOP_POINT) {
+                                  await confirmStopPoint(mData.value);
+                                }else{
+                                  Navigator.of(context).pop({'code':200,'flag':widget.flag,Const.ADDR_VO:mData.value});
+                                }
+                              }else{
+                                await regAddr();
+                              }
                             },
                             child: Container(
                                 height: CustomStyle.getHeight(60.0.h),
                                 alignment: Alignment.center,
-                                decoration: BoxDecoration(color: main_color),
+                                decoration: const BoxDecoration(color: main_color),
                                 child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -688,7 +730,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                                       CustomStyle.sizedBoxWidth(5.0.w),
                                       Text(
                                         textAlign: TextAlign.center,
-                                        Strings.of(context)?.get("reg_btn")??"Not Found",
+                                        widget.flag == Const.RESULT_WORK_SADDR ? "\'상차지\' 등록하기" : widget.flag == Const.RESULT_WORK_EADDR ? "\'하차지\' 등록하기" : widget.flag == Const.RESULT_WORK_STOP_POINT? "\'경유지\' 등록하기" : Strings.of(context)?.get("reg_btn")??"Not Found",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize16, styleWhiteCol),
                                       ),

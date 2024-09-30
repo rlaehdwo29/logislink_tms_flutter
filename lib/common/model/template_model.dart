@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:get/get.dart';
-import 'package:json_annotation/json_annotation.dart';
 import 'package:logislink_tms_flutter/common/model/result_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 
 class TemplateModel extends ResultModel {
-  String? templateTitle;        //탬플릿 제목
   String? templateId;           // 탬플릿ID
+  String? templateTitle;        //탬플릿 제목
   String? reqCustId;            //화주 거래처 ID
   String? reqCustName;            //화주 거래처명
   String? reqDeptId;            //화주 부서 ID
@@ -25,21 +23,25 @@ class TemplateModel extends ResultModel {
   String? inOutSctnName;
   String? truckTypeCode;        //운송유형
   String? truckTypeName;
+
   String? sComName;            //상차지명
   String? sSido;                //상차지시도
   String? sGungu;                //상차지군구
   String? sDong;                //상차지동
   String? sAddr;                //상차지주소
   String? sAddrDetail;            //상차지상세주소
+  String? sDate;                //상차일 (YYYY-MM-DD HH:mm:ss)
   String? sStaff;                //상차지담당자
   String? sTel;                //상차지 연락처
   String? sMemo;                //상차지메모
+
   String? eComName;            //하차지명
   String? eSido;                //하차지시도
   String? eGungu;                //하차지군구
   String? eDong;                //하차지 동
   String? eAddr;                //하차지 주소
-  String? eAddrDetail;            //하차지 상세주소
+  String? eAddrDetail;            //하차지
+  String? eDate;                //하차일 (YYYY-MM-DD HH:mm:ss)
   String? eStaff;                //하차지 담당자
   String? eTel;                //하차지 연락처
   String? eMemo;                //하차지 메모
@@ -47,6 +49,7 @@ class TemplateModel extends ResultModel {
   double? sLon;
   double? eLat;
   double? eLon;
+
   String? goodsName;            //화물정보
   String? goodsWeight;            //화물중량
   String? weightUnitCode;        //중량단위코드
@@ -73,14 +76,11 @@ class TemplateModel extends ResultModel {
   String? driverMemo;            //차주 확인사항
   String? itemCode;            //운송품목코드
   String? itemName;            //운송품목코드
-  String? orderState;
-  String? orderStateName;
   String? regid;                   //등록 id
   String? regdate;                 //오더 등록일
   int? stopCount;                  //경유지
 
   /* 매출 정보  */
-  String? sellAllocId;             //매출 배차 ID
   String? sellCustId;              //매출 거래처 ID
   String? sellDeptId;              //매출 부서 ID
   String? sellStaff;               //매출거래처 담당자
@@ -106,11 +106,6 @@ class TemplateModel extends ResultModel {
   /* 매입 정보 */
   String? buyCharge;                //매입운송비
   String? buyFee;                    //매입수수료
-
-  String? linkCode;            // 정보망코드
-  String? linkCodeName;        // 정보망코드이름
-
-  String? linkType;            // 정보망코드
 
   String? wayPointMemo;      //경유비 메모
   String? wayPointCharge;   //경유비 금액
@@ -144,6 +139,8 @@ class TemplateModel extends ResultModel {
   String? manCharge;
   String? oneCharge;
 
+  String? useYn;
+
   TemplateModel({
     this.templateTitle,        //탬플릿 제목
     this.templateId,           //탬플릿ID
@@ -169,6 +166,7 @@ class TemplateModel extends ResultModel {
     this.sDong,                //상차지동
     this.sAddr,                //상차지주소
     this.sAddrDetail,            //상차지상세주소
+    this.sDate,                //상차일 (YYYY-MM-DD HH:mm:ss)
     this.sStaff,                //상차지담당자
     this.sTel,                //상차지 연락처
     this.sMemo,                //상차지메모
@@ -178,6 +176,7 @@ class TemplateModel extends ResultModel {
     this.eDong,                //하차지 동
     this.eAddr,                //하차지 주소
     this.eAddrDetail,            //하차지 상세주소
+    this.eDate,                //하차일 (YYYY-MM-DD HH:mm:ss)
     this.eStaff,                //하차지 담당자
     this.eTel,                //하차지 연락처
     this.eMemo,                //하차지 메모
@@ -213,28 +212,31 @@ class TemplateModel extends ResultModel {
     this.itemName,            //운송품목코드
     this.stopCount,                  //경유지
 
-    this.sellCharge,              //매출운송비
-    this.sellFee,                 //매출수수료
-    this.sellWeight,              //매출중량
-    this.sellWayPointMemo,        //경유비 메모
-    this.sellWayPointCharge,      //경유비 금액
-    this.sellStayMemo,            //대기료 메모
-    this.sellStayCharge,          //대기료 금액
-    this.sellHandWorkMemo,        //수작업비 메모
-    this.sellHandWorkCharge,      //수작업비 금액
-    this.sellRoundMemo,           //회차료 메모
-    this.sellRoundCharge,         //회차료 금액
-    this.sellOtherAddMemo,        //기타추가비 메모
-    this.sellOtherAddCharge,      //기타추가비 금액
-    this.custPayType,             //거래처 빠른지급여부
+    this.sellCustId, 			//매출 거래처 ID
+    this.sellDeptId,  			//매출 부서 ID
+    this.sellStaff, 			//매출거래처 담당자
+    this.sellStaffName,  		//매출거래처 담당자
+    this.sellStaffTel,  		//매출거래처 담당자 연락처
+    this.sellCustName,
+    this.sellDeptName,
+    this.sellCharge, 			//매출운송비
+    this.sellFee, 				//매출수수료
+    this.sellWeight, 			//매출중량
+    this.sellWayPointMemo, 		//경유비 메모
+    this.sellWayPointCharge, 	//경유비 금액
+    this.sellStayMemo, 			//대기료 메모
+    this.sellStayCharge, 		//대기료 금액
+    this.sellHandWorkMemo, 		//수작업비 메모
+    this.sellHandWorkCharge, 	//수작업비 금액
+    this.sellRoundMemo, 		//회차료 메모
+    this.sellRoundCharge, 		//회차료 금액
+    this.sellOtherAddMemo, 		//기타추가비 메모
+    this.sellOtherAddCharge, 	//기타추가비 금액
+    this.custPayType, 			//거래처 빠른지급여부
 
     this.buyCharge,                //매입운송비
     this.buyFee,                    //매입수수료
 
-    this.linkCode,            // 정보망코드
-    this.linkCodeName,        // 정보망코드이름
-
-    this.linkType,            // 정보망코드
     this.wayPointMemo,      //경유비 메모
     this.wayPointCharge,   //경유비 금액
     this.stayMemo,         //대기료 메모
@@ -262,7 +264,9 @@ class TemplateModel extends ResultModel {
     this.oneCargo,
     this.call24Charge,
     this.manCharge,
-    this.oneCharge
+    this.oneCharge,
+
+    this.useYn
   });
 
   factory TemplateModel.fromJSON(Map<String,dynamic> json) {
@@ -311,6 +315,8 @@ class TemplateModel extends ResultModel {
         //상차지주소
         sAddrDetail: json['sAddrDetail'],
         //상차지상세주소
+        sDate: json['sDate'],
+        //상차일
         sStaff: json['sStaff'],
         //상차지담당자
         sTel: json['sTel'],
@@ -329,6 +335,8 @@ class TemplateModel extends ResultModel {
         //하차지 주소
         eAddrDetail: json['eAddrDetail'],
         //하차지 상세주소
+        eDate: json['eDate'],
+        //하차일
         eStaff: json['eStaff'],
         //하차지 담당자
         eTel: json['eTel'],
@@ -387,13 +395,52 @@ class TemplateModel extends ResultModel {
         stopCount: json['stopCount'],
         //경유지
 
-        linkCode: json['linkCode'],
-        // 정보망코드
-        linkCodeName: json['linkCodeName'],
-        // 정보망코드이름
-
-        linkType: json['linkType'],
-        // 정보망코드
+        sellCustId : json['sellCustId'],
+        //매출거래처ID
+        sellDeptId : json['sellDeptId'],
+        //매출 부서 ID
+        sellStaff : json['sellStaff'],
+        //매출거래처 담당자
+        sellStaffName : json['sellStaffName'],
+        //매출거래처 담당자
+        sellStaffTel : json['sellStaffTel'],
+        //매출거래처 담당자 연락처
+        sellCustName : json['sellCustName'],
+        //매출거래처이름
+        sellDeptName : json['sellDeptName'],
+        //매출거래처 부서명
+        sellCharge : json['sellCharge'],
+        //매출운송비
+        sellFee : json['sellFee'],
+        //매출수수료
+        sellWeight : json['sellWeight'],
+        //매출중량
+        sellWayPointMemo : json['sellWayPointMemo'],
+        //경유비 메모
+        sellWayPointCharge : json['sellWayPointCharge'],
+        //경유비 금액
+        sellStayMemo : json['sellStayMemo'],
+        //대기료 메모
+        sellStayCharge : json['sellStayCharge'],
+        //대기료 금액
+        sellHandWorkMemo : json['sellHandWorkMemo'],
+        //수작업비 메모
+        sellHandWorkCharge : json['sellHandWorkCharge'],
+        //수작업비 금액
+        sellRoundMemo : json['sellRoundMemo'],
+        //회차료 메모
+        sellRoundCharge : json['sellRoundCharge'],
+        //회차료 금액
+        sellOtherAddMemo : json['sellOtherAddMemo'],
+        //기타추가비 메모
+        sellOtherAddCharge : json['sellOtherAddCharge'],
+        //기타추가비 금액
+        custPayType : json['custPayType'],
+        //거래처 빠른지급여부
+        buyCharge : json['buyCharge'],
+        //매입운송비
+        buyFee : json['buyFee'],
+        //매입수수료
 
         wayPointMemo: json['wayPointMemo'],
         //경유비 메모
@@ -434,7 +481,9 @@ class TemplateModel extends ResultModel {
         oneCargo: json['oneCargo'],
         call24Charge: json['call24Charge'],
         manCharge: json['manCharge'],
-        oneCharge: json['oneCharge']
+        oneCharge: json['oneCharge'],
+
+        useYn: json['useYn']
     );
     var list = json['orderStopList']??"[]"; // 경유지 목록
     if(list != "[]") {
@@ -473,6 +522,7 @@ class TemplateModel extends ResultModel {
       "sDong": sDong,
       "sAddr": sAddr,
       "sAddrDetail": sAddrDetail,
+      "sDate": sDate,
       "sStaff": sStaff,
       "sTel": sTel,
       "sMemo": sMemo,
@@ -482,6 +532,7 @@ class TemplateModel extends ResultModel {
       "eDong": eDong,
       "eAddr": eAddr,
       "eAddrDetail": eAddrDetail,
+      "eDate": eDate,
       "eStaff": eStaff,
       "eTel": eTel,
       "eMemo": eMemo,
@@ -515,14 +566,32 @@ class TemplateModel extends ResultModel {
       "driverMemo": driverMemo,
       "itemCode": itemCode,
       "itemName": itemName,
-      "orderState": orderState,
-      "orderStateName": orderStateName,
       "regid": regid,
       "regdate": regdate,
       "stopCount": stopCount,
-      "linkCode": linkCode,
-      "linkCodeName": linkCodeName,
-      "linkType": linkType,
+      "sellCustId" : sellCustId,
+      "sellDeptId" : sellDeptId,
+      "sellStaff" : sellStaff,
+      "sellStaffName" : sellStaffName,
+      "sellStaffTel" : sellStaffTel,
+      "sellCustName" : sellCustName,
+      "sellDeptName" : sellDeptName,
+      "sellCharge" : sellCharge,
+      "sellFee" : sellFee,
+      "sellWeight" : sellWeight,
+      "sellWayPointMemo" : sellWayPointMemo,
+      "sellWayPointCharge" : sellWayPointCharge,
+      "sellStayMemo" : sellStayMemo,
+      "sellStayCharge" : sellStayCharge,
+      "sellHandWorkMemo" : sellHandWorkMemo,
+      "sellHandWorkCharge" : sellHandWorkCharge,
+      "sellRoundMemo" : sellRoundMemo,
+      "sellRoundCharge" : sellRoundCharge,
+      "sellOtherAddMemo" : sellOtherAddMemo,
+      "sellOtherAddCharge" : sellOtherAddCharge,
+      "custPayType" : custPayType,
+      "buyCharge" : buyCharge,
+      "buyFee" : buyFee,
       "wayPointMemo": wayPointMemo,
       "wayPointCharge": wayPointCharge,
       "stayMemo": stayMemo,
@@ -536,8 +605,6 @@ class TemplateModel extends ResultModel {
       "unitPrice": unitPrice,
       "unitPriceType": unitPriceType,
       "unitPriceTypeName": unitPriceTypeName,
-      "custMngName": custMngName,
-      "custMngMemo": custMngMemo,
       "payType": payType,
       "reqPayYN": reqPayYN,
       "reqPayDate": reqPayDate,
@@ -549,7 +616,8 @@ class TemplateModel extends ResultModel {
       "oneCargo": oneCargo,
       "call24Charge": call24Charge,
       "manCharge": manCharge,
-      "oneCharge": oneCharge
+      "oneCharge": oneCharge,
+      "useYn": useYn
     };
   }
 }

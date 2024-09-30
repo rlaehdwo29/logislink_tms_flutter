@@ -610,14 +610,14 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
               centerTitle: true,
               title: Text(
                   Strings.of(context)?.get("addr_search_title") ?? "Not Found",
                   style: CustomStyle.appBarTitleFont(
-                      styleFontSize18, styleWhiteCol)
+                      styleFontSize18, Colors.black)
               ),
               toolbarHeight: 50.h,
               leading: IconButton(
@@ -626,7 +626,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                 },
                 color: styleWhiteCol,
                 icon: Icon(
-                    Icons.keyboard_arrow_left, size: 24.h, color: styleWhiteCol),
+                    Icons.keyboard_arrow_left, size: 24.h, color: Colors.black),
               ),
             ),
         body: SafeArea(

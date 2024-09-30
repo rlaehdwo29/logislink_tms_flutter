@@ -223,8 +223,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
   Future<void> getUserRpa() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
-    await DioService.dioClient(header: true).rpaLinkInfo(
-        user.authorization,
+    await DioService.dioClient(header: true).rpaLinkInfo(user.authorization,
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
@@ -237,6 +236,12 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
             } else {
              mUserRpaData.value = UserRpaModel();
             }
+            et24CallIdController.text = mUserRpaData.value.link24Id??"";
+            et24CallPwController.text = mUserRpaData.value.link24Pass??"";
+            etHwaIdController.text = mUserRpaData.value.man24Id??"";
+            etHwaPwController.text = mUserRpaData.value.man24Pass??"";
+            etOneCallIdController.text = mUserRpaData.value.one24Id??"";
+            etOneCallPwController.text = mUserRpaData.value.one24Pass??"";
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -272,14 +277,12 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ClipRRect(
-              borderRadius: BorderRadius.circular(90),
-              child: Container(
-                  color: Colors.white,
+          Center(
+              child: CircleAvatar(
+                  radius: 45,
+                  backgroundColor: Colors.white,
                   child: Image.asset(
                     "assets/image/ic_logo.png",
-                    width: CustomStyle.getWidth(60.0),
-                    height: CustomStyle.getHeight(60.0),
                     color: Colors.black,
                     fit: BoxFit.contain,
                   )
@@ -305,12 +308,6 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
   }
 
   Widget bodyWidget() {
-    et24CallIdController.text = mUserRpaData.value.link24Id??"";
-    et24CallPwController.text = mUserRpaData.value.link24Pass??"";
-    etHwaIdController.text = mUserRpaData.value.man24Id??"";
-    etHwaPwController.text = mUserRpaData.value.man24Pass??"";
-    etOneCallIdController.text = mUserRpaData.value.one24Id??"";
-    etOneCallPwController.text = mUserRpaData.value.one24Pass??"";
 
     return Container(
       color: light_gray24,
@@ -640,7 +637,21 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                             style: CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w600),
                           )
                         ]
-                      ) : const SizedBox()
+                      ) :  Row(
+                        children: [
+                          Container(
+                              margin: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(3)),
+                              child: Icon(
+                                  Icons.warning_amber,
+                                  size: 22.h, color: rpa_btn_cancle
+                              )
+                          ),
+                          Text(
+                            "등록필요",
+                            style: CustomStyle.CustomFont(styleFontSize14, rpa_btn_cancle,font_weight: FontWeight.w600),
+                          )
+                        ]
+                    )
                   ]
                 ),
                 Container(
@@ -800,7 +811,21 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                                 style: CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w600),
                               )
                             ]
-                        ) : const SizedBox()
+                        ) : Row(
+                            children: [
+                              Container(
+                                  margin: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(3)),
+                                  child: Icon(
+                                      Icons.warning_amber,
+                                      size: 22.h, color: rpa_btn_cancle
+                                  )
+                              ),
+                              Text(
+                                "등록필요",
+                                style: CustomStyle.CustomFont(styleFontSize14, rpa_btn_cancle,font_weight: FontWeight.w600),
+                              )
+                            ]
+                        )
                       ]
                   ),
                   Container(
@@ -960,7 +985,21 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                                 style: CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w600),
                               )
                             ]
-                        ) : const SizedBox()
+                        ) : Row(
+                            children: [
+                              Container(
+                                  margin: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(3)),
+                                  child: Icon(
+                                      Icons.warning_amber,
+                                      size: 22.h, color: rpa_btn_cancle
+                                  )
+                              ),
+                              Text(
+                                "등록필요",
+                                style: CustomStyle.CustomFont(styleFontSize14, rpa_btn_cancle,font_weight: FontWeight.w600),
+                              )
+                            ]
+                        )
                       ]
                   ),
                   Container(
@@ -1158,7 +1197,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
           });
         },
         child: Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
                 toolbarHeight: 50.h,
                 leading: IconButton(

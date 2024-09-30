@@ -263,7 +263,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
             appBar: AppBar(
               title:  Text(
                   Strings.of(context)?.get("order_customer_title")??"Not Found",
-                  style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
               ),
               toolbarHeight: 50.h,
               centerTitle: true,
@@ -273,7 +273,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                   Navigator.of(context).pop({'code':100});
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
               ),
             ),
             body: SafeArea(

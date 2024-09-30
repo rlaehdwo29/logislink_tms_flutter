@@ -497,7 +497,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                 ),
                 Text(
-                  llRequestInfo.value ? "${mData.value.sellCustName} ${mData.value.sellDeptName}" : Strings.of(context)?.get("order_reg_request_info_hint") ?? "Not Found",
+                  llRequestInfo.value ? "${mData.value.sellCustName} ${mData.value.sellDeptName??""}" : Strings.of(context)?.get("order_reg_request_info_hint") ?? "Not Found",
                   style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                 )
               ],
@@ -1000,18 +1000,18 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
 
-              var user = await controller.getUserInfo();
+              UserModel user = await controller.getUserInfo();
 
               await FirebaseAnalytics.instance.logEvent(
                 name: Platform.isAndroid
                     ? "regist_order_aos"
                     : "regist_order_ios",
-                parameters: {
-                  "user_id": user.userId,
-                  "user_custId": user.custId,
-                  "user_deptId": user.deptId,
-                  "reqCustId": mData.value.sellCustId,
-                  "sellDeptId": mData.value.sellDeptId
+                parameters: <String, Object> {
+                  "user_id": user.userId??"",
+                  "user_custId": user.custId??"",
+                  "user_deptId": user.deptId??"",
+                  "reqCustId": mData.value.sellCustId??"",
+                  "sellDeptId": mData.value.sellDeptId??""
                 },
               );
 
@@ -1022,15 +1022,15 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                       ? "regist_order_rpa_aos"
                       : "regist_order_rpa_ios",
                   parameters: {
-                    "user_id": user.userId,
-                    "user_custId": user.custId,
-                    "user_deptId": user.deptId,
-                    "reqCustId": mData.value.sellCustId,
-                    "sellDeptId": mData.value.sellDeptId,
+                    "user_id": user.userId??"",
+                    "user_custId": user.custId??"",
+                    "user_deptId": user.deptId??"",
+                    "reqCustId": mData.value.sellCustId??"",
+                    "sellDeptId": mData.value.sellDeptId??"",
                     "call24Cargo_Status": mData.value.call24Cargo??"",
                     "manCargo_Status": mData.value.manCargo??"",
                     "oneCargo_Status": mData.value.oneCargo??"",
-                    "rpaSalary": mData.value.call24Charge,
+                    "rpaSalary": mData.value.call24Charge??"",
                   },
                 );
               }

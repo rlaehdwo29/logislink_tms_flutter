@@ -182,7 +182,7 @@ openSnakBar(
                 ? InkWell(
               onTap: callback,
               child: Image.asset(
-                "assets/image/close.png",
+                "assets/image/cancle.png",
                 width: CustomStyle.getWidth(13.0),
                 height: CustomStyle.getHeight(13.0),
                 color: styleBaseCol1,

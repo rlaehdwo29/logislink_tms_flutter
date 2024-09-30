@@ -9,7 +9,11 @@ import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/template_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
+import 'package:logislink_tms_flutter/page/renewpage/create_template_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/template_manage_detail_page.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
+import 'package:page_animation_transition/animations/left_to_right_transition.dart';
+import 'package:page_animation_transition/page_animation_transition.dart';
 
 class TemplateManagePage extends StatefulWidget {
 
@@ -42,10 +46,10 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               reqTel: "010-1111-5222",
               reqAddr: "경기도 고양시 일산대로",
               reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
+              sellCustId: "C2024070900000",
+              sellCustName: "테스트 주선사",
+              sellDeptId: "tms_test",
+              sellDeptName: "관리자",
               inOutSctn: "01",
               inOutSctnName: "내수",
               truckTypeCode: "TR",
@@ -78,7 +82,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               weightUnitName: "톤",
               goodsQty: "11",
               qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
+              qtyUnitName: "RL",
               sWayCode: "수",
               sWayName: "수작업",
               eWayCode: "지",
@@ -118,9 +122,6 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               buyCharge: "75000",
               buyFee: "7500",
 
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
               wayPointMemo: "ㅇㅇㅇ",
               wayPointCharge: "11",
               stayMemo: "ㄴㄴㄴㄴ",
@@ -134,17 +135,15 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               unitPrice: "",
               unitPriceType: "01",
               unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
               payType: "N",
               reqPayYN: "N",
               reqPayDate: "",
               talkYn: "Y",
               orderStopList: List.empty(growable: true),
               reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
+              call24Cargo: "N",
+              manCargo: "N",
+              oneCargo: "N",
               call24Charge: "20000",
               manCharge: "15000",
               oneCharge: "16000"
@@ -163,10 +162,10 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               reqTel: "010-1111-5222",
               reqAddr: "경기도 고양시 일산대로",
               reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
+              sellCustId: "C2024070900000",
+              sellCustName: "테스트 주선사",
+              sellDeptId: "tms_test",
+              sellDeptName: "관리자",
               inOutSctn: "01",
               inOutSctnName: "내수",
               truckTypeCode: "TR",
@@ -198,8 +197,8 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               weightUnitCode: "TON",
               weightUnitName: "톤",
               goodsQty: "11",
-              qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
+              qtyUnitCode: "BK",
+              qtyUnitName: "BK",
               sWayCode: "수",
               sWayName: "수작업",
               eWayCode: "지",
@@ -239,9 +238,6 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               buyCharge: "75000",
               buyFee: "7500",
 
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
               wayPointMemo: "ㅇㅇㅇ",
               wayPointCharge: "11",
               stayMemo: "ㄴㄴㄴㄴ",
@@ -255,17 +251,15 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               unitPrice: "",
               unitPriceType: "01",
               unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
               payType: "N",
               reqPayYN: "N",
               reqPayDate: "",
               talkYn: "Y",
               orderStopList: List.empty(growable: true),
               reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
+              call24Cargo: "Y",
+              manCargo: "N",
+              oneCargo: "N",
               call24Charge: "20000",
               manCharge: "15000",
               oneCharge: "16000"
@@ -284,10 +278,10 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               reqTel: "010-1111-5222",
               reqAddr: "경기도 고양시 일산대로",
               reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
+              sellCustId: "C2024070900000",
+              sellCustName: "테스트 주선사",
+              sellDeptId: "tms_test",
+              sellDeptName: "관리자",
               inOutSctn: "01",
               inOutSctnName: "내수",
               truckTypeCode: "TR",
@@ -319,8 +313,8 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               weightUnitCode: "TON",
               weightUnitName: "톤",
               goodsQty: "11",
-              qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
+              qtyUnitCode: "VAN",
+              qtyUnitName: "VAN-컨테이너",
               sWayCode: "수",
               sWayName: "수작업",
               eWayCode: "지",
@@ -360,9 +354,6 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               buyCharge: "75000",
               buyFee: "7500",
 
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
               wayPointMemo: "ㅇㅇㅇ",
               wayPointCharge: "11",
               stayMemo: "ㄴㄴㄴㄴ",
@@ -376,17 +367,15 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               unitPrice: "",
               unitPriceType: "01",
               unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
               payType: "N",
               reqPayYN: "N",
               reqPayDate: "",
               talkYn: "Y",
               orderStopList: List.empty(growable: true),
               reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
+              call24Cargo: "N",
+              manCargo: "Y",
+              oneCargo: "N",
               call24Charge: "20000",
               manCharge: "15000",
               oneCharge: "16000"
@@ -405,10 +394,10 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               reqTel: "010-1111-5222",
               reqAddr: "경기도 고양시 일산대로",
               reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
+              sellCustId: "C2024070900000",
+              sellCustName: "테스트 주선사",
+              sellDeptId: "tms_test",
+              sellDeptName: "관리자",
               inOutSctn: "01",
               inOutSctnName: "내수",
               truckTypeCode: "TR",
@@ -440,8 +429,8 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               weightUnitCode: "TON",
               weightUnitName: "톤",
               goodsQty: "11",
-              qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
+              qtyUnitCode: "BUNDLE",
+              qtyUnitName: "BUNDLE",
               sWayCode: "수",
               sWayName: "수작업",
               eWayCode: "지",
@@ -481,9 +470,6 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               buyCharge: "75000",
               buyFee: "7500",
 
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
               wayPointMemo: "ㅇㅇㅇ",
               wayPointCharge: "11",
               stayMemo: "ㄴㄴㄴㄴ",
@@ -497,17 +483,15 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               unitPrice: "",
               unitPriceType: "01",
               unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
               payType: "N",
               reqPayYN: "N",
               reqPayDate: "",
               talkYn: "Y",
               orderStopList: List.empty(growable: true),
               reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
+              call24Cargo: "N",
+              manCargo: "N",
+              oneCargo: "N",
               call24Charge: "20000",
               manCharge: "15000",
               oneCharge: "16000"
@@ -559,7 +543,6 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
     return InkWell(
       onTap: (){
         if(selectMode.value) {
-          print("몇개여몇개여 => ${select_template_list.length}");
           if(select_template_list.length > 0){
             select_template_list.forEach((element) { 
               if (element.templateId == item.templateId) {
@@ -572,7 +555,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
             select_template_list.add(item);
           }
         }else{
-          
+          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => TemplateManageDetailPage(item: item)));
         }
       },
         child: Obx(() => Container(
@@ -633,11 +616,11 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Text(
-                          "${item.custName}",
+                          "${item.sellCustName}",
                           style:CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w500)
                       ),
                       Text(
-                          "${item.deptId}",
+                          "${item.sellDeptName}",
                           style:CustomStyle.CustomFont(styleFontSize13, Colors.black,font_weight: FontWeight.w300)
                       )
                     ],
@@ -678,21 +661,16 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                                   children: [
                                     Row(
                                         crossAxisAlignment: CrossAxisAlignment.center,
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.start,
                                         children: [
                                           Container(
                                               padding:const EdgeInsets.all(3),
-                                              margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                              margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(5)),
                                               decoration: const BoxDecoration(
                                                   color: renew_main_color2,
                                                   shape: BoxShape.circle
                                               ),
                                               child: Text("상",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
-                                          ),
-                                          Text(
-                                            "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-                                            style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
-                                            textAlign: TextAlign.center,
                                           ),
                                         ]
                                     ),
@@ -759,21 +737,16 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                                     children: [
                                       Row(
                                           crossAxisAlignment: CrossAxisAlignment.center,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.start,
                                           children: [
                                             Container(
                                                 padding:const EdgeInsets.all(3),
-                                                margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                                margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(5)),
                                                 decoration: const BoxDecoration(
                                                     color: rpa_btn_cancle,
                                                     shape: BoxShape.circle
                                                 ),
                                                 child: Text("하",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
-                                            ),
-                                            Text(
-                                              "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-                                              style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
-                                              textAlign: TextAlign.center,
                                             ),
                                           ]
                                       ),
@@ -995,34 +968,6 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
             centerTitle: true,
             automaticallyImplyLeading: false,
             actions: [
-              Obx(() =>
-              selectMode.value ?
-              TextButton(
-                  onPressed: (){
-                    openCommonConfirmBox(
-                        context,
-                        "${select_template_list.length}건의 탬플릿을 삭제하시겠습니까?",
-                        Strings.of(context)?.get("cancel")??"Not Found",
-                        Strings.of(context)?.get("confirm")??"Not Found",
-                            () {Navigator.of(context).pop(false);},
-                            () async {
-                          Navigator.of(context).pop(false);
-                          int delCnt = 0;
-                          for(var selectItem in select_template_list) {
-                            template_list.remove(selectItem);
-                            delCnt++;
-                          }
-                          Util.snackbar(context, "$delCnt건의 탬플릿이 삭제되었습니다.");
-                          selectMode.value = false;
-                        }
-                    );
-                  },
-                  child: Text(
-                    "삭제",
-                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
-                  )
-              ) : const SizedBox()
-              ),
               TextButton(
                   onPressed: (){
                     selectMode.value = !selectMode.value;
@@ -1054,6 +999,79 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                   ]
               );
             })
+          ),
+          bottomNavigationBar: Obx(() =>
+                selectMode.value ?
+               InkWell(
+                   onTap: () async {
+                     if(select_template_list.length > 0) {
+                       openCommonConfirmBox(
+                           context,
+                           "${select_template_list.length}건의 탬플릿을 삭제하시겠습니까?",
+                           Strings.of(context)?.get("cancel") ?? "Not Found",
+                           Strings.of(context)?.get("confirm") ?? "Not Found",
+                               () {
+                             Navigator.of(context).pop(false);
+                           },
+                               () async {
+                             Navigator.of(context).pop(false);
+                             int delCnt = 0;
+                             for (var selectItem in select_template_list) {
+                               template_list.remove(selectItem);
+                               delCnt++;
+                             }
+                             Util.snackbar(context, "$delCnt건의 탬플릿이 삭제되었습니다.");
+                             selectMode.value = false;
+                           });
+                        }else{
+                          Util.toast("삭제할 탬플릿을 선택해주세요.");
+                        }
+                     },
+                   child: Container(
+                       width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.5,
+                       height: CustomStyle.getHeight(50),
+                       alignment: Alignment.center,
+                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                       margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal: CustomStyle.getWidth(20)),
+                       child: Row(
+                           crossAxisAlignment: CrossAxisAlignment.center,
+                           mainAxisAlignment: MainAxisAlignment.center,
+                           children: [
+                             Icon(Icons.delete, size: 25.h, color: styleWhiteCol),
+                             CustomStyle.sizedBoxWidth(5.0.w),
+                             Text(
+                               textAlign: TextAlign.center,
+                               "${select_template_list.length}건 삭제",
+                               style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                             ),
+                           ]
+                       )
+                   )
+               ) : InkWell(
+                    onTap: () async {
+                      await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(), pageAnimationType: LeftToRightTransition()));
+                    },
+                    child: Container(
+                        width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.5,
+                        height: CustomStyle.getHeight(50),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                        margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal: CustomStyle.getWidth(20)),
+                        child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add, size: 25.h, color: styleWhiteCol),
+                              CustomStyle.sizedBoxWidth(5.0.w),
+                              Text(
+                                textAlign: TextAlign.center,
+                                "탬플릿 생성",
+                                style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                              ),
+                            ]
+                        )
+                    )
+                )
           ),
         )
     );

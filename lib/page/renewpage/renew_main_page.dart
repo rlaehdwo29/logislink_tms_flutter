@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:fbroadcast/fbroadcast.dart' as fbroad;
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:logger/logger.dart';
@@ -26,9 +28,14 @@ import 'package:logislink_tms_flutter/common/model/user_rpa_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/db/appdatabase.dart';
+import 'package:logislink_tms_flutter/page/renewpage/create_template_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_setting_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_detail_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/template_manage_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/appbar_monitor_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/appbar_notice_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/notification_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
@@ -36,6 +43,7 @@ import 'package:logislink_tms_flutter/provider/order_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:page_animation_transition/animations/left_to_right_transition.dart';
+import 'package:page_animation_transition/animations/right_to_left_faded_transition.dart';
 import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:provider/provider.dart';
@@ -85,6 +93,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final mCalendarStartDate = DateTime.now().obs;
   final mCalendarEndDate = DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day+1).obs;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+  CalendarFormat _calendarWeekFormat = CalendarFormat.twoWeeks;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOn;
 
   final myOrderSelect = false.obs;
@@ -189,7 +198,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       orderList.addAll(list);
     }
 
-      template_list.add(
+      /* template_list.add(
           TemplateModel(
               templateTitle: "템플릿 테스트",
               templateId: "TP20240711095643",
@@ -201,10 +210,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               reqTel: "010-1111-5222",
               reqAddr: "경기도 고양시 일산대로",
               reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
+              sellCustId: "C2024070900000",
+              sellCustName: "테스트 주선사",
+              sellDeptId: "tms_test",
+              sellDeptName: "관리자",
               inOutSctn: "01",
               inOutSctnName: "내수",
               truckTypeCode: "TR",
@@ -232,7 +241,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               eLat: 42.24884351,
               eLon: 135.5132484,
               goodsName: "화물정보 테스트",
-              goodsWeight: "5톤",
+              goodsWeight: "5",
               weightUnitCode: "TON",
               weightUnitName: "톤",
               goodsQty: "11",
@@ -277,9 +286,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               buyCharge: "75000",
               buyFee: "7500",
 
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
               wayPointMemo: "ㅇㅇㅇ",
               wayPointCharge: "11",
               stayMemo: "ㄴㄴㄴㄴ",
@@ -301,377 +307,14 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               talkYn: "Y",
               orderStopList: List.empty(growable: true),
               reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
+              call24Cargo: "N",
+              manCargo: "N",
+              oneCargo: "N",
               call24Charge: "20000",
               manCharge: "15000",
               oneCharge: "16000"
           )
-      );
-
-      template_list.add(
-          TemplateModel(
-              templateTitle: "템플릿 테스트222",
-              templateId: "TP20240710022141",
-              reqCustId: "temp_test1",
-              reqCustName: "테스트 화주",
-              reqDeptId: "dept_test",
-              reqDeptName: "배차팀",
-              reqStaff: "김담당",
-              reqTel: "010-1111-5222",
-              reqAddr: "경기도 고양시 일산대로",
-              reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
-              inOutSctn: "01",
-              inOutSctnName: "내수",
-              truckTypeCode: "TR",
-              truckTypeName: "트럭",
-              sComName: "테스트 상차지",
-              sSido: "경기도 고양시",
-              sGungu: "일산서구",
-              sDong: "풍산동",
-              sAddr: "가내로 184-2길",
-              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
-              sStaff: "곰담당",
-              sTel: "010-9999-8888",
-              sMemo: "상차지 테스트 메모",
-              eComName: "하차지 테스트",
-              eSido: "부산광역시",
-              eGungu: "중구",
-              eDong: "광산동",
-              eAddr: "하천읍17-7길",
-              eAddrDetail: "해운드릴터파크 202동 202호",
-              eStaff: "쿠담당",
-              eTel: "010-9999-7777",
-              eMemo: "하차지 테스트 메모",
-              sLat: 39.99152432,
-              sLon: 72.79536515,
-              eLat: 42.24884351,
-              eLon: 135.5132484,
-              goodsName: "화물정보 테스트",
-              goodsWeight: "5톤",
-              weightUnitCode: "TON",
-              weightUnitName: "톤",
-              goodsQty: "11",
-              qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
-              sWayCode: "수",
-              sWayName: "수작업",
-              eWayCode: "지",
-              eWayName: "지금",
-              mixYn: "N",
-              mixSize: "",
-              returnYn: "N",
-              carTonCode: "5",
-              carTonName: "5톤",
-              carTypeCode: "06",
-              carTypeName: "몰루",
-              chargeType: "01",
-              chargeTypeName: "인수증",
-              distance: 17.12,
-              time: 27,
-              reqMemo: "요청사항 뭔데?",
-              driverMemo: "차주 요청 사항 뭔데?",
-              itemCode: "27",
-              itemName: "응애",
-              stopCount: 0,
-
-              sellCharge: "65000",
-              sellFee: "6500",
-              sellWeight: "1",
-              sellWayPointMemo: "매출경유비 메모",
-              sellWayPointCharge: "10000",
-              sellStayMemo: "매출 대기료 메모",
-              sellStayCharge: "10100",
-              sellHandWorkMemo: "매출 수작업비 메모",
-              sellHandWorkCharge: "10200",
-              sellRoundMemo: "매출 회차료 메모",
-              sellRoundCharge: "10300",
-              sellOtherAddMemo: "매출 기타추가비 메모",
-              sellOtherAddCharge: "10400",
-              custPayType: "Y",
-
-              buyCharge: "75000",
-              buyFee: "7500",
-
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
-              wayPointMemo: "ㅇㅇㅇ",
-              wayPointCharge: "11",
-              stayMemo: "ㄴㄴㄴㄴ",
-              stayCharge: "22",
-              handWorkMemo: "ㄷㄷㄷㄷ",
-              handWorkCharge: "33",
-              roundMemo: "ㄹㄹㄹㄹ",
-              roundCharge: "44",
-              otherAddMemo: "ㅁㅁㅁㅁ",
-              otherAddCharge: "55",
-              unitPrice: "",
-              unitPriceType: "01",
-              unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
-              payType: "N",
-              reqPayYN: "N",
-              reqPayDate: "",
-              talkYn: "Y",
-              orderStopList: List.empty(growable: true),
-              reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
-              call24Charge: "20000",
-              manCharge: "15000",
-              oneCharge: "16000"
-          )
-      );
-
-      template_list.add(
-          TemplateModel(
-              templateTitle: "템플릿 테스트333",
-              templateId: "TP20240713032153",
-              reqCustId: "temp_test1",
-              reqCustName: "테스트 화주",
-              reqDeptId: "dept_test",
-              reqDeptName: "배차팀",
-              reqStaff: "김담당",
-              reqTel: "010-1111-5222",
-              reqAddr: "경기도 고양시 일산대로",
-              reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
-              inOutSctn: "01",
-              inOutSctnName: "내수",
-              truckTypeCode: "TR",
-              truckTypeName: "트럭",
-              sComName: "테스트 상차지",
-              sSido: "경기도 고양시",
-              sGungu: "일산서구",
-              sDong: "풍산동",
-              sAddr: "가내로 184-2길",
-              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
-              sStaff: "곰담당",
-              sTel: "010-9999-8888",
-              sMemo: "상차지 테스트 메모",
-              eComName: "하차지 테스트",
-              eSido: "부산광역시",
-              eGungu: "중구",
-              eDong: "광산동",
-              eAddr: "하천읍17-7길",
-              eAddrDetail: "해운드릴터파크 202동 202호",
-              eStaff: "쿠담당",
-              eTel: "010-9999-7777",
-              eMemo: "하차지 테스트 메모",
-              sLat: 39.99152432,
-              sLon: 72.79536515,
-              eLat: 42.24884351,
-              eLon: 135.5132484,
-              goodsName: "화물정보 테스트",
-              goodsWeight: "5톤",
-              weightUnitCode: "TON",
-              weightUnitName: "톤",
-              goodsQty: "11",
-              qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
-              sWayCode: "수",
-              sWayName: "수작업",
-              eWayCode: "지",
-              eWayName: "지금",
-              mixYn: "N",
-              mixSize: "",
-              returnYn: "N",
-              carTonCode: "5",
-              carTonName: "5톤",
-              carTypeCode: "06",
-              carTypeName: "몰루",
-              chargeType: "01",
-              chargeTypeName: "인수증",
-              distance: 17.12,
-              time: 27,
-              reqMemo: "요청사항 뭔데?",
-              driverMemo: "차주 요청 사항 뭔데?",
-              itemCode: "27",
-              itemName: "응애",
-              stopCount: 0,
-
-              sellCharge: "65000",
-              sellFee: "6500",
-              sellWeight: "1",
-              sellWayPointMemo: "매출경유비 메모",
-              sellWayPointCharge: "10000",
-              sellStayMemo: "매출 대기료 메모",
-              sellStayCharge: "10100",
-              sellHandWorkMemo: "매출 수작업비 메모",
-              sellHandWorkCharge: "10200",
-              sellRoundMemo: "매출 회차료 메모",
-              sellRoundCharge: "10300",
-              sellOtherAddMemo: "매출 기타추가비 메모",
-              sellOtherAddCharge: "10400",
-              custPayType: "Y",
-
-              buyCharge: "75000",
-              buyFee: "7500",
-
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
-              wayPointMemo: "ㅇㅇㅇ",
-              wayPointCharge: "11",
-              stayMemo: "ㄴㄴㄴㄴ",
-              stayCharge: "22",
-              handWorkMemo: "ㄷㄷㄷㄷ",
-              handWorkCharge: "33",
-              roundMemo: "ㄹㄹㄹㄹ",
-              roundCharge: "44",
-              otherAddMemo: "ㅁㅁㅁㅁ",
-              otherAddCharge: "55",
-              unitPrice: "",
-              unitPriceType: "01",
-              unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
-              payType: "N",
-              reqPayYN: "N",
-              reqPayDate: "",
-              talkYn: "Y",
-              orderStopList: List.empty(growable: true),
-              reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
-              call24Charge: "20000",
-              manCharge: "15000",
-              oneCharge: "16000"
-          )
-      );
-
-      template_list.add(
-          TemplateModel(
-              templateTitle: "템플릿 테스트444",
-              templateId: "TP202407141201772",
-              reqCustId: "temp_test1",
-              reqCustName: "테스트 화주",
-              reqDeptId: "dept_test",
-              reqDeptName: "배차팀",
-              reqStaff: "김담당",
-              reqTel: "010-1111-5222",
-              reqAddr: "경기도 고양시 일산대로",
-              reqAddrDetail: "화정트릴파크움 102동 1102호",
-              custId: "C2024070900000",
-              custName: "테스트 주선사",
-              deptId: "tms_test",
-              deptName: "관리자",
-              inOutSctn: "01",
-              inOutSctnName: "내수",
-              truckTypeCode: "TR",
-              truckTypeName: "트럭",
-              sComName: "테스트 상차지",
-              sSido: "경기도 고양시",
-              sGungu: "일산서구",
-              sDong: "풍산동",
-              sAddr: "가내로 184-2길",
-              sAddrDetail: "월드센트럴리움아이파크 101동 101호",
-              sStaff: "곰담당",
-              sTel: "010-9999-8888",
-              sMemo: "상차지 테스트 메모",
-              eComName: "하차지 테스트",
-              eSido: "부산광역시",
-              eGungu: "중구",
-              eDong: "광산동",
-              eAddr: "하천읍17-7길",
-              eAddrDetail: "해운드릴터파크 202동 202호",
-              eStaff: "쿠담당",
-              eTel: "010-9999-7777",
-              eMemo: "하차지 테스트 메모",
-              sLat: 39.99152432,
-              sLon: 72.79536515,
-              eLat: 42.24884351,
-              eLon: 135.5132484,
-              goodsName: "화물정보 테스트",
-              goodsWeight: "5톤",
-              weightUnitCode: "TON",
-              weightUnitName: "톤",
-              goodsQty: "11",
-              qtyUnitCode: "R/L",
-              qtyUnitName: "qtyUnitName",
-              sWayCode: "수",
-              sWayName: "수작업",
-              eWayCode: "지",
-              eWayName: "지금",
-              mixYn: "N",
-              mixSize: "",
-              returnYn: "N",
-              carTonCode: "5",
-              carTonName: "5톤",
-              carTypeCode: "06",
-              carTypeName: "몰루",
-              chargeType: "01",
-              chargeTypeName: "인수증",
-              distance: 17.12,
-              time: 27,
-              reqMemo: "요청사항 뭔데?",
-              driverMemo: "차주 요청 사항 뭔데?",
-              itemCode: "27",
-              itemName: "응애",
-              stopCount: 0,
-
-              sellCharge: "65000",
-              sellFee: "6500",
-              sellWeight: "1",
-              sellWayPointMemo: "매출경유비 메모",
-              sellWayPointCharge: "10000",
-              sellStayMemo: "매출 대기료 메모",
-              sellStayCharge: "10100",
-              sellHandWorkMemo: "매출 수작업비 메모",
-              sellHandWorkCharge: "10200",
-              sellRoundMemo: "매출 회차료 메모",
-              sellRoundCharge: "10300",
-              sellOtherAddMemo: "매출 기타추가비 메모",
-              sellOtherAddCharge: "10400",
-              custPayType: "Y",
-
-              buyCharge: "75000",
-              buyFee: "7500",
-
-              linkCode: "F",
-              linkCodeName: "접수",
-              linkType: "03",
-              wayPointMemo: "ㅇㅇㅇ",
-              wayPointCharge: "11",
-              stayMemo: "ㄴㄴㄴㄴ",
-              stayCharge: "22",
-              handWorkMemo: "ㄷㄷㄷㄷ",
-              handWorkCharge: "33",
-              roundMemo: "ㄹㄹㄹㄹ",
-              roundCharge: "44",
-              otherAddMemo: "ㅁㅁㅁㅁ",
-              otherAddCharge: "55",
-              unitPrice: "",
-              unitPriceType: "01",
-              unitPriceTypeName: "대당단가",
-              custMngName: "정상",
-              custMngMemo: "정상입니다.",
-              payType: "N",
-              reqPayYN: "N",
-              reqPayDate: "",
-              talkYn: "Y",
-              orderStopList: List.empty(growable: true),
-              reqStaffName: "요담당",
-              call24Cargo: "D",
-              manCargo: "D",
-              oneCargo: "R",
-              call24Charge: "20000",
-              manCharge: "15000",
-              oneCharge: "16000"
-          )
-      );
+      );*/
 
   }
 
@@ -740,208 +383,231 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   Future openCalendarDialog() {
     mCalendarNowDate = DateTime.now();
     DateTime? tempSelectedDay;
-    final tempRangeStart = mCalendarStartDate.value.obs;
-    final tempRangeEnd = mCalendarEndDate.value.obs;
+    DateTime? tempRangeStart = mCalendarStartDate.value;
+    DateTime? tempRangeEnd = mCalendarEndDate.value;
 
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       enableDrag: true,
-      barrierLabel: "ㅇㅇㅇㅇㅇ",
+      barrierLabel: "날짜 직접설정",
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
           side: BorderSide(color: Color(0xffEDEEF0), width: 1)
       ),
       backgroundColor: Colors.white,
       builder: (context) {
-        return FractionallySizedBox(
-            heightFactor: 0.65,
-            child: Container(
-                width: double.infinity,
-                alignment: Alignment.centerLeft,
-                margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
-                padding: EdgeInsets.only(right: CustomStyle.getWidth(10),left: CustomStyle.getWidth(10),top: CustomStyle.getHeight(10)),
-                decoration: const BoxDecoration(
-                    color: Colors.white
-                ),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SingleChildScrollView(
-                        child: SizedBox(
-                            width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width,
-                            height: MediaQueryData.fromView(WidgetsBinding.instance.window).size.height * 0.6,
-                            child: Column(
-                                children: [
-                                  TableCalendar(
-                                    rowHeight: MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio > 1500 ? CustomStyle.getHeight(30.h) :CustomStyle.getHeight(45.h) ,
-                                    locale: 'ko_KR',
-                                    firstDay: DateTime.utc(2010, 1, 1),
-                                    lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
-                                    headerStyle: HeaderStyle(
-                                      // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
-                                      formatButtonVisible: false,
-                                      // 달력 타이틀을 센터로
-                                      titleCentered: true,
-                                      // 말 그대로 타이틀 텍스트 스타일링
-                                      titleTextStyle:
-                                      CustomStyle.CustomFont(
-                                          styleFontSize16, Colors.black,font_weight: FontWeight.w700
-                                      ),
-                                      rightChevronIcon: Icon(Icons.chevron_right,size: 26.h),
-                                      leftChevronIcon: Icon(Icons.chevron_left, size: 26.h),
-                                    ),
-                                    calendarStyle: CalendarStyle(
-                                      tablePadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
-                                      outsideTextStyle: CustomStyle.CustomFont(styleFontSize12, line),
-                                      // 오늘 날짜에 하이라이팅의 유무
-                                      isTodayHighlighted: false,
-                                      // 캘린더의 평일 배경 스타일링(default면 평일을 의미)
-                                      defaultDecoration: const BoxDecoration(
-                                        color: Colors.white,
-                                      ),
-                                      // 캘린더의 주말 배경 스타일링
-                                      weekendDecoration:  const BoxDecoration(
-                                        color: Colors.white,
-                                      ),
-                                      // 선택한 날짜 배경 스타일링
-                                      selectedDecoration: BoxDecoration(
-                                          color: styleWhiteCol,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: main_color,width: 1.w)
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState)
+        {
+          return FractionallySizedBox(
+              heightFactor: 0.65,
+              child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.symmetric(
+                      horizontal: CustomStyle.getWidth(15)),
+                  padding: EdgeInsets.only(right: CustomStyle.getWidth(10),
+                      left: CustomStyle.getWidth(10),
+                      top: CustomStyle.getHeight(10)),
+                  decoration: const BoxDecoration(
+                      color: Colors.white
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SingleChildScrollView(
+                            child: SizedBox(
+                                width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width,
+                                height: MediaQueryData.fromView(WidgetsBinding.instance.window).size.height * 0.6,
+                                child: Column(
+                                    children: [
+                                      TableCalendar(
+                                        rowHeight: MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio > 1500 ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(45.h),
+                                        locale: 'ko_KR',
+                                        firstDay: DateTime.utc(2010, 1, 1),
+                                        lastDay: DateTime.utc(DateTime.now().year + 10, DateTime.now().month, DateTime.now().day),
+                                        daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
+                                        headerStyle: HeaderStyle(
+                                          // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
+                                          formatButtonVisible: false,
+                                          // 달력 타이틀을 센터로
+                                          titleCentered: true,
+                                          // 말 그대로 타이틀 텍스트 스타일링
+                                          titleTextStyle:
+                                          CustomStyle.CustomFont(
+                                              styleFontSize16, Colors.black,
+                                              font_weight: FontWeight.w700
+                                          ),
+                                          rightChevronIcon: Icon(
+                                              Icons.chevron_right, size: 26.h),
+                                          leftChevronIcon: Icon(
+                                              Icons.chevron_left, size: 26.h),
+                                        ),
+                                        calendarStyle: CalendarStyle(
+                                          tablePadding: EdgeInsets.symmetric(
+                                              vertical: CustomStyle.getHeight(10.h),
+                                              horizontal: CustomStyle.getWidth(5.w)
+                                          ),
+                                          outsideTextStyle: CustomStyle.CustomFont(styleFontSize12, line),
+                                          // 오늘 날짜에 하이라이팅의 유무
+                                          isTodayHighlighted: false,
+                                          // 캘린더의 평일 배경 스타일링(default면 평일을 의미)
+                                          defaultDecoration: const BoxDecoration(
+                                            color: Colors.white,
+                                          ),
+                                          // 캘린더의 주말 배경 스타일링
+                                          weekendDecoration: const BoxDecoration(
+                                            color: Colors.white,
+                                          ),
+                                          // 선택한 날짜 배경 스타일링
+                                          selectedDecoration: BoxDecoration(
+                                              color: styleWhiteCol,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: main_color, width: 1.w)
+                                          ),
+                                          defaultTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w600),
+                                          weekendTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.red, font_weight: FontWeight.w600),
+                                          selectedTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w600),
+                                          // range 크기 조절
+                                          rangeHighlightScale: 1.0,
 
-                                      ),
-                                      defaultTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w600),
-                                      weekendTextStyle:
-                                      CustomStyle.CustomFont(styleFontSize14, Colors.red,font_weight: FontWeight.w600),
-                                      selectedTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w600),
-                                      // range 크기 조절
-                                      rangeHighlightScale: 1.0,
+                                          // range 색상 조정
+                                          rangeHighlightColor: const Color(0xFFDFE8F4),
 
-                                      // range 색상 조정
-                                      rangeHighlightColor: const Color(0xFFDFE8F4),
+                                          // rangeStartDay 글자 조정
+                                          rangeStartTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w600),
 
-                                      // rangeStartDay 글자 조정
-                                      rangeStartTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize16, Colors.black,font_weight: FontWeight.w600),
+                                          // rangeStartDay 모양 조정
+                                          rangeStartDecoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: Colors.black, width: 1.w)
+                                          ),
 
-                                      // rangeStartDay 모양 조정
-                                      rangeStartDecoration: BoxDecoration(
-                                          color: const Color(0xFFDFE8F4),
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.black,width: 1.w)
-                                      ),
+                                          // rangeEndDay 글자 조정
+                                          rangeEndTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w600),
 
-                                      // rangeEndDay 글자 조정
-                                      rangeEndTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize16, Colors.black,font_weight: FontWeight.w600),
+                                          // rangeEndDay 모양 조정
+                                          rangeEndDecoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(color: Colors.black, width: 1.w)
+                                          ),
 
-                                      // rangeEndDay 모양 조정
-                                      rangeEndDecoration: BoxDecoration(
-                                          color:  const Color(0xFFDFE8F4),
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: Colors.black,width: 1.w)
-                                      ),
+                                          // startDay, endDay 사이의 글자 조정
+                                          withinRangeTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black),
 
-                                      // startDay, endDay 사이의 글자 조정
-                                      withinRangeTextStyle: CustomStyle.CustomFont(
-                                          styleFontSize14, Colors.black),
+                                          // startDay, endDay 사이의 모양 조정
+                                          withinRangeDecoration: const BoxDecoration(),
+                                        ),
+                                        //locale: 'ko_KR',
+                                        focusedDay: mCalendarNowDate,
+                                        selectedDayPredicate: (day) {
+                                          return isSameDay(tempSelectedDay, day);
+                                        },
+                                        rangeStartDay: tempRangeStart,
+                                        rangeEndDay: tempRangeEnd,
+                                        calendarFormat: _calendarFormat,
+                                        rangeSelectionMode: _rangeSelectionMode,
+                                        onDaySelected: (selectedDay, focusedDay) {
+                                          if (!isSameDay(tempSelectedDay, selectedDay)) {
+                                            setState(() {
+                                              tempSelectedDay = selectedDay;
+                                              mCalendarNowDate = focusedDay;
+                                              _rangeSelectionMode =
+                                                  RangeSelectionMode.toggledOff;
+                                            });
+                                          }
+                                        },
+                                        onRangeSelected: (start, end, focusedDay) {
+                                          setState(() {
+                                            tempSelectedDay = start;
+                                            mCalendarNowDate = focusedDay;
+                                            tempRangeStart = start;
+                                            tempRangeEnd = end;
+                                            _rangeSelectionMode = RangeSelectionMode.toggledOn;
+                                          });
+                                        },
 
-                                      // startDay, endDay 사이의 모양 조정
-                                      withinRangeDecoration:
-                                      const BoxDecoration(),
-                                    ),
-                                    //locale: 'ko_KR',
-                                    focusedDay: mCalendarNowDate,
-                                    selectedDayPredicate: (day) {
-                                      return isSameDay(tempSelectedDay, day);
-                                    },
-                                    rangeStartDay: tempRangeStart.value,
-                                    rangeEndDay: tempRangeEnd.value,
-                                    calendarFormat: _calendarFormat,
-                                    rangeSelectionMode: _rangeSelectionMode,
-                                    onDaySelected: (selectedDay, focusedDay) {
-                                      if (!isSameDay(tempSelectedDay, selectedDay)) {
-                                        setState(() {
-                                          tempSelectedDay = selectedDay;
+                                        onFormatChanged: (format) {
+                                          if (_calendarFormat != format) {
+                                            setState(() {
+                                              _calendarFormat = format;
+                                            });
+                                          }
+                                        },
+                                        onPageChanged: (focusedDay) {
                                           mCalendarNowDate = focusedDay;
-                                          _rangeSelectionMode = RangeSelectionMode.toggledOff;
-                                        });
-                                      }
-                                    },
-                                    onRangeSelected: (start, end, focusedDay) {
-                                      setState(() {
-                                        tempSelectedDay = start;
-                                        mCalendarNowDate = focusedDay;
-                                        tempRangeStart.value = start!;
-                                        tempRangeEnd.value = end!;
-                                        _rangeSelectionMode = RangeSelectionMode.toggledOn;
-                                      });
-                                    },
-
-                                    onFormatChanged: (format) {
-                                      if (_calendarFormat != format) {
-                                        setState(() {
-                                          _calendarFormat = format;
-                                        });
-                                      }
-                                    },
-                                    onPageChanged: (focusedDay) {
-                                      mCalendarNowDate = focusedDay;
-                                    },
-                                  ),
-                                   InkWell(
-                          onTap: () async {
-                          
-                          int? diffDay = tempRangeEnd.value.difference(tempRangeStart.value).inDays;
-                                              if(tempRangeStart == null || tempRangeEnd == null){
-                                                if(tempRangeStart == null && tempRangeEnd != null) {
-                                                  tempRangeStart.value = tempRangeEnd.value.add(const Duration(days: -30));
-                                                }else if(tempRangeStart != null &&tempRangeEnd == null) {
-                                                  DateTime? tempDate = tempRangeStart.value.add(const Duration(days: 30));
-                                                  int startDiffDay = tempDate!.difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)).inDays;
-                                                  if(startDiffDay > 0) {
-                                                    tempRangeEnd.value = tempRangeStart.value;
-                                                    tempRangeStart.value = tempRangeEnd.value.add(const Duration(days: -30));
-                                                  }else{
-                                                    tempRangeEnd.value = tempRangeStart.value.add(const Duration(days: 30));
-                                                  }
-                                                }else{
-                                                  return Util.toast("시작 날짜 또는 종료 날짜를 선택해주세요.");
+                                        },
+                                      ),
+                                      InkWell(
+                                          onTap: () async {
+                                            int? diffDay = tempRangeEnd?.difference(tempRangeStart!).inDays;
+                                            if (tempRangeStart == null || tempRangeEnd == null) {
+                                              if (tempRangeStart == null && tempRangeEnd != null) {
+                                                tempRangeStart = tempRangeEnd?.add(const Duration(days: -30));
+                                              } else
+                                              if (tempRangeStart != null && tempRangeEnd == null) {
+                                                DateTime? tempDate = tempRangeStart?.add(const Duration(days: 30));
+                                                int startDiffDay = tempDate!.difference(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)).inDays;
+                                                if (startDiffDay > 0) {
+                                                  tempRangeEnd = tempRangeStart;
+                                                  tempRangeStart = tempRangeEnd?.add(const Duration(days: -30));
+                                                } else {
+                                                  tempRangeEnd =
+                                                      tempRangeStart?.add(const Duration(days: 30));
                                                 }
+                                              } else {
+                                                return Util.toast(
+                                                    "시작 날짜 또는 종료 날짜를 선택해주세요.");
                                               }
-                                              mCalendarStartDate.value = tempRangeStart.value;
-                                              mCalendarEndDate.value = tempRangeEnd.value;
-                                              Navigator.of(context).pop(false);
-                                              await refresh();
+                                            } else if (diffDay! > 30) {
+                                              return Util.toast(
+                                                  Strings.of(context)?.get(
+                                                      "dateOver") ??
+                                                      "Not Found");
+                                            }
+                                            mCalendarStartDate.value =
+                                            tempRangeStart!;
+                                            mCalendarEndDate.value =
+                                            tempRangeEnd!;
+                                            Navigator.of(context).pop(false);
+                                          },
+                                          child: Center(
+                                              child: Container(
 
-                            
-                          },
-                          child: Center(
-                              child: Container(
-      
-                                height: CustomStyle.getHeight(50),
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  "적용",
-                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
-                                ),
-                              )
-                          )
-                      )
-                                ]
+                                                height: CustomStyle.getHeight(
+                                                    50),
+                                                alignment: Alignment.center,
+                                                margin: EdgeInsets.symmetric(
+                                                    vertical: CustomStyle
+                                                        .getHeight(5)),
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius
+                                                        .circular(50),
+                                                    color: renew_main_color2),
+                                                child: Text(
+                                                  textAlign: TextAlign.center,
+                                                  "적용",
+                                                  style: CustomStyle.CustomFont(
+                                                      styleFontSize18,
+                                                      styleWhiteCol),
+                                                ),
+                                              )
+                                          )
+                                      )
+                                    ]
+                                )
                             )
                         )
-                    )
-                    ]
-                )
-            )
-        );
+                      ]
+                  )
+              )
+          );
+        });
       },
     );
   }
@@ -986,6 +652,452 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       msg = "";
     }
     return msg;
+  }
+
+  Future<void> openStoEDateSheet(BuildContext context,TemplateModel templateItem) {
+    mCalendarNowDate = DateTime.now();
+    DateTime? tempStartSelectedDay = DateTime.now();
+    final seletStartMode = false.obs;
+    DateTime? tempEndSelectedDay = DateTime.now();
+    final selectEndMode = false.obs;
+    final startTimeChk = true.obs;
+    final sTime = DateTime.now().obs;
+    final endTimeChk = true.obs;
+    final eTime = DateTime.now().obs;
+
+
+    return showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        enableDrag: true,
+        barrierLabel: "상/하차 일시",
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+            side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+        ),
+        backgroundColor: Colors.white,
+        builder: (context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return FractionallySizedBox(
+                heightFactor: 0.70,
+                child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.topCenter,
+                    margin: EdgeInsets.symmetric(
+                        horizontal: CustomStyle.getWidth(15)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(10),
+                        left: CustomStyle.getWidth(10),
+                        top: CustomStyle.getHeight(10)),
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        color: Colors.white
+                    ),
+                    child: Obx(() => SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    margin: EdgeInsets.only(
+                                        bottom: CustomStyle.getHeight(15)),
+                                    child: Text("\"${templateItem.templateTitle}\"\n상/하차 날짜를 선택해주세요.",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize20, Colors.black,
+                                            font_weight: FontWeight.w800)
+                                    )
+                                )
+                              ]),
+                      Container(
+                        decoration: const BoxDecoration(
+                          border: Border(
+                              top: BorderSide(
+                                color: light_gray24,
+                                width: 2
+                              )
+                          )
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children : [
+                            Container(
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "상차일",
+                                    style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w600),
+                                  ),
+                                  Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                          "시간무관",
+                                        style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500),
+                                      ),
+                                      Checkbox(
+                                        value: startTimeChk.value,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            startTimeChk.value = value!;
+                                          });
+                                        },
+                                      ),
+                                    ]
+                                  )
+                                ]
+                              )
+                            ),
+                            InkWell(
+                              onTap: (){
+                                seletStartMode.value = !seletStartMode.value;
+                                if(selectEndMode.value) selectEndMode.value = false;
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                  border: Border.all(color: light_gray23,width: 2)
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "${tempStartSelectedDay == null?"-":"${tempStartSelectedDay?.year}-${tempStartSelectedDay?.month}-${tempStartSelectedDay?.day}"}",
+                                        style: CustomStyle.CustomFont(styleFontSize16, Colors.black),
+                                      ),
+                                      Icon(Icons.calendar_today,color: light_gray23,size: 24.r)
+                                    ]
+                                )
+                              )
+                            ),
+
+                          ]
+                        )
+                      ),
+                      seletStartMode.value ?
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                              margin: EdgeInsets.only(top: CustomStyle.getHeight(3.h)),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: light_gray23,width: 2),
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: TableCalendar(
+                              rowHeight: MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio > 1500 ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(45.h),
+                              locale: 'ko_KR',
+                              firstDay: DateTime.utc(DateTime.now().year - 10, 1, 1),
+                              lastDay: DateTime.utc(DateTime.now().year + 10, DateTime.now().month, DateTime.now().day),
+                              daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
+                              headerVisible: false,
+                              headerStyle: HeaderStyle(
+                                // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
+                                formatButtonVisible: false,
+                                // 달력 타이틀을 센터로
+                                titleCentered: true,
+                                // 말 그대로 타이틀 텍스트 스타일링
+                                titleTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w700),
+                                rightChevronIcon: Icon(Icons.chevron_right, size: 26.h),
+                                leftChevronIcon: Icon(Icons.chevron_left, size: 26.h),
+                              ),
+                              calendarStyle: CalendarStyle(
+                                tablePadding: EdgeInsets.symmetric( horizontal: CustomStyle.getWidth(5.w)),
+                                outsideTextStyle: CustomStyle.CustomFont(styleFontSize12, line),
+                                // 오늘 날짜에 하이라이팅의 유무
+                                isTodayHighlighted: false,
+                                // 캘린더의 평일 배경 스타일링(default면 평일을 의미)
+                                defaultDecoration: const BoxDecoration(color: Colors.white,),
+                                // 캘린더의 주말 배경 스타일링
+                                weekendDecoration: const BoxDecoration(color: Colors.white,),
+                                // 선택한 날짜 배경 스타일링
+                                selectedDecoration: BoxDecoration(
+                                    color: const Color(0xffFFB4B9),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: const Color(0xffFFB4B9), width: 1.w)
+
+                                ),
+                                defaultTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w600),
+                                weekendTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.red, font_weight: FontWeight.w600),
+                                selectedTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w700),
+                                // startDay, endDay 사이의 글자 조정
+                                withinRangeTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+
+                                // startDay, endDay 사이의 모양 조정
+                                withinRangeDecoration: const BoxDecoration(),
+                              ),
+                              focusedDay: mCalendarNowDate,
+                              selectedDayPredicate: (day) {
+                                return isSameDay(tempStartSelectedDay, day);
+                              },
+                              calendarFormat: _calendarWeekFormat,
+                              onDaySelected: (selectedDay, focusedDay) {
+                                if (!isSameDay(tempStartSelectedDay, selectedDay)) {
+                                  setState(() {
+                                    tempStartSelectedDay = selectedDay;
+                                    mCalendarNowDate = focusedDay;
+                                    _rangeSelectionMode = RangeSelectionMode.toggledOff;
+                                  });
+                                }
+                              },
+                              onFormatChanged: (format) {
+                                if (_calendarWeekFormat != format) {
+                                  setState(() {
+                                    _calendarWeekFormat = format;
+                                  });
+                                }
+                              },
+                              onPageChanged: (focusedDay) {
+                                mCalendarNowDate = focusedDay;
+                              },
+                            )
+                        ) : const SizedBox(),
+                          !startTimeChk.value ?
+                          Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                              margin: EdgeInsets.only(top: CustomStyle.getHeight(3.h)),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: light_gray23, width: 2)
+                              ),
+                              child: TimePickerSpinner(
+                                is24HourMode: true,
+                                normalTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black),
+                                highlightedTextStyle: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w700),
+                                time: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0),
+                                spacing: 50,
+                                itemHeight: 30,
+                                isForce2Digits: true,
+                                minutesInterval: 30,
+                                onTimeChange: (time) {
+                                  setState((){
+                                    sTime.value = DateTime(sTime.value.year,sTime.value.month,sTime.value.day,time.hour,time.minute,0);
+                                  });
+                                },
+                              )
+                          ) : const SizedBox(),
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children : [
+                                Container(
+                                    margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                                    child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "하차일",
+                                            style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w600),
+                                          ),
+                                          Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  "시간무관",
+                                                  style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w500),
+                                                ),
+                                                Checkbox(
+                                                  value: endTimeChk.value,
+                                                  onChanged: (value) {
+                                                    setState(() {
+                                                      endTimeChk.value = value!;
+                                                    });
+                                                  },
+                                                ),
+                                              ]
+                                          )
+                                        ]
+                                    )
+                                ),
+                                InkWell(
+                                    onTap: (){
+                                      selectEndMode.value = !selectEndMode.value;
+                                      if(seletStartMode.value) seletStartMode.value = false;
+                                    },
+                                    child: Container(
+                                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
+                                        margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.white,
+                                            border: Border.all(color: light_gray23,width: 2)
+                                        ),
+                                        child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "${tempEndSelectedDay == null?"-":"${tempEndSelectedDay?.year}-${tempEndSelectedDay?.month}-${tempEndSelectedDay?.day}"}",
+                                                style: CustomStyle.CustomFont(styleFontSize16, Colors.black),
+                                              ),
+                                              Icon(Icons.calendar_today,color: light_gray23,size: 24.r)
+                                            ]
+                                        )
+                                    )
+                                ),
+
+                              ]
+                          ),
+                          selectEndMode.value ?
+                          Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                              margin: EdgeInsets.only(top: CustomStyle.getHeight(3.h)),
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: light_gray23,width: 2),
+                                  borderRadius: BorderRadius.circular(10)
+                              ),
+                              child: TableCalendar(
+                                rowHeight: MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio > 1500 ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(45.h),
+                                locale: 'ko_KR',
+                                firstDay: DateTime.utc(DateTime.now().year - 10, 1, 1),
+                                lastDay: DateTime.utc(DateTime.now().year + 10, DateTime.now().month, DateTime.now().day),
+                                daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
+                                headerVisible: false,
+                                headerStyle: HeaderStyle(
+                                  // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
+                                  formatButtonVisible: false,
+                                  // 달력 타이틀을 센터로
+                                  titleCentered: true,
+                                  // 말 그대로 타이틀 텍스트 스타일링
+                                  titleTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w700),
+                                  rightChevronIcon: Icon(Icons.chevron_right, size: 26.h),
+                                  leftChevronIcon: Icon(Icons.chevron_left, size: 26.h),
+                                ),
+                                calendarStyle: CalendarStyle(
+                                  tablePadding: EdgeInsets.symmetric( horizontal: CustomStyle.getWidth(5.w)),
+                                  outsideTextStyle: CustomStyle.CustomFont(styleFontSize12, line),
+                                  // 오늘 날짜에 하이라이팅의 유무
+                                  isTodayHighlighted: false,
+                                  // 캘린더의 평일 배경 스타일링(default면 평일을 의미)
+                                  defaultDecoration: const BoxDecoration(color: Colors.white,),
+                                  // 캘린더의 주말 배경 스타일링
+                                  weekendDecoration: const BoxDecoration(color: Colors.white,),
+                                  // 선택한 날짜 배경 스타일링
+                                  selectedDecoration: BoxDecoration(
+                                      color: const Color(0xFF50C8FF),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: const Color(0xFF50C8FF), width: 1.w)
+
+                                  ),
+                                  defaultTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w600),
+                                  weekendTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.red, font_weight: FontWeight.w600),
+                                  selectedTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w700),
+                                  // startDay, endDay 사이의 글자 조정
+                                  withinRangeTextStyle: CustomStyle.CustomFont(styleFontSize14, Colors.black),
+
+                                  // startDay, endDay 사이의 모양 조정
+                                  withinRangeDecoration: const BoxDecoration(),
+                                ),
+                                focusedDay: mCalendarNowDate,
+                                selectedDayPredicate: (day) {
+                                  return isSameDay(tempEndSelectedDay, day);
+                                },
+                                calendarFormat: _calendarWeekFormat,
+                                onDaySelected: (selectedDay, focusedDay) {
+                                  if(parseIntDate(Util.getAllDate(tempStartSelectedDay!)) > parseIntDate(Util.getTextDate(selectedDay))) {
+                                    Util.toast(Strings.of(context)?.get("order_reg_day_date_fail"));
+                                  }else {
+                                    if (!isSameDay(tempEndSelectedDay, selectedDay)) {
+                                      setState(() {
+                                        tempEndSelectedDay = selectedDay;
+                                        mCalendarNowDate = focusedDay;
+                                        _rangeSelectionMode = RangeSelectionMode.toggledOff;
+                                      });
+                                    }
+                                  }
+                                },
+                                onFormatChanged: (format) {
+                                  if (_calendarWeekFormat != format) {
+                                    setState(() {
+                                      _calendarWeekFormat = format;
+                                    });
+                                  }
+                                },
+                                onPageChanged: (focusedDay) {
+                                  mCalendarNowDate = focusedDay;
+                                },
+                              )
+                          ) : const SizedBox(),
+                          !endTimeChk.value ?
+                            Container(
+                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(3.h)),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: light_gray23, width: 2)
+                              ),
+                              child: TimePickerSpinner(
+                                is24HourMode: true,
+                                normalTextStyle: CustomStyle.CustomFont(styleFontSize16, Colors.black),
+                                highlightedTextStyle: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w700),
+                                time: DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day,DateTime.now().hour+1,0),
+                                spacing: 50,
+                                itemHeight: 30,
+                                isForce2Digits: true,
+                                minutesInterval: 30,
+                                onTimeChange: (time) {
+                                  setState((){
+                                    eTime.value = DateTime(eTime.value.year,eTime.value.month,eTime.value.day,time.hour,time.minute,0);
+                                    print("되는겨? => ${eTime.value}");
+                                  });
+                                },
+                              )
+                            ) : const SizedBox(),
+
+
+                          InkWell(
+                              onTap: () async {
+                                  DateTime? sDateTime = DateTime(tempStartSelectedDay!.year,tempStartSelectedDay!.month,tempStartSelectedDay!.day,!startTimeChk.value ? sTime.value.hour : 0,!startTimeChk.value ? sTime.value.minute : 0 ,0);
+                                  DateTime? eDateTime = DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 0, !endTimeChk.value ? eTime.value.minute : 0, 0);
+                                  if(parseIntDate2(Util.getAllDate(sDateTime)) > parseIntDate2(Util.getAllDate(eDateTime))) {
+                                    Util.toast(Strings.of(context)?.get("order_reg_day_date_fail"));
+                                  }else {
+                                    templateItem.sDate = Util.getAllDate(sDateTime);
+                                    templateItem.eDate = Util.getAllDate(eDateTime);
+                                    await showRegOrder(templateItem);
+                                  }
+                              },
+                              child: InkWell(
+                                  onTap: () async {
+                                    await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "D",tModel: templateItem), pageAnimationType: LeftToRightTransition()));
+                                  },
+                                  child: Center(
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: CustomStyle.getHeight(15)),
+                                    width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
+                                    height: CustomStyle.getHeight(50),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      "오더 등록",
+                                      style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                    ),
+                                  )
+                              )
+                            )
+                          )
+                        ])
+                      )
+                    )
+                )
+            );
+          });
+        });
   }
 
   Future<void> openRegOrderTemplateSheet(BuildContext context, String title) async {
@@ -1036,8 +1148,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         Expanded(
                         flex:2,
                           child: InkWell(
-                            onTap:(){
-                                
+                            onTap:() async {
+                              await Navigator.of(context).push(PageAnimationTransition(page: TemplateManagePage(), pageAnimationType: LeftToRightTransition()));
                             },
                             child: Container(
                             margin: EdgeInsets.only(right: CustomStyle.getWidth(15)),
@@ -1063,6 +1175,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                             }else{
                               Future.delayed(const Duration(milliseconds: 300), () {
                                 Navigator.of(context).pop();
+                                openStoEDateSheet(context,selectItem.value);
                               });
                             }
                           },
@@ -1075,7 +1188,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: selectItem.value.templateId.isNull == true || selectItem.value.templateId?.isEmpty == true ? light_gray24 : renew_main_color2),
                                 child: Text(
                                   textAlign: TextAlign.center,
-                                  "적용",
+                                  "상/하차 날짜 선택",
                                   style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
                                 ),
                               ))
@@ -1496,7 +1609,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   Future<void> openSelectRegOrderDialog(BuildContext context) async {
 
-    final selectRegOrder = "".obs;
+    final selectRegOrder = Util.userDebugger == true ? "02".obs : "01".obs;
 
       showModalBottomSheet(
       context: context,
@@ -1536,6 +1649,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                          crossAxisAlignment: CrossAxisAlignment.center,
                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                            children: [
+                             Util.userDebugger == false?
                              Obx(() => InkWell(
                                onTap: (){
                                  selectRegOrder.value = "01";
@@ -1595,7 +1709,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     ]
                                                   ),
                                                   Text(
-                                                      "신속한 오더 등록이\n가능해요",
+                                                      "등록된 탬플릿으로\n신속한 등록을 해요",
                                                       textAlign: TextAlign.center,
                                                       style: CustomStyle.CustomFont(styleFontSize13,selectRegOrder.value == "01" ? renew_main_color2 :  Colors.black,font_weight: FontWeight.w400)
                                                   ),
@@ -1606,7 +1720,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     ],
                                   )
                                 )
-                             )),
+                             )) : const SizedBox(),
                              Obx(() => InkWell(
                                onTap: (){
                                  selectRegOrder.value = "02";
@@ -1716,10 +1830,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         height: CustomStyle.getHeight(15.0),
                                       )
                                   ),
-                                  Text(
-                                      "많은 정보 입력은 귀찮아요",
-                                      style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
-                                    )
+                                  Obx(() =>
+                                    Text(
+                                        selectRegOrder.value == "01" ? "많은 정보 입력은 귀찮아요" : "디테일한 오더 등록이 필요해요",
+                                        style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                      )
+                                  )
                                   ]
                                 )
                              ),
@@ -1737,16 +1853,18 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                              height: CustomStyle.getHeight(15.0),
                                            )
                                        ),
-                                       Text(
-                                           "중요하지 않은 조건은, 알아서 넣어주세요",
-                                           style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                       Obx(() =>
+                                         Text(
+                                             selectRegOrder.value == "01"? "중요하지 않은 조건은, 알아서 넣어주세요" : "내 손으로 차근차근 정보를 입력할래요",
+                                             style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                         )
                                        ),
                                      ]
                                  )
                              ),
                              Container(
                                  margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
-                                 child: Row(
+                                 child: Obx(() => Row(
                                      crossAxisAlignment: CrossAxisAlignment.center,
                                      mainAxisAlignment: MainAxisAlignment.start,
                                      children :[
@@ -1758,16 +1876,24 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                              height: CustomStyle.getHeight(15.0),
                                            )
                                        ),
+                                       selectRegOrder.value == "01" ?
                                         Text(
                                           "최소한의 조건",
                                             style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
-                                        ),
+                                        ) : Text(
+                                           "신속한 등록",
+                                           style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
+                                       ),
+                                       selectRegOrder.value == "01" ?
                                        Text(
                                            "으로 빠르게 오더를 등록하고 싶어요",
                                            style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                       ) : Text(
+                                           "보다는 꼼꼼한 오더 등록을하고 싶어요",
+                                           style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
                                        )
                                      ]
-                                 )
+                                 ))
                              )
                            ]
                          )))
@@ -2577,20 +2703,64 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       Container(
                       margin: EdgeInsets.only(bottom: CustomStyle.getHeight(5)),
                           child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Image.asset(
-                                "assets/image/ic_filter.png",
-                                width: CustomStyle.getWidth(22.0),
-                                height: CustomStyle.getHeight(22.0),
-                                color: Colors.black,
+                              Row(
+                                children :[
+                                  Image.asset(
+                                    "assets/image/ic_filter.png",
+                                    width: CustomStyle.getWidth(22.0),
+                                    height: CustomStyle.getHeight(22.0),
+                                    color: Colors.black,
+                                  ),
+                                  Container(
+                                      margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
+                                      child: Text(
+                                          title,
+                                          style: CustomStyle.CustomFont(styleFontSize18, Colors.black, font_weight: FontWeight.w500)
+                                      )
+                                  ),
+                                ]
                               ),
-                              Container(
-                                  margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
-                                  child: Text(
-                                      title,
-                                      style: CustomStyle.CustomFont(styleFontSize18, Colors.black, font_weight: FontWeight.w500)
+
+                              InkWell(
+                                  onTap: () async {
+                                    var result = await searchValidation();
+                                    if(result) {
+                                      Future.delayed(
+                                          const Duration(milliseconds: 300), () {
+                                        // 오더 검색
+                                        select_value.value = tempSearchColumn.value; // 오더 검색 카테고리
+                                        searchValue.value = searchOrderController.text; // 검색Field
+                                        //오더 상태
+                                        categoryOrderCode.value = tempStatecode.value.code??""; // 오더 상태 Code
+                                        categoryOrderState.value = tempStatecode.value.codeName??"-"; // 오더 상태 Name
+
+                                        //담당자 선택
+                                        categoryStaffModel.value = tempStaffmodel.value;
+
+                                        page.value = 1;
+                                        scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+
+                                        Navigator.of(context).pop();
+                                      });
+                                    }else{
+                                      Util.toast("검색어를 2글자 이상 입력해주세요.");
+                                    }
+                                  },
+                                  child: Center(
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),color: renew_main_color2),
+                                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(15.w)),
+                                        margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                        child: Text(
+                                          textAlign: TextAlign.center,
+                                          "적용",
+                                          style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                                        ),
+                                      )
                                   )
                               )
                             ]
@@ -2889,47 +3059,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               ]
                           )
                       ),
-
-                      InkWell(
-                          onTap: () async {
-                            var result = await searchValidation();
-                            if(result) {
-                              Future.delayed(
-                                  const Duration(milliseconds: 300), () {
-                                // 오더 검색
-                                select_value.value = tempSearchColumn.value; // 오더 검색 카테고리
-                                searchValue.value = searchOrderController.text; // 검색Field
-                                //오더 상태
-                                categoryOrderCode.value = tempStatecode.value.code??""; // 오더 상태 Code
-                                categoryOrderState.value = tempStatecode.value.codeName??"-"; // 오더 상태 Name
-
-                                //담당자 선택
-                                categoryStaffModel.value = tempStaffmodel.value;
-
-                                page.value = 1;
-                                scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
-
-                                Navigator.of(context).pop();
-                              });
-                            }else{
-                              Util.toast("검색어를 2글자 이상 입력해주세요.");
-                            }
-                          },
-                          child: Center(
-                              child: Container(
-                                width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
-                                height: CustomStyle.getHeight(50),
-                                alignment: Alignment.center,
-                                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  "적용",
-                                  style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
-                                ),
-                              )
-                          )
-                      )
                     ]
                 )
               )
@@ -3002,10 +3131,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     await FirebaseAnalytics.instance.logEvent(
       name: Platform.isAndroid ? "inquire_order_aos" : "inquire_order_ios",
       parameters: {
-        "user_id": user.userId,
-        "user_custId" : user.custId,
-        "user_deptId": user.deptId,
-        "orderId" : item.orderId,
+        "user_id": user.userId??"",
+        "user_custId" : user.custId??"",
+        "user_deptId": user.deptId??"",
+        "orderId" : item.orderId??"",
       },
     );
 
@@ -3092,7 +3221,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
   }
 
-  int chargeTotal(String? chargeFlag,TemplateModel mData) {
+  int tempChargeTotal(String? chargeFlag,TemplateModel mData) {
     int total = 0;
     if(chargeFlag == "S") {
       total = int.parse(mData.sellCharge ?? "0") +
@@ -3111,6 +3240,172 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           int.parse(mData.sellFee ?? "0");
     }
     return total;
+  }
+
+  int ordChargeTotal(String? chargeFlag,OrderModel mData) {
+    int total = 0;
+    if(chargeFlag == "S") {
+      total = int.parse(mData.sellCharge ?? "0") +
+          int.parse(mData.sellWayPointCharge ?? "0") +
+          int.parse(mData.sellStayCharge ?? "0") +
+          int.parse(mData.sellHandWorkCharge ?? "0") +
+          int.parse(mData.sellRoundCharge ?? "0") +
+          int.parse(mData.sellOtherAddCharge ?? "0");
+    }else {
+      total = int.parse(mData.buyCharge ?? "0") +
+          int.parse(mData.wayPointCharge ?? "0") +
+          int.parse(mData.stayCharge ?? "0") +
+          int.parse(mData.handWorkCharge ?? "0") +
+          int.parse(mData.roundCharge ?? "0") +
+          int.parse(mData.otherAddCharge ?? "0") -
+          int.parse(mData.sellFee ?? "0");
+    }
+    return total;
+  }
+
+  Future<void> showRegOrder(TemplateModel templateItem) async {
+    openCommonConfirmBox(
+        context,
+        "오더를 등록하시겠습니까?",
+        Strings.of(context)?.get("no") ?? "Error!!",
+        Strings.of(context)?.get("yes") ?? "Error!!",
+            () {Navigator.of(context).pop(false);},
+            () async {
+          Navigator.of(context).pop(false);
+          //await regTemplateOrder();
+        }
+    );
+  }
+
+  String validation(TemplateModel templateItem){
+    var valiType = "";
+    if(templateItem.sellCustId?.isEmpty == true || templateItem.sellCustId.isNull) {
+      valiType = "거래처명";
+    }else if(templateItem.sellDeptId?.isEmpty == true || templateItem.sellDeptId.isNull) {
+      valiType = "담당부서";
+    }else if(templateItem.sDate?.isEmpty == true || templateItem.sDate.isNull) {
+      valiType = "상차일";
+    }else if(templateItem.sAddr?.isEmpty == true || templateItem.sAddr.isNull){
+      valiType = "상차지 주소";
+    }else if(templateItem.eDate?.isEmpty == true || templateItem.eDate.isNull) {
+      valiType = "하차일";
+    }else if(templateItem.eAddr?.isEmpty == true || templateItem.eAddr.isNull){
+      valiType = "하차지 주소";
+    }else if(templateItem.carTypeCode?.isEmpty == true || templateItem.carTypeCode.isNull) {
+      valiType = "차종";
+    }else if(templateItem.carTonCode?.isEmpty == true || templateItem.carTonCode.isNull) {
+      valiType = "톤수";
+    }else if(templateItem.goodsName?.isEmpty == true || templateItem.goodsName.isNull) {
+      valiType = "화물정보";
+    }else if(templateItem.buyCharge?.isEmpty == true || templateItem.buyCharge.isNull) {
+      valiType = "청구운임";
+    }
+    return valiType;
+  }
+
+  Future<void> regTemplateOrder(TemplateModel templateItem) async {
+    String valiChk = validation(templateItem);
+    if(valiChk == "") {
+      Logger logger = Logger();
+      await pr?.show();
+      UserModel? user = await controller.getUserInfo();
+      await DioService.dioClient(header: true).orderReg(
+          user.authorization,
+          templateItem.sellCustName,
+          templateItem.sellCustId,
+          templateItem.sellDeptId,
+          templateItem.sellStaff, templateItem.sellStaffTel, templateItem.reqAddr,
+          templateItem.reqAddrDetail,user.custId,user.deptId,templateItem.inOutSctn,templateItem.truckTypeCode,
+          templateItem.sComName,templateItem.sSido,templateItem.sGungu,templateItem.sDong,templateItem.sAddr,templateItem.sAddrDetail,
+          templateItem.sDate,templateItem.sStaff,templateItem.sTel,templateItem.sMemo,templateItem.eComName,templateItem.eSido,
+          templateItem.eGungu,templateItem.eDong,templateItem.eAddr,templateItem.eAddrDetail,templateItem.eDate,templateItem.eStaff,
+          templateItem.eTel,templateItem.eMemo,templateItem.sLat,templateItem.sLon,templateItem.eLat,templateItem.eLon,
+          templateItem.goodsName,double.parse(templateItem.goodsWeight??"0.0"),templateItem.weightUnitCode,templateItem.goodsQty,templateItem.qtyUnitCode,
+          templateItem.sWayCode,templateItem.eWayCode,templateItem.mixYn,templateItem.mixSize,templateItem.returnYn,
+          templateItem.carTonCode,templateItem.carTypeCode,templateItem.chargeType,templateItem.unitPriceType,int.parse(templateItem.unitPrice??"0"),templateItem.distance,templateItem.time,
+          templateItem.reqMemo, templateItem.driverMemo,templateItem.itemCode,int.parse(templateItem.sellCharge??"0"),int.parse(templateItem.sellFee??"0"),
+          templateItem.orderStopList != null && templateItem.orderStopList?.isNotEmpty == true ? jsonEncode(templateItem.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
+          templateItem.sellWayPointMemo,templateItem.sellWayPointCharge,templateItem.sellStayMemo,templateItem.sellStayCharge,
+          templateItem.handWorkMemo,templateItem.sellHandWorkCharge,templateItem.sellRoundMemo,templateItem.sellRoundCharge,
+          templateItem.sellOtherAddMemo,templateItem.sellOtherAddCharge,templateItem.sellWeight,"N",
+          templateItem.call24Cargo,
+          templateItem.manCargo,
+          templateItem.oneCargo,
+          templateItem.call24Charge,
+          templateItem.manCharge,
+          templateItem.oneCharge
+
+      ).then((it) async {
+        await pr?.hide();
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("renewRegOrder() _response -> ${_response.status} // ${_response.resultMap}");
+        if(_response.status == "200") {
+          if(_response.resultMap?["result"] == true) {
+
+            var user = await controller.getUserInfo();
+
+            await FirebaseAnalytics.instance.logEvent(
+              name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
+              parameters: {
+                "user_id(RN)": user.userId??"",
+                "user_custId(RN)": user.custId??"",
+                "user_deptId(RN)": user.deptId??"",
+                "reqCustId(RN)": templateItem.sellCustId??"",
+                "sellDeptId(RN)": templateItem.sellDeptId??""
+              },
+            );
+
+            if (templateItem.call24Cargo == "Y" ||
+                templateItem.manCargo == "Y" || templateItem.oneCargo == "Y") {
+              await FirebaseAnalytics.instance.logEvent(
+                name: Platform.isAndroid ? "regist_order_rpa_aos" : "regist_order_rpa_ios",
+                parameters: {
+                  "user_id(RN)": user.userId??"",
+                  "user_custId(RN)": user.custId??"",
+                  "user_deptId(RN)": user.deptId??"",
+                  "reqCustId(RN)": templateItem.sellCustId??"",
+                  "sellDeptId(RN)": templateItem.sellDeptId??"",
+                  "call24Cargo_Status(RN)": templateItem.call24Cargo??"",
+                  "manCargo_Status(RN)": templateItem.manCargo??"",
+                  "oneCargo_Status(RN)": templateItem.oneCargo??"",
+                  "rpaSalary(RN)": templateItem.call24Charge??"",
+                },
+              );
+            }
+
+            Navigator.of(context).pop({'code': 200, 'allocId': _response.resultMap?["msg"]});
+          }else{
+            openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+          }
+        }
+      }).catchError((Object obj) async {
+        await pr?.hide();
+        switch (obj.runtimeType) {
+          case DioError:
+          // Here's the sample to get the failed response error code and message
+            final res = (obj as DioError).response;
+            print("renewRegOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
+            break;
+          default:
+            print("renewRegOrder() getOrder Default => ");
+            break;
+        }
+      });
+    }else{
+      Util.toast("\"${valiChk}\" 항목을 입력해주세요.");
+    }
+  }
+
+  int parseIntDate(String date) {
+    return int.parse(Util.mergeDate(date));
+  }
+
+  int parseIntDate2(String date) {
+    return int.parse(Util.mergeAllDate(date));
+  }
+
+  int parseIntTime(String time){
+    return int.parse(Util.mergeTime(time));
   }
 
   /**
@@ -3144,8 +3439,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               size: 30,
               color: Colors.black,
             ),
-            onPressed: () {
-
+            onPressed: () async {
+              await Navigator.of(context).push(PageAnimationTransition(page: NotificationPage(), pageAnimationType: LeftToRightTransition()));
             },
             tooltip: MaterialLocalizations.of(mContext).openAppDrawerTooltip,
           ),
@@ -3215,25 +3510,25 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         mainAxisAlignment: MainAxisAlignment.end,
                                       children:[
                                         Container(
-                                          margin: App().isTablet(context) ?  EdgeInsets.only(right: CustomStyle.getWidth(5.w)) : EdgeInsets.only(right: CustomStyle.getWidth(25.w)),
-                                          width: App().isTablet(context) ? CustomStyle.getWidth(10.w) : CustomStyle.getWidth(15.w),
-                                          height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(30.h),
+                                          margin: App().isTablet(context) ?  EdgeInsets.only(right: CustomStyle.getWidth(5.w)) : EdgeInsets.only(right: CustomStyle.getWidth(0.w)),
+                                          width: App().isTablet(context) ? CustomStyle.getWidth(10.w) : CustomStyle.getWidth(50),
+                                          height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(50),
                                           child: IconButton(
                                               onPressed: (){
                                                 Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ReNewAppBarSettingPage()));
                                               },
-                                              icon: Icon(Icons.settings,size: App().isTablet(context) ? 30.h : 25 ,color: Colors.white)
+                                              icon: Icon(Icons.settings,size: App().isTablet(context) ? 38.h : 28.h ,color: Colors.white)
                                           )
                                         ),
                                         Container(
-                                          width: App().isTablet(context) ? CustomStyle.getWidth(10.w) : CustomStyle.getWidth(15.w),
-                                          height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(30.h),
-                                          margin: App().isTablet(context) ?  EdgeInsets.only(right: CustomStyle.getWidth(5.w)) : EdgeInsets.only(right: CustomStyle.getWidth(25.w)),
+                                          width: App().isTablet(context) ? CustomStyle.getWidth(10.w) : CustomStyle.getWidth(50),
+                                          height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(50),
+                                          margin: App().isTablet(context) ?  EdgeInsets.only(right: CustomStyle.getWidth(5.w)) : EdgeInsets.only(right: CustomStyle.getWidth(0.w)),
                                           child: IconButton(
                                               onPressed: (){
                                                 _scaffoldKey.currentState!.closeEndDrawer();
                                               },
-                                              icon: Icon(Icons.close,size: App().isTablet(context) ? 35.h : 25 ,color: Colors.white)
+                                              icon: Icon(Icons.close,size: App().isTablet(context) ? 38.h : 28.h ,color: Colors.white)
                                           )
                                         ),
                                       ]
@@ -3241,22 +3536,19 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     Expanded(
                                     child: Container(
                                       margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
+                                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                                       child: Row(
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children:[
-                                          SizedBox(
-                                            width: App().isTablet(context) ? CustomStyle.getWidth(19.w) : CustomStyle.getWidth(50.w),
-                                            height: App().isTablet(context) ? CustomStyle.getHeight(45.h) : CustomStyle.getHeight(45.h),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(100.0),
-                                              child: Container(
-                                                color: Colors.white,
-                                                  child: Image.asset(
-                                                    "assets/image/ic_logo.png",
-                                                    color: Colors.black,
-                                                    fit: BoxFit.contain,
-                                                  )
+                                           Center(
+                                            child: CircleAvatar(
+                                              radius: 35,
+                                              backgroundColor: Colors.white,
+                                              child: Image.asset(
+                                                "assets/image/ic_logo.png",
+                                                color: Colors.black,
+                                                fit: BoxFit.contain,
                                               )
                                             )
                                           ),
@@ -3287,7 +3579,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     ),
                                     Container(
                                       alignment: Alignment.bottomCenter,
-                                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(8)),
+                                      //padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(8)),
                                       decoration: BoxDecoration(
                                         border: Border(
                                           top: BorderSide(
@@ -3301,15 +3593,18 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           Expanded(
                                             flex:1,
                                               child: InkWell(
-                                                onTap: (){
-
+                                                onTap: () async {
+                                                  await Navigator.of(context).push(PageAnimationTransition(page: NotificationPage(), pageAnimationType: RightToLeftFadedTransition()));
                                                 },
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                                                 child: Row(
                                                 mainAxisAlignment: MainAxisAlignment.center,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  Icon(Icons.notifications,
-                                                      size: App().isTablet(context) ? 28.h : 21.h,
+                                                  Icon(
+                                                      Icons.notifications,
+                                                      size: App().isTablet(context) ? 38.h : 28.h,
                                                       color: Colors.white
                                                   ),
                                                   Text(
@@ -3319,6 +3614,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   )
                                                 ]
                                               )
+                                              )
                                             )
                                           ),
                                           Expanded(
@@ -3327,21 +3623,24 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                 onTap: (){
                                                   Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewAppBarMyPage()));
                                                 },
-                                                  child: Row(
-                                                  mainAxisAlignment: MainAxisAlignment.center,
-                                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                                children :[
-                                                  Icon(Icons.manage_accounts,
-                                                      size: App().isTablet(context) ? 28.h : 21.h,
-                                                      color: Colors.white
-                                                  ),
-                                                  Text(
-                                                      "마이페이지",
-                                                      textAlign: TextAlign.center,
-                                                      style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol,font_weight: FontWeight.w700)
-                                                  )
-                                                ]
-                                              )
+                                                  child: Container(
+                                                  padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                                    child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                                    children :[
+                                                      Icon(Icons.manage_accounts,
+                                                          size: App().isTablet(context) ? 38.h : 28.h,
+                                                          color: Colors.white
+                                                      ),
+                                                      Text(
+                                                          "마이페이지",
+                                                          textAlign: TextAlign.center,
+                                                          style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol,font_weight: FontWeight.w700)
+                                                        )
+                                                      ]
+                                                    )
+                                                )
                                             )
                                           )
                                         ],
@@ -3425,7 +3724,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         ),
                     ),
                     onTap: (){
-                     // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarMonitorPage()));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarMonitorPage()));
                     },
                   ),
                   ListTile(
@@ -3455,7 +3754,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       ),
                     ),
                     onTap: (){
-                     // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarNoticePage()));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarNoticePage()));
                     },
                   ),
                   ListTile(
@@ -3848,8 +4147,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                       margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                       child: Image.asset(
                                         "assets/image/ic_filter.png",
-                                        width: CustomStyle.getWidth(17.0),
-                                        height: CustomStyle.getHeight(17.0),
+                                        width: CustomStyle.getWidth(21.0),
+                                        height: CustomStyle.getHeight(21.0),
                                         color: Colors.white,
                                       )
                                     ),
@@ -4152,7 +4451,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       child: Container(
         child: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
-            print("뭔디아뭔디아 => ${constraints.constrainWidth().toInt()}");
             final dashCount = App().isTablet(context) ? (constraints.constrainWidth().toInt() / 15.0).floor() : (constraints.constrainWidth().toInt() / 5.0).floor();
             return Flex(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -4264,53 +4562,63 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           ],
                         ),
                             Row(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Flexible(
                                     flex: 3,
-                                    child: Row(children: [
-                                      item.orderState != "09" && item.driverState == null ?
-                                      Container(
-                                          decoration: CustomStyle.baseBoxDecoWhite(),
-                                          padding: EdgeInsets.symmetric(
-                                            vertical:
-                                            CustomStyle.getHeight(5.0.h),),
-                                          child: Text(
-                                            "${item.allocStateName}",
-                                            style: CustomStyle.CustomFont(styleFontSize16, order_state_01,font_weight: FontWeight.w700),
+                                    child: Row(
+                                      children: [
+                                        item.orderState != "09" && item.driverState == null ?
+                                        Container(
+                                            decoration: CustomStyle.baseBoxDecoWhite(),
+                                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                            child: Text(
+                                              "${item.allocStateName}  ",
+                                              overflow: TextOverflow.ellipsis,
+                                              style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
+                                            )
+                                        ) : const SizedBox(),
+                                        item.linkName?.isEmpty == false && item.linkName != "" ?
+                                        (item.call24Cargo == null || item.call24Cargo?.isEmpty == true)
+                                            && (item.manCargo == null || item.manCargo?.isEmpty == true)
+                                            && (item.oneCargo == null || item.oneCargo?.isEmpty == true) ?
+                                        Container(
+                                            padding: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                            child: Text(
+                                              "지불운임",
+                                              style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
+                                            )
+                                        ) : Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                            padding: EdgeInsets.only(
+                                                right: CustomStyle.getWidth(5.w)),
+                                            child: Text(
+                                              "${item.linkName??""}",
+                                              overflow: TextOverflow.ellipsis,
+                                              style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                                            )
                                           )
-                                      ) : const SizedBox(),
-                                      item.linkName?.isEmpty == false && item.linkName != "" ?
-                                      (item.call24Cargo == null || item.call24Cargo?.isEmpty == true)
-                                          && (item.manCargo == null || item.manCargo?.isEmpty == true)
-                                          && (item.oneCargo == null || item.oneCargo?.isEmpty == true) ?
-                                      Container(
-                                          padding: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                        ) : const SizedBox(),
+                                        item.buyCustName?.isEmpty == false && item.buyCustName != "" ?
+                                        Expanded(
+                                          flex: 1,
                                           child: Text(
-                                            "지불운임",
-                                            style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
+                                            "${item.buyCustName??""}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: CustomStyle.CustomFont(styleFontSize12, order_state_01,font_weight: FontWeight.w700),
                                           )
-                                      ) :
-                                      Container(
-                                          padding: EdgeInsets.only(
-                                              right: CustomStyle.getWidth(5.0.w)),
+                                        ) : const SizedBox(),
+                                        item.buyDeptName?.isEmpty == false && item.buyDeptName != "" ?
+                                        Expanded(
+                                          flex: 1,
                                           child: Text(
-                                            item.linkName??"",
-                                            style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
+                                            " | ${item.buyDeptName??""}",
+                                            overflow: TextOverflow.ellipsis,
+                                            style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w600),
                                           )
-                                      ) : const SizedBox(),
-                                      item.buyCustName?.isEmpty == false && item.buyCustName != "" ?
-                                      Text(
-                                        item.buyCustName??"",
-                                        style: CustomStyle.CustomFont(styleFontSize16, order_state_01,font_weight: FontWeight.w700),
-                                      ) : const SizedBox(),
-                                      item.buyDeptName?.isEmpty == false && item.buyDeptName != "" ?
-                                      Text(
-                                        "  ${item.buyDeptName??""}",
-                                        style: CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w400),
-                                      ) : const SizedBox()
-                                    ]
+                                        ) : const SizedBox()
+                                      ]
                                     )
                                 ),
                                 Flexible(
@@ -4322,7 +4630,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         : Container(
                                       alignment: Alignment.centerRight,
                                       child: Text(
-                                        "${Util.getInCodeCommaWon(item.buyCharge.toString())}원",
+                                        "${Util.getInCodeCommaWon(ordChargeTotal("T", item).toString())}원",
                                         style: CustomStyle.CustomFont(styleFontSize16, text_color_01, font_weight: FontWeight.w700),
                                       ),
                                     )
@@ -5455,7 +5763,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
     return InkWell(
         onTap: (){
-          print("응애응에 => ${selectItem.value.templateId}");
           if(selectItem.value.templateId == item.templateId) {
             selectItem.value = TemplateModel();
           }else{
@@ -5498,11 +5805,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                                "${item.custName}",
+                                "${item.sellCustName}",
                                 style:CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w500)
                             ),
                             Text(
-                                "${item.deptId}",
+                                "${item.sellDeptName}",
                                 style:CustomStyle.CustomFont(styleFontSize13, Colors.black,font_weight: FontWeight.w300)
                             )
                           ],
@@ -5543,21 +5850,16 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         children: [
                                           Row(
                                               crossAxisAlignment: CrossAxisAlignment.center,
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.start,
                                               children: [
                                                 Container(
                                                     padding:const EdgeInsets.all(3),
-                                                    margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                                    margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(5)),
                                                     decoration: const BoxDecoration(
                                                         color: renew_main_color2,
                                                         shape: BoxShape.circle
                                                     ),
                                                     child: Text("상",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
-                                                ),
-                                                Text(
-                                                  "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-                                                  style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
-                                                  textAlign: TextAlign.center,
                                                 ),
                                               ]
                                           ),
@@ -5624,21 +5926,16 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                           children: [
                                             Row(
                                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.start,
                                                 children: [
                                                   Container(
                                                       padding:const EdgeInsets.all(3),
-                                                      margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                                                      margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(5)),
                                                       decoration: const BoxDecoration(
                                                           color: rpa_btn_cancle,
                                                           shape: BoxShape.circle
                                                       ),
                                                       child: Text("하",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
-                                                  ),
-                                                  Text(
-                                                    "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}",
-                                                    style: CustomStyle.CustomFont(styleFontSize14, Colors.black, font_weight: FontWeight.w400),
-                                                    textAlign: TextAlign.center,
                                                   ),
                                                 ]
                                             ),
@@ -5686,7 +5983,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                                   ),
                                   Text(
-                                    "${Util.getInCodeCommaWon(chargeTotal("S",item).toString())} 원",
+                                    "${Util.getInCodeCommaWon(tempChargeTotal("S",item).toString())} 원",
                                     style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w700),
                                   )
                                 ],
@@ -5700,7 +5997,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                                   ),
                                   Text(
-                                    "${Util.getInCodeCommaWon(chargeTotal("T",item).toString())} 원",
+                                    "${Util.getInCodeCommaWon(tempChargeTotal("T",item).toString())} 원",
                                     style: CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w700),
                                   )
                                 ],
@@ -5791,7 +6088,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         ))
     );
   }
-
 
   /**
    * Widget End

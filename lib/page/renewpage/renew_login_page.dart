@@ -58,7 +58,7 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          height: App().isTablet(context) ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(20.h),
+            height: App().isTablet(context) ? CustomStyle.getHeight(50.h) : CustomStyle.getHeight(50.h),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -404,7 +404,7 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
     return mainWidget(
         context,
         child: Scaffold(
-          backgroundColor: Theme.of(context).backgroundColor,
+          backgroundColor: Colors.white,
           body: SafeArea(
             child: Container(
                 width:width,
@@ -426,7 +426,7 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
                                       Image.asset("assets/image/ic_logo.png"),
                                       CustomStyle.sizedBoxHeight(100.0),
                                       Container(
-                                          height: App().isTablet(context) ? CustomStyle.getHeight(30.h) : CustomStyle.getHeight(20.h),
+                                          height: App().isTablet(context) ? CustomStyle.getHeight(50.h) : CustomStyle.getHeight(50.h),
                                           alignment: Alignment.center,
                                           margin: EdgeInsets.only(bottom: CustomStyle.getHeight(20)),
                                           decoration: BoxDecoration(
@@ -458,7 +458,7 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
                                         },
                                         child: Container(
                                           width: width,
-                                          height:  App().isTablet(context) ? CustomStyle.getHeight(35.h): CustomStyle.getHeight(25.h),
+                                          height:  App().isTablet(context) ? CustomStyle.getHeight(35.h): CustomStyle.getHeight(45.h),
                                           decoration: BoxDecoration(
                                             color: renew_main_color2_sub,
                                             borderRadius: BorderRadius.circular(50)

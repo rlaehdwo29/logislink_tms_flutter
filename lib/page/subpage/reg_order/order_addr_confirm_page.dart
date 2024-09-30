@@ -349,7 +349,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
           appBar: AppBar(
                 title: Text(
                       Strings.of(context)?.get("order_addr_confirm_title")??"Not Found",
-                      style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
+                      style: CustomStyle.appBarTitleFont(styleFontSize16, Colors.black)
                   ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -359,7 +359,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h,color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
                 ),
               ),
           body: SafeArea(

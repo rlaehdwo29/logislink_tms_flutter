@@ -30,7 +30,6 @@ class App extends GetxController{
 
   Future<bool> getRenewValue() async {
     bool state = await SP.getBoolean(Const.RENEW_APP);
-    print("리뉴얼 설정 => ${state}");
     if(state == null) {
       await setRenewValue(true);
       renew_value.value = true;

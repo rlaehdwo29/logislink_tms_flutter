@@ -206,12 +206,13 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                                 padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h),bottom: CustomStyle.getHeight(10.h)),
                                 margin: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: selectStopType01.value ? text_box_color_01 : text_box_color_02, width: 1.0.w),
+                                    border: Border.all(color: selectStopType01.value ? renew_main_color2 : text_box_color_02, width: 1.0.w),
                                   borderRadius: BorderRadius.all(Radius.circular(5.w))
                                 ),
                               child: Text(
-                                "상차지",
-                                style: CustomStyle.CustomFont(styleFontSize14, selectStopType01.value ? text_box_color_01 : text_box_color_02),
+                                //"상차지",
+                                "\'상차\'할거에요",
+                                style: CustomStyle.CustomFont(styleFontSize14, selectStopType01.value ? renew_main_color2 : text_box_color_02),
                                 ),
                               )
                             )
@@ -227,12 +228,13 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                                padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h),bottom: CustomStyle.getHeight(10.h)),
                                margin: EdgeInsets.only(left: CustomStyle.getWidth(3.w)),
                                decoration: BoxDecoration(
-                                   border: Border.all(color: selectStopType02.value ? text_box_color_01 : text_box_color_02, width: 1.0.w),
+                                   border: Border.all(color: selectStopType02.value ? rpa_btn_cancle : text_box_color_02, width: 1.0.w),
                                    borderRadius: BorderRadius.all(Radius.circular(5.w))
                                ),
                                child: Text(
-                                 "하차지",
-                                 style: CustomStyle.CustomFont(styleFontSize14, selectStopType02.value ? text_box_color_01 : text_box_color_02),
+                                 //"하차지",
+                                 "\'하차\'할거에요",
+                                 style: CustomStyle.CustomFont(styleFontSize14, selectStopType02.value ? rpa_btn_cancle : text_box_color_02),
                                ),
                              )
                            )
@@ -746,7 +748,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                   return Text(
                     mTitle.value,
                     style: CustomStyle.appBarTitleFont(
-                        styleFontSize16, styleWhiteCol)
+                        styleFontSize16, Colors.black)
                   );
                 }),
                 toolbarHeight: 50.h,
@@ -757,7 +759,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon:  Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                  icon:  Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -791,7 +793,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                           child: Container(
                               height: CustomStyle.getHeight(60.0.h),
                               alignment: Alignment.center,
-                              decoration: BoxDecoration(color: main_color),
+                              decoration: BoxDecoration(color: renew_main_color2),
                               child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,

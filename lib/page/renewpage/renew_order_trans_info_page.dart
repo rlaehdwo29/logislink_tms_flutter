@@ -42,7 +42,7 @@ class RenewOrderTransInfoPage extends StatefulWidget {
 
 class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with TickerProviderStateMixin {
 
-  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter( locale: 'ko', decimalDigits: 0, symbol: '￦',);
+  final CurrencyTextInputFormatter _formatter = CurrencyTextInputFormatter.currency(locale: 'ko', decimalDigits: 0, symbol: '￦');
   ProgressDialog? pr;
 
   final code = "".obs;
@@ -131,15 +131,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     etCarNumController = TextEditingController();
 
     //추가 운임 EditText
-    etWayPointController = TextEditingController();
+    etWayPointController = TextEditingController(text: mData.value.wayPointCharge??"");
     etWayPointMemoController = TextEditingController();
-    etStayChargeController = TextEditingController();
+    etStayChargeController = TextEditingController(text: mData.value.stayCharge??"");
     etStayChargeMemoController = TextEditingController();
-    etHandWorkChargeController = TextEditingController();
+    etHandWorkChargeController = TextEditingController(text: mData.value.handWorkCharge??"");
     ethandWorkMemoController = TextEditingController();
-    etRoundChargeController = TextEditingController();
+    etRoundChargeController = TextEditingController(text:  mData.value.roundCharge??"",);
     etRoundMemoController = TextEditingController();
-    etOtherAddChargeController = TextEditingController();
+    etOtherAddChargeController = TextEditingController(text: mData.value.otherAddCharge??"");
     etOtherAddMemoController = TextEditingController();
 
     etDriverMemoController = TextEditingController();
@@ -764,6 +764,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         child: TabBar(
           tabs: [
             Container(
+              width: double.infinity,
               margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
               child: Text(
                 Strings.of(context)?.get("order_trans_info_type_01")??"운송사_",
@@ -771,6 +772,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
               ),
             ),
             Container(
+              width: double.infinity,
               margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
               child: Text(
                 Strings.of(context)?.get("order_trans_info_type_02")??"차량_",
@@ -869,9 +871,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                   child: Container(
                                       margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                       height: CustomStyle.getHeight(35.h),
-                                      child: TextField(
+                                      child: TextFormField(
                                         inputFormatters: <TextInputFormatter>[
-                                          CurrencyTextInputFormatter(
+                                          CurrencyTextInputFormatter.currency(
                                             locale: 'ko',
                                             decimalDigits: 0,
                                             symbol: '￦',
@@ -925,7 +927,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         onChanged: (value) async {
                                           if(value.length > 0) {
                                             mData.value.wayPointCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
-                                            etWayPointController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                           }else{
                                             mData.value.wayPointCharge = "0";
                                             etWayPointController.text = "0";
@@ -1050,9 +1051,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         child: Container(
                                             margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                             height: CustomStyle.getHeight(35.h),
-                                            child: TextField(
+                                            child: TextFormField(
                                               inputFormatters: <TextInputFormatter>[
-                                                CurrencyTextInputFormatter(
+                                                CurrencyTextInputFormatter.currency(
                                                   locale: 'ko',
                                                   decimalDigits: 0,
                                                   symbol: '￦',
@@ -1106,7 +1107,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                               onChanged: (value) async {
                                                 if(value.length > 0) {
                                                   mData.value.stayCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
-                                                  etStayChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                                 }else{
                                                   mData.value.stayCharge = "0";
                                                   etStayChargeController.text = "0";
@@ -1231,9 +1231,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       child: Container(
                                           margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                           height: CustomStyle.getHeight(35.h),
-                                          child: TextField(
+                                          child: TextFormField(
                                             inputFormatters: <TextInputFormatter>[
-                                              CurrencyTextInputFormatter(
+                                              CurrencyTextInputFormatter.currency(
                                                 locale: 'ko',
                                                 decimalDigits: 0,
                                                 symbol: '￦',
@@ -1287,7 +1287,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                             onChanged: (value) async {
                                               if(value.length > 0) {
                                                 mData.value.handWorkCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
-                                                etHandWorkChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                               }else{
                                                 mData.value.handWorkCharge = "0";
                                                 etHandWorkChargeController.text = "0";
@@ -1412,9 +1411,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                       child: Container(
                                           margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                           height: CustomStyle.getHeight(35.h),
-                                          child: TextField(
+                                          child: TextFormField(
                                             inputFormatters: <TextInputFormatter>[
-                                              CurrencyTextInputFormatter(
+                                              CurrencyTextInputFormatter.currency(
                                                 locale: 'ko',
                                                 decimalDigits: 0,
                                                 symbol: '￦',
@@ -1468,7 +1467,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                             onChanged: (value) async {
                                               if(value.length > 0) {
                                                 mData.value.roundCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
-                                                etRoundChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                               }else{
                                                 mData.value.roundCharge = "0";
                                                 etRoundChargeController.text = "0";
@@ -1593,9 +1591,9 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                         child: Container(
                                             margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                             height: CustomStyle.getHeight(35.h),
-                                            child: TextField(
+                                            child: TextFormField(
                                               inputFormatters: <TextInputFormatter>[
-                                                CurrencyTextInputFormatter(
+                                                CurrencyTextInputFormatter.currency(
                                                   locale: 'ko',
                                                   decimalDigits: 0,
                                                   symbol: '￦',
@@ -1649,7 +1647,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                                               onChanged: (value) async {
                                                 if(value.length > 0) {
                                                   mData.value.otherAddCharge = int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString();
-                                                  etOtherAddChargeController.text = _formatter.format(int.parse(value.trim().replaceAll("￦", '').replaceAll(",", '')).toString());
                                                 }else{
                                                   mData.value.otherAddCharge = "0";
                                                   etOtherAddChargeController.text = "0";
@@ -2198,19 +2195,14 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   Future<void> initView() async {
 
     //추가 운임 EditText
-    etWayPointController.text = _formatter.format(mData.value.wayPointCharge??"");
     etWayPointMemoController.text = mData.value.wayPointMemo??"";
     if(mData.value.wayPointMemo != "" && mData.value.wayPointMemo != null) wayPointChecked.value = true;
-    etStayChargeController.text = _formatter.format(mData.value.stayCharge??"");
     etStayChargeMemoController.text = mData.value.stayMemo??"";
     if(mData.value.stayMemo != "" && mData.value.stayMemo != null) stayChargeChecked.value = true;
-    etHandWorkChargeController.text = _formatter.format(mData.value.handWorkCharge??"");
     ethandWorkMemoController.text = mData.value.handWorkMemo??"";
     if(mData.value.handWorkMemo != "" && mData.value.handWorkMemo != null) handWorkChecked.value = true;
-    etRoundChargeController.text = _formatter.format(mData.value.roundCharge??"");
     etRoundMemoController.text = mData.value.roundMemo??"";
     if(mData.value.roundCharge != "" && mData.value.roundCharge != null) roundChargeChecked.value = true;
-    etOtherAddChargeController.text = _formatter.format(mData.value.otherAddCharge??"");
     etOtherAddMemoController.text = mData.value.otherAddMemo??"";
     if(mData.value.otherAddMemo != "" && mData.value.otherAddMemo != null) otherAddChargeChecked.value = true;
 
@@ -2309,7 +2301,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     int otherAddCharge = mData.value.otherAddCharge?.isEmpty == true || mData.value.otherAddCharge == null ? 0 : int.parse(mData.value.otherAddCharge!);
 
     int total = buyCharge + wayPointCharge + stayCharge + handWorkCharge + roundCharge + otherAddCharge;
-    print("뭐지 => $buyCharge // $wayPointCharge // $stayCharge // $handWorkCharge// $handWorkCharge // $roundCharge // $otherAddCharge // ${total}");
     tvTotal.value = total;
   }
 
@@ -2682,12 +2673,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
               await FirebaseAnalytics.instance.logEvent(
                 name: Platform.isAndroid ? "trans_order_aos" : "trans_order_ios",
                 parameters: {
-                  "user_id": user.userId,
-                  "user_custId" : user.custId,
-                  "user_deptId": user.deptId,
-                  "orderId" : mData.value.orderId,
-                  "buyCustId" : mData.value.buyCustId,
-                  "buyDeptId" : mData.value.buyDeptId
+                  "user_id": user.userId??"",
+                  "user_custId" : user.custId??"",
+                  "user_deptId": user.deptId??"",
+                  "orderId" : mData.value.orderId??"",
+                  "buyCustId" : mData.value.buyCustId??"",
+                  "buyDeptId" : mData.value.buyDeptId??""
                 },
               );
               Navigator.of(context).pop({'code': 200});
@@ -2933,8 +2924,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                 ),
               ),
           body: SafeArea(
-              child: Obx(() {
-                return SizedBox(
+              child: //Obx(() {
+                 SizedBox(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -2944,8 +2935,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                           //mainBodyWidget(),
                         ],
                    )
-                );
-              })
+                )
+             // })
           ),
             bottomNavigationBar: Obx((){
               return SizedBox(

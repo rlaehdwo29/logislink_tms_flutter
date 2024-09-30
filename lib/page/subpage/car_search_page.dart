@@ -788,7 +788,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
             appBar: AppBar(
                   title: Text(
                       Strings.of(context)?.get("car_search_title")??"Not Found",
-                      style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                      style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
                   ),
                   toolbarHeight: 50.h,
                   centerTitle: true,
@@ -798,7 +798,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       Navigator.of(context).pop({'code':100});
                     },
                     color: styleWhiteCol,
-                    icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
+                    icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
                   ),
                 ),
             body: SafeArea(

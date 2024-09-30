@@ -634,7 +634,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                 title: Text(
                       "화물정보",
                       style: CustomStyle.appBarTitleFont(
-                          styleFontSize16, styleWhiteCol)
+                          styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -644,7 +644,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -1315,7 +1315,8 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                             )
                         ) : const SizedBox(),
                         //혼적크기
-                        llMixSize.value ? Container(
+                        llMixSize.value ?
+                        Container(
                             padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
