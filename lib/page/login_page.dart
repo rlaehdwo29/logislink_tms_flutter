@@ -37,7 +37,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with CommonMainWidget {
 
   bool m_TermsCheck = false;
-  late TERMS m_TermsMode;
+  TERMS m_TermsMode = TERMS.NONE;
   final controller = Get.find<App>();
   final userID = "".obs;
   final userPassword = "".obs;
@@ -319,81 +319,88 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
   Future<void> userLogin() async {
      Logger logger = Logger();
     SP.putBool(Const.KEY_GUEST_MODE, false);
-    if (validate()) {
-      var terms = await SP.getBoolean(Const.KEY_TERMS);
-      if (!terms) {
-        await CheckTermsAgree();
-      } else {
-        var password = Util.encryption(userPassword.value);
-        password.replaceAll("\n", "");
-        await pr?.show();
-        await DioService.dioClient(header: true).login(userID.value, password).then((it) async {
-          await pr?.hide();
-          ReturnMap _response = DioService.dioResponse(it);
-          logger.i("userLogin() _response -> ${_response.status} // ${_response.resultMap}");
-          if (_response.status == "200") {
-            if (_response.resultMap?["result"] == true) {
-                if (_response.resultMap?["data"] != null) {
-                  UserModel userInfo = UserModel.fromJSON(
-                      it.response.data["data"]);
-                  if (userInfo != null) {
-                    userInfo.authorization =
-                    it.response.headers["authorization"]?[0];
-                    await controller.setUserInfo(userInfo);
-                    if (m_TermsCheck == false && m_TermsMode == TERMS.INSERT) {
-                      var results = await Navigator.of(context).push(
-                          MaterialPageRoute(
-                              builder: (
-                                  BuildContext context) => const TermsPage())
-                      );
+      if (validate()) {
+        var terms = await SP.getBoolean(Const.KEY_TERMS);
+        if (!terms) {
+          await CheckTermsAgree();
+        } else {
+          var password = Util.encryption(userPassword.value);
+          password.replaceAll("\n", "");
+          await pr?.show();
+          await DioService.dioClient(header: true).login(userID.value, password).then((it) async {
+            await pr?.hide();
+            try {
+              ReturnMap _response = DioService.dioResponse(it);
+              logger.i(
+                  "userLogin() _response -> ${_response.status} // ${_response
+                      .resultMap}");
+              if (_response.status == "200") {
+                if (_response.resultMap?["result"] == true) {
+                  if (_response.resultMap?["data"] != null) {
+                    UserModel userInfo = UserModel.fromJSON(
+                        it.response.data["data"]);
+                    if (userInfo != null) {
+                      userInfo.authorization =
+                      it.response.headers["authorization"]?[0];
+                      await controller.setUserInfo(userInfo);
+                      if (m_TermsCheck == false &&
+                          m_TermsMode == TERMS.INSERT) {
+                        var results = await Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (
+                                    BuildContext context) => const TermsPage())
+                        );
 
-                      if (results != null && results.containsKey("code")) {
-                        if (results["code"] == 200) {
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (
-                                      BuildContext context) => const LoginPage()),
-                                  (route) => false);
+                        if (results != null && results.containsKey("code")) {
+                          if (results["code"] == 200) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (
+                                        BuildContext context) => const LoginPage()),
+                                    (route) => false);
+                          }
                         }
+                      } else {
+                        await sendDeviceInfo();
+                        await sendAlarmTalk();
                       }
                     } else {
-                      await sendDeviceInfo();
-                      await sendAlarmTalk();
+                      openOkBox(context, _response.message ?? "",
+                          Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                            Navigator.of(context).pop(false);
+                          });
                     }
-                  } else {
-                    openOkBox(context, _response.message ?? "",
-                        Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                          Navigator.of(context).pop(false);
-                        });
                   }
+                } else {
+                  openOkBox(context, _response.resultMap?["msg"],
+                      Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                        Navigator.of(context).pop(false);
+                      });
                 }
-            }else{
-              openOkBox(context, _response.resultMap?["msg"],
-                  Strings.of(context)?.get("confirm") ?? "Error!!", () {
-                    Navigator.of(context).pop(false);
-                  });
+              } else {
+                Util.snackbar(context, "등록된 사용자가 아닙니다.");
+              }
+            }catch(e) {
+              print("eeeeeee => $e");
             }
-          } else {
-            Util.snackbar(context, "등록된 사용자가 아닙니다.");
-          }
-        }).catchError((Object obj) async {
-          await pr?.hide();
-          switch (obj.runtimeType) {
-            case DioError:
-            // Here's the sample to get the failed response error code and message
-              final res = (obj as DioError).response;
-              logger.e(
-                  "login_page.dart userLogin() error : ${res
-                      ?.statusCode} -> ${res
-                      ?.statusMessage}");
-              break;
-            default:
-              logger.e("login_page.dart userLogin() error222 :");
-              break;
-          }
-        });
+          }).catchError((Object obj) async {
+            await pr?.hide();
+            switch (obj.runtimeType) {
+              case DioError:
+              // Here's the sample to get the failed response error code and message
+                final res = (obj as DioError).response;
+                logger.e(
+                    "login_page.dart userLogin() error : ${res
+                        ?.statusCode} -> ${res
+                        ?.statusMessage}");
+                break;
+              default:
+                logger.e("login_page.dart userLogin() error222 :");
+                break;
+            }
+          });
+        }
       }
-    }
   }
 
   @override

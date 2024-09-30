@@ -225,7 +225,7 @@ class Const {
     */
 
 enum TERMS {
- INSERT, UPDATE, DONE
+ NONE, INSERT, UPDATE, DONE
 }
 
 enum MODE{
