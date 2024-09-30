@@ -101,7 +101,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final categoryOrderState = "오더전체".obs;
   final categoryVehicCode = "".obs;
   final categoryVehicState = "화망전송무관".obs;
-  final categoryStaffModel = CustUserModel(mobile: "",userName: "오더전체").obs;
+  final categoryStaffModel = CustUserModel(mobile: "",userName: "담당자전체").obs;
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
   final _isNewVersionCheck = false.obs;
@@ -174,8 +174,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       searchOrderController = TextEditingController();
       db = controller.getRepository();
       db.deleteAll();
+      await getPointResult();
       await initView();
-      //await getPointResult();
       dropDownList?.add(CodeModel(code: "carNum",codeName: "차량번호"));
       dropDownList?.add(CodeModel(code: "driverName",codeName: "차주명"));
       dropDownList?.add(CodeModel(code: "sellCustName",codeName: "거래처명"));
@@ -2656,7 +2656,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
         case 'STAFF_STATE_CD':
-          categoryStaffModel.value = custUserModel ?? CustUserModel(mobile: "",userName: "오더전체");
+          categoryStaffModel.value = custUserModel ?? CustUserModel(mobile: "",userName: "담당자전체");
           page.value = 1;
           scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
@@ -3093,12 +3093,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
             if(custUserList.isNotEmpty) custUserList.clear();
               List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
               custUserList.addAll(itemsList);
-              custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내오더"));
-              custUserList.insert(custUserList.length, CustUserModel(mobile: "",userName:  "오더전체"));
+              custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내 담당"));
+              custUserList.insert(custUserList.length, CustUserModel(mobile: "",userName:  "담당자전체"));
           }else{
             custUserList.value = List.empty(growable: true);
-            custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내오더"));
-            custUserList.insert(1, CustUserModel(mobile: "",userName:  "오더전체"));
+            custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내 담당"));
+            custUserList.insert(1, CustUserModel(mobile: "",userName:  "담당자전체"));
           }
         }else{
           openOkBox(context,"${response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
@@ -3408,6 +3408,35 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     return int.parse(Util.mergeTime(time));
   }
 
+  Future<void> getPointResult() async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    await DioService.dioClient(header: true).getTmsPointResult(user.authorization).then((it) async {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getPointResult() _response -> ${_response.status} // ${_response.resultMap}");
+      if(_response.status == "200") {
+        if(_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["point"] != null) {
+            mPoint.value = _response.resultMap?["point"];
+          }
+        }else{
+          openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
+        }
+      }
+    }).catchError((Object obj) async {
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getPointResult() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getPointResult() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
   /**
    * Function End
    */
@@ -3541,6 +3570,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children:[
+                                          /*
                                            Center(
                                             child: CircleAvatar(
                                               radius: 35,
@@ -3551,7 +3581,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                 fit: BoxFit.contain,
                                               )
                                             )
-                                          ),
+                                          ),*/
                                           Container(
                                             margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
                                             child: Column(

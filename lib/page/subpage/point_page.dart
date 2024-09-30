@@ -115,7 +115,7 @@ class _PointPageState extends State<PointPage> {
                   centerTitle: true,
                   title: Text("포인트 조회",
                       style: CustomStyle.appBarTitleFont(
-                          styleFontSize18, styleWhiteCol)
+                          styleFontSize18, Colors.black)
                   ),
                   toolbarHeight: 50.h,
                   leading: IconButton(
@@ -124,7 +124,7 @@ class _PointPageState extends State<PointPage> {
                       Navigator.of(context).pop();
                     },
                     color: styleWhiteCol,
-                    icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                    icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                   ),
                 ),
             body: SafeArea(
@@ -165,23 +165,23 @@ class _PointPageState extends State<PointPage> {
                   child: Stack(
                     children: [
                       Container(
+                        padding:const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                            color: light_gray1,
+                            color: item.ptypeCD == "SAVE" ? point_blue : item.ptypeCD == "MOVE" ? rpa_btn_modify : item.ptypeCD == "USE" ? point_red : text_color_01,
                             shape: BoxShape.circle,
-                            border: Border.all(color: light_gray22,width: CustomStyle.getWidth(4.w))
                         ),
                       ),
                       Center(
                         child: Text(
                           item.ptypeCD == "SAVE" ? "적립" : item.ptypeCD == "MOVE" ? "이관" : item.ptypeCD == "USE" ? "사용" : "Error",
-                          style: CustomStyle.CustomFont(styleFontSize14, item.ptypeCD == "SAVE" ? point_blue : item.ptypeCD == "MOVE" ? point_red : item.ptypeCD == "USE" ? point_red : text_color_01),
+                          style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
                         ),
                       )
                     ],
                   )
               ),
               Expanded(
-                  flex: 8,
+                  flex: 10,
                   child: Container(
                       padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                       child: RichText(
@@ -190,13 +190,13 @@ class _PointPageState extends State<PointPage> {
                           maxLines: 2,
                           text: TextSpan(
                             text: "${item.pointType}",
-                            style: CustomStyle.CustomFont(styleFontSize13, item.ptypeCD == "SAVE" ? Colors.black : item.ptypeCD == "MOVE" ? point_red : item.ptypeCD == "USE" ? point_red : text_color_01),
+                            style: CustomStyle.CustomFont(styleFontSize13, item.ptypeCD == "SAVE" ? Colors.black : item.ptypeCD == "MOVE" ? rpa_btn_modify : item.ptypeCD == "USE" ? point_red : text_color_01),
                           )
                       )
                   )
               ),
               Expanded(
-                  flex: 4,
+                  flex: 5,
                   child: Column(
                     children: [
                       Expanded(
@@ -210,8 +210,8 @@ class _PointPageState extends State<PointPage> {
                                   borderRadius: BorderRadius.all(Radius.circular(100.w))
                               ),
                               child: Text(
-                                "${Util.getInCodeCommaWon(item.point.toString())} P",
-                                style: CustomStyle.CustomFont(styleFontSize12, item.ptypeCD == "SAVE" ? point_blue : item.ptypeCD == "MOVE" ? point_red : item.ptypeCD == "USE" ? point_red : text_color_01,font_weight: FontWeight.w700),
+                                "${item.ptypeCD == "SAVE" ? "+" : "-"} ${Util.getInCodeCommaWon(item.point.toString())} P",
+                                style: CustomStyle.CustomFont(styleFontSize12, item.ptypeCD == "SAVE" ? point_blue : item.ptypeCD == "MOVE" ? rpa_btn_modify : item.ptypeCD == "USE" ? point_red : text_color_01,font_weight: FontWeight.w700),
                               )
                           )
                       ),
