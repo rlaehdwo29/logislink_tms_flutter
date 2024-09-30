@@ -1007,11 +1007,11 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                     ? "regist_order_aos"
                     : "regist_order_ios",
                 parameters: {
-                  "user_id": user.userId,
-                  "user_custId": user.custId,
-                  "user_deptId": user.deptId,
-                  "reqCustId": mData.value.sellCustId,
-                  "sellDeptId": mData.value.sellDeptId
+                  "user_id": user.userId??"",
+                  "user_custId": user.custId??"",
+                  "user_deptId": user.deptId??"",
+                  "reqCustId": mData.value.sellCustId??"",
+                  "sellDeptId": mData.value.sellDeptId??""
                 },
               );
 
@@ -1022,15 +1022,15 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                       ? "regist_order_rpa_aos"
                       : "regist_order_rpa_ios",
                   parameters: {
-                    "user_id": user.userId,
-                    "user_custId": user.custId,
-                    "user_deptId": user.deptId,
-                    "reqCustId": mData.value.sellCustId,
-                    "sellDeptId": mData.value.sellDeptId,
+                    "user_id": user.userId??"",
+                    "user_custId": user.custId??"",
+                    "user_deptId": user.deptId??"",
+                    "reqCustId": mData.value.sellCustId??"",
+                    "sellDeptId": mData.value.sellDeptId??"",
                     "call24Cargo_Status": mData.value.call24Cargo??"",
                     "manCargo_Status": mData.value.manCargo??"",
                     "oneCargo_Status": mData.value.oneCargo??"",
-                    "rpaSalary": mData.value.call24Charge,
+                    "rpaSalary": mData.value.call24Charge??"",
                   },
                 );
               }

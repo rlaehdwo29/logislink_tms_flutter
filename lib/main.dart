@@ -235,8 +235,7 @@ class _MyAppState extends State<MyApp> {
                   .appBarTheme
                   .copyWith(backgroundColor: main_color),
               primaryColor: main_color,
-              backgroundColor: styleWhiteCol,
-              textTheme: TextTheme(bodyText1: CustomStyle.baseFont()),
+              textTheme: TextTheme(bodyLarge: CustomStyle.baseFont()),
               visualDensity: VisualDensity.adaptivePlatformDensity,
               fontFamily: 'NotoSansKR',
             ),

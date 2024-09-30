@@ -1504,7 +1504,7 @@ Widget build(BuildContext context) {
         });
       } ,
       child: Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+          backgroundColor: Colors.white,
       appBar: AppBar(
               centerTitle: true,
               toolbarHeight: 50.h,

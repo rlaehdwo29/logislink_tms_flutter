@@ -766,12 +766,12 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
               await FirebaseAnalytics.instance.logEvent(
                 name: Platform.isAndroid ? "trans_order_aos" : "trans_order_ios",
                 parameters: {
-                  "user_id": user.userId,
-                  "user_custId" : user.custId,
-                  "user_deptId": user.deptId,
-                  "orderId" : mData.value.orderId,
-                  "buyCustId" : mData.value.buyCustId,
-                  "buyDeptId" : mData.value.buyDeptId
+                  "user_id": user.userId??"",
+                  "user_custId" : user.custId??"",
+                  "user_deptId": user.deptId??"",
+                  "orderId" : mData.value.orderId??"",
+                  "buyCustId" : mData.value.buyCustId??"",
+                  "buyDeptId" : mData.value.buyDeptId??""
                 },
               );
               Navigator.of(context).pop({'code': 200});

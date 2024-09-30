@@ -20,7 +20,7 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
   Widget build(BuildContext context) {
     var filePath = "$SERVER_URL$RECEIPT_PATH${widget.item.fileName}";
     return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Colors.white,
         appBar: AppBar(
               centerTitle: true,
               title: Text(

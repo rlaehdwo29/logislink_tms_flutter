@@ -91,7 +91,7 @@ class _NotificationPageState extends State<NotificationPage> {
           });
     },
     child: Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Colors.white,
         appBar: AppBar(
               centerTitle: true,
               title:Text("알림",

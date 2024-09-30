@@ -110,7 +110,7 @@ class _PointPageState extends State<PointPage> {
           });
         },
         child: Scaffold(
-            backgroundColor: Theme.of(context).backgroundColor,
+            backgroundColor: Colors.white,
             appBar: AppBar(
                   centerTitle: true,
                   title: Text("포인트 조회",
