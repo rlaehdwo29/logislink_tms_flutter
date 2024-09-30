@@ -99,6 +99,7 @@ abstract class Rest {
       @Header("Authorization") String? Authorization,
       @Field("fromDate") String? fromDate,
       @Field("toDate") String? toDate,
+      @Field("dayOption") String? dayOption,
       @Field("orderState") String? orderState,
       @Field("allocState") String? allocState,
       @Field("myOrder") String? myOrder,
