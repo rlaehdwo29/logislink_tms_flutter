@@ -65,6 +65,23 @@ abstract class Rest {
       @Field("mobile") String? mobile);
 
   /**
+   * 사용자 RPA 정보 수정
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_RPA_UPDATE)
+  Future<HttpResponse> userRpaInfoUpdate(
+      @Header("Authorization") String? Authorization,
+      @Field("call24Yn") String? call24Yn,
+      @Field("link24Id") String? link24Id,
+      @Field("link24Pass") String? link24Pass,
+      @Field("man24Id") String? man24Id,
+      @Field("man24Pass") String? man24Pass,
+      @Field("one24Id") String? one24Id,
+      @Field("one24Pass") String? one24Pass
+  );
+
+
+  /**
    * 기기 정보 업데이트
    */
   @FormUrlEncoded()
@@ -101,8 +118,8 @@ abstract class Rest {
       @Field("toDate") String? toDate,
       @Field("dayOption") String? dayOption,
       @Field("orderState") String? orderState,
-      @Field("allocState") String? allocState,
-      @Field("myOrder") String? myOrder,
+      @Field("rpaState") String? rpaState,
+      @Field("staffName") String? staffName,
       @Field("pageNo") int? pageNo,
       @Field("searchColumn") String? searchColumn,
       @Field("searchValue") String? searchValue

@@ -96,12 +96,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   CalendarFormat _calendarWeekFormat = CalendarFormat.twoWeeks;
   RangeSelectionMode _rangeSelectionMode = RangeSelectionMode.toggledOn;
 
-  final myOrderSelect = false.obs;
   final categoryOrderCode = "".obs;
   final categoryOrderState = "오더전체".obs;
   final categoryRpaCode = "".obs;
   final categoryRpaState = "화망전송전체".obs;
-  final categoryStaffModel = CustUserModel(mobile: "",userName: "담당자전체").obs;
+  final categoryStaffModel = CustUserModel(userId: "",userName: "담당자전체").obs;
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
   final _isNewVersionCheck = false.obs;
@@ -1367,7 +1366,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     shrinkWrap: true,
                                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
-                                      childAspectRatio: (1 / .5),
+                                      childAspectRatio: (1 / .4),
                                       mainAxisSpacing: 10, //수평 Padding
                                       crossAxisSpacing: 10, //수직 Padding
                                     ),
@@ -2769,7 +2768,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
         case 'STAFF_STATE_CD':
-          categoryStaffModel.value = custUserModel ?? CustUserModel(mobile: "",userName: "담당자전체");
+          categoryStaffModel.value = custUserModel ?? CustUserModel(userId: "",userName: "담당자전체");
           page.value = 1;
           scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
@@ -2782,6 +2781,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     final tempStatecode = CodeModel(code: categoryOrderCode.value ,codeName:  categoryOrderState.value).obs; // 오더 상태
     List<CodeModel>? mOrderList = SP.getCodeList(Const.ORDER_STATE_CD);
     mOrderList?.insert(0, CodeModel(code: "",codeName:  "오더전체"));
+    final tempRpamodel = CodeModel(code: categoryRpaCode.value ,codeName: categoryRpaState.value).obs;
+    List<CodeModel>? mRpaList = List.empty(growable: true);
+    mRpaList?.insert(0, CodeModel(code: "",codeName:  "화망전송전체"));
+    mRpaList?.insert(1, CodeModel(code: "W",codeName:  "화망배차전"));
+    mRpaList?.insert(2, CodeModel(code: "F",codeName:  "배차확정완료"));
     final tempStaffmodel = categoryStaffModel.value.obs;
     final mStaffList = custUserList;
 
@@ -2849,6 +2853,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         //오더 상태
                                         categoryOrderCode.value = tempStatecode.value.code??""; // 오더 상태 Code
                                         categoryOrderState.value = tempStatecode.value.codeName??"-"; // 오더 상태 Name
+
+                                        // 정보망상태
+                                        categoryRpaCode.value = tempRpamodel.value.code??"";
+                                        categoryRpaState.value = tempRpamodel.value.codeName??"";
 
                                         //담당자 선택
                                         categoryStaffModel.value = tempStaffmodel.value;
@@ -3067,13 +3075,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
                                     child: AnimationLimiter(
                                         child: GridView.builder(
-                                        itemCount: mOrderList?.length,
+                                        itemCount: mRpaList?.length,
                                         physics: const ScrollPhysics(),
                                         scrollDirection: Axis.vertical,
                                         shrinkWrap: true,
                                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                          crossAxisCount: 4, //1 개의 행에 보여줄 item 개수
-                                          childAspectRatio: (1 / .4),
+                                          crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
+                                          childAspectRatio: (1 / .3),
                                           mainAxisSpacing: 10, //수평 Padding
                                           crossAxisSpacing: 10, //수직 Padding
                                         ),
@@ -3086,21 +3094,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                   child: FadeInAnimation(
                                                   child: Obx(() =>  InkWell(
                                               onTap: () {
-                                                tempStatecode.value = CodeModel(code: mOrderList?[index].code,codeName: mOrderList?[index].codeName);
+                                                tempRpamodel.value = CodeModel(code: mRpaList?[index].code,codeName: mRpaList?[index].codeName);
                                               },
                                               child: Container(
                                                   height: CustomStyle.getHeight(70.0),
                                                   decoration: BoxDecoration(
-                                                      color: tempStatecode.value.code  == mOrderList?[index].code ? renew_main_color2 : light_gray24,
+                                                      color: tempRpamodel.value.code  == mRpaList?[index].code ? renew_main_color2 : light_gray24,
                                                       borderRadius: BorderRadius.circular(30)
                                                   ),
                                                   child: Center(
                                                     child: Text(
-                                                      "${mOrderList?[index].codeName}",
+                                                      "${mRpaList?[index].codeName}",
                                                       textAlign: TextAlign.center,
                                                       style: CustomStyle.CustomFont(
-                                                          styleFontSize12, tempStatecode.value.code  == mOrderList?[index].code ? Colors.white: text_color_01,
-                                                          font_weight: tempStatecode.value.code  == mOrderList?[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                          styleFontSize12, tempRpamodel.value.code  == mRpaList?[index].code ? Colors.white: text_color_01,
+                                                          font_weight: tempRpamodel.value.code  == mRpaList?[index].code ? FontWeight.w800 : FontWeight.w600),
                                                     ),
                                                   )
                                               )
@@ -3205,13 +3213,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
             var list = response.resultMap?["data"] as List;
             if(custUserList.isNotEmpty) custUserList.clear();
               List<CustUserModel> itemsList = list.map((i) => CustUserModel.fromJSON(i)).toList();
+              custUserList.insert(0, CustUserModel(userId: user.userId,userName:  "내 담당"));
               custUserList.addAll(itemsList);
-              custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내 담당"));
-              custUserList.insert(custUserList.length, CustUserModel(mobile: "",userName:  "담당자전체"));
+              custUserList.insert(custUserList.length, CustUserModel(userId: "",userName:  "담당자전체"));
           }else{
             custUserList.value = List.empty(growable: true);
-            custUserList.insert(0, CustUserModel(mobile: user.mobile,userName:  "내 담당"));
-            custUserList.insert(1, CustUserModel(mobile: "",userName:  "담당자전체"));
+            custUserList.insert(0, CustUserModel(userId: user.userId,userName:  "내 담당"));
+            custUserList.insert(1, CustUserModel(userId: "",userName:  "담당자전체"));
           }
         }else{
           openOkBox(context,"${response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
@@ -3764,7 +3772,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                               flex:1,
                                               child: InkWell(
                                                 onTap: (){
-                                                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewAppBarMyPage()));
+                                                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewAppBarMyPage(call24Yn: api24Data.value["apiKey24"] != null && api24Data.value["apiKey24"] != '' ? "Y" : "N")));
                                                 },
                                                   child: Container(
                                                   padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
@@ -4138,7 +4146,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
             daySelectOption.value,
             categoryOrderCode.value,
             categoryRpaCode.value,
-            myOrderSelect.value == true? "Y":"N",
+            categoryStaffModel.value.userId,
             page.value,
             select_value.value.code??"",
             searchValue.value

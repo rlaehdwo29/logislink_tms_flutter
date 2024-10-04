@@ -9,7 +9,7 @@ const String m_ServerDebug = "http://192.168.53.51:9080";         // Local
 //const String m_ServerDebug = "http://192.168.0.2:8080";
 const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
-const String SERVER_URL = m_ServerDebug;
+const String SERVER_URL = m_ServerRelease;
 
 const String RECEIPT_PATH = "/files/receipt/";
 
@@ -44,6 +44,8 @@ const String URL_KAKAO_ADDRESS = "/v2/local/search/address.json";
 const String URL_USER_INFO = "/cust/user/info";
 // 사용자 정보 수정
 const String URL_USER_UPDATE = "/cust/user/update";
+// 사용자 RPA 정보 수정
+const String URL_USER_RPA_UPDATE = "/cust/user/rpa/update";
 // 기기 정보 업데이트
 const String URL_DEVICE_UPDATE = "/cust/device/update";
 // 사용자 탬플릿 등록

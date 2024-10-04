@@ -22,9 +22,10 @@ import 'package:dio/dio.dart';
 class RenewAppBarMyPage extends StatefulWidget {
   final void Function(bool?)? onCallback;
   String? code;
+  String? call24Yn;
 
 
-  RenewAppBarMyPage({Key? key,this.code,this.onCallback}):super(key: key);
+  RenewAppBarMyPage({Key? key,this.code,this.call24Yn, this.onCallback}):super(key: key);
 
   _RenewAppBarMyPageState createState() => _RenewAppBarMyPageState();
 }
@@ -35,6 +36,8 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
   final mData = UserModel().obs;
   final tempData = UserModel().obs;
   final mUserRpaData = UserRpaModel().obs;
+
+  final api24Data = <String, dynamic>{}.obs;
 
   static const String EDIT_BIZ = "edit_biz";
   final bizFocus = false.obs;
@@ -139,23 +142,101 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
     openOkBox(context, Strings.of(context)?.get("Guest_Intro_Mode")??"Error", Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
   }
 
+  bool validationRpaEdit() {
+    var result = false;
+
+    if(et24CallIdController.text != mUserRpaData.value.link24Id) {
+      result = true;
+    }else if(et24CallPwController.text != mUserRpaData.value.link24Pass) {
+      result = true;
+    }else if(etHwaIdController.text != mUserRpaData.value.man24Id) {
+      result = true;
+    }else if(etHwaPwController.text != mUserRpaData.value.man24Pass) {
+      result = true;
+    }else if(etOneCallIdController.text != mUserRpaData.value.one24Id) {
+      result = true;
+    }else if(etOneCallPwController.text != mUserRpaData.value.one24Pass) {
+      result = true;
+    }
+    return result;
+  }
+
   Future<void> editMyInfo() async {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
 
-    await DioService.dioClient(header: true).userUpdate(
+    if(etPasswordController.text == '' || etPasswordController.text == null) {
+      if(validationRpaEdit()) {
+        await updateRpaInfo();
+      }else{
+        Util.toast("변경할 사항이 없습니다.");
+      }
+    }else{
+      await DioService.dioClient(header: true).userUpdate(
+          user.authorization,
+          Util.encryption(etPasswordController.text.trim()),
+          user.telnum, user.email, user.mobile
+      ).then((it) async {
+        try {
+          ReturnMap _response = DioService.dioResponse(it);
+          logger.d("editMyInfo() _response -> ${_response.status} // ${_response.resultMap}");
+          if (_response.status == "200") {
+            if (_response.resultMap?["result"] == true) {
+              etPasswordController.text = "";
+              etPasswordConfirmController.text = "";
+              if(validationRpaEdit()) {
+                await updateRpaInfo();
+              }else{
+                Navigator.of(context).pop(false);
+                Util.toast("비밀번호가 수정되었습니다.");
+              }
+            } else {
+              openOkBox(context, "${_response.resultMap?["msg"]}",
+                  Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                    Navigator.of(context).pop(false);
+                  });
+            }
+          }
+        }catch(e) {
+          print("editMyInfo() Exeption =>$e");
+        }
+      }).catchError((Object obj){
+        switch (obj.runtimeType) {
+          case DioError:
+          // Here's the sample to get the failed response error code and message
+            final res = (obj as DioError).response;
+            print("editMyInfo() Error => ${res?.statusCode} // ${res?.statusMessage}");
+            break;
+          default:
+            print("editMyInfo() getOrder Default => ");
+            break;
+        }
+      });
+    }
+
+  }
+
+  Future<void> updateRpaInfo() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+
+    await DioService.dioClient(header: true).userRpaInfoUpdate(
         user.authorization,
-        Util.encryption(etPasswordController.text.trim()),
-        user.telnum, user.email, user.mobile
+        widget.call24Yn,
+        et24CallIdController.text,
+        et24CallPwController.text,
+        etHwaIdController.text,
+        etHwaPwController.text,
+        etOneCallIdController.text,
+        etOneCallPwController.text
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
-        logger.d("editMyInfo() _response -> ${_response.status} // ${_response.resultMap}");
+        logger.d("updateRpaInfo() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.toast("비밀번호가 변경되었습니다.");
-            etPasswordController.text = "";
-            etPasswordConfirmController.text = "";
+            Util.toast("정보가 수정되었습니다.");
+            Navigator.of(context).pop(false);
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
@@ -164,17 +245,17 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
           }
         }
       }catch(e) {
-        print("editMyInfo() Exeption =>$e");
+        print("updateRpaInfo() Exeption =>$e");
       }
     }).catchError((Object obj){
       switch (obj.runtimeType) {
         case DioError:
         // Here's the sample to get the failed response error code and message
           final res = (obj as DioError).response;
-          print("editMyInfo() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          print("updateRpaInfo() Error => ${res?.statusCode} // ${res?.statusMessage}");
           break;
         default:
-          print("editMyInfo() getOrder Default => ");
+          print("updateRpaInfo() getOrder Default => ");
           break;
       }
     });
@@ -607,7 +688,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
             height: CustomStyle.getHeight(1),
             color: light_gray15,
           ),
-
+          widget.call24Yn == "Y" ?
           Container(
             margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
             child: Column(
@@ -684,6 +765,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             et24CallIdController.clear();
+                            et24CallIdController.text = '';
                           },
                           icon: Icon(
                             Icons.clear,
@@ -747,6 +829,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             et24CallPwController.clear();
+                            et24CallPwController.text = '';
                           },
                           icon: Icon(
                             Icons.clear,
@@ -781,7 +864,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                 )
               ],
             )
-          ),
+          ) : const SizedBox(),
           Container(
               margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
               child: Column(
@@ -858,6 +941,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                           suffixIcon: IconButton(
                             onPressed: () {
                               etHwaIdController.clear();
+                              etHwaIdController.text = '';
                             },
                             icon: Icon(
                               Icons.clear,
@@ -921,6 +1005,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                           suffixIcon: IconButton(
                             onPressed: () {
                               etHwaPwController.clear();
+                              etHwaPwController.text = '';
                             },
                             icon: Icon(
                               Icons.clear,
@@ -1032,6 +1117,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                           suffixIcon: IconButton(
                             onPressed: () {
                               etOneCallIdController.clear();
+                              etOneCallIdController.text = '';
                             },
                             icon: Icon(
                               Icons.clear,
@@ -1095,6 +1181,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                           suffixIcon: IconButton(
                             onPressed: () {
                               etOneCallPwController.clear();
+                              etOneCallPwController.text = '';
                             },
                             icon: Icon(
                               Icons.clear,
@@ -1147,7 +1234,18 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
                     showGuestDialog();
                     return;
                   }
-                  await editMyInfo();
+
+                  openCommonConfirmBox(
+                      context,
+                      "내 정보를 수정하시겠습니까?",
+                      Strings.of(context)?.get("cancel")??"Not Found",
+                      Strings.of(context)?.get("confirm")??"Not Found",
+                          () {Navigator.of(context).pop(false);},
+                          () async {
+                        Navigator.of(context).pop(false);
+                        await editMyInfo();
+                      }
+                  );
                 },
                 child: Container(
                     width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.7,
