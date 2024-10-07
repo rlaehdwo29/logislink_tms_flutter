@@ -1894,7 +1894,6 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         // 정보망접수, 정보망접수 완료, 배차실패(화물맨), 배차대기(화물맨), 정보망오류
       if(mData.value.orderState == "00" || mData.value.orderState =="01"){
         tvReOrder.value = false;
-        tvOrderCancel.value  = false;
         tvAlloc.value = true;
         tvModify.value = true;
         tvAllocCancel.value = false;

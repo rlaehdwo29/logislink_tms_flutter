@@ -1773,7 +1773,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Future<void> showOrderTrans(String allocId) async {
     openCommonConfirmBox(
         context,
-        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까??",
+        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까?",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
@@ -3533,7 +3533,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               }else{
                                 cd = "";
                               }
-                              if(int.parse(SelectNumber.value) > 20000){
+                              if(int.parse(SelectNumber.value) >= 20000){
                                 if(flag == "D") {
                                   await registRpa(item,link_type,SelectNumber.value,item_index);
                                 }else {

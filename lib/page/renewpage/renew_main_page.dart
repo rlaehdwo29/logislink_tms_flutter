@@ -32,10 +32,12 @@ import 'package:logislink_tms_flutter/page/renewpage/create_template_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_setting_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_detail_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/template_manage_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_monitor_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_notice_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/notification_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
@@ -73,7 +75,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final dateSelectValue = 3.obs;
   final daySelectOption = "0".obs;
   final filterOrderOption = ["오더전체","접수","배차","운송사지정","취소"];
-  final filterRpaOption = ["화망전송전체","화망배차전", "배차확정완료"];
+  final filterRpaOption = ["화망전송무관","화망배차전", "배차확정완료"];
 
   final GlobalKey webViewKey = GlobalKey();
   late final InAppWebViewController webViewController;
@@ -99,7 +101,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final categoryOrderCode = "".obs;
   final categoryOrderState = "오더전체".obs;
   final categoryRpaCode = "".obs;
-  final categoryRpaState = "화망전송전체".obs;
+  final categoryRpaState = "화망전송무관".obs;
   final categoryStaffModel = CustUserModel(userId: "",userName: "담당자전체").obs;
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
@@ -1319,7 +1321,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
       final tempCodemodel = CodeModel(code: categoryRpaCode.value ,codeName: categoryRpaState.value).obs;
       List<CodeModel>? mCodeList = List.empty(growable: true);
-      mCodeList?.insert(0, CodeModel(code: "",codeName:  "화망전송전체"));
+      mCodeList?.insert(0, CodeModel(code: "",codeName:  "화망전송무관"));
       mCodeList?.insert(1, CodeModel(code: "W",codeName:  "화망배차전"));
       mCodeList?.insert(2, CodeModel(code: "F",codeName:  "배차확정완료"));
 
@@ -1695,7 +1697,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               }else{
                                 cd = "";
                               }
-                              if(int.parse(SelectNumber.value) > 20000){
+                              if(int.parse(SelectNumber.value) >= 20000){
                                 if(flag == "D") {
                                   await registRpa(item,linkType,SelectNumber.value,itemIndex);
                                 }else {
@@ -1758,9 +1760,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       ),
                        Row(
                          crossAxisAlignment: CrossAxisAlignment.center,
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                           mainAxisAlignment:  Util.userDebugger == false ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
                            children: [
-                             Util.userDebugger == false?
+                             Util.userDebugger == false ?
                              Obx(() => InkWell(
                                onTap: (){
                                  selectRegOrder.value = "01";
@@ -2783,7 +2785,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     mOrderList?.insert(0, CodeModel(code: "",codeName:  "오더전체"));
     final tempRpamodel = CodeModel(code: categoryRpaCode.value ,codeName: categoryRpaState.value).obs;
     List<CodeModel>? mRpaList = List.empty(growable: true);
-    mRpaList?.insert(0, CodeModel(code: "",codeName:  "화망전송전체"));
+    mRpaList?.insert(0, CodeModel(code: "",codeName:  "화망전송무관"));
     mRpaList?.insert(1, CodeModel(code: "W",codeName:  "화망배차전"));
     mRpaList?.insert(2, CodeModel(code: "F",codeName:  "배차확정완료"));
     final tempStaffmodel = categoryStaffModel.value.obs;
@@ -3260,6 +3262,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
 
     Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewOrderDetailPage(order_vo: item), pageAnimationType: LeftToRightTransition()));
+    //Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: OrderDetailPage(order_vo: item), pageAnimationType: LeftToRightTransition()));
 
     if(results.containsKey("code")){
       if(results["code"] == 200) {
@@ -3285,7 +3288,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   Future<void> showOrderTrans(String allocId) async {
     openCommonConfirmBox(
         context,
-        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까??",
+        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까?",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
@@ -3335,7 +3338,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   }
 
   Future<void> goToTransInfo(OrderModel data) async {
-    //await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderTransInfoPage(order_vo: data)));
+    await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewOrderTransInfoPage(order_vo: data)));
   }
 
   void showGuestDialog(){
@@ -3583,7 +3586,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         toolbarHeight: 50.h,
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
+          /*IconButton(
             icon: const Icon(
               Icons.notifications,
               size: 30,
@@ -3593,7 +3596,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               await Navigator.of(context).push(PageAnimationTransition(page: NotificationPage(), pageAnimationType: LeftToRightTransition()));
             },
             tooltip: MaterialLocalizations.of(mContext).openAppDrawerTooltip,
-          ),
+          ),*/
           IconButton(
             icon: Image.asset("assets/image/ic_menu.png",
                 width: CustomStyle.getWidth(25.0.w),
@@ -3954,7 +3957,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
               crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Container(
+                  /*Container(
                     alignment: Alignment.centerLeft,
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
                     child: Row(
@@ -3980,7 +3983,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         )
                       ]
                     )
-                  ),
+                  ),*/
+                  Container(),
                   Container(
                     alignment: Alignment.centerRight,
                     padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),

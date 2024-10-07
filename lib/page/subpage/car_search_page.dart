@@ -72,7 +72,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
               child: TextField(
                 style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                 textAlign: TextAlign.start,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 onChanged: (value) async {
                   search_text.value = value;
                   await searchCar();

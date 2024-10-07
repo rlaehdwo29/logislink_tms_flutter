@@ -2315,9 +2315,9 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
   }
 
   Widget bodyWidget() {
-    unitPriceController.text = mData.value.unitPrice == null || mData.value.unitPrice?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.unitPrice??"0".trim().replaceAll(",", "")).toString());
-    sellChargeController.text = mData.value.sellCharge == null || mData.value.sellCharge?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellCharge??"0".trim().replaceAll(",", "")).toString());
-    sellFeeController.text = mData.value.sellFee == null || mData.value.sellFee?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellFee??"0".trim().replaceAll(",", "")).toString());
+    unitPriceController.text = mData.value.unitPrice == null || mData.value.unitPrice?.isEmpty == true || mData.value.unitPrice == "null"? "0" : Util.getInCodeCommaWon(int.parse(mData.value.unitPrice??"0".trim().replaceAll(",", "")).toString());
+    sellChargeController.text = mData.value.sellCharge == null || mData.value.sellCharge?.isEmpty == true || mData.value.sellCharge == "null" ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellCharge??"0".trim().replaceAll(",", "")).toString());
+    sellFeeController.text = mData.value.sellFee == null || mData.value.sellFee?.isEmpty == true || mData.value.sellFee == "null" ? "0" : Util.getInCodeCommaWon(int.parse(mData.value.sellFee??"0".trim().replaceAll(",", "")).toString());
     sellWeightController.text = mData.value.sellWeight??"0";
     rpaValueController.text = mRpaSalary.value?.isEmpty == true ? "0" : Util.getInCodeCommaWon(int.parse(mRpaSalary.value.trim().replaceAll(",", "")).toString());
     //추가 운임

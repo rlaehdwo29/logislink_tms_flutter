@@ -723,7 +723,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                         ]
                     ),
                     Text(
-                      (buyDrivLicNum.value != '' ?  buyDrivLicNum.value?.replaceAllMapped(RegExp(r'(\d{6})(\d{6,7})'), (m) => '${m[1]}-${m[2]}') : "")!,
+                      (buyDrivLicNum.value != '' ?  buyDrivLicNum.value.replaceAllMapped(RegExp(r'(\d{6})(\d{6,7})'), (m) => '${m[1]}-${m[2]}') : "")!,
                       style: CustomStyle.CustomFont(styleFontSize14,  text_color_01),
                     ),
                   ],
@@ -2012,7 +2012,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                             onPressed: () async {
                               if(SelectNumber.value == null || SelectNumber.value.isEmpty == true) SelectNumber.value = "0";
 
-                              if(int.parse(SelectNumber.value) > 20000){
+                              if(int.parse(SelectNumber.value) >= 20000){
                                 mData.value.buyCharge = SelectNumber.value;
                                 setState(() {
                                   mData.value.buyCharge = SelectNumber.value;
@@ -2220,6 +2220,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     }else{
       await getOrderOption();
     }
+
     etBuyChargeController.text = mData.value.buyCharge??"0";
     etDriverMemoController.text = mData.value.driverMemo??"";
     await setTotal();
@@ -2482,7 +2483,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       }
     }
 
-    String? dncStr = null;
+    /*String? dncStr = null;
     if(!(data.buyDriverLicenseNumber?.isEmpty == true) && data.buyDriverLicenseNumber != null) {
       try {
         dncStr = await Util.dataDecode(data.buyDriverLicenseNumber ?? "");
@@ -2501,7 +2502,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       }
     }else{
       buyDrivLicNum.value = "";
-    }
+    }*/
   }
 
   Future<void> showPayTypeDialog() async {

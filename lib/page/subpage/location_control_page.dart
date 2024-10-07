@@ -256,7 +256,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                 title: Text(
                     Strings.of(context)?.get("location_control_title")??"위치관제_",
                     style: CustomStyle.appBarTitleFont(
-                        styleFontSize16, styleWhiteCol)
+                        styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 leading: IconButton(
@@ -265,7 +265,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                     Navigator.of(context).pop();
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -288,7 +288,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                                 child: Container(
                               padding: EdgeInsets.all(10.w),
                               decoration: const BoxDecoration(
-                                color: main_btn,
+                                color: renew_main_color2,
                                 shape: BoxShape.circle,
                               ),
                                 child: Icon(
