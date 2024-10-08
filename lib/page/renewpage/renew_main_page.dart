@@ -386,7 +386,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     DateTime? tempSelectedDay;
     DateTime? tempRangeStart = mCalendarStartDate.value;
     DateTime? tempRangeEnd = mCalendarEndDate.value;
-
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -403,6 +402,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           builder: (BuildContext context, StateSetter setState)
         {
           return FractionallySizedBox(
+              widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: 0.65,
               child: Container(
                   width: double.infinity,
@@ -682,6 +682,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return FractionallySizedBox(
+                widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
                 heightFactor: 0.70,
                 child: Container(
                     width: double.infinity,
@@ -1118,6 +1119,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       backgroundColor: Colors.white,
       builder: (context) {
         return FractionallySizedBox(
+            widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
             heightFactor: template_list.length > 2 ? 0.70 : 0.4,
             child: Container(
                 width: double.infinity,
@@ -1223,6 +1225,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         backgroundColor: Colors.white,
         builder: (context) {
           return FractionallySizedBox(
+              widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.6 : 0.5 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
               child: Container(
                   width: double.infinity,
@@ -1338,6 +1341,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         backgroundColor: Colors.white,
         builder: (context) {
           return FractionallySizedBox(
+              widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.6 : 0.5 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
               child: Container(
                   width: double.infinity,
@@ -1448,6 +1452,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         backgroundColor: Colors.white,
         builder: (context) {
           return FractionallySizedBox(
+              widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: mStaffList.length > 16 ? 0.50 : mStaffList.length > 12 ? 0.4 : 0.3,
               child: Container(
                   width: double.infinity,
@@ -1567,6 +1572,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       backgroundColor: Colors.white,
       builder: (context) {
         return FractionallySizedBox(
+            widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
             heightFactor: 0.70,
             child: Container(
               width: double.infinity,
@@ -1723,7 +1729,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   Future<void> openSelectRegOrderDialog(BuildContext context) async {
 
     final selectRegOrder = Util.userDebugger == true ? "02".obs : "01".obs;
-
+    print("하아앙 -> ${MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height}");
       showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1737,7 +1743,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       backgroundColor: Colors.white,
       builder: (context) {
         return FractionallySizedBox(
-            heightFactor: 0.7,
+            widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
+            heightFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height > 1000 ? 0.9 : 0.7,
             child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
@@ -1840,7 +1847,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                },
                                child: Container(
                                    width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
-                                   height: CustomStyle.getHeight(180),
+                                   height: MediaQueryData.fromView(WidgetsBinding.instance.window).size.height > 1000 ? CustomStyle.getHeight(250) : CustomStyle.getHeight(180),
                                    padding: const EdgeInsets.all(10),
                                    decoration: BoxDecoration(
                                        border: Border.all(color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
@@ -2804,6 +2811,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       backgroundColor: Colors.white,
       builder: (context) {
         return FractionallySizedBox(
+            widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
             heightFactor: 0.9,
             child: SingleChildScrollView(
                 child: Container(
@@ -4482,7 +4490,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 Positioned(
                     child: Container(
                         color:Colors.black.withOpacity(0.4),
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),horizontal: CustomStyle.getWidth(10)),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,

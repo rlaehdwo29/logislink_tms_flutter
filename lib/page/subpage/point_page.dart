@@ -149,7 +149,7 @@ class _PointPageState extends State<PointPage> {
         var item = mList[index];
         return Container(
           height: CustomStyle.getHeight(75.h),
-          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(17.w),vertical: CustomStyle.getWidth(7.w)),
+          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(17),vertical: CustomStyle.getWidth(7)),
           decoration: BoxDecoration(
               border: Border(
                   bottom: BorderSide(
@@ -165,7 +165,7 @@ class _PointPageState extends State<PointPage> {
                   child: Stack(
                     children: [
                       Container(
-                        padding:const EdgeInsets.all(4),
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                             color: item.ptypeCD == "SAVE" ? point_blue : item.ptypeCD == "MOVE" ? rpa_btn_modify : item.ptypeCD == "USE" ? point_red : text_color_01,
                             shape: BoxShape.circle,
@@ -218,7 +218,7 @@ class _PointPageState extends State<PointPage> {
                       Expanded(
                           flex: 4,
                           child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                               alignment: Alignment.center,
                               child: Text(
                                 "${Util.pointDate(item.pointDate)}",

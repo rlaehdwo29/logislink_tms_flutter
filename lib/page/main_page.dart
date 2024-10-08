@@ -336,7 +336,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             ),
 
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "내정보",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -347,7 +347,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "실적현황",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -357,7 +357,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "공지사항",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -367,7 +367,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "설정",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -376,7 +376,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarSettingPage()));
               },
             ),ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "도움말",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -388,7 +388,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 }
               },
             ),ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "로그아웃",
                 style: CustomStyle.CustomFont(styleFontSize14, order_state_09),
@@ -397,7 +397,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 await goToExit();
               },
             ),ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Row(
                   children:[
                     Container(
@@ -454,7 +454,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Widget getListCardView(OrderModel item,int item_index) {
 
     return Container(
-        padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),top: CustomStyle.getHeight(10.0.h)),
+        padding: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5),top: CustomStyle.getHeight(10)),
         child: InkWell(
             onTap: () async {
               await goToOrderDetail(item,item_index);

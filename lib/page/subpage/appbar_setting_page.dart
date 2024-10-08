@@ -317,7 +317,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                 ),
                 Container(
-                    padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0.w)),
+                    padding: EdgeInsets.only(left: CustomStyle.getWidth(10.0)),
                     child: Icon(Icons.keyboard_arrow_right,size: 24.h,color: const Color(0xffACACAC))
                 )
               ],

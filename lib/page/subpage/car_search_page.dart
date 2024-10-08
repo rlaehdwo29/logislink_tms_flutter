@@ -81,7 +81,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                   counterText: '',
                   hintText: Strings.of(context)?.get("car_search_hint")??"Not Found",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -113,8 +113,8 @@ class _CarSearchPageState extends State<CarSearchPage> {
         },
         child: Container(
             padding: EdgeInsets.symmetric(
-                vertical: CustomStyle.getHeight(5.h),
-                horizontal: CustomStyle.getWidth(15.w)),
+                vertical: CustomStyle.getHeight(5),
+                horizontal: CustomStyle.getWidth(15)),
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
@@ -175,7 +175,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
           Navigator.of(context).pop({'code':200,'car':item});
         },
         child: Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(20)),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -201,7 +201,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                           style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                         ),
                         Container(
-                          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
+                          padding: EdgeInsets.only(left: CustomStyle.getWidth(5)),
                           child: Text(
                             Util.makePhoneNumber(item.mobile),
                             style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
@@ -294,7 +294,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                         borderRadius: BorderRadius.all(Radius.circular(0.0))
                     ),
                     title: Container(
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5)),
                         decoration: CustomStyle.customBoxDeco(main_color,radius: 0),
                         child: Text(
                           '${Strings.of(context)?.get("order_detail_vehicle_dispatch")}',
@@ -310,7 +310,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                               children: [
                                 // 차량번호(필수)
                                 Container(
-                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),top: CustomStyle.getHeight(10.h),left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w)),
+                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5),top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5)),
                                     child: Row(
                                       children: [
                                         Container(
