@@ -252,7 +252,7 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
   }
 
   Future<void> goToRequest() async {
-    Map<String,int> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderRequestInfoPage(order_vo: mOrderOption.value,code: Const.RESULT_SETTING_REQUEST,)));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderRequestInfoPage(order_vo: mOrderOption.value,code: Const.RESULT_SETTING_REQUEST,)));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
@@ -325,6 +325,8 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
         Util.toast("배차 정보 설정이 저장되었습니다.");
         break;
     }
+    await getOrderOption();
+    setState(() {});
   }
 
   Widget appSettingWidget() {

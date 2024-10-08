@@ -962,7 +962,17 @@ Future<void> getCustUser() async {
                       flex: 1,
                       child: InkWell(
                           onTap: () async {
-                            await confirm();
+                            await  openCommonConfirmBox(
+                                context,
+                                "화주 정보 설정값을 초기화 하시겠습니까?",
+                                Strings.of(context)?.get("cancel")??"Not Found",
+                                Strings.of(context)?.get("confirm")??"Not Found",
+                                    () {Navigator.of(context).pop(false);},
+                                    () async {
+                                  Navigator.of(context).pop(false);
+                                  await reset();
+                                }
+                            );
                           },
                           child: Container(
                               height: CustomStyle.getHeight(60.0.h),
@@ -991,17 +1001,7 @@ Future<void> getCustUser() async {
                       flex: 1,
                       child: InkWell(
                           onTap: () async {
-                            await  openCommonConfirmBox(
-                                context,
-                                "화주 정보 설정값을 초기화 하시겠습니까?",
-                                Strings.of(context)?.get("cancel")??"Not Found",
-                                Strings.of(context)?.get("confirm")??"Not Found",
-                                    () {Navigator.of(context).pop(false);},
-                                    () async {
-                                  Navigator.of(context).pop(false);
-                                  await reset();
-                                }
-                            );
+                            await save();
                           },
                           child: Container(
                               height: CustomStyle.getHeight(60.0.h),

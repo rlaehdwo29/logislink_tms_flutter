@@ -3644,7 +3644,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 padding: EdgeInsets.zero,
                 children: [
                   SizedBox(
-                    height: App().isTablet(context) ? 220.h : 200.h,
+                    height: App().isTablet(context) ? 260.h : 220.h,
                   child: DrawerHeader(
                       decoration: const BoxDecoration(
                         color: renew_main_color2,

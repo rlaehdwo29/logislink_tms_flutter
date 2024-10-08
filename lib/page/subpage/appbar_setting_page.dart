@@ -258,7 +258,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
     }
   }
 
-  Future<void> setActivityResult(Map<String,dynamic> results)async {
+  Future<void> setActivityResult(Map<String,dynamic> results) async {
     switch(results[Const.RESULT_WORK]){
       case Const.RESULT_SETTING_REQUEST:
         Util.toast("화주 정보 설정이 저장되었습니다.");
@@ -276,6 +276,8 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
         Util.toast("배차 정보 설정이 저장되었습니다.");
         break;
     }
+    await getOrderOption();
+    setState(() {});
   }
 
   Widget appSettingWidget() {

@@ -332,15 +332,14 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
     if(codeType != "") {
       switch(codeType) {
         case "CAR_TYPE_CD" :
-          setState(() {
             mData.value.carTypeCode = codeModel?.code;
             mData.value.carTypeName = codeModel?.codeName;
             mData.value.carTonCode = null;
             mData.value.carTonName = null;
-          });
           await setEnable();
           break;
       }
+      setState(() {});
     }
   }
 
@@ -352,12 +351,11 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
     if(codeType != "") {
       switch(codeType) {
         case "CAR_TON_CD" :
-          setState(() {
             mData.value.carTonCode = codeModel?.code;
             mData.value.carTonName = codeModel?.codeName;
-          });
           break;
       }
+      setState(() {});
     }
   }
 
@@ -516,7 +514,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).setOptionCargo(
-      user.authorization,"",
+      user.authorization,"Y",
       mData.value.inOutSctn,mData.value.truckTypeCode,mData.value.carTypeCode, mData.value.carTonCode,
       mData.value.itemCode, mData.value.goodsName, mData.value.goodsWeight, mData.value.sWayCode, mData.value.eWayCode
     ).then((it) async {
