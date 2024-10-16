@@ -84,7 +84,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final orderList = List.empty(growable: true).obs;
   final custUserList = List.empty(growable: true).obs;
   final userRpaModel = UserRpaModel().obs;
-  final template_list = List.empty(growable: true).obs;
   final myOrder = "N".obs;
   final orderState = "".obs;
   final allocState = "".obs;
@@ -518,8 +517,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                             setState(() {
                                               tempSelectedDay = selectedDay;
                                               mCalendarNowDate = focusedDay;
-                                              _rangeSelectionMode =
-                                                  RangeSelectionMode.toggledOff;
+                                              _rangeSelectionMode = RangeSelectionMode.toggledOff;
                                             });
                                           }
                                         },
@@ -665,7 +663,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     final sTime = DateTime.now().obs;
     final endTimeChk = true.obs;
     final eTime = DateTime.now().obs;
-
+    templateItem.sDate = Util.getAllDate(DateTime(tempStartSelectedDay!.year,tempStartSelectedDay!.month,tempStartSelectedDay!.day,!startTimeChk.value ? sTime.value.hour : 0,!startTimeChk.value ? sTime.value.minute : 0 ,0));
+    templateItem.eDate = Util.getAllDate(DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 23, !endTimeChk.value ? eTime.value.minute : 59, 59));
 
     return showModalBottomSheet(
         context: context,
@@ -1054,7 +1053,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                 onTimeChange: (time) {
                                   setState((){
                                     eTime.value = DateTime(eTime.value.year,eTime.value.month,eTime.value.day,time.hour,time.minute,0);
-                                    print("되는겨? => ${eTime.value}");
                                   });
                                 },
                               )
@@ -1075,7 +1073,16 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               },
                               child: InkWell(
                                   onTap: () async {
-                                    await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "D",tModel: templateItem), pageAnimationType: LeftToRightTransition()));
+                                    Navigator.of(context).pop();
+                                    Map<String,dynamic> results  = await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "D",tModel: templateItem), pageAnimationType: LeftToRightTransition()));
+
+                                    if(results != null && results.containsKey("code")){
+                                      if(results["code"] == 200) {
+                                        Util.toast("오더가 정상적으로 등록되었습니다.");
+                                        await refresh();
+                                      }
+                                    }
+
                                   },
                                   child: Center(
                                   child: Container(
@@ -1103,8 +1110,9 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   }
 
   Future<void> openRegOrderTemplateSheet(BuildContext context, String title) async {
-
+    final template_list = List.empty(growable: true).obs;
     final selectItem = TemplateModel().obs;
+    await getTemplateList(template_list.value);
 
     showModalBottomSheet(
       context: context,
@@ -1120,7 +1128,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       builder: (context) {
         return FractionallySizedBox(
             widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
-            heightFactor: template_list.length > 2 ? 0.70 : 0.4,
+            heightFactor: 0.7,
             child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
@@ -1170,7 +1178,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           )
                         )
                       ]),
-                      templateListWidget(selectItem),
+                      templateListWidget(template_list,selectItem),
                       InkWell(
                           onTap: () async {
                             if(selectItem.value.templateId.isNull == true || selectItem.value.templateId?.isEmpty == true) {
@@ -3456,7 +3464,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           templateItem.sWayCode,templateItem.eWayCode,templateItem.mixYn,templateItem.mixSize,templateItem.returnYn,
           templateItem.carTonCode,templateItem.carTypeCode,templateItem.chargeType,templateItem.unitPriceType,int.parse(templateItem.unitPrice??"0"),templateItem.distance,templateItem.time,
           templateItem.reqMemo, templateItem.driverMemo,templateItem.itemCode,int.parse(templateItem.sellCharge??"0"),int.parse(templateItem.sellFee??"0"),
-          templateItem.orderStopList != null && templateItem.orderStopList?.isNotEmpty == true ? jsonEncode(templateItem.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
+          templateItem.templateStopList != null && templateItem.templateStopList?.isNotEmpty == true ? jsonEncode(templateItem.templateStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
           templateItem.sellWayPointMemo,templateItem.sellWayPointCharge,templateItem.sellStayMemo,templateItem.sellStayCharge,
           templateItem.handWorkMemo,templateItem.sellHandWorkCharge,templateItem.sellRoundMemo,templateItem.sellRoundCharge,
           templateItem.sellOtherAddMemo,templateItem.sellOtherAddCharge,templateItem.sellWeight,"N",
@@ -3564,6 +3572,49 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           break;
         default:
           print("getPointResult() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getTemplateList(List mList) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getTemplateList(
+        user.authorization
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getTemplateList() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              var list = _response.resultMap?["data"] as List;
+              if(mList.isNotEmpty) mList.clear();
+              if(list.length > 0){
+                List<TemplateModel> itemsList = list.map((i) => TemplateModel.fromJSON(i)).toList();
+                mList.addAll(itemsList);
+              }
+
+            }else{
+              mList = List.empty(growable: true);
+            }
+          } else {
+            mList = List.empty(growable: true);
+          }
+        }
+      }catch(e) {
+        print("getTemplateList() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getTemplateList() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getTemplateList() getOrder Default => ");
           break;
       }
     });
@@ -5888,7 +5939,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     }
   }
 
-  Widget templateListWidget(Rx<TemplateModel> selectItem){
+  Widget templateListWidget(List template_list, Rx<TemplateModel> selectItem){
 
     return Container(
       child: template_list.isNotEmpty
