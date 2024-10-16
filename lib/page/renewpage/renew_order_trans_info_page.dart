@@ -52,7 +52,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
 
   final isTransInfoExpanded = [].obs;
   final isEtcExpanded = [].obs;
-  final mTabCode = "01".obs;
   late TabController _tabController;
 
   final mData = OrderModel().obs;
@@ -267,8 +266,8 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                             ]
                         ),
                         Text(
-                          mData.value.buyStaffName == null || mData.value.buyStaffName?.isNotEmpty == true ? "담당자를 선택해주세요.":  mData.value.buyStaffName??"",
-                          style: CustomStyle.CustomFont(styleFontSize14,  mData.value.buyStaffName == null || mData.value.buyStaffName?.isNotEmpty == true ? styleDefaultGrey : text_color_01),
+                          mData.value.buyStaffName == null || mData.value.buyStaffName?.isEmpty == true ? "담당자를 선택해주세요.":  mData.value.buyStaffName??"",
+                          style: CustomStyle.CustomFont(styleFontSize14,  mData.value.buyStaffName == null || mData.value.buyStaffName?.isEmpty == true ? styleDefaultGrey : text_color_01),
                         ),
                       ],
                     )
@@ -2233,12 +2232,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       int selectedTabIndex = _tabController.index;
       switch(selectedTabIndex) {
         case 0 :
-          mTabCode.value = "01";
+          transType.value = "01";
           mData.value = OrderModel.fromJSON(widget.order_vo.toMap());
           await initView();
           break;
         case 1 :
-          mTabCode.value = "02";
+          transType.value = "02";
           mData.value = OrderModel.fromJSON(widget.order_vo.toMap());
           await initView();
           break;
@@ -2398,7 +2397,6 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       if (results["code"] == 200) {
         if(results["custUser"] != null) {
           await setCustUser(results["custUser"]);
-          setState(() {});
         }
       }
     }
@@ -2433,6 +2431,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     }else{
       talkYn.value = false;
     }
+    setState(() {});
   }
 
   Future<void> goToCarSearch() async {
@@ -2603,11 +2602,10 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         mData.value.eSido,
         mData.value.eGungu,
         mData.value.eDong,
-      orderCarTonCode.value,
-      orderCarTypeCode.value,
+        orderCarTonCode.value,
+        orderCarTypeCode.value,
         mData.value.sDate,
         mData.value.eDate
-
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
