@@ -2599,13 +2599,16 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         mData.value.sSido,
         mData.value.sGungu,
         mData.value.sDong,
+        mData.value.sComName,
         mData.value.eSido,
         mData.value.eGungu,
         mData.value.eDong,
         orderCarTonCode.value,
         orderCarTypeCode.value,
         mData.value.sDate,
-        mData.value.eDate
+        mData.value.eDate,
+        mData.value.eComName,
+        mData.value.unitPriceType
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
@@ -2624,6 +2627,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                 etBuyChargeController.text = orderBuyCharge.value;
               });
             }
+            setTotal();
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
                 Strings.of(context)?.get("confirm") ?? "Error!!", () {
