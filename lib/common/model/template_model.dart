@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:logislink_tms_flutter/common/model/result_model.dart';
-import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
+import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/model/template_stop_point_model.dart';
 
-class TemplateModel extends ResultModel {
+class TemplateModel extends ReturnMap {
   String? templateId;           // 탬플릿ID
   String? templateTitle;        //탬플릿 제목
   String? reqCustId;            //화주 거래처 ID
@@ -45,6 +45,7 @@ class TemplateModel extends ResultModel {
   String? eStaff;                //하차지 담당자
   String? eTel;                //하차지 연락처
   String? eMemo;                //하차지 메모
+
   double? sLat;
   double? sLon;
   double? eLat;
@@ -129,7 +130,7 @@ class TemplateModel extends ResultModel {
   String? reqPayYN;
   String? reqPayDate;
   String? talkYn;
-  List<StopPointModel>? orderStopList; // 경유지 목록
+  List<TemplateStopPointModel>? templateStopList; // 경유지 목록
   String? reqStaffName;
 
   String? call24Cargo;
@@ -256,7 +257,7 @@ class TemplateModel extends ResultModel {
     this.reqPayYN,
     this.reqPayDate,
     this.talkYn,
-    this.orderStopList, // 경유지 목록
+    this.templateStopList, // 경유지 목록
     this.reqStaffName,
 
     this.call24Cargo,
@@ -277,223 +278,348 @@ class TemplateModel extends ResultModel {
         //탬플릿 ID
         reqCustId: json['reqCustId'],
         //화주 거래처 ID
-        reqCustName: json['reqCustName'],
+        reqCustName: json['reqCustName']??"",
         //화주 거래처명
-        reqDeptId: json['reqDeptId'],
+        reqDeptId: json['reqDeptId']??"",
         //화주 부서 ID
-        reqDeptName: json['reqDeptName'],
+        reqDeptName: json['reqDeptName']??"",
         //화주 부서명
-        reqStaff: json['reqStaff'],
+        reqStaff: json['reqStaff']??"",
         //화주 담당자
-        reqTel: json['reqTel'],
+        reqTel: json['reqTel']??"",
         //화주 연락처
-        reqAddr: json['reqAddr'],
+        reqAddr: json['reqAddr']??"",
         //화주 주소
-        reqAddrDetail: json['reqAddrDetail'],
+        reqAddrDetail: json['reqAddrDetail']??"",
         //화주 상세주소
-        custId: json['custId'],
+        custId: json['custId']??"",
         //화주 지정 운송,주선사 ID
-        custName: json['custName'],
-        deptId: json['deptId'],
+        custName: json['custName']??"",
+        deptId: json['deptId']??"",
         //화주 지정 운송,주선사 부서 Id
-        deptName: json['deptName'],
-        inOutSctn: json['inOutSctn'],
+        deptName: json['deptName']??"",
+        inOutSctn: json['inOutSctn']??"",
         //수출입구분(내수, 수출입)
-        inOutSctnName: json['inOutSctnName'],
-        truckTypeCode: json['truckTypeCode'],
+        inOutSctnName: json['inOutSctnName']??"",
+        truckTypeCode: json['truckTypeCode']??"",
         //운송유형
-        truckTypeName: json['truckTypeName'],
-        sComName: json['sComName'],
+        truckTypeName: json['truckTypeName']??"",
+        sComName: json['sComName']??"",
         //상차지명
-        sSido: json['sSido'],
+        sSido: json['sSido']??"",
         //상차지시도
-        sGungu: json['sGungu'],
+        sGungu: json['sGungu']??"",
         //상차지군구
-        sDong: json['sDong'],
+        sDong: json['sDong']??"",
         //상차지동
-        sAddr: json['sAddr'],
+        sAddr: json['sAddr']??"",
         //상차지주소
-        sAddrDetail: json['sAddrDetail'],
+        sAddrDetail: json['sAddrDetail']??"",
         //상차지상세주소
-        sDate: json['sDate'],
+        sDate: json['sDate']??"",
         //상차일
-        sStaff: json['sStaff'],
+        sStaff: json['sStaff']??"",
         //상차지담당자
-        sTel: json['sTel'],
+        sTel: json['sTel']??"",
         //상차지 연락처
-        sMemo: json['sMemo'],
+        sMemo: json['sMemo']??"",
         //상차지메모
-        eComName: json['eComName'],
+        eComName: json['eComName']??"",
         //하차지명
-        eSido: json['eSido'],
+        eSido: json['eSido']??"",
         //하차지시도
-        eGungu: json['eGungu'],
+        eGungu: json['eGungu']??"",
         //하차지군구
-        eDong: json['eDong'],
+        eDong: json['eDong']??"",
         //하차지 동
-        eAddr: json['eAddr'],
+        eAddr: json['eAddr']??"",
         //하차지 주소
-        eAddrDetail: json['eAddrDetail'],
+        eAddrDetail: json['eAddrDetail']??"",
         //하차지 상세주소
-        eDate: json['eDate'],
+        eDate: json['eDate']??"",
         //하차일
-        eStaff: json['eStaff'],
+        eStaff: json['eStaff']??"",
         //하차지 담당자
-        eTel: json['eTel'],
+        eTel: json['eTel']??"",
         //하차지 연락처
-        eMemo: json['eMemo'],
+        eMemo: json['eMemo']??"",
         //하차지 메모
         sLat: double.parse((json['sLat'] ?? 0.0).toString()),
         sLon: double.parse((json['sLon'] ?? 0.0).toString()),
         eLat: double.parse((json['eLat'] ?? 0.0).toString()),
         eLon: double.parse((json['eLon'] ?? 0.0).toString()),
-        goodsName: json['goodsName'],
+        goodsName: json['goodsName']??"",
         //화물정보
-        goodsWeight: json['goodsWeight'].toString(),
+        goodsWeight: (json['goodsWeight']??0.0).toString(),
         //화물중량
-        weightUnitCode: json['weightUnitCode'],
+        weightUnitCode: json['weightUnitCode']??"",
         //중량단위코드
-        weightUnitName: json['weightUnitName'],
+        weightUnitName: json['weightUnitName']??"",
         //중량단위이름
-        goodsQty: json['goodsQty'],
+        goodsQty: (json['goodsQty']??0).toString(),
         //화물수량
-        qtyUnitCode: json['qtyUnitCode'],
+        qtyUnitCode: json['qtyUnitCode']??"",
         //수량단위코드
-        qtyUnitName: json['qtyUnitName'],
+        qtyUnitName: json['qtyUnitName']??"",
         //수량단위이름
-        sWayCode: json['sWayCode'],
+        sWayCode: json['sWayCode']??"",
         //상차방법
-        sWayName: json['sWayName'],
+        sWayName: json['sWayName']??"",
         //상차방법
-        eWayCode: json['eWayCode'],
+        eWayCode: json['eWayCode']??"",
         //하차방법
-        eWayName: json['eWayName'],
+        eWayName: json['eWayName']??"",
         //하차방법
-        mixYn: json['mixYn'],
+        mixYn: json['mixYn']??"",
         //혼적여부
-        mixSize: json['mixSize'],
+        mixSize: json['mixSize']??"",
         //혼적크기
-        returnYn: json['returnYn'],
+        returnYn: json['returnYn']??"",
         //왕복여부
-        carTonCode: json['carTonCode'],
-        carTonName: json['carTonName'],
-        carTypeCode: json['carTypeCode'],
-        carTypeName: json['carTypeName'],
-        chargeType: json['chargeType'],
+        carTonCode: json['carTonCode']??"",
+        carTonName: json['carTonName']??"",
+        carTypeCode: json['carTypeCode']??"",
+        carTypeName: json['carTypeName']??"",
+        chargeType: json['chargeType']??"",
         //운임구분코드(인수증.선착불)
-        chargeTypeName: json['chargeTypeName'],
-        distance: double.parse((json['distance'] ?? 0.0).toString()),
+        chargeTypeName: json['chargeTypeName']??"",
+        distance: json['distance']??0.0,
         time: json['time'],
-        reqMemo: json['reqMemo'],
+        reqMemo: json['reqMemo']??"",
         //화주 요청사항 (주선사/운송사 확인)
-        driverMemo: json['driverMemo'],
+        driverMemo: json['driverMemo']??"",
         //차주 확인사항
-        itemCode: json['itemCode'].toString(),
+        itemCode: json['itemCode']??"",
         //운송품목코드
-        itemName: json['itemName'],
+        itemName: json['itemName']??"",
         //오더 등록일
-        stopCount: json['stopCount'],
+        stopCount: json['stopCount']??"",
         //경유지
 
-        sellCustId : json['sellCustId'],
+        sellCustId : json['sellCustId']??"",
         //매출거래처ID
-        sellDeptId : json['sellDeptId'],
+        sellDeptId : json['sellDeptId']??"",
         //매출 부서 ID
-        sellStaff : json['sellStaff'],
+        sellStaff : json['sellStaff']??"",
         //매출거래처 담당자
-        sellStaffName : json['sellStaffName'],
+        sellStaffName : json['sellStaffName']??"",
         //매출거래처 담당자
-        sellStaffTel : json['sellStaffTel'],
+        sellStaffTel : json['sellStaffTel']??"",
         //매출거래처 담당자 연락처
-        sellCustName : json['sellCustName'],
+        sellCustName : json['sellCustName']??"",
         //매출거래처이름
-        sellDeptName : json['sellDeptName'],
+        sellDeptName : json['sellDeptName']??"",
         //매출거래처 부서명
-        sellCharge : json['sellCharge'],
+        sellCharge : (json['sellCharge']??0).toString(),
         //매출운송비
-        sellFee : json['sellFee'],
+        sellFee : (json['sellFee']??0).toString(),
         //매출수수료
-        sellWeight : json['sellWeight'],
+        sellWeight : (json['sellWeight']??0).toString(),
         //매출중량
-        sellWayPointMemo : json['sellWayPointMemo'],
+        sellWayPointMemo : json['sellWayPointMemo']??"",
         //경유비 메모
-        sellWayPointCharge : json['sellWayPointCharge'],
+        sellWayPointCharge : (json['sellWayPointCharge']??0).toString(),
         //경유비 금액
-        sellStayMemo : json['sellStayMemo'],
+        sellStayMemo : json['sellStayMemo']??"",
         //대기료 메모
-        sellStayCharge : json['sellStayCharge'],
+        sellStayCharge : (json['sellStayCharge']??0).toString(),
         //대기료 금액
-        sellHandWorkMemo : json['sellHandWorkMemo'],
+        sellHandWorkMemo : json['sellHandWorkMemo']??"",
         //수작업비 메모
-        sellHandWorkCharge : json['sellHandWorkCharge'],
+        sellHandWorkCharge : (json['sellHandWorkCharge']??0).toString(),
         //수작업비 금액
-        sellRoundMemo : json['sellRoundMemo'],
+        sellRoundMemo : json['sellRoundMemo']??"",
         //회차료 메모
-        sellRoundCharge : json['sellRoundCharge'],
+        sellRoundCharge : (json['sellRoundCharge']??0).toString(),
         //회차료 금액
-        sellOtherAddMemo : json['sellOtherAddMemo'],
+        sellOtherAddMemo : json['sellOtherAddMemo']??"",
         //기타추가비 메모
-        sellOtherAddCharge : json['sellOtherAddCharge'],
+        sellOtherAddCharge : (json['sellOtherAddCharge']??0).toString(),
         //기타추가비 금액
-        custPayType : json['custPayType'],
+        custPayType : json['custPayType']??"",
         //거래처 빠른지급여부
-        buyCharge : json['buyCharge'],
+        buyCharge : (json['buyCharge']??0).toString(),
         //매입운송비
-        buyFee : json['buyFee'],
+        buyFee : (json['buyFee']??0).toString(),
         //매입수수료
 
-        wayPointMemo: json['wayPointMemo'],
+        wayPointMemo: json['wayPointMemo']??"",
         //경유비 메모
-        wayPointCharge: json['wayPointCharge'],
+        wayPointCharge: (json['wayPointCharge']??0).toString(),
         //경유비 금액
-        stayMemo: json['stayMemo'],
+        stayMemo: json['stayMemo']??"",
         //대기료 메모
-        stayCharge: json['stayCharge'],
+        stayCharge: (json['stayCharge']??0).toString(),
         //대기료 금액
-        handWorkMemo: json['handWorkMemo'],
+        handWorkMemo: json['handWorkMemo']??"",
         //수작업비 메모
-        handWorkCharge: json['handWorkCharge'],
+        handWorkCharge: (json['handWorkCharge']??0).toString(),
         //수작업비 금액
-        roundMemo: json['roundMemo'],
+        roundMemo: json['roundMemo']??"",
         //회차료 메모
-        roundCharge: json['roundCharge'],
+        roundCharge: (json['roundCharge']??0).toString(),
         //회차료 금액
-        otherAddMemo: json['otherAddMemo'],
+        otherAddMemo: json['otherAddMemo']??"",
         //기타추가비 메모
-        otherAddCharge: json['otherAddCharge'],
+        otherAddCharge: (json['otherAddCharge']??0).toString(),
         //기타추가비 금액
 
         unitPrice: (json['unitCharge']??0).toString(),
-        unitPriceType: json['unitPriceType'],
-        unitPriceTypeName: json['unitPriceTypeName'],
+        unitPriceType: json['unitPriceType']??"",
+        unitPriceTypeName: json['unitPriceTypeName']??"",
 
-        custMngName: json['custMngName'],
-        custMngMemo: json['custMngMemo'],
+        custMngName: json['custMngName']??"",
+        custMngMemo: json['custMngMemo']??"",
 
-        payType: json['payType'],
-        reqPayYN: json['reqPayYN'],
-        reqPayDate: json['reqPayDate'],
-        talkYn: json['talkYn'],
-        reqStaffName:json['reqStaffName'],
+        payType: json['payType']??"",
+        reqPayYN: json['reqPayYN']??"",
+        reqPayDate: json['reqPayDate']??"",
+        talkYn: json['talkYn']??"",
+        reqStaffName:json['reqStaffName']??"",
 
-        call24Cargo: json['call24Cargo'],
-        manCargo: json['manCargo'],
-        oneCargo: json['oneCargo'],
-        call24Charge: json['call24Charge'],
-        manCharge: json['manCharge'],
-        oneCharge: json['oneCharge'],
+        call24Cargo: json['call24Cargo']??"",
+        manCargo: json['manCargo']??"",
+        oneCargo: json['oneCargo']??"",
+        call24Charge: (json['call24Charge']??0).toString(),
+        manCharge: (json['manCharge']??0).toString(),
+        oneCharge: (json['oneCharge']??0).toString(),
 
         useYn: json['useYn']
     );
-    var list = json['orderStopList']??"[]"; // 경유지 목록
+    var list = json['templateStopList']??"[]"; // 경유지 목록
     if(list != "[]") {
       var jsonList = jsonDecode(list);
-      List<StopPointModel> itemsList = jsonList.map((i) => StopPointModel.fromJSON(i)).toList();
-      order.orderStopList = itemsList;
+      List<TemplateStopPointModel> itemsList = jsonList.map((i) => TemplateModel.fromJSON(i)).toList();
+      order.templateStopList = itemsList;
     }else{
-      order.orderStopList = List.empty(growable: true);
+      order.templateStopList = List.empty(growable: true);
     }
     return order;
+  }
+
+  Map<String,dynamic> toJson() {
+    return {
+      "templateTitle" : templateTitle,
+      "templateId" : templateId,
+      "reqCustId" : reqCustId,
+      "reqCustName" : reqCustName,
+      "reqDeptId" : reqDeptId,
+      "reqDeptName" : reqDeptName,
+      "reqStaff" : reqStaff,
+      "reqTel" : reqTel,
+      "reqAddr" : reqAddr,
+      "reqAddrDetail" : reqAddrDetail,
+      "custId" : custId,
+      "custName" : custName,
+      "deptId" : deptId,
+      "deptName" : deptName,
+      "inOutSctn" : inOutSctn,
+      "inOutSctnName" : inOutSctnName,
+      "truckTypeCode" : truckTypeCode,
+      "truckTypeName" : truckTypeName,
+      "sComName" : sComName,
+      "sSido" : sSido,
+      "sGungu" : sGungu,
+      "sDong" : sDong,
+      "sAddr" : sAddr,
+      "sAddrDetail" : sAddrDetail,
+      "sDate" : sDate,
+      "sStaff" : sStaff,
+      "sTel" : sTel,
+      "sMemo" : sMemo,
+      "eComName" : eComName,
+      "eSido" : eSido,
+      "eGungu" : eGungu,
+      "eDong" : eDong,
+      "eAddr" : eAddr,
+      "eAddrDetail" : eAddrDetail,
+      "eDate" : eDate,
+      "eStaff" : eStaff,
+      "eTel" : eTel,
+      "eMemo" : eMemo,
+      "sLat" : sLat,
+      "sLon" : sLon,
+      "eLat" : eLat,
+      "eLon" : eLon,
+      "goodsName" : goodsName,
+      "goodsWeight" : goodsWeight,
+      "weightUnitCode" : weightUnitCode,
+      "weightUnitName" : weightUnitName,
+      "goodsQty" : goodsQty,
+      "qtyUnitCode" : qtyUnitCode,
+      "qtyUnitName" : qtyUnitName,
+      "sWayCode" : sWayCode,
+      "sWayName" : sWayName,
+      "eWayCode" : eWayCode,
+      "eWayName" : eWayName,
+      "mixYn" : mixYn,
+      "mixSize" : mixSize,
+      "returnYn" : returnYn,
+      "carTonCode" : carTonCode,
+      "carTonName" : carTonName,
+      "carTypeCode" : carTypeCode,
+      "carTypeName" : carTypeName,
+      "chargeType" : chargeType,
+      "chargeTypeName" : chargeTypeName,
+      "distance" : distance,
+      "time" : time,
+      "reqMemo" : reqMemo,
+      "driverMemo" : driverMemo,
+      "itemCode" : itemCode,
+      "itemName" : itemName,
+      "stopCount" : stopCount,
+      "sellCustId" : sellCustId,
+      "sellDeptId" : sellDeptId,
+      "sellStaff" : sellStaff,
+      "sellStaffName" : sellStaffName,
+      "sellStaffTel" : sellStaffTel,
+      "sellCustName" : sellCustName,
+      "sellDeptName" : sellDeptName,
+      "sellCharge" : sellCharge,
+      "sellFee" : sellFee,
+      "sellWeight" : sellWeight,
+      "sellWayPointMemo" : sellWayPointMemo,
+      "sellWayPointCharge" : sellWayPointCharge,
+      "sellStayMemo" : sellStayMemo,
+      "sellStayCharge" : sellStayCharge,
+      "sellHandWorkMemo" : sellHandWorkMemo,
+      "sellHandWorkCharge" : sellHandWorkCharge,
+      "sellRoundMemo" : sellRoundMemo,
+      "sellRoundCharge" : sellRoundCharge,
+      "sellOtherAddMemo" : sellOtherAddMemo,
+      "sellOtherAddCharge" : sellOtherAddCharge,
+      "custPayType" : custPayType,
+      "buyCharge" : buyCharge,
+      "buyFee" : buyFee,
+      "wayPointMemo" : wayPointMemo,
+      "wayPointCharge" : wayPointCharge,
+      "stayMemo" : stayMemo,
+      "stayCharge" : stayCharge,
+      "handWorkMemo" : handWorkMemo,
+      "handWorkCharge" : handWorkCharge,
+      "roundMemo" : roundMemo,
+      "roundCharge" : roundCharge,
+      "otherAddMemo" : otherAddMemo,
+      "otherAddCharge" : otherAddCharge,
+      "unitPrice" : unitPrice,
+      "unitPriceType" : unitPriceType,
+      "unitPriceTypeName" : unitPriceTypeName,
+      "custMngName" : custMngName,
+      "custMngMemo" : custMngMemo,
+      "payType" : payType,
+      "reqPayYN" : reqPayYN,
+      "reqPayDate" : reqPayDate,
+      "talkYn" : talkYn,
+      "templateStopList" : templateStopList,
+      "reqStaffName" : reqStaffName,
+      "call24Cargo" : call24Cargo,
+      "manCargo" : manCargo,
+      "oneCargo" : oneCargo,
+      "call24Charge" : call24Charge,
+      "manCharge" : manCharge,
+      "oneCharge" : oneCharge,
+      "useYn" : useYn,
+    };
   }
 
   Map<String,dynamic> toMap() {
@@ -609,7 +735,7 @@ class TemplateModel extends ResultModel {
       "reqPayYN": reqPayYN,
       "reqPayDate": reqPayDate,
       "talkYn": talkYn,
-      "orderStopList": jsonEncode(orderStopList??List.empty(growable: true)),
+      "templateStopList": jsonEncode(templateStopList??List.empty(growable: true)),
       "reqStaffName":reqStaffName,
       "call24Cargo": call24Cargo,
       "manCargo": manCargo,
