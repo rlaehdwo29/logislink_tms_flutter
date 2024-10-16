@@ -4,16 +4,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
+import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/template_model.dart';
+import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/page/renewpage/create_template_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/template_manage_detail_page.dart';
+import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:page_animation_transition/animations/left_to_right_transition.dart';
 import 'package:page_animation_transition/page_animation_transition.dart';
+import 'package:dio/dio.dart';
 
 class TemplateManagePage extends StatefulWidget {
 
@@ -24,9 +29,11 @@ class TemplateManagePage extends StatefulWidget {
 
 class _TemplateManagePageState extends State<TemplateManagePage> {
 
+  final controller = Get.find<App>();
+
   final template_list = List.empty(growable: true).obs;
   final selectMode = false.obs;
-  final select_template_list = List.empty(growable: true).obs;
+  final select_template_list = <TemplateModel>[].obs;
   
 
   @override
@@ -34,7 +41,9 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
     super.initState();
 
     Future.delayed(Duration.zero, () async {
-      template_list.add(
+      await getTemplateList();
+
+      /*template_list.add(
           TemplateModel(
               templateTitle: "템플릿 테스트",
               templateId: "TP20240711095643",
@@ -496,7 +505,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
               manCharge: "15000",
               oneCharge: "16000"
           )
-      );
+      );*/
     });
 
   }
@@ -526,6 +535,85 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
     return total;
   }
 
+  Future<void> getTemplateList() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getTemplateList(
+      user.authorization
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getTemplateList() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+                var list = _response.resultMap?["data"] as List;
+                if(template_list.isNotEmpty) template_list.clear();
+                if(list.length > 0){
+                  List<TemplateModel> itemsList = list.map((i) => TemplateModel.fromJSON(i)).toList();
+                  template_list.addAll(itemsList);
+                }
+
+            }else{
+              template_list.value = List.empty(growable: true);
+            }
+          } else {
+            template_list.value = List.empty(growable: true);
+          }
+        }
+      }catch(e) {
+        print("getTemplateList() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getTemplateList() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getTemplateList() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> delTemplateList(List<TemplateModel> tList) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).templateDel(
+        user.authorization,
+        jsonEncode(tList?.map((e) => e.toJson()).toList())
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("delTemplateList() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              tList = List.empty(growable: true);
+
+            }
+          } else {
+            Util.toast("탬플릿 삭제에 실패하였습니다.");
+          }
+        }
+      }catch(e) {
+        print("delTemplateList() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("delTemplateList() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("delTemplateList() getOrder Default => ");
+          break;
+      }
+    });
+  }
 
   /**
    * Function End
@@ -1015,12 +1103,8 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                            },
                                () async {
                              Navigator.of(context).pop(false);
-                             int delCnt = 0;
-                             for (var selectItem in select_template_list) {
-                               template_list.remove(selectItem);
-                               delCnt++;
-                             }
-                             Util.snackbar(context, "$delCnt건의 탬플릿이 삭제되었습니다.");
+                             await delTemplateList(select_template_list);
+                             Util.snackbar(context, "${select_template_list.length}건의 탬플릿이 삭제되었습니다.");
                              selectMode.value = false;
                            });
                         }else{
@@ -1049,7 +1133,14 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                    )
                ) : InkWell(
                     onTap: () async {
-                      await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(), pageAnimationType: LeftToRightTransition()));
+                      Map<String, dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(), pageAnimationType: LeftToRightTransition()));
+
+                      if (results != null && results.containsKey("code")) {
+                        if (results["code"] == 200) {
+                          Util.toast("탬플릿이 등록되었습니다.");
+                          await getTemplateList();
+                        }
+                      }
                     },
                     child: Container(
                         width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.5,

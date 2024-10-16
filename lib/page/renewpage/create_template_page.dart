@@ -18,6 +18,7 @@ import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/template_model.dart';
+import 'package:logislink_tms_flutter/common/model/template_stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
@@ -76,8 +77,35 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
     Future.delayed(Duration.zero, () async {
 
       if(widget.tModel != null) {
+        final orderStopList = <StopPointModel>[].obs;
+        if(widget.tModel?.templateStopList?.length != 0) {
+          for(int i = 0; i < widget.tModel!.templateStopList!.length; i++) {
+            orderStopList.add(StopPointModel(
+              stopSeq : widget.tModel!.templateStopList![i].stopSeq,
+              stopNo : widget.tModel!.templateStopList![i].stopNo,
+              eComName : widget.tModel!.templateStopList![i].eComName,
+              eAddr : widget.tModel!.templateStopList![i].eAddr,
+              eAddrDetail : widget.tModel!.templateStopList![i].eAddrDetail,
+              eStaff : widget.tModel!.templateStopList![i].eStaff,
+              eTel : widget.tModel!.templateStopList![i].eTel,
+              finishYn : widget.tModel!.templateStopList![i].finishYn,
+              finishDate : widget.tModel!.templateStopList![i].finishDate,
+              beginYn : widget.tModel!.templateStopList![i].beginYn,
+              beginDate : widget.tModel!.templateStopList![i].beginDate,
+              goodsWeight : widget.tModel!.templateStopList![i].goodsWeight,
+              eLat : widget.tModel!.templateStopList![i].eLat,
+              eLon : widget.tModel!.templateStopList![i].eLon,
+              weightUnitCode : widget.tModel!.templateStopList![i].weightUnitCode,
+              goodsQty : widget.tModel!.templateStopList![i].goodsQty,
+              qtyUnitCode : widget.tModel!.templateStopList![i].qtyUnitCode,
+              qtyUnitName : widget.tModel!.templateStopList![i].qtyUnitName,
+              goodsName : widget.tModel!.templateStopList![i].goodsName,
+              useYn : widget.tModel!.templateStopList![i].useYn,
+              stopSe : widget.tModel!.templateStopList![i].stopSe,
+            ));
+          }
+        }
         mData.value = OrderModel(
-            //orderId: widget.tModel?.orderId,
             reqCustId: widget.tModel?.reqCustId??"",
             reqCustName: widget.tModel?.reqCustName??"",
             reqDeptId: widget.tModel?.reqDeptId??"",
@@ -94,6 +122,7 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
             inOutSctnName: widget.tModel?.inOutSctnName,
             truckTypeCode: widget.tModel?.truckTypeCode,
             truckTypeName: widget.tModel?.truckTypeName,
+
             sComName: widget.tModel?.sComName,
             sSido: widget.tModel?.sSido,
             sGungu: widget.tModel?.sGungu,
@@ -147,7 +176,6 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
             regid: widget.tModel?.regid,
             regdate: widget.tModel?.regdate,
             stopCount: widget.tModel?.stopCount,
-            //sellAllocId: widget.tModel?.sellAllocId,
             sellCustId: widget.tModel?.sellCustId,
             sellDeptId: widget.tModel?.sellDeptId,
             sellStaff: widget.tModel?.sellStaff,
@@ -169,38 +197,8 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
             sellOtherAddMemo: widget.tModel?.sellOtherAddMemo,
             sellOtherAddCharge: widget.tModel?.sellOtherAddCharge,
             custPayType: widget.tModel?.custPayType,
-            //allocId: widget.tModel?.allocId,
-            //allocState: widget.tModel?.allocState,
-            //allocStateName: widget.tModel?.allocStateName,
-            //buyCustId: widget.tModel?.buyCustId,
-            //buyDeptId: widget.tModel?.buyDeptId,
-            //buyCustName: widget.tModel?.buyCustName,
-            //buyDeptName: widget.tModel?.buyDeptName,
-            //buyStaff: widget.tModel?.buyStaff,
-            //buyStaffName: widget.tModel?.buyStaffName,
-            //buyStaffTel: widget.tModel?.buyStaffTel,
             buyCharge: widget.tModel?.buyCharge,
             buyFee: widget.tModel?.buyFee,
-            //allocDate: widget.tModel?.allocDate,
-            //driverState: widget.tModel?.driverState,
-            //vehicId: widget.tModel?.vehicId,
-            //driverId: widget.tModel?.driverId,
-            //carNum: widget.tModel?.carNum,
-            //driverName: widget.tModel?.driverName,
-            //driverTel: widget.tModel?.driverTel,
-            //driverStateName: widget.tModel?.driverStateName,
-            //carMngName: widget.tModel?.carMngName,
-            //carMngMemo: widget.tModel?.carMngMemo,
-            //receiptYn: widget.tModel?.receiptYn,
-            //receiptPath: widget.tModel?.receiptPath,
-            //receiptDate: widget.tModel?.receiptDate,
-            //charge: widget.tModel?.charge,
-            //startDate: widget.tModel?.startDate,
-            //finishDate: widget.tModel?.finishDate,
-            //enterDate: widget.tModel?.enterDate,
-            //payDate: widget.tModel?.payDate,
-            // buyLinkYn: widget.tModel?.buyLinkYn,
-            // linkName: widget.tModel?.linkName,
             wayPointMemo: widget.tModel?.wayPointMemo,
             wayPointCharge: widget.tModel?.wayPointCharge,
             stayMemo: widget.tModel?.stayMemo,
@@ -220,7 +218,7 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
             reqPayYN: widget.tModel?.reqPayYN,
             reqPayDate: widget.tModel?.reqPayDate,
             talkYn: widget.tModel?.talkYn,
-            orderStopList: widget.tModel?.orderStopList,
+            orderStopList: orderStopList.value,
             reqStaffName: widget.tModel?.reqStaffName,
             call24Cargo: widget.tModel?.call24Cargo,
             manCargo: widget.tModel?.manCargo,
@@ -323,11 +321,11 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
                 physics: const NeverScrollableScrollPhysics(), // swipe navigation handling is not supported
                 controller: _motionTabBarController,
                 children: <Widget>[
-                  MainPageContentComponent1(context: context, mData: mData.value, title: "화주 정보", controller: _motionTabBarController!,flag: widget.flag,),
-                  MainPageContentComponent2(context: context, mData: mData.value, title: "상/하차지", controller: _motionTabBarController!,flag: widget.flag),
-                  MainPageContentComponent3(context: context, mData: mData.value, title: "화물 정보", controller: _motionTabBarController!,flag: widget.flag),
-                  MainPageContentComponent4(context: context, mData: mData.value, title: "운임 정보", controller: _motionTabBarController!,flag: widget.flag),
-                  MainPageContentComponent5(context: context, mData: mData.value, title: "최종 확인", controller: _motionTabBarController!,flag: widget.flag),
+                  MainPageContentComponent1(context: context, mData: mData.value, title: "화주 정보", tabController: _motionTabBarController!,flag: widget.flag,),
+                  MainPageContentComponent2(context: context, mData: mData.value, title: "상/하차지", tabController: _motionTabBarController!,flag: widget.flag),
+                  MainPageContentComponent3(context: context, mData: mData.value, title: "화물 정보", tabController: _motionTabBarController!,flag: widget.flag),
+                  MainPageContentComponent4(context: context, mData: mData.value, title: "운임 정보", tabController: _motionTabBarController!,flag: widget.flag),
+                  MainPageContentComponent5(context: context, mData: mData.value, title: "최종 확인", tabController: _motionTabBarController!,flag: widget.flag),
                 ],
             )
           ),
@@ -416,11 +414,11 @@ class MainPageContentComponent1 extends StatefulWidget {
   final BuildContext context;
   final String title;
   final OrderModel mData;
-  final MotionTabBarController controller;
+  final MotionTabBarController tabController;
   String? code;
   String? flag;
 
-  MainPageContentComponent1({Key? key,required this.context,required this.mData, required this.title,required this.controller,this.code,this.flag}):super(key:key);
+  MainPageContentComponent1({Key? key,required this.context,required this.mData, required this.title,required this.tabController,this.code,this.flag}):super(key:key);
 
   @override
   _MainPageContentComponent1State createState() => _MainPageContentComponent1State();
@@ -697,11 +695,11 @@ class MainPageContentComponent2 extends StatefulWidget {
   final BuildContext context;
   final OrderModel mData;
   final String title;
-  final MotionTabBarController controller;
+  final MotionTabBarController tabController;
   String? code;
   String? flag;
 
-  MainPageContentComponent2({Key? key,required this.context,required this.mData, required this.title,required this.controller,this.code,this.flag}):super(key:key);
+  MainPageContentComponent2({Key? key,required this.context,required this.mData, required this.title,required this.tabController,this.code,this.flag}):super(key:key);
 
   @override
   _MainPageContentComponent2State createState() => _MainPageContentComponent2State();
@@ -854,7 +852,7 @@ class _MainPageContentComponent2State extends State<MainPageContentComponent2> {
           isEAddr.value = true;
         }else if(results["flag"] == Const.RESULT_WORK_STOP_POINT) {
           StopPointModel stopModel = results["data"];
-          if(widget.mData.orderStopList == null) widget.mData.orderStopList = List.empty(growable: true);
+          if(widget.mData.orderStopList != null) widget.mData.orderStopList = List.empty(growable: true);
           widget.mData.orderStopList?.add(stopModel);
         }
         setState(() {});
@@ -1540,11 +1538,11 @@ class MainPageContentComponent3 extends StatefulWidget {
   final BuildContext context;
   final String title;
   final OrderModel mData;
-  final MotionTabBarController controller;
+  final MotionTabBarController tabController;
   String? code;
   String? flag;
 
-  MainPageContentComponent3({Key? key,required this.context, required this.mData, required this.title,required this.controller,this.code,this.flag}):super(key:key);
+  MainPageContentComponent3({Key? key,required this.context, required this.mData, required this.title,required this.tabController,this.code,this.flag}):super(key:key);
 
   @override
   _MainPageContentComponent3State createState() => _MainPageContentComponent3State();
@@ -2005,7 +2003,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Text(
-                                            widget.mData.carTypeName??"차종선택",
+                                            widget.mData.carTypeName == null || widget.mData.carTypeName?.isEmpty == true ? "차종선택" : widget.mData.carTypeName!,
                                             textAlign: TextAlign.center,
                                             style: CustomStyle.CustomFont(styleFontSize12, widget.mData.carTypeCode == null || widget.mData.carTypeCode?.isEmpty == true ? light_gray21 : Colors.white , font_weight: FontWeight.w600),
                                           ),
@@ -2054,7 +2052,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Text(
-                                        widget.mData.carTonName??"톤수선택",
+                                        widget.mData.carTonName == null || widget.mData.carTonName?.isEmpty == true ? "톤수선택" : widget.mData.carTonName!,
                                         textAlign: TextAlign.center,
                                         style: CustomStyle.CustomFont(styleFontSize12, widget.mData.carTonCode == null || widget.mData.carTonCode?.isEmpty == true ? light_gray21 : Colors.white , font_weight: FontWeight.w600),
                                       ),
@@ -2173,7 +2171,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-                                  "${widget.mData.itemCode?.isNotEmpty == true ? widget.mData.itemName : "${Strings.of(context)?.get("select_info")??"Not Found"}"}",
+                                  widget.mData.itemCode == null || widget.mData.itemCode?.isEmpty == true ? Strings.of(context)?.get("select_info")??"Not Found" : widget.mData.itemName!,
                                   textAlign: TextAlign.center,
                                   style: CustomStyle.CustomFont(styleFontSize12, widget.mData.itemCode == null || widget.mData.itemCode?.isEmpty == true ? light_gray21 : Colors.white , font_weight: FontWeight.w600),
                                 ),
@@ -2724,11 +2722,11 @@ class MainPageContentComponent4 extends StatefulWidget {
   final BuildContext context;
   final String title;
   final OrderModel mData;
-  final MotionTabBarController controller;
+  final MotionTabBarController tabController;
   String? code;
   String? flag;
 
-  MainPageContentComponent4({Key? key,required this.context,required this.mData,required this.title,required this.controller,this.code,this.flag}):super(key:key);
+  MainPageContentComponent4({Key? key,required this.context,required this.mData,required this.title,required this.tabController,this.code,this.flag}):super(key:key);
 
   _MainPageContentComponent4State createState() => _MainPageContentComponent4State();
 }
@@ -4962,11 +4960,11 @@ class MainPageContentComponent5 extends StatefulWidget {
   final BuildContext context;
   final String title;
   final OrderModel mData;
-  final MotionTabBarController controller;
+  final MotionTabBarController tabController;
   String? code;
   String? flag;
 
-  MainPageContentComponent5({Key? key,required this.context,required this.mData,required this.title,required this.controller,this.code,this.flag}):super(key:key);
+  MainPageContentComponent5({Key? key,required this.context,required this.mData,required this.title,required this.tabController,this.code,this.flag}):super(key:key);
 
   _MainPageContentComponent5State createState() => _MainPageContentComponent5State();
 }
@@ -5039,27 +5037,43 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
   }
 
   bool validation(OrderModel mData){
+
     bool result = true;
     if (mData.sellCustName == null || mData.sellCustName?.isEmpty == true) {
-      //Util.toast("거래처명을 선택해주세요.");
+      Util.toast("\'거래처명\'을 선택해주세요.");
+      widget.tabController!.index = 0;
       result = false;
     } else if (mData.sellDeptId == null || mData.sellDeptId?.isEmpty == true) {
-      //Util.toast("담당부서를 선택해주세요.");
+      Util.toast("\'담당부서\'를 선택해주세요.");
+      widget.tabController!.index = 0;
       result = false;
     } else if (mData.sAddr == null || mData.sAddr?.isEmpty == true) {
-      //Util.toast("상차지를 선택해주세요.");
+      Util.toast("\'상차지\'를 선택해주세요.");
+      widget.tabController!.index = 1;
       result = false;
     } else if (mData.eAddr == null || mData.eAddr?.isEmpty == true) {
-      //Util.toast("하차지를 선택해주세요.");
+      Util.toast("\'하차지\'를 선택해주세요.");
+      widget.tabController!.index = 1;
       result = false;
     } else if (mData.carTypeCode == null || mData.carTypeCode?.isEmpty == true) {
-      //Util.toast("차종을 선택해주세요.");
+      Util.toast("\'차종\'을 선택해주세요.");
+      widget.tabController!.index = 2;
       result = false;
     } else if (mData.carTypeCode == null || mData.carTonCode?.isEmpty == true) {
-      //Util.toast("톤수를 선택해주세요.");
+      Util.toast("\'톤수\'를 선택해주세요.");
+      widget.tabController!.index = 2;
       result = false;
     } else if (mData.goodsName == null || mData.goodsName?.isEmpty == true) {
-      //Util.toast("화물정보를 입력해주세요.");
+      Util.toast("\'화물정보\'를 입력해주세요.");
+      widget.tabController!.index = 2;
+      result = false;
+    } else if (mData.chargeType == null || mData.chargeType?.isEmpty == true) {
+      Util.toast("\'결제방법\'을 선택해주세요.");
+      widget.tabController!.index = 3;
+      result = false;
+    }else if (mData.unitPriceType == null || mData.unitPriceType?.isEmpty == true) {
+      Util.toast("\'단가구분\'을 선택해주세요.");
+      widget.tabController!.index = 3;
       result = false;
     }
     return result;
@@ -5105,9 +5119,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             UserModel user = await controller.getUserInfo();
 
             await FirebaseAnalytics.instance.logEvent(
-              name: Platform.isAndroid
-                  ? "regist_order_aos"
-                  : "regist_order_ios",
+              name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
               parameters: <String, Object> {
                 "user_id": user.userId??"",
                 "user_custId": user.custId??"",
@@ -5120,9 +5132,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             if (mData.call24Cargo == "Y" ||
                 mData.manCargo == "Y" || mData.oneCargo == "Y") {
               await FirebaseAnalytics.instance.logEvent(
-                name: Platform.isAndroid
-                    ? "regist_order_rpa_aos"
-                    : "regist_order_rpa_ios",
+                name: Platform.isAndroid ? "regist_order_rpa_aos" : "regist_order_rpa_ios",
                 parameters: {
                   "user_id": user.userId??"",
                   "user_custId": user.custId??"",
@@ -5155,8 +5165,6 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             break;
         }
       });
-    }else{
-      Util.toast(Strings.of(context)?.get("order_reg_hint")??"Not Found");
     }
   }
 
@@ -5212,10 +5220,10 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             tModel.eLon,
 
             tModel.goodsName,
-            double.parse(tModel.goodsWeight ?? "0.0"),
+            double.parse(tModel.goodsWeight ?? "0"),
             tModel.weightUnitCode,
             tModel.weightUnitName,
-            tModel.goodsQty,
+            double.parse(tModel.goodsQty ?? "0.0"),
             tModel.qtyUnitCode,
             tModel.qtyUnitName,
             tModel.sWayCode,
@@ -5235,26 +5243,26 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             tModel.unitPriceType,
             int.parse(tModel.unitPrice ?? "0"),
             tModel.unitPriceTypeName,
-            tModel.distance,
+            tModel.distance?.toString(),
             tModel.time,
             tModel.reqMemo,
             tModel.driverMemo,
             tModel.itemCode,
             int.parse(tModel.sellCharge ?? "0"),
             int.parse(tModel.sellFee ?? "0"),
-            tModel.orderStopList != null && tModel.orderStopList?.isNotEmpty == true ? jsonEncode(tModel.orderStopList?.map((e) => e.toJson()).toList()) : null,
+            jsonEncode(tModel.templateStopList?.map((e) => e.toJson()).toList()),
             user.userId,
             user.mobile,
             tModel.sellWayPointMemo,
-            tModel.sellWayPointCharge,
+            int.parse(tModel.sellWayPointCharge??"0"),
             tModel.sellStayMemo,
-            tModel.sellStayCharge,
+            int.parse(tModel.sellStayCharge??"0"),
             tModel.handWorkMemo,
-            tModel.sellHandWorkCharge,
+            int.parse(tModel.sellHandWorkCharge??"0"),
             tModel.sellRoundMemo,
-            tModel.sellRoundCharge,
+            int.parse(tModel.sellRoundCharge??"0"),
             tModel.sellOtherAddMemo,
-            tModel.sellOtherAddCharge,
+            int.parse(tModel.sellOtherAddCharge??"0"),
             tModel.sellWeight,
             "N",
             tModel.call24Cargo,
@@ -5266,17 +5274,13 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
         ).then((it) async {
           await pr?.hide();
           ReturnMap _response = DioService.dioResponse(it);
-          logger.d(
-              "regTemplate() _response -> ${_response.status} // ${_response
-                  .resultMap}");
+          logger.d("regTemplate() _response -> ${_response.status} // ${_response.resultMap}");
           if (_response.status == "200") {
             if (_response.resultMap?["result"] == true) {
               UserModel user = await controller.getUserInfo();
 
               await FirebaseAnalytics.instance.logEvent(
-                name: Platform.isAndroid
-                    ? "regist_template_aos"
-                    : "regist_template_ios",
+                name: Platform.isAndroid ? "regist_template_aos" : "regist_template_ios",
                 parameters: <String, Object>{
                   "user_id": user.userId ?? "",
                   "user_custId": user.custId ?? "",
@@ -5293,6 +5297,8 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
                     Navigator.of(context).pop(false);
                   });
             }
+          }else{
+            Util.toast("탬플릿 생성중 오류가 발생하였습니다.");
           }
         }).catchError((Object obj) async {
           await pr?.hide();
@@ -5300,8 +5306,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             case DioError:
             // Here's the sample to get the failed response error code and message
               final res = (obj as DioError).response;
-              print("regTemplate() Error => ${res?.statusCode} // ${res
-                  ?.statusMessage}");
+              print("regTemplate() Error => ${res?.statusCode} // ${res?.statusMessage}");
               break;
             default:
               print("regTemplate() getOrder Default => ");
@@ -5314,6 +5319,34 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
   }
 
    TemplateModel convertTempModel(OrderModel tModel){
+     final covTemplateStopList = <TemplateStopPointModel>[].obs;
+    if(tModel.orderStopList != null) {
+      for(int i = 0; i < tModel.orderStopList!.length; i++) {
+        covTemplateStopList.add(TemplateStopPointModel(
+          stopSeq : tModel.orderStopList?[i].stopSeq,
+          stopNo : tModel.orderStopList?[i].stopNo,
+          eComName : tModel.orderStopList?[i].eComName,
+          eAddr : tModel.orderStopList?[i].eAddr,
+          eAddrDetail : tModel.orderStopList?[i].eAddrDetail,
+          eStaff : tModel.orderStopList?[i].eStaff,
+          eTel : tModel.orderStopList?[i].eTel,
+          finishYn : tModel.orderStopList?[i].finishYn,
+          finishDate : tModel.orderStopList?[i].finishDate,
+          beginYn : tModel.orderStopList?[i].beginYn,
+          beginDate : tModel.orderStopList?[i].beginDate,
+          goodsWeight : tModel.orderStopList?[i].goodsWeight,
+          eLat : tModel.orderStopList?[i].eLat,
+          eLon : tModel.orderStopList?[i].eLon,
+          weightUnitCode : tModel.orderStopList?[i].weightUnitCode,
+          goodsQty : tModel.orderStopList?[i].goodsQty,
+          qtyUnitCode : tModel.orderStopList?[i].qtyUnitCode,
+          qtyUnitName : tModel.orderStopList?[i].qtyUnitName,
+          goodsName : tModel.orderStopList?[i].goodsName,
+          useYn : tModel.orderStopList?[i].useYn,
+          stopSe : tModel.orderStopList?[i].stopSe,
+        ));
+      }
+    }
      TemplateModel tempModel = TemplateModel(
          reqCustId: tModel?.reqCustId??"",
          reqCustName: tModel?.reqCustName??"",
@@ -5422,7 +5455,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
          reqPayYN: tModel?.reqPayYN,
          reqPayDate: tModel?.reqPayDate,
          talkYn: tModel?.talkYn,
-         orderStopList: tModel?.orderStopList,
+         templateStopList: covTemplateStopList.value,
          reqStaffName: tModel?.reqStaffName,
          call24Cargo: tModel?.call24Cargo,
          manCargo: tModel?.manCargo,
