@@ -1,20 +1,26 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/template_model.dart';
+import 'package:logislink_tms_flutter/common/model/template_stop_point_model.dart';
+import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/page/renewpage/create_template_page.dart';
+import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:page_animation_transition/animations/left_to_right_transition.dart';
 import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:phone_call/phone_call.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:dio/dio.dart';
 
 class TemplateManageDetailPage extends StatefulWidget {
 
@@ -39,6 +45,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
   final isEtcExpanded = [].obs;
   final mStopList = List.empty(growable: true).obs;
 
+  final controller = Get.find<App>();
 
 /**
  * Start Function
@@ -72,7 +79,12 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
 
     Future.delayed(Duration.zero, () async {
       mData.value = widget.item;
-
+      await getTemplateStopList();
+      if(mStopList.length > 0) {
+        mStopList.clear();
+      }else{
+        mStopList.addAll(widget.item.templateStopList!);
+      }
       if(mData.value.stopCount != 0) {
         llStopPointHeader.value = true;
         llStopPointList.value = true;
@@ -82,6 +94,116 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
       }
     });
 
+  }
+
+  Future<void> getTemplateDetail() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getTemplateDetail(
+        user.authorization,
+        mData.value.templateId
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("getTemplateDetail() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            if (_response.resultMap?["data"] != null) {
+              TemplateModel template = TemplateModel.fromJSON(it.response.data["data"][0]);
+              mData.value = template;
+            }
+          }
+        }
+      }catch(e) {
+        print("getTemplateDetail() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getTemplateDetail() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getTemplateDetail() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> delTemplateList() async {
+    var select_template_list = List.empty(growable: true);
+    select_template_list.add(mData.value);
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).templateDel(
+        user.authorization,
+        jsonEncode(select_template_list.map((e) => e.toJson()).toList())
+    ).then((it) async {
+      try {
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("delTemplateList() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            Util.toast("\"${mData.value.templateTitle}\" 탬플릿이 삭제되었습니다.");
+            Navigator.of(context).pop({'code' : 300});
+          } else {
+            Util.toast("${_response.resultMap?["msg"]}");
+          }
+        }
+      }catch(e) {
+        print("delTemplateList() Exeption =>$e");
+      }
+    }).catchError((Object obj){
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("delTemplateList() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("delTemplateList() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getTemplateStopList() async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getTemplateStopList(user.authorization,widget.item?.templateId).then((it) async {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getTemplateStopList() Regist _response -> ${_response.status} // ${_response.resultMap}");
+      if (_response.status == "200") {
+        if (_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["data"] != null) {
+            var list = _response.resultMap?["data"] as List;
+            List<TemplateStopPointModel> itemsList = list.map((i) => TemplateStopPointModel.fromJSON(i)).toList();
+            if (itemsList.length != 0) {
+              if(widget.item?.templateStopList?.isNotEmpty == true || widget.item?.templateStopList != null) widget.item?.templateStopList?.clear();
+              widget.item?.templateStopList?.addAll(itemsList);
+            }
+          }
+        } else {
+          openOkBox(context, "${_response.resultMap?["msg"]}",
+              Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                Navigator.of(context).pop(false);
+              });
+        }
+      }
+    }).catchError((Object obj) async {
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getTemplateStopList() RegVersion Error => ${res?.statusCode} // ${res
+              ?.statusMessage}");
+          break;
+        default:
+          print("getTemplateStopList() RegVersion getOrder Default => ");
+          break;
+      }
+    });
   }
 
 /**
@@ -834,6 +956,175 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
     );
   }
 
+  Widget orderSaddrEaddr() {
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(10)),
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+        child: Column(
+      children: [
+        Container(
+            margin: EdgeInsets.only(top: CustomStyle.getHeight(5),left: CustomStyle.getWidth(15),right: CustomStyle.getWidth(15)),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Util.ynToBoolean(mData.value.payType)?
+                Text(
+                  "빠른지급",
+                  textAlign: TextAlign.center,
+                  style: CustomStyle.CustomFont(styleFontSize14, Colors.red,font_weight: FontWeight.w700),
+                ) : const SizedBox()
+              ],
+            )
+        ),
+              Column(
+              children:[
+    Container(
+    margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            Expanded(
+              flex: 4,
+              child: Container(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                  padding:const EdgeInsets.all(3),
+                                  margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(5)),
+                                  decoration: const BoxDecoration(
+                                      color: renew_main_color2,
+                                      shape: BoxShape.circle
+                                  ),
+                                  child: Text("상",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
+                              ),
+                            ]
+                        ),
+                        Flexible(
+                            child: RichText(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                textAlign:TextAlign.center,
+                                text: TextSpan(
+                                  text: mData.value.sComName??"",
+                                  style:  CustomStyle.CustomFont(styleFontSize16, main_color, font_weight: FontWeight.w800),
+                                )
+                            )
+                        ),
+                        CustomStyle.sizedBoxHeight(5.0.h),
+                        Flexible(
+                            child: RichText(
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                textAlign:TextAlign.center,
+                                text: TextSpan(
+                                  text: mData.value.sAddr??"",
+                                  style: CustomStyle.CustomFont(styleFontSize11, main_color),
+                                )
+                            )
+                        ),
+                      ]
+                  )
+              ),
+            ),
+            Expanded(
+                flex: 2,
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/image/ic_arrow.png",
+                        width: CustomStyle.getWidth(32.0),
+                        height: CustomStyle.getHeight(32.0),
+                        color: const Color(0xffC7CBDE),
+                      ),
+                      Text(
+                        "${Util.makeDistance(mData.value.distance)}",
+                        style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
+                      ),
+                      Text(
+                        "${Util.makeTime(mData.value.time??0)}",
+                        style: CustomStyle.CustomFont(styleFontSize11, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
+                      )
+                    ]
+                )
+            ),
+            Expanded(
+                flex: 4,
+                child: Container(
+                    decoration: const BoxDecoration(
+                      borderRadius:  BorderRadius.all(Radius.circular(10)),
+                    ),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                    padding:const EdgeInsets.all(3),
+                                    margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(5)),
+                                    decoration: const BoxDecoration(
+                                        color: rpa_btn_cancle,
+                                        shape: BoxShape.circle
+                                    ),
+                                    child: Text("하",style: CustomStyle.CustomFont(styleFontSize12, Colors.white,font_weight: FontWeight.w600),)
+                                ),
+                              ]
+                          ),
+                          Flexible(
+                              child: RichText(
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                    text:
+                                    mData.value.eComName ?? "",
+                                    style: CustomStyle.CustomFont(styleFontSize16, main_color, font_weight: FontWeight.w800),
+                                  )
+                              )
+                          ),
+                          CustomStyle.sizedBoxHeight(5.h),
+                          Flexible(
+                              child: RichText(
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  text: TextSpan(
+                                      text: mData.value.eAddr??"",
+                                      style:CustomStyle.CustomFont(styleFontSize11, main_color)
+                                  )
+                              )
+                          ),
+                        ]
+                    )
+                )
+            )
+              ],
+            )
+        )
+      ]),
+    ])
+    );
+  }
+
   Widget orderSellWidget() {
     return Container(
         decoration: const BoxDecoration(
@@ -993,7 +1284,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
     return WillPopScope(
         onWillPop: () async {
           return Future((){
-            Navigator.of(context).pop();
+            Navigator.of(context).pop({'code':300});
             return true;
           });
         } ,
@@ -1016,8 +1307,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                             () {Navigator.of(context).pop();},
                             () async {
                           Navigator.of(context).pop();
-                          Util.snackbar(context, "${mData.value.templateTitle} 탬플릿이 삭제되었습니다.");
-                          Navigator.of(context).pop();
+                          await delTemplateList();
                         }
                     );
                   },
@@ -1039,7 +1329,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
             leading:
             IconButton(
               onPressed: () async {
-                Navigator.of(context).pop({'code':100});
+                Navigator.of(context).pop({'code':300});
               },
               color: styleWhiteCol,
               icon: Image.asset(
@@ -1067,6 +1357,16 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
                                   child: Text(
+                                    "상/하차 정보",
+                                    style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
+                                  )
+                              ),
+                              orderSaddrEaddr(),
+                              llStopPointHeader.value ? stopPointPannelWidget() : const SizedBox(),
+                              Container(
+                                  alignment: Alignment.centerLeft,
+                                  margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
+                                  child: Text(
                                     "운임 정보",
                                     style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
                                   )
@@ -1080,7 +1380,6 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                                     style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
                                   )
                               ) : const SizedBox(),
-                              llStopPointHeader.value ? stopPointPannelWidget() : const SizedBox(),
                               Container(
                                   alignment: Alignment.centerLeft,
                                   margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
@@ -1118,7 +1417,14 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                         flex: 1,
                         child: InkWell(
                             onTap: () async {
-                              await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "M",tModel: mData.value), pageAnimationType: LeftToRightTransition()));
+                              Map<String, dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "M",tModel: mData.value), pageAnimationType: LeftToRightTransition()));
+
+                              if (results != null && results.containsKey("code")) {
+                                if (results["code"] == 200) {
+                                  Util.toast("탬플릿이 수정되었습니다.");
+                                  await getTemplateDetail();
+                                }
+                              }
                             },
                             child: Container(
                               margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(40)),

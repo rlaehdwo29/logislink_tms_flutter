@@ -46,9 +46,11 @@ class CreateTemplatePage extends StatefulWidget {
   String? code;
   String? flag;
   TemplateModel? tModel;
+  bool? sTimeFreeYn;
+  bool? eTimeFreeYn;
 
 
-  CreateTemplatePage({Key? key,this.tModel,this.code,this.flag}):super(key:key);
+  CreateTemplatePage({Key? key,this.tModel,this.code,this.flag,this.sTimeFreeYn,this.eTimeFreeYn}):super(key:key);
 
   _CreateTemplatePageState createState() => _CreateTemplatePageState();
 }
@@ -57,6 +59,8 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
 
   final code = "".obs;
   final mData = OrderModel().obs;
+
+  final controller = Get.find<App>();
 
   MotionTabBarController? _motionTabBarController;
 
@@ -147,6 +151,8 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
             sLon: widget.tModel?.sLon,
             eLat: widget.tModel?.eLat,
             eLon: widget.tModel?.eLon,
+            sTimeFreeYN: widget.sTimeFreeYn == true ? 'Y' : 'N',
+            eTimeFreeYN: widget.eTimeFreeYn == true ? 'Y' : 'N',
             goodsName: widget.tModel?.goodsName,
             goodsWeight: widget.tModel?.goodsWeight,
             weightUnitCode: widget.tModel?.weightUnitCode,
@@ -212,8 +218,6 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
             unitPrice: widget.tModel?.unitPrice,
             unitPriceType: widget.tModel?.unitPriceType,
             unitPriceTypeName: widget.tModel?.unitPriceTypeName,
-            custMngName: widget.tModel?.custMngName,
-            custMngMemo: widget.tModel?.custMngMemo,
             payType: widget.tModel?.payType,
             reqPayYN: widget.tModel?.reqPayYN,
             reqPayDate: widget.tModel?.reqPayDate,
@@ -271,9 +275,6 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
    */
 
 
-
-
-
   /**
    * Widget Start
    */
@@ -322,10 +323,10 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
                 controller: _motionTabBarController,
                 children: <Widget>[
                   MainPageContentComponent1(context: context, mData: mData.value, title: "화주 정보", tabController: _motionTabBarController!,flag: widget.flag,),
-                  MainPageContentComponent2(context: context, mData: mData.value, title: "상/하차지", tabController: _motionTabBarController!,flag: widget.flag),
+                  MainPageContentComponent2(context: context, mData: mData.value, title: "상/하차지", tabController: _motionTabBarController!,flag: widget.flag, templateId: widget.tModel?.templateId),
                   MainPageContentComponent3(context: context, mData: mData.value, title: "화물 정보", tabController: _motionTabBarController!,flag: widget.flag),
                   MainPageContentComponent4(context: context, mData: mData.value, title: "운임 정보", tabController: _motionTabBarController!,flag: widget.flag),
-                  MainPageContentComponent5(context: context, mData: mData.value, title: "최종 확인", tabController: _motionTabBarController!,flag: widget.flag),
+                  MainPageContentComponent5(context: context, mData: mData.value, title: "최종 확인", tabController: _motionTabBarController!,flag: widget.flag, templateId: widget.tModel?.templateId),
                 ],
             )
           ),
@@ -698,8 +699,9 @@ class MainPageContentComponent2 extends StatefulWidget {
   final MotionTabBarController tabController;
   String? code;
   String? flag;
+  String? templateId;
 
-  MainPageContentComponent2({Key? key,required this.context,required this.mData, required this.title,required this.tabController,this.code,this.flag}):super(key:key);
+  MainPageContentComponent2({Key? key,required this.context,required this.mData, required this.title,required this.tabController,this.code,this.flag, this.templateId}):super(key:key);
 
   @override
   _MainPageContentComponent2State createState() => _MainPageContentComponent2State();
@@ -852,7 +854,6 @@ class _MainPageContentComponent2State extends State<MainPageContentComponent2> {
           isEAddr.value = true;
         }else if(results["flag"] == Const.RESULT_WORK_STOP_POINT) {
           StopPointModel stopModel = results["data"];
-          if(widget.mData.orderStopList != null) widget.mData.orderStopList = List.empty(growable: true);
           widget.mData.orderStopList?.add(stopModel);
         }
         setState(() {});
@@ -1565,9 +1566,9 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
   void initState() {
     super.initState();
 
-    goodsNameController = TextEditingController();
-    cargoWgtController = TextEditingController();
-    goodsQtyController = TextEditingController();
+    goodsNameController = TextEditingController(text: widget.mData.goodsName??"");
+    cargoWgtController = TextEditingController(text: widget.mData.goodsWeight??"0.0");
+    goodsQtyController = TextEditingController(text: widget.mData.goodsQty??"0.0");
 
     Future.delayed(Duration.zero, () async {
       if(widget.mData.inOutSctn?.isEmpty == true || widget.mData.inOutSctn.isNull == true) {
@@ -1577,11 +1578,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
       widget.mData.mixYn = "N";
       widget.mData.returnYn = "N";
       widget.mData.weightUnitCode = "TON";
-      widget.mData.goodsWeight = widget.mData.goodsWeight??"0";
-      cargoWgtController.text = widget.mData.goodsWeight!;
       widget.mData.goodsQty = widget.mData.goodsQty??"0";
-      goodsQtyController.text = widget.mData.goodsQty??"0";
-      goodsNameController.text = widget.mData.goodsName??"";
 
       mCargoList.addAll(getCodeList(Const.IN_OUT_SCTN));
       mCargoTruckList.addAll(getCodeList(Const.TRUCK_TYPE_CD));
@@ -2257,9 +2254,11 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                                       onChanged: (value){
                                         setState(() {
                                           if(value.length == 0) {
-                                            widget.mData.goodsWeight = "";
+                                            widget.mData.goodsWeight = "0.0";
+                                            cargoWgtController.text = "0.0";
                                           }else{
                                             widget.mData.goodsWeight = value;
+                                            cargoWgtController.text = value;
                                           }
                                         });
                                       },
@@ -2335,7 +2334,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                                                   onChanged: (value){
                                                     setState(() {
                                                       if(value.length == 0) {
-                                                        widget.mData.goodsQty = "";
+                                                        widget.mData.goodsQty = "0.0";
                                                       }else{
                                                         widget.mData.goodsQty = value;
                                                       }
@@ -2726,7 +2725,7 @@ class MainPageContentComponent4 extends StatefulWidget {
   String? code;
   String? flag;
 
-  MainPageContentComponent4({Key? key,required this.context,required this.mData,required this.title,required this.tabController,this.code,this.flag}):super(key:key);
+  MainPageContentComponent4({Key? key,required this.context,required this.mData,required this.title,required this.tabController, this.code,this.flag}):super(key:key);
 
   _MainPageContentComponent4State createState() => _MainPageContentComponent4State();
 }
@@ -2748,6 +2747,7 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
   final tvUnitPriceType02 = false.obs;
   final llUnitPrice = false.obs;
   final etUnitPrice = false.obs;
+  final mRpaSalary = "0".obs;
 
   late TabController _tabController;
   final mTabCode = "01".obs;
@@ -2760,7 +2760,6 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
   final tv24Call = false.obs;
   final tvHwaMull = true.obs;
   final tvOneCall = true.obs;
-  final mRpaSalary = "".obs;
 
   late TextEditingController unitPriceController;
   late TextEditingController sellChargeController;
@@ -2790,9 +2789,11 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
     if(m24Call.value == "N") {
       m24Call.value = "Y";
       widget.mData.call24Cargo = "Y";
+      if(mRpaSalary.value != "0") widget.mData.call24Charge = mRpaSalary.value;
     }else{
       m24Call.value = "N";
-      widget.mData.call24Cargo = "Y";
+      widget.mData.call24Cargo = "N";
+      if(mRpaSalary.value != "0") widget.mData.call24Charge = "0";
     }
   }
 
@@ -2800,9 +2801,11 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
     if(mOneCall.value == "N") {
       mOneCall.value = "Y";
       widget.mData.oneCargo = "Y";
+      if(mRpaSalary.value != "0") widget.mData.oneCharge = mRpaSalary.value;
     }else{
       mOneCall.value = "N";
       widget.mData.oneCargo = "N";
+      if(mRpaSalary.value != "0") widget.mData.oneCharge = "0";
     }
   }
 
@@ -2810,15 +2813,18 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
     if(mHwaMull.value == "N") {
       mHwaMull.value = "Y";
       widget.mData.manCargo = "Y";
+      if(mRpaSalary.value != "0") widget.mData.manCharge = mRpaSalary.value;
       tvHwaMull.value = true;
     }else{
       if(mHwaMullFlag.value) {
         mHwaMull.value == "Y";
         widget.mData.manCargo = "Y";
+        if(mRpaSalary.value != "0") widget.mData.manCharge = mRpaSalary.value;
         mHwaMullFlag.value = false; // 지속적으로 On 되어 있는것이 On/Off로 전환 - 2023-09-04
       }else{
         mHwaMull.value = "N";
         widget.mData.manCargo = "N";
+        if(mRpaSalary.value != "0") widget.mData.manCharge = "0";
       }
     }
   }
@@ -3677,9 +3683,6 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
                         if(value.length > 0) {
                           sellWeightController.text = value.replaceFirst(RegExp(r'^0+'), '');
                           widget.mData.sellWeight = sellWeightController.text;
-
-                          /*sellWeightController.text = value;
-                    widget.mData.sellWeight = value;*/
                         } else {
                           sellWeightController.text = "";
                           widget.mData.sellWeight = "";
@@ -3693,6 +3696,7 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
             /**
              * 정보망 전송
              */
+            widget.flag == "D" ?
             Container(
                 margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
                 padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(5)),
@@ -3892,7 +3896,17 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
                                         rpaValueController.text = "0";
                                         mRpaSalary.value = "0";
                                       }
-                                      setState(() {});
+                                      setState(() {
+                                        if(widget.mData.call24Cargo == "Y") {
+                                         widget.mData.call24Charge = mRpaSalary?.value;
+                                        }
+                                        if(widget.mData.oneCargo == "Y") {
+                                         widget.mData.oneCharge = mRpaSalary?.value;
+                                        }
+                                        if(widget.mData.manCargo == "Y") {
+                                          widget.mData.manCharge = mRpaSalary?.value;
+                                        }
+                                      });
                                   },
                                 )
                             )
@@ -3900,7 +3914,7 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
                       )
                     ]
                 )
-            )
+            ) : const SizedBox()
           ]
       )
     );
@@ -4963,8 +4977,9 @@ class MainPageContentComponent5 extends StatefulWidget {
   final MotionTabBarController tabController;
   String? code;
   String? flag;
+  String? templateId;
 
-  MainPageContentComponent5({Key? key,required this.context,required this.mData,required this.title,required this.tabController,this.code,this.flag}):super(key:key);
+  MainPageContentComponent5({Key? key,required this.context,required this.mData,required this.title,required this.tabController, this.code,this.flag,this.templateId}):super(key:key);
 
   _MainPageContentComponent5State createState() => _MainPageContentComponent5State();
 }
@@ -5097,11 +5112,11 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
           mData.eTel,mData.eMemo,mData.sLat,mData.sLon,mData.eLat,mData.eLon,
           mData.goodsName,double.parse(mData.goodsWeight??"0.0"),mData.weightUnitCode,mData.goodsQty,mData.qtyUnitCode,
           mData.sWayCode,mData.eWayCode,mData.mixYn,mData.mixSize,mData.returnYn,
-          mData.carTonCode,mData.carTypeCode,mData.chargeType,mData.unitPriceType,int.parse(mData.unitPrice??"0"),mData.distance,mData.time,
+          mData.carTonCode,mData.carTypeCode,mData.chargeType,mData.unitPriceType,int.parse(mData.unitPrice??"0"),mData.distance, mData.sTimeFreeYN, mData.eTimeFreeYN,mData.time,
           mData.reqMemo, mData.driverMemo,mData.itemCode,int.parse(mData.sellCharge??"0"),int.parse(mData.sellFee??"0"),
           mData.orderStopList != null && mData.orderStopList?.isNotEmpty == true ? jsonEncode(mData.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
           mData.sellWayPointMemo,mData.sellWayPointCharge,mData.sellStayMemo,mData.sellStayCharge,
-          mData.handWorkMemo,mData.sellHandWorkCharge,mData.sellRoundMemo,mData.sellRoundCharge,
+          mData.sellHandWorkMemo,mData.sellHandWorkCharge,mData.sellRoundMemo,mData.sellRoundCharge,
           mData.sellOtherAddMemo,mData.sellOtherAddCharge,mData.sellWeight,"N",
           mData.call24Cargo,
           mData.manCargo,
@@ -5182,6 +5197,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             tModel.sellDeptName,
             tModel.sellDeptId,
             tModel.sellStaff,
+            tModel.sellStaffName,
             tModel.sellStaffTel,
             tModel.reqAddr,
             tModel.reqAddrDetail,
@@ -5248,6 +5264,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             tModel.reqMemo,
             tModel.driverMemo,
             tModel.itemCode,
+            tModel.itemName,
             int.parse(tModel.sellCharge ?? "0"),
             int.parse(tModel.sellFee ?? "0"),
             jsonEncode(tModel.templateStopList?.map((e) => e.toJson()).toList()),
@@ -5257,7 +5274,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             int.parse(tModel.sellWayPointCharge??"0"),
             tModel.sellStayMemo,
             int.parse(tModel.sellStayCharge??"0"),
-            tModel.handWorkMemo,
+            tModel.sellHandWorkMemo,
             int.parse(tModel.sellHandWorkCharge??"0"),
             tModel.sellRoundMemo,
             int.parse(tModel.sellRoundCharge??"0"),
@@ -5316,6 +5333,154 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
       }else{
         Util.toast("탬플릿명을 입력해주세요.");
       }
+  }
+
+  Future<void> modifyTemplate(OrderModel mData) async {
+    TemplateModel tModel = convertTempModel(mData);
+    Logger logger = Logger();
+      await pr?.show();
+      UserModel? user = await controller.getUserInfo();
+      await DioService.dioClient(header: true).templateMod(
+          user.authorization,
+          widget.templateId,
+          tModel.sellCustName,
+          tModel.sellCustId,
+          tModel.sellDeptName,
+          tModel.sellDeptId,
+          tModel.sellStaff,
+          tModel.sellStaffName,
+          tModel.sellStaffTel,
+          tModel.reqAddr,
+          tModel.reqAddrDetail,
+          user.custId,
+          user.deptId,
+          tModel.inOutSctn,
+          tModel.inOutSctnName,
+          tModel.truckTypeCode,
+          tModel.truckTypeName,
+
+          tModel.sComName,
+          tModel.sSido,
+          tModel.sGungu,
+          tModel.sDong,
+          tModel.sAddr,
+          tModel.sAddrDetail,
+          tModel.sDate,
+          tModel.sStaff,
+          tModel.sTel,
+          tModel.sMemo,
+
+          tModel.eComName,
+          tModel.eSido,
+          tModel.eGungu,
+          tModel.eDong,
+          tModel.eAddr,
+          tModel.eAddrDetail,
+          tModel.eDate,
+          tModel.eStaff,
+          tModel.eTel,
+          tModel.eMemo,
+
+          tModel.sLat,
+          tModel.sLon,
+          tModel.eLat,
+          tModel.eLon,
+
+          tModel.goodsName,
+          double.parse(tModel.goodsWeight ?? "0"),
+          tModel.weightUnitCode,
+          tModel.weightUnitName,
+          double.parse(tModel.goodsQty ?? "0.0"),
+          tModel.qtyUnitCode,
+          tModel.qtyUnitName,
+          tModel.sWayCode,
+          tModel.sWayName,
+          tModel.eWayCode,
+          tModel.eWayName,
+          tModel.mixYn,
+          tModel.mixSize,
+          tModel.returnYn,
+          tModel.carTonCode,
+          tModel.carTonName,
+          tModel.carTypeCode,
+          tModel.carTypeName,
+          tModel.chargeType,
+          tModel.chargeTypeName,
+
+          tModel.unitPriceType,
+          int.parse(tModel.unitPrice ?? "0"),
+          tModel.unitPriceTypeName,
+          tModel.distance?.toString(),
+          tModel.time,
+          tModel.reqMemo,
+          tModel.driverMemo,
+          tModel.itemCode,
+          tModel.itemName,
+          int.parse(tModel.sellCharge ?? "0"),
+          int.parse(tModel.sellFee ?? "0"),
+          jsonEncode(tModel.templateStopList?.map((e) => e.toJson()).toList()),
+          user.userId,
+          user.mobile,
+          tModel.sellWayPointMemo,
+          int.parse(tModel.sellWayPointCharge??"0"),
+          tModel.sellStayMemo,
+          int.parse(tModel.sellStayCharge??"0"),
+          tModel.sellHandWorkMemo,
+          int.parse(tModel.sellHandWorkCharge??"0"),
+          tModel.sellRoundMemo,
+          int.parse(tModel.sellRoundCharge??"0"),
+          tModel.sellOtherAddMemo,
+          int.parse(tModel.sellOtherAddCharge??"0"),
+          tModel.sellWeight,
+          "N",
+          tModel.call24Cargo,
+          tModel.manCargo,
+          tModel.oneCargo,
+          tModel.call24Charge,
+          tModel.manCharge,
+          tModel.oneCharge
+      ).then((it) async {
+        await pr?.hide();
+        ReturnMap _response = DioService.dioResponse(it);
+        logger.d("modifyTemplate() _response -> ${_response.status} // ${_response.resultMap}");
+        if (_response.status == "200") {
+          if (_response.resultMap?["result"] == true) {
+            UserModel user = await controller.getUserInfo();
+
+            await FirebaseAnalytics.instance.logEvent(
+              name: Platform.isAndroid ? "modifyTemplate_aos" : "modifyTemplate_ios",
+              parameters: <String, Object>{
+                "user_id": user.userId ?? "",
+                "user_custId": user.custId ?? "",
+                "user_deptId": user.deptId ?? "",
+                "reqCustId": tModel.sellCustId ?? "",
+                "sellDeptId": tModel.sellDeptId ?? ""
+              },
+            );
+
+            Navigator.of(context).pop({'code': 200});
+          } else {
+            openOkBox(context, "${_response.resultMap?["msg"]}",
+                Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                  Navigator.of(context).pop(false);
+                });
+          }
+        }else{
+          Util.toast("탬플릿 수정중 오류가 발생하였습니다.");
+        }
+      }).catchError((Object obj) async {
+        await pr?.hide();
+        switch (obj.runtimeType) {
+          case DioError:
+          // Here's the sample to get the failed response error code and message
+            final res = (obj as DioError).response;
+            print("modifyTemplate() Error => ${res?.statusCode} // ${res?.statusMessage}");
+            break;
+          default:
+            print("modifyTemplate() getOrder Default => ");
+            break;
+        }
+      });
   }
 
    TemplateModel convertTempModel(OrderModel tModel){
@@ -6399,7 +6564,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
   Widget bodyArea() {
     return Column(
       children: [
-         widget.flag != "D" ?
+         widget.flag == "" || widget.flag == null ?
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
@@ -6408,7 +6573,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
               style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
             )
         ) : const SizedBox(),
-        widget.flag != "D"? templateTitleWidget() : const SizedBox(),
+        widget.flag == ""  || widget.flag == null ? templateTitleWidget() : const SizedBox(),
         Container(
             alignment: Alignment.centerLeft,
             margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
@@ -6476,9 +6641,27 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
                         onPressed: () async {
                           var data = widget.mData;
                           if(widget.flag == "D") { // 오더 등록
+                            if(widget.mData.call24Cargo == "Y") {
+                              if(int.parse(widget.mData.call24Charge??"0") < 20000){
+                                widget.tabController.index = 3;
+                                return Util.toast("정보망 전송(24시콜) 시 지불운임은 20,000원이상입니다.");
+                              }
+                            }
+                            if(widget.mData.oneCargo == "Y") {
+                              if(int.parse(widget.mData.oneCharge??"0") < 20000){
+                                widget.tabController.index = 3;
+                                return Util.toast("정보망 전송(원콜) 시 지불운임은 20,000원이상입니다.");
+                              }
+                            }
+                            if(widget.mData.manCargo == "Y") {
+                              if(int.parse(widget.mData.manCharge??"0") < 20000){
+                                widget.tabController.index = 3;
+                                return Util.toast("정보망 전송(화물맨) 시 지불운임은 20,000원이상입니다.");
+                              }
+                            }
                             await regOrder(widget.mData);
                           }else if(widget.flag == "M") { // 탬플릿 수정
-
+                            await modifyTemplate(widget.mData);
                           }else{ // 탬플릿 생성
                             await regTemplate(templateTitleController.text, widget.mData);
                           }

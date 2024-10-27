@@ -23,6 +23,7 @@ import 'package:logislink_tms_flutter/common/model/cust_user_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_current_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/template_model.dart';
+import 'package:logislink_tms_flutter/common/model/template_stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_rpa_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
@@ -664,7 +665,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     final endTimeChk = true.obs;
     final eTime = DateTime.now().obs;
     templateItem.sDate = Util.getAllDate(DateTime(tempStartSelectedDay!.year,tempStartSelectedDay!.month,tempStartSelectedDay!.day,!startTimeChk.value ? sTime.value.hour : 0,!startTimeChk.value ? sTime.value.minute : 0 ,0));
-    templateItem.eDate = Util.getAllDate(DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 23, !endTimeChk.value ? eTime.value.minute : 59, 59));
+    templateItem.eDate = Util.getAllDate(DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 23, !endTimeChk.value ? eTime.value.minute : 59, 0));
 
     return showModalBottomSheet(
         context: context,
@@ -1059,22 +1060,16 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                             ) : const SizedBox(),
 
 
-                          InkWell(
-                              onTap: () async {
-                                  DateTime? sDateTime = DateTime(tempStartSelectedDay!.year,tempStartSelectedDay!.month,tempStartSelectedDay!.day,!startTimeChk.value ? sTime.value.hour : 0,!startTimeChk.value ? sTime.value.minute : 0 ,0);
-                                  DateTime? eDateTime = DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 0, !endTimeChk.value ? eTime.value.minute : 0, 0);
-                                  if(parseIntDate2(Util.getAllDate(sDateTime)) > parseIntDate2(Util.getAllDate(eDateTime))) {
-                                    Util.toast(Strings.of(context)?.get("order_reg_day_date_fail"));
-                                  }else {
-                                    templateItem.sDate = Util.getAllDate(sDateTime);
-                                    templateItem.eDate = Util.getAllDate(eDateTime);
-                                    await showRegOrder(templateItem);
-                                  }
-                              },
-                              child: InkWell(
+                            InkWell(
                                   onTap: () async {
                                     Navigator.of(context).pop();
-                                    Map<String,dynamic> results  = await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "D",tModel: templateItem), pageAnimationType: LeftToRightTransition()));
+                                    await getTemplateStopList(templateItem);
+                                    DateTime? sDateTime = DateTime(tempStartSelectedDay!.year,tempStartSelectedDay!.month,tempStartSelectedDay!.day,!startTimeChk.value ? sTime.value.hour : 0,!startTimeChk.value ? sTime.value.minute : 0 ,0);
+                                    DateTime? eDateTime = DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 23, !endTimeChk.value ? eTime.value.minute : 59, 0);
+                                    templateItem.sDate = Util.getAllDate(sDateTime);
+                                    templateItem.eDate = Util.getAllDate(eDateTime);
+
+                                    Map<String,dynamic> results  = await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "D",tModel: templateItem, sTimeFreeYn: startTimeChk.value, eTimeFreeYn: endTimeChk.value), pageAnimationType: LeftToRightTransition()));
 
                                     if(results != null && results.containsKey("code")){
                                       if(results["code"] == 200) {
@@ -1099,7 +1094,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                   )
                               )
                             )
-                          )
                         ])
                       )
                     )
@@ -1736,8 +1730,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   Future<void> openSelectRegOrderDialog(BuildContext context) async {
 
-    final selectRegOrder = Util.userDebugger == true ? "02".obs : "01".obs;
-    print("하아앙 -> ${MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height}");
+    final selectRegOrder = "01".obs;
       showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -1775,9 +1768,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                       ),
                        Row(
                          crossAxisAlignment: CrossAxisAlignment.center,
-                           mainAxisAlignment:  Util.userDebugger == false ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
+                           mainAxisAlignment:  MainAxisAlignment.spaceBetween,
                            children: [
-                             Util.userDebugger == false ?
                              Obx(() => InkWell(
                                onTap: (){
                                  selectRegOrder.value = "01";
@@ -1848,7 +1840,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     ],
                                   )
                                 )
-                             )) : const SizedBox(),
+                             )) ,
                              Obx(() => InkWell(
                                onTap: (){
                                  selectRegOrder.value = "02";
@@ -3403,19 +3395,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     return total;
   }
 
-  Future<void> showRegOrder(TemplateModel templateItem) async {
-    openCommonConfirmBox(
-        context,
-        "오더를 등록하시겠습니까?",
-        Strings.of(context)?.get("no") ?? "Error!!",
-        Strings.of(context)?.get("yes") ?? "Error!!",
-            () {Navigator.of(context).pop(false);},
-            () async {
-          Navigator.of(context).pop(false);
-          //await regTemplateOrder();
-        }
-    );
-  }
 
   String validation(TemplateModel templateItem){
     var valiType = "";
@@ -3441,99 +3420,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       valiType = "청구운임";
     }
     return valiType;
-  }
-
-  Future<void> regTemplateOrder(TemplateModel templateItem) async {
-    String valiChk = validation(templateItem);
-    if(valiChk == "") {
-      Logger logger = Logger();
-      await pr?.show();
-      UserModel? user = await controller.getUserInfo();
-      await DioService.dioClient(header: true).orderReg(
-          user.authorization,
-          templateItem.sellCustName,
-          templateItem.sellCustId,
-          templateItem.sellDeptId,
-          templateItem.sellStaff, templateItem.sellStaffTel, templateItem.reqAddr,
-          templateItem.reqAddrDetail,user.custId,user.deptId,templateItem.inOutSctn,templateItem.truckTypeCode,
-          templateItem.sComName,templateItem.sSido,templateItem.sGungu,templateItem.sDong,templateItem.sAddr,templateItem.sAddrDetail,
-          templateItem.sDate,templateItem.sStaff,templateItem.sTel,templateItem.sMemo,templateItem.eComName,templateItem.eSido,
-          templateItem.eGungu,templateItem.eDong,templateItem.eAddr,templateItem.eAddrDetail,templateItem.eDate,templateItem.eStaff,
-          templateItem.eTel,templateItem.eMemo,templateItem.sLat,templateItem.sLon,templateItem.eLat,templateItem.eLon,
-          templateItem.goodsName,double.parse(templateItem.goodsWeight??"0.0"),templateItem.weightUnitCode,templateItem.goodsQty,templateItem.qtyUnitCode,
-          templateItem.sWayCode,templateItem.eWayCode,templateItem.mixYn,templateItem.mixSize,templateItem.returnYn,
-          templateItem.carTonCode,templateItem.carTypeCode,templateItem.chargeType,templateItem.unitPriceType,int.parse(templateItem.unitPrice??"0"),templateItem.distance,templateItem.time,
-          templateItem.reqMemo, templateItem.driverMemo,templateItem.itemCode,int.parse(templateItem.sellCharge??"0"),int.parse(templateItem.sellFee??"0"),
-          templateItem.templateStopList != null && templateItem.templateStopList?.isNotEmpty == true ? jsonEncode(templateItem.templateStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
-          templateItem.sellWayPointMemo,templateItem.sellWayPointCharge,templateItem.sellStayMemo,templateItem.sellStayCharge,
-          templateItem.handWorkMemo,templateItem.sellHandWorkCharge,templateItem.sellRoundMemo,templateItem.sellRoundCharge,
-          templateItem.sellOtherAddMemo,templateItem.sellOtherAddCharge,templateItem.sellWeight,"N",
-          templateItem.call24Cargo,
-          templateItem.manCargo,
-          templateItem.oneCargo,
-          templateItem.call24Charge,
-          templateItem.manCharge,
-          templateItem.oneCharge
-
-      ).then((it) async {
-        await pr?.hide();
-        ReturnMap _response = DioService.dioResponse(it);
-        logger.d("renewRegOrder() _response -> ${_response.status} // ${_response.resultMap}");
-        if(_response.status == "200") {
-          if(_response.resultMap?["result"] == true) {
-
-            var user = await controller.getUserInfo();
-
-            await FirebaseAnalytics.instance.logEvent(
-              name: Platform.isAndroid ? "regist_order_aos" : "regist_order_ios",
-              parameters: {
-                "user_id(RN)": user.userId??"",
-                "user_custId(RN)": user.custId??"",
-                "user_deptId(RN)": user.deptId??"",
-                "reqCustId(RN)": templateItem.sellCustId??"",
-                "sellDeptId(RN)": templateItem.sellDeptId??""
-              },
-            );
-
-            if (templateItem.call24Cargo == "Y" ||
-                templateItem.manCargo == "Y" || templateItem.oneCargo == "Y") {
-              await FirebaseAnalytics.instance.logEvent(
-                name: Platform.isAndroid ? "regist_order_rpa_aos" : "regist_order_rpa_ios",
-                parameters: {
-                  "user_id(RN)": user.userId??"",
-                  "user_custId(RN)": user.custId??"",
-                  "user_deptId(RN)": user.deptId??"",
-                  "reqCustId(RN)": templateItem.sellCustId??"",
-                  "sellDeptId(RN)": templateItem.sellDeptId??"",
-                  "call24Cargo_Status(RN)": templateItem.call24Cargo??"",
-                  "manCargo_Status(RN)": templateItem.manCargo??"",
-                  "oneCargo_Status(RN)": templateItem.oneCargo??"",
-                  "rpaSalary(RN)": templateItem.call24Charge??"",
-                },
-              );
-            }
-
-            Navigator.of(context).pop({'code': 200, 'allocId': _response.resultMap?["msg"]});
-          }else{
-            openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
-          }
-        }
-      }).catchError((Object obj) async {
-        await pr?.hide();
-        switch (obj.runtimeType) {
-          case DioError:
-          // Here's the sample to get the failed response error code and message
-            final res = (obj as DioError).response;
-            print("renewRegOrder() Error => ${res?.statusCode} // ${res?.statusMessage}");
-            break;
-          default:
-            print("renewRegOrder() getOrder Default => ");
-            break;
-        }
-      });
-    }else{
-      Util.toast("\"${valiChk}\" 항목을 입력해주세요.");
-    }
   }
 
   int parseIntDate(String date) {
@@ -3615,6 +3501,43 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           break;
         default:
           print("getTemplateList() getOrder Default => ");
+          break;
+      }
+    });
+  }
+
+  Future<void> getTemplateStopList(TemplateModel? tModel) async {
+    Logger logger = Logger();
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getTemplateStopList(user.authorization, tModel?.templateId).then((it) async {
+      ReturnMap _response = DioService.dioResponse(it);
+      logger.d("getTemplateStopList() Regist _response -> ${_response.status} // ${_response.resultMap}");
+      if (_response.status == "200") {
+        if (_response.resultMap?["result"] == true) {
+          if (_response.resultMap?["data"] != null) {
+            var list = _response.resultMap?["data"] as List;
+            List<TemplateStopPointModel> itemsList = list.map((i) => TemplateStopPointModel.fromJSON(i)).toList();
+            if (itemsList.length != 0) {
+              tModel?.templateStopList?.addAll(itemsList);
+            }
+          }
+        } else {
+          openOkBox(context, "${_response.resultMap?["msg"]}",
+              Strings.of(context)?.get("confirm") ?? "Error!!", () {
+                Navigator.of(context).pop(false);
+              });
+        }
+      }
+    }).catchError((Object obj) async {
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getTemplateStopList() RegVersion Error => ${res?.statusCode} // ${res
+              ?.statusMessage}");
+          break;
+        default:
+          print("getTemplateStopList() RegVersion getOrder Default => ");
           break;
       }
     });
@@ -6223,7 +6146,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           )
                       ),
                       Container(
-                          padding: EdgeInsets.only(left: CustomStyle.getWidth(15), right: CustomStyle.getWidth(15), bottom: CustomStyle.getHeight(10),top: CustomStyle.getHeight(5)),
+                          padding: EdgeInsets.only(left: CustomStyle.getWidth(5), bottom: CustomStyle.getHeight(10),top: CustomStyle.getHeight(5)),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,

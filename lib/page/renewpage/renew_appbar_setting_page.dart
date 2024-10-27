@@ -520,7 +520,6 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
                           )
                       )
                   ),
-                  Util.userDebugger == false ?
                   InkWell(
                       onTap: () async {
                         await Navigator.of(context).push(PageAnimationTransition(page: TemplateManagePage(), pageAnimationType: LeftToRightTransition()));
@@ -552,9 +551,7 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
                             ],
                           )
                       )
-                  ) : SizedBox(
-                    width:CustomStyle.getWidth(90),
-                    height: CustomStyle.getHeight(90),)
+                  )
                 ],
               )
               )
