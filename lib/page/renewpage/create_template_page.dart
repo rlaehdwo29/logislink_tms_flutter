@@ -2255,10 +2255,8 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                                         setState(() {
                                           if(value.length == 0) {
                                             widget.mData.goodsWeight = "0.0";
-                                            cargoWgtController.text = "0.0";
                                           }else{
                                             widget.mData.goodsWeight = value;
-                                            cargoWgtController.text = value;
                                           }
                                         });
                                       },

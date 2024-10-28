@@ -1308,9 +1308,6 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                   if(value.length > 0) {
                     sellWeightController.text = value.replaceFirst(RegExp(r'^0+'), '');
                     mData.value.sellWeight = sellWeightController.text;
-
-                    /*sellWeightController.text = value;
-                    mData.value.sellWeight = value;*/
                   } else {
                     sellWeightController.text = "";
                     mData.value.sellWeight = "";

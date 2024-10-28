@@ -390,7 +390,6 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                       }
                                     },
                                     onRangeSelected: (start, end, focusedDay) {
-                                      //print("onRangeSelected => ${start} // $end // ${focusedDay}");
                                       setState(() {
                                         _tempSelectedDay = start;
                                         _focusedDay = focusedDay;

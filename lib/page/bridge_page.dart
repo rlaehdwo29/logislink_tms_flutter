@@ -271,20 +271,10 @@ class _BridgePageState extends State<BridgePage> {
 
   void goToMain() {
     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const RenewMainPage()), (route) => false);
-    /*if(controller.renew_value.value) {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const RenewMainPage()), (route) => false);
-    }else {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const MainPage()), (route) => false);
-    }*/
   }
 
   Future<void> goToLogin() async {
     Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const ReNewLoginPage()), (route) => false);
-    /*if(controller.renew_value.value) {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const ReNewLoginPage()), (route) => false);
-    }else {
-      Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()), (route) => false);
-    }*/
   }
 
   @override
