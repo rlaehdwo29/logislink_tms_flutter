@@ -118,6 +118,7 @@ abstract class Rest {
       @Field("toDate") String? toDate,
       @Field("dayOption") String? dayOption,
       @Field("orderState") String? orderState,
+      @Field("deptState") String? deptState,
       @Field("rpaState") String? rpaState,
       @Field("staffName") String? staffName,
       @Field("pageNo") int? pageNo,

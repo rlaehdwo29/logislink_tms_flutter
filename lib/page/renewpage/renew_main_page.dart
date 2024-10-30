@@ -20,6 +20,7 @@ import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/cust_user_model.dart';
+import 'package:logislink_tms_flutter/common/model/dept_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_current_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/template_model.dart';
@@ -76,7 +77,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
   final dateSelectValue = 3.obs;
   final daySelectOption = "0".obs;
   final filterOrderOption = ["오더전체","접수","배차","운송사지정","취소"];
-  final filterRpaOption = ["화망전송무관","화망배차전", "배차확정완료"];
+  final filterRpaOption = ["화망무관","화망배차전", "배차확정"];
 
   final GlobalKey webViewKey = GlobalKey();
   late final InAppWebViewController webViewController;
@@ -84,6 +85,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   final orderList = List.empty(growable: true).obs;
   final custUserList = List.empty(growable: true).obs;
+  final deptList = List.empty(growable: true).obs;
   final userRpaModel = UserRpaModel().obs;
   final myOrder = "N".obs;
   final orderState = "".obs;
@@ -100,8 +102,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
   final categoryOrderCode = "".obs;
   final categoryOrderState = "오더전체".obs;
+  final categoryDeptCode = "".obs;
+  final categoryDeptState = "부서전체".obs;
   final categoryRpaCode = "".obs;
-  final categoryRpaState = "화망전송무관".obs;
+  final categoryRpaState = "화망무관".obs;
   final categoryStaffModel = CustUserModel(userId: "",userName: "담당자전체").obs;
   List<CodeModel>? dropDownList = List.empty(growable: true);
   final select_value = CodeModel().obs;
@@ -177,6 +181,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       db.deleteAll();
       await getPointResult();
       await initView();
+      await getDeptList();
       dropDownList?.add(CodeModel(code: "carNum",codeName: "차량번호"));
       dropDownList?.add(CodeModel(code: "driverName",codeName: "차주명"));
       dropDownList?.add(CodeModel(code: "sellCustName",codeName: "거래처명"));
@@ -1204,13 +1209,125 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
         },
       );
 
+    } else if (codeType == Const.DEPT) {
+      final tempCodemodel = CodeModel(code: categoryDeptCode.value ,codeName:  categoryDeptState.value).obs;
+      List<CodeModel>? mCodeList = SP.getCodeList(Const.DEPT);
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        enableDrag: true,
+        barrierLabel: title,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadiusDirectional.only(topStart: Radius.circular(15), topEnd: Radius.circular(15)),
+            side: BorderSide(color: Color(0xffEDEEF0), width: 1)
+        ),
+        backgroundColor: Colors.white,
+        builder: (context) {
+          return FractionallySizedBox(
+              widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
+              heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.6 : 0.5 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
+              child: Container(
+                  width: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
+                  padding: EdgeInsets.only(right: CustomStyle.getWidth(10),left: CustomStyle.getWidth(10),top: CustomStyle.getHeight(10)),
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      color: Colors.white
+                  ),
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
+                            child: Text(
+                                title,
+                                style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800)
+                            )
+                        ),
+                        Expanded(
+                            child: AnimationLimiter(
+                                child: GridView.builder(
+                                    itemCount: mCodeList.length,
+                                    physics: const ScrollPhysics(),
+                                    scrollDirection: Axis.vertical,
+                                    shrinkWrap: true,
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
+                                      childAspectRatio: (1 / .4),
+                                      mainAxisSpacing: 10, //수평 Padding
+                                      crossAxisSpacing: 10, //수직 Padding
+                                    ),
+                                    itemBuilder: (BuildContext context, int index) {
+                                      return AnimationConfiguration.staggeredGrid(
+                                          position: index,
+                                          duration: const Duration(milliseconds: 400),
+                                          columnCount: 3,
+                                          child: ScaleAnimation(
+                                              child: FadeInAnimation(
+                                                  child: Obx(() =>  InkWell(
+                                                      onTap: () {
+                                                        tempCodemodel.value = CodeModel(code: mCodeList[index].code,codeName: mCodeList[index].codeName);
+                                                      },
+                                                      child: Container(
+                                                          height: CustomStyle.getHeight(70.0),
+                                                          decoration: BoxDecoration(
+                                                              color: tempCodemodel.value.code  == mCodeList[index].code ? renew_main_color2 : light_gray24,
+                                                              borderRadius: BorderRadius.circular(30)
+                                                          ),
+                                                          child: Center(
+                                                            child: Text(
+                                                              "${mCodeList[index].codeName}",
+                                                              textAlign: TextAlign.center,
+                                                              style: CustomStyle.CustomFont(
+                                                                  styleFontSize12, tempCodemodel.value.code  == mCodeList[index].code ? Colors.white: text_color_01,
+                                                                  font_weight: tempCodemodel.value.code  == mCodeList[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                            ),
+                                                          )
+                                                      )
+                                                  )))));
+                                    }
+                                ))
+                        ),
+                        InkWell(
+                            onTap: () async {
+                              callback(codeType,codeModel: tempCodemodel.value);
+                              Future.delayed(const Duration(milliseconds: 300), () {
+                                Navigator.of(context).pop();
+                              });
+                            },
+                            child: Center(
+                                child: Container(
+                                  width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.7,
+                                  height: CustomStyle.getHeight(50),
+                                  alignment: Alignment.center,
+                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: renew_main_color2),
+                                  child: Text(
+                                    textAlign: TextAlign.center,
+                                    "적용",
+                                    style: CustomStyle.CustomFont(styleFontSize18, styleWhiteCol),
+                                  ),
+                                )
+                            )
+                        )
+                      ]
+                  )
+              )
+          );
+        },
+      );
+
     } else if(codeType == Const.RPA_STATE_CD) {
 
       final tempCodemodel = CodeModel(code: categoryRpaCode.value ,codeName: categoryRpaState.value).obs;
       List<CodeModel>? mCodeList = List.empty(growable: true);
-      mCodeList?.insert(0, CodeModel(code: "",codeName:  "화망전송무관"));
+      mCodeList?.insert(0, CodeModel(code: "",codeName:  "화망무관"));
       mCodeList?.insert(1, CodeModel(code: "W",codeName:  "화망배차전"));
-      mCodeList?.insert(2, CodeModel(code: "F",codeName:  "배차확정완료"));
+      mCodeList?.insert(2, CodeModel(code: "F",codeName:  "배차확정"));
 
       showModalBottomSheet(
         context: context,
@@ -2652,6 +2769,12 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
           page.value = 1;
           scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
           break;
+        case 'DEPT' :
+            categoryDeptCode.value = codeModel?.code??"";
+            categoryDeptState.value = codeModel?.codeName??"-";
+            page.value = 1;
+            scrollController.animateTo(0, duration: const Duration(milliseconds: 1500), curve: Curves.ease);
+          break;
         case 'RPA_STATE_CD':
           categoryRpaCode.value = codeModel?.code??"";
           categoryRpaState.value = codeModel?.codeName??"-";
@@ -2672,11 +2795,13 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     final tempStatecode = CodeModel(code: categoryOrderCode.value ,codeName:  categoryOrderState.value).obs; // 오더 상태
     List<CodeModel>? mOrderList = SP.getCodeList(Const.ORDER_STATE_CD);
     mOrderList?.insert(0, CodeModel(code: "",codeName:  "오더전체"));
+    final tempDeptStatecode = CodeModel(code: categoryDeptCode.value ,codeName:  categoryDeptState.value).obs; // 부서 검색
+    List<CodeModel>? mDeptList = SP.getCodeList(Const.DEPT);
     final tempRpamodel = CodeModel(code: categoryRpaCode.value ,codeName: categoryRpaState.value).obs;
     List<CodeModel>? mRpaList = List.empty(growable: true);
-    mRpaList?.insert(0, CodeModel(code: "",codeName:  "화망전송무관"));
+    mRpaList?.insert(0, CodeModel(code: "",codeName:  "화망무관"));
     mRpaList?.insert(1, CodeModel(code: "W",codeName:  "화망배차전"));
-    mRpaList?.insert(2, CodeModel(code: "F",codeName:  "배차확정완료"));
+    mRpaList?.insert(2, CodeModel(code: "F",codeName:  "배차확정"));
     final tempStaffmodel = categoryStaffModel.value.obs;
     final mStaffList = custUserList;
 
@@ -2742,6 +2867,11 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         // 오더 검색
                                         select_value.value = tempSearchColumn.value; // 오더 검색 카테고리
                                         searchValue.value = searchOrderController.text; // 검색Field
+
+                                        // 부서 검색
+                                        categoryDeptCode.value = tempDeptStatecode.value.code??"";
+                                        categoryDeptState.value = tempDeptStatecode.value.codeName??"-";
+
                                         //오더 상태
                                         categoryOrderCode.value = tempStatecode.value.code??""; // 오더 상태 Code
                                         categoryOrderState.value = tempStatecode.value.codeName??"-"; // 오더 상태 Name
@@ -2952,6 +3082,65 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                             CustomStyle.getDivider2()
                           ]
                         )
+                      ),
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                          child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children :[
+                                Text(
+                                  "부서 검색",
+                                  style: CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w500),
+                                ),
+                                Container(
+                                    margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+                                    child: AnimationLimiter(
+                                        child: GridView.builder(
+                                            itemCount: mDeptList?.length,
+                                            physics: const ScrollPhysics(),
+                                            scrollDirection: Axis.vertical,
+                                            shrinkWrap: true,
+                                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                              crossAxisCount: 3, //1 개의 행에 보여줄 item 개수
+                                              childAspectRatio: (1 / .3),
+                                              mainAxisSpacing: 10, //수평 Padding
+                                              crossAxisSpacing: 10, //수직 Padding
+                                            ),
+                                            itemBuilder: (BuildContext context, int index) {
+                                              return AnimationConfiguration.staggeredGrid(
+                                                  position: index,
+                                                  duration: const Duration(milliseconds: 400),
+                                                  columnCount: 4,
+                                                  child: ScaleAnimation(
+                                                      child: FadeInAnimation(
+                                                          child: Obx(() =>  InkWell(
+                                                              onTap: () {
+                                                                tempDeptStatecode.value = CodeModel(code: mDeptList?[index].code,codeName: mDeptList?[index].codeName);
+                                                              },
+                                                              child: Container(
+                                                                  height: CustomStyle.getHeight(70.0),
+                                                                  decoration: BoxDecoration(
+                                                                      color: tempDeptStatecode.value.code  == mDeptList?[index].code ? renew_main_color2 : light_gray24,
+                                                                      borderRadius: BorderRadius.circular(30)
+                                                                  ),
+                                                                  child: Center(
+                                                                    child: Text(
+                                                                      "${mDeptList?[index].codeName}",
+                                                                      textAlign: TextAlign.center,
+                                                                      style: CustomStyle.CustomFont(
+                                                                          styleFontSize12, tempDeptStatecode.value.code  == mDeptList?[index].code ? Colors.white: text_color_01,
+                                                                          font_weight: tempDeptStatecode.value.code  == mDeptList?[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                                    ),
+                                                                  )
+                                                              )
+                                                          )))));
+                                            }
+                                        ))
+                                ),
+                                CustomStyle.getDivider2()
+                              ]
+                          )
                       ),
                       Container(
                           margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
@@ -3425,6 +3614,49 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     });
   }
 
+  Future<void> getDeptList() async {
+    Logger logger = Logger();
+    await pr?.show();
+    await DioService.dioClient(header: true).getDeptList(mUser.value.authorization).then((it) async {
+      await pr?.hide();
+      ReturnMap response = DioService.dioResponse(it);
+      logger.d("getDeptList() _response -> ${response.status} // ${response.resultMap}");
+      if(response.status == "200") {
+        if (response.resultMap?["data"] != null) {
+          var list = response.resultMap?["data"] as List;
+          List<DeptModel> itemsList = list.map((i) => DeptModel.fromJSON(i)).toList();
+          if(deptList.isNotEmpty) deptList.clear();
+          deptList.addAll(itemsList);
+
+          List<CodeModel> codeList = List.empty(growable: true);
+          codeList.add(CodeModel(code: "",codeName: "부서전체"));
+          for(var data in deptList) {
+            codeList.add(CodeModel(code: data.deptId, codeName: data.deptName));
+          }
+          var mapList = ({
+            "data": codeList
+          });
+          var jsonString = jsonEncode(mapList);
+          await SP.putCodeList(Const.DEPT, jsonString);
+
+        }
+      }
+      setState(() {});
+    }).catchError((Object obj) async {
+      await pr?.hide();
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("getDeptList() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("getDeptList() Error Default => ");
+          break;
+      }
+    });
+  }
+
   /**
    * Function End
    */
@@ -3558,18 +3790,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                         crossAxisAlignment: CrossAxisAlignment.center,
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         children:[
-                                          /*
-                                           Center(
-                                            child: CircleAvatar(
-                                              radius: 35,
-                                              backgroundColor: Colors.white,
-                                              child: Image.asset(
-                                                "assets/image/ic_logo.png",
-                                                color: Colors.black,
-                                                fit: BoxFit.contain,
-                                              )
-                                            )
-                                          ),*/
                                           Container(
                                             margin: EdgeInsets.only(left: CustomStyle.getWidth(10)),
                                             child: Column(
@@ -4013,6 +4233,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
             Util.getTextDate(mCalendarEndDate.value),
             daySelectOption.value,
             categoryOrderCode.value,
+            categoryDeptCode.value,
             categoryRpaCode.value,
             categoryStaffModel.value.userId,
             page.value,
@@ -4127,6 +4348,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                               )
                             )
                           ),
+                          mUser.value.masterYn == "Y" ?
+                          Expanded(
+                              flex: 1,
+                              child: InkWell(
+                                  onTap: (){
+                                    openCodeBottomSheet(context,"부서 선택",Const.DEPT,selectItem);
+                                  },
+                                  child: Obx(() => Text(
+                                      categoryDeptState.value,
+                                      textAlign: TextAlign.center,
+                                      style: CustomStyle.CustomFont(styleFontSize14, Colors.white,font_weight: FontWeight.w700)
+                                  )
+                                  )
+                              )
+                          ) : const SizedBox(),
                           Expanded(
                               flex: 1,
                               child: InkWell(
@@ -4169,14 +4405,15 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                       margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                       child: Image.asset(
                                         "assets/image/ic_filter.png",
-                                        width: CustomStyle.getWidth(21.0),
-                                        height: CustomStyle.getHeight(21.0),
+                                        width: CustomStyle.getWidth(15.0),
+                                        height: CustomStyle.getHeight(15.0),
                                         color: Colors.white,
                                       )
                                     ),
                                     Text(
                                       "필터",
                                       style: CustomStyle.CustomFont(styleFontSize14, Colors.white),
+                                        textAlign: TextAlign.center,
                                     )
                                   ],
                                 )
@@ -4346,7 +4583,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                 Positioned(
                     child: Container(
                         color:Colors.black.withOpacity(0.4),
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(0)),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -4365,6 +4602,21 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     )
                                 )
                             ),
+                            mUser.value.masterYn == "Y" ?
+                            Expanded(
+                                flex: 1,
+                                child: InkWell(
+                                    onTap: (){
+                                      openCodeBottomSheet(context,"부서 선택",Const.DEPT,selectItem);
+                                    },
+                                    child: Obx(() => Text(
+                                        categoryDeptState.value,
+                                        textAlign: TextAlign.center,
+                                        style: CustomStyle.CustomFont(styleFontSize14, Colors.white,font_weight: FontWeight.w700)
+                                    )
+                                    )
+                                )
+                            ) : const SizedBox(),
                             Expanded(
                                 flex: 1,
                                 child: InkWell(
@@ -4401,7 +4653,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     },
                                     child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
                                         Container(
                                             margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
