@@ -14,6 +14,7 @@ import 'package:logislink_tms_flutter/common/model/addr_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/cust_user_model.dart';
 import 'package:logislink_tms_flutter/common/model/customer_model.dart';
+import 'package:logislink_tms_flutter/common/model/dept_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
@@ -29,6 +30,7 @@ import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_page.dar
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_reg_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cargo_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cust_user_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/order_customer_dept_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_customer_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
@@ -489,6 +491,27 @@ class _MainPageContentComponent1State extends State<MainPageContentComponent1> {
     });
   }
 
+  Future<void> goToCustomerDept() async {
+    Map<String, dynamic> results = await Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (BuildContext context) => OrderCustomerDeptPage(
+                code:"")
+        )
+    );
+
+    if (results != null && results.containsKey("code")) {
+      if (results["code"] == 200) {
+        await setCustomerDept(results["custDept"]);
+      }
+    }
+  }
+
+  Future<void> setCustomerDept(DeptModel data) async {
+    widget.mData.sellDeptId = data.deptId;
+    widget.mData.sellDeptName = data.deptName;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
       return Container(
@@ -545,37 +568,42 @@ class _MainPageContentComponent1State extends State<MainPageContentComponent1> {
                       )
                   ),
                   Container(
-                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
-                      margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
-                      width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: light_gray22,width: 1),
-                          borderRadius: BorderRadius.circular(20)
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                "* ",
-                                textAlign: TextAlign.center,
-                                style: CustomStyle.CustomFont(styleFontSize15, Colors.red,font_weight: FontWeight.w600),
-                              ),
-                              Text(
-                                "담당부서",
-                                style: CustomStyle.CustomFont(styleFontSize15, Colors.black,font_weight: FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                          Text(
-                              widget.mData.sellDeptName ?? "",
-                              style: CustomStyle.CustomFont(styleFontSize14,   widget.mData.sellDeptName == null || widget.mData.sellDeptName?.isEmpty == true ? light_gray23 : Colors.black, font_weight: FontWeight.w500)
-                          ),
-                        ],
-                      )
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(10)),
+                        margin: EdgeInsets.only(top: CustomStyle.getHeight(10)),
+                        width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: light_gray22,width: 1),
+                            borderRadius: BorderRadius.circular(20)
+                        ),
+                        child: InkWell(
+                            onTap: () async {
+                              await goToCustomerDept();
+                            },
+                            child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  "* ",
+                                  textAlign: TextAlign.center,
+                                  style: CustomStyle.CustomFont(styleFontSize15, Colors.red,font_weight: FontWeight.w600),
+                                ),
+                                Text(
+                                  "담당부서",
+                                  style: CustomStyle.CustomFont(styleFontSize15, Colors.black,font_weight: FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                            Text(
+                                widget.mData.sellDeptName ?? "",
+                                style: CustomStyle.CustomFont(styleFontSize14,   widget.mData.sellDeptName == null || widget.mData.sellDeptName?.isEmpty == true ? light_gray23 : Colors.black, font_weight: FontWeight.w500)
+                            ),
+                          ],
+                        )
+                    )
                   ),
                   InkWell(
                       onTap: () async {

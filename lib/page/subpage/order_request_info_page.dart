@@ -7,6 +7,7 @@ import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/cust_user_model.dart';
 import 'package:logislink_tms_flutter/common/model/customer_model.dart';
+import 'package:logislink_tms_flutter/common/model/dept_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/unit_charge_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
@@ -14,6 +15,7 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cust_user_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/order_customer_dept_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_customer_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
@@ -95,6 +97,21 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
     }
   }
 
+  Future<void> goToCustomerDept() async {
+    Map<String, dynamic> results = await Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (BuildContext context) => OrderCustomerDeptPage(
+                code:"")
+        )
+    );
+
+    if (results != null && results.containsKey("code")) {
+      if (results["code"] == 200) {
+        await setCustomerDept(results["custDept"]);
+      }
+    }
+  }
+
   Future<void> setCustomer(CustomerModel data) async {
     mData.value.sellCustId = data.custId;
     mData.value.sellCustName = data.custName;
@@ -112,6 +129,12 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
     await getUnitChargeCnt();
     await getUnitChargeData();
 
+  }
+
+  Future<void> setCustomerDept(DeptModel data) async {
+    mData.value.sellDeptId = data.deptId;
+    mData.value.sellDeptName = data.deptName;
+    setState(() {});
   }
 
   Future<void> getUnitChargeCnt() async {
@@ -455,7 +478,9 @@ Future<void> getCustUser() async {
                   border: Border.all(color: text_box_color_02),
                   borderRadius: BorderRadius.all(Radius.circular(5.0.h))),
               child: InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    await goToCustomerDept();
+                  },
                   child: Row(
                     children: [
                       Expanded(
