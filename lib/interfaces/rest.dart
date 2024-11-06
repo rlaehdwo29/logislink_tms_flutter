@@ -65,6 +65,23 @@ abstract class Rest {
       @Field("mobile") String? mobile);
 
   /**
+   * 사용자 RPA 정보 수정
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_RPA_UPDATE)
+  Future<HttpResponse> userRpaInfoUpdate(
+      @Header("Authorization") String? Authorization,
+      @Field("call24Yn") String? call24Yn,
+      @Field("link24Id") String? link24Id,
+      @Field("link24Pass") String? link24Pass,
+      @Field("man24Id") String? man24Id,
+      @Field("man24Pass") String? man24Pass,
+      @Field("one24Id") String? one24Id,
+      @Field("one24Pass") String? one24Pass
+  );
+
+
+  /**
    * 기기 정보 업데이트
    */
   @FormUrlEncoded()
@@ -99,9 +116,11 @@ abstract class Rest {
       @Header("Authorization") String? Authorization,
       @Field("fromDate") String? fromDate,
       @Field("toDate") String? toDate,
+      @Field("dayOption") String? dayOption,
       @Field("orderState") String? orderState,
-      @Field("allocState") String? allocState,
-      @Field("myOrder") String? myOrder,
+      @Field("deptState") String? deptState,
+      @Field("rpaState") String? rpaState,
+      @Field("staffName") String? staffName,
       @Field("pageNo") int? pageNo,
       @Field("searchColumn") String? searchColumn,
       @Field("searchValue") String? searchValue
@@ -126,6 +145,29 @@ abstract class Rest {
   @POST(URL_ORDER_LIST)
   Future<HttpResponse> getOrderDetail(@Header("Authorization") String? Authorization,
       @Field("sellAllocId") String? sellAllocId);
+
+  /**
+   * 탬플릿 리스트
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_TEMPLATE_LIST)
+  Future<HttpResponse> getTemplateList(@Header("Authorization") String? Authorization);
+
+  /**
+   * 탬플릿 상세
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_TEMPLATE_LIST)
+  Future<HttpResponse> getTemplateDetail(@Header("Authorization") String? Authorization,
+      @Field("templateId") String? templateId);
+
+  /**
+   * 탬플릿 경유지 리스트
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_TEMPLATE_STOP_LIST)
+  Future<HttpResponse> getTemplateStopList(@Header("Authorization") String? Authorization,
+      @Field("templateId") String? templateId);
 
   /*
     *  오더 상세(Link 선택시)
@@ -187,6 +229,7 @@ abstract class Rest {
       @Field("unitPriceType") String? unitPriceType,
       @Field('unitCharge') int? unitCharge,
       @Field("distance") double? distance,
+      @Field("sTimeFreeYN") String? sTimeFreeYN, @Field("eTimeFreeYN") String? eTimeFreeYN,
       @Field("time") int? time, @Field("reqMemo") String? reqMemo,
       @Field("driverMemo") String? driverMemo, @Field("itemCode") String? itemCode,
       @Field("sellCharge") int? sellCharge, @Field("sellFee") int? sellFee,
@@ -206,6 +249,130 @@ abstract class Rest {
       @Field("manCharge") String? manCharge,
       @Field("oneCharge") String? oneCharge
       );
+
+  /**
+   * 탬플릿 등록
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_TEMPLATE_REG)
+  Future<HttpResponse> templateReg(
+      @Header("Authorization") String? Authorization,
+      @Field("templateTitle") String? templateTitle,
+      @Field("reqCustName") String? reqCustName,
+      @Field("reqCustId") String? reqCustId,
+      @Field("reqDeptName") String? reqDeptName,
+      @Field("reqDeptId") String? reqDeptId,
+      @Field("reqStaff") String? reqStaff, @Field("sellStaffName") String? sellStaffName, @Field("reqTel") String? reqTel,
+      @Field("reqAddr") String? reqAddr, @Field("reqAddrDetail") String? reqAddrDetail,
+      @Field("custId") String? custId, @Field("deptId") String? deptId,
+      @Field("inOutSctn") String? inOutSctn, @Field("inOutSctnName") String? inOutSctnName, @Field("truckTypeCode") String? truckTypeCode, @Field("truckTypeName") String? truckTypeName,
+      @Field("sComName") String? sComName, @Field("sSido") String? sSido,
+      @Field("sGungu") String? sGungu, @Field("sDong") String? sDong,
+      @Field("sAddr") String? sAddr, @Field("sAddrDetail") String? sAddrDetail,
+      @Field("sDate") String? sDate, @Field("sStaff") String? sStaff,
+      @Field("sTel") String? sTel, @Field("sMemo") String? sMemo,
+      @Field("eComName") String? eComName, @Field("eSido") String? eSido,
+      @Field("eGungu") String? eGungu, @Field("eDong") String? eDong,
+      @Field("eAddr") String? eAddr, @Field("eAddrDetail") String? eAddrDetail,
+      @Field("eDate") String? eDate, @Field("eStaff") String? eStaff,
+      @Field("eTel") String? eTel, @Field("eMemo") String? eMemo,
+      @Field("sLat") double? sLat, @Field("sLon") double? sLon,
+      @Field("eLat") double? eLat, @Field("eLon") double? eLon,
+      @Field("goodsName") String? goodsName, @Field("goodsWeight") double? goodsWeight,
+      @Field("weightUnitCode") String? weightUnitCode, @Field("weightUnitName") String? weightUnitName, @Field("goodsQty") double? goodsQty,
+      @Field("qtyUnitCode") String? qtyUnitCode, @Field("qtyUnitName") String? qtyUnitName, @Field("sWayCode") String? sWayCode, @Field("sWayName") String? sWayName,
+      @Field("eWayCode") String? eWayCode,@Field("eWayName") String? eWayName, @Field("mixYn") String? mixYn,
+      @Field("mixSize") String? mixSize, @Field("returnYn") String? returnYn,
+      @Field("carTonCode") String? carTonCode,@Field("carTonName") String? carTonName, @Field("carTypeCode") String? carTypeCode, @Field("carTypeName") String? carTypeName,
+      @Field("chargeType") String? chargeType, @Field("chargeTypeName") String? chargeTypeName,
+      @Field("unitPriceType") String? unitPriceType,@Field('unitCharge') int? unitCharge,@Field("unitPriceTypeName") String? unitPriceTypeName,
+      @Field("distance") String? distance,
+      @Field("time") int? time, @Field("reqMemo") String? reqMemo,
+      @Field("driverMemo") String? driverMemo, @Field("itemCode") String? itemCode, @Field("itemName") String? itemName ,
+      @Field("sellCharge") int? sellCharge, @Field("sellFee") int? sellFee,
+      @Field("templateStopList") String? templateStopList, @Field("buyStaff") String? buyStaff,
+      @Field("buyStaffTel") String? buyStaffTel, @Field("sellWayPointMemo") String? sellWayPointMemo,
+      @Field("sellWayPointCharge") int? sellWayPointCharge, @Field("sellStayMemo") String? sellStayMemo,
+      @Field("sellStayCharge") int? sellStayCharge, @Field("sellHandWorkMemo") String? sellHandWorkMemo,
+      @Field("sellHandWorkCharge") int? sellHandWorkCharge, @Field("sellRoundMemo") String? sellRoundMemo,
+      @Field("sellRoundCharge") int? sellRoundCharge, @Field("sellOtherAddMemo") String? sellOtherAddMemo,
+      @Field("sellOtherAddCharge") int? sellOtherAddCharge, @Field("sellWeight") String? sellWeight,
+      @Field("talkYn") String? talkYn,
+
+      @Field("call24Cargo") String? call24Cargo,
+      @Field("manCargo") String? manCargo,
+      @Field("oneCargo") String? oneCargo,
+      @Field("call24Charge") String? call24Charge,
+      @Field("manCharge") String? manCharge,
+      @Field("oneCharge") String? oneCharge
+      );
+
+  /**
+   * 탬플릿 수정
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_TEMPLATE_REG)
+  Future<HttpResponse> templateMod(
+      @Header("Authorization") String? Authorization,
+      @Field("templateId") String? templateId,
+      @Field("reqCustName") String? reqCustName,
+      @Field("reqCustId") String? reqCustId,
+      @Field("reqDeptName") String? reqDeptName,
+      @Field("reqDeptId") String? reqDeptId,
+      @Field("reqStaff") String? reqStaff, @Field("sellStaffName") String? sellStaffName, @Field("reqTel") String? reqTel,
+      @Field("reqAddr") String? reqAddr, @Field("reqAddrDetail") String? reqAddrDetail,
+      @Field("custId") String? custId, @Field("deptId") String? deptId,
+      @Field("inOutSctn") String? inOutSctn, @Field("inOutSctnName") String? inOutSctnName, @Field("truckTypeCode") String? truckTypeCode, @Field("truckTypeName") String? truckTypeName,
+      @Field("sComName") String? sComName, @Field("sSido") String? sSido,
+      @Field("sGungu") String? sGungu, @Field("sDong") String? sDong,
+      @Field("sAddr") String? sAddr, @Field("sAddrDetail") String? sAddrDetail,
+      @Field("sDate") String? sDate, @Field("sStaff") String? sStaff,
+      @Field("sTel") String? sTel, @Field("sMemo") String? sMemo,
+      @Field("eComName") String? eComName, @Field("eSido") String? eSido,
+      @Field("eGungu") String? eGungu, @Field("eDong") String? eDong,
+      @Field("eAddr") String? eAddr, @Field("eAddrDetail") String? eAddrDetail,
+      @Field("eDate") String? eDate, @Field("eStaff") String? eStaff,
+      @Field("eTel") String? eTel, @Field("eMemo") String? eMemo,
+      @Field("sLat") double? sLat, @Field("sLon") double? sLon,
+      @Field("eLat") double? eLat, @Field("eLon") double? eLon,
+      @Field("goodsName") String? goodsName, @Field("goodsWeight") double? goodsWeight,
+      @Field("weightUnitCode") String? weightUnitCode, @Field("weightUnitName") String? weightUnitName, @Field("goodsQty") double? goodsQty,
+      @Field("qtyUnitCode") String? qtyUnitCode, @Field("qtyUnitName") String? qtyUnitName, @Field("sWayCode") String? sWayCode, @Field("sWayName") String? sWayName,
+      @Field("eWayCode") String? eWayCode,@Field("eWayName") String? eWayName, @Field("mixYn") String? mixYn,
+      @Field("mixSize") String? mixSize, @Field("returnYn") String? returnYn,
+      @Field("carTonCode") String? carTonCode,@Field("carTonName") String? carTonName, @Field("carTypeCode") String? carTypeCode, @Field("carTypeName") String? carTypeName,
+      @Field("chargeType") String? chargeType, @Field("chargeTypeName") String? chargeTypeName,
+      @Field("unitPriceType") String? unitPriceType,@Field('unitCharge') int? unitCharge,@Field("unitPriceTypeName") String? unitPriceTypeName,
+      @Field("distance") String? distance,
+      @Field("time") int? time, @Field("reqMemo") String? reqMemo,
+      @Field("driverMemo") String? driverMemo, @Field("itemCode") String? itemCode, @Field("itemName") String? itemName ,
+      @Field("sellCharge") int? sellCharge, @Field("sellFee") int? sellFee,
+      @Field("templateStopList") String? templateStopList, @Field("buyStaff") String? buyStaff,
+      @Field("buyStaffTel") String? buyStaffTel, @Field("sellWayPointMemo") String? sellWayPointMemo,
+      @Field("sellWayPointCharge") int? sellWayPointCharge, @Field("sellStayMemo") String? sellStayMemo,
+      @Field("sellStayCharge") int? sellStayCharge, @Field("sellHandWorkMemo") String? sellHandWorkMemo,
+      @Field("sellHandWorkCharge") int? sellHandWorkCharge, @Field("sellRoundMemo") String? sellRoundMemo,
+      @Field("sellRoundCharge") int? sellRoundCharge, @Field("sellOtherAddMemo") String? sellOtherAddMemo,
+      @Field("sellOtherAddCharge") int? sellOtherAddCharge, @Field("sellWeight") String? sellWeight,
+      @Field("talkYn") String? talkYn,
+
+      @Field("call24Cargo") String? call24Cargo,
+      @Field("manCargo") String? manCargo,
+      @Field("oneCargo") String? oneCargo,
+      @Field("call24Charge") String? call24Charge,
+      @Field("manCharge") String? manCharge,
+      @Field("oneCharge") String? oneCharge
+      );
+
+  /**
+   * 탬플릿 삭제
+   */
+  @FormUrlEncoded()
+  @POST(URL_USER_TEMPLATE_DEL)
+  Future<HttpResponse> templateDel(
+      @Header("Authorization") String? Authorization,
+      @Field("templateDelList") String? templateDelList,
+  );
 
   /**
    * 오더 수정
@@ -466,6 +633,13 @@ abstract class Rest {
       @Field("orderId") String? orderId);
 
   /**
+   * New: 정보망 계정 정보
+   */
+  @FormUrlEncoded()
+  @POST(URL_LINK_USER_INFO)
+  Future<HttpResponse> rpaLinkInfo(@Header("Authorization") String? Authorization);
+
+  /**
    * New: 정보망 현황 : 기본 데이터
    */
   @FormUrlEncoded()
@@ -598,7 +772,10 @@ abstract class Rest {
    */
 
   @POST(URL_DEPT_LIST)
-  Future<HttpResponse> getDeptList(@Header("Authorization") String? Authorization);
+  Future<HttpResponse> getDeptList(
+        @Header("Authorization") String? Authorization,
+        @Field("sellCustId") String? sellCustId
+      );
 
   /**
    * 오더&배차현황
@@ -754,13 +931,16 @@ abstract class Rest {
       @Field("sSido") String? sSido,
       @Field("sGungu") String? sGungu,
       @Field("sDong") String? sDong,
+      @Field("sComName") String? sComName,
       @Field("eSido") String? eSido,
       @Field("eGungu") String? eGungu,
       @Field("eDong") String? eDong,
       @Field("carTonCode") String? carTonCode,
       @Field("carTypeCode") String? carTypeCode,
       @Field("sDate") String? sDate,
-      @Field("eDate") String? eDate);
+      @Field("eDate") String? eDate,
+      @Field("eComName") String? eComName,
+      @Field("unitPriceType") String? unitPriceType);
 
   /**
    * 단가표 Count

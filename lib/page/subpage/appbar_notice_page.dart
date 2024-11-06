@@ -129,7 +129,7 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
               toolbarHeight: 50.h,
               title: Text(
                   "공지사항",
-                  style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
+                  style: CustomStyle.appBarTitleFont(styleFontSize16, Colors.black)
               ),
               leading: IconButton(
                 onPressed: () {
@@ -137,7 +137,7 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
+                icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
               ),
           ),
         body: SafeArea(

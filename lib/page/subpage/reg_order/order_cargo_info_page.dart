@@ -332,15 +332,14 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
     if(codeType != "") {
       switch(codeType) {
         case "CAR_TYPE_CD" :
-          setState(() {
             mData.value.carTypeCode = codeModel?.code;
             mData.value.carTypeName = codeModel?.codeName;
             mData.value.carTonCode = null;
             mData.value.carTonName = null;
-          });
           await setEnable();
           break;
       }
+      setState(() {});
     }
   }
 
@@ -352,12 +351,11 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
     if(codeType != "") {
       switch(codeType) {
         case "CAR_TON_CD" :
-          setState(() {
             mData.value.carTonCode = codeModel?.code;
             mData.value.carTonName = codeModel?.codeName;
-          });
           break;
       }
+      setState(() {});
     }
   }
 
@@ -516,7 +514,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
     Logger logger = Logger();
     UserModel? user = await controller.getUserInfo();
     await DioService.dioClient(header: true).setOptionCargo(
-      user.authorization,"",
+      user.authorization,"Y",
       mData.value.inOutSctn,mData.value.truckTypeCode,mData.value.carTypeCode, mData.value.carTonCode,
       mData.value.itemCode, mData.value.goodsName, mData.value.goodsWeight, mData.value.sWayCode, mData.value.eWayCode
     ).then((it) async {
@@ -634,7 +632,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                 title: Text(
                       "화물정보",
                       style: CustomStyle.appBarTitleFont(
-                          styleFontSize16, styleWhiteCol)
+                          styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -644,7 +642,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -1315,7 +1313,8 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                             )
                         ) : const SizedBox(),
                         //혼적크기
-                        llMixSize.value ? Container(
+                        llMixSize.value ?
+                        Container(
                             padding: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,

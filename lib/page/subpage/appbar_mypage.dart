@@ -419,12 +419,6 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
           var app = await controller.getUserInfo();
           if(app != tempData.value) {
 
-            /*var result = await showCanceled();
-            if (result == true) {
-              return true;
-            } else {
-              return false;
-            }*/
           }
           if(widget.onCallback != null) {
             widget.onCallback!(true);

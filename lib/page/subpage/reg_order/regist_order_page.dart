@@ -497,7 +497,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                   style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                 ),
                 Text(
-                  llRequestInfo.value ? "${mData.value.sellCustName} ${mData.value.sellDeptName}" : Strings.of(context)?.get("order_reg_request_info_hint") ?? "Not Found",
+                  llRequestInfo.value ? "${mData.value.sellCustName} ${mData.value.sellDeptName??""}" : Strings.of(context)?.get("order_reg_request_info_hint") ?? "Not Found",
                   style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                 )
               ],
@@ -980,7 +980,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           mData.value.eTel,mData.value.eMemo,mData.value.sLat,mData.value.sLon,mData.value.eLat,mData.value.eLon,
           mData.value.goodsName,double.parse(mData.value.goodsWeight??"0.0"),mData.value.weightUnitCode,mData.value.goodsQty,mData.value.qtyUnitCode,
           mData.value.sWayCode,mData.value.eWayCode,mData.value.mixYn,mData.value.mixSize,mData.value.returnYn,
-          mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.unitPriceType,int.parse(mData.value.unitPrice??"0"),mData.value.distance,mData.value.time,
+          mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.unitPriceType,int.parse(mData.value.unitPrice??"0"),mData.value.distance,"N","N",mData.value.time,
           mData.value.reqMemo, mData.value.driverMemo,mData.value.itemCode,int.parse(mData.value.sellCharge??"0"),int.parse(mData.value.sellFee??"0"),
           mData.value.orderStopList != null && mData.value.orderStopList?.isNotEmpty == true ? jsonEncode(mData.value.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
           mData.value.sellWayPointMemo,mData.value.sellWayPointCharge,mData.value.sellStayMemo,mData.value.sellStayCharge,
@@ -1000,13 +1000,13 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
 
-              var user = await controller.getUserInfo();
+              UserModel user = await controller.getUserInfo();
 
               await FirebaseAnalytics.instance.logEvent(
                 name: Platform.isAndroid
                     ? "regist_order_aos"
                     : "regist_order_ios",
-                parameters: {
+                parameters: <String, Object> {
                   "user_id": user.userId??"",
                   "user_custId": user.custId??"",
                   "user_deptId": user.deptId??"",
@@ -1226,7 +1226,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
       appBar: AppBar(
             title: Text(
                 widget.flag == "M" ? Strings.of(context)?.get("order_detail_order_modify")??"오더수정_" : Strings.of(context)?.get("order_reg_title")??"오더 등록_",
-                style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
             ),
             toolbarHeight: 50.h,
             centerTitle: true,
@@ -1239,7 +1239,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                 }
               },
               color: styleWhiteCol,
-              icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+              icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
             ),
           ),
       body: SafeArea(

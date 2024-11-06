@@ -65,7 +65,7 @@ class _WebViewPageState extends State<WebViewPage> {
               title: Text(
                   widget.title,
                   style: CustomStyle.appBarTitleFont(
-                      styleFontSize16, styleWhiteCol)
+                      styleFontSize16, Colors.black)
               ),
               toolbarHeight: 50.h,
               leading: IconButton(
@@ -73,7 +73,7 @@ class _WebViewPageState extends State<WebViewPage> {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
+                icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
               ),
             ),
         body:  SafeArea(

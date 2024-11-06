@@ -3,7 +3,7 @@ class Const {
  static final bool logEnable = false;
 
  // 버전명
- static final APP_VERSION = "1.1.51`";
+ static final APP_VERSION = "1.1.65";
 
  //스토어 주소
  static final ANDROID_STORE = "https://play.google.com/store/apps/details?id=com.logislink.tms";
@@ -35,6 +35,8 @@ class Const {
  static final KEY_GUEST_MODE = "key_guest";
  static final GUEST_ID = "guest";
  static final GUEST_PW = "guestp";
+
+ static final RENEW_APP = "renew_app";
 
  /**
   * Intent Result Code
@@ -78,6 +80,7 @@ class Const {
   * Intent Filter
   */
  static final String INTENT_ORDER_REFRESH = "com.logislink.tms.INTENT_ORDER_REFRESH";
+ static final String TEMPLATE_REFRESH = "com.logislink.tms.TEMPLATE_REFRESH";
  static final String INTENT_ORDER_DETAIL_REFRESH = "com.logislink.tms.INTENT_ORDER_DETAIL_REFRESH";
 
  /**
@@ -161,6 +164,10 @@ class Const {
  static final String ORDER_STATE_CD = "ORDER_STATE_CD";
  // 배차상태
  static final String ALLOC_STATE_CD = "ALLOC_STATE_CD";
+ // 화망상태
+ static final String RPA_STATE_CD = "RPA_STATE_CD";
+ // 담당자지정
+ static final String STAFF_STATE_CD = "STAFF_STATE_CD";
  // 상하차방법
  static final String WAY_TYPE_CD = "WAY_TYPE_CD";
  // 혼적길이

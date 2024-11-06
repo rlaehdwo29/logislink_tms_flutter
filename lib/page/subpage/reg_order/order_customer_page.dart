@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
@@ -97,15 +98,26 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
     return Container(
       child: mList.isNotEmpty
           ? Expanded(
-          child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            shrinkWrap: true,
-            itemCount: mList.length,
-            itemBuilder: (context, index) {
-              var item = mList[index];
-              return getListItemView(item);
-            },
+          child: AnimationLimiter(
+              child: ListView.builder(
+              scrollDirection: Axis.vertical,
+              shrinkWrap: true,
+              itemCount: mList.length,
+              itemBuilder: (context, index) {
+                var item = mList[index];
+                    return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                    verticalOffset: 50.0,
+                    child: FadeInAnimation(
+                      child: getListItemView(item)
+                    )
+                  )
+                );
+              },
           )
+      )
       ):Expanded(
           child: Container(
               alignment: Alignment.center,
@@ -251,7 +263,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
             appBar: AppBar(
               title:  Text(
                   Strings.of(context)?.get("order_customer_title")??"Not Found",
-                  style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                  style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
               ),
               toolbarHeight: 50.h,
               centerTitle: true,
@@ -261,7 +273,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                   Navigator.of(context).pop({'code':100});
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
               ),
             ),
             body: SafeArea(

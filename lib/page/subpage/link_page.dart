@@ -162,11 +162,6 @@ class _LinkPageState extends State<LinkPage> {
               }
 
               if(status.value.order_id != null) {
-                /*for(int i = 0; i < list.length; i++) {
-                  if(list[i].linkCd == Const.CALL_24_KEY_NAME) {
-                    list.removeAt(i);
-                  }
-                }*/
                 if(!(status.value.call24Status == "E")) {
                   if(m24Call.value == false) {
                     OrderLinkCurrentModel dum24Call = OrderLinkCurrentModel();

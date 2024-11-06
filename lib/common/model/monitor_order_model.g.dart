@@ -8,14 +8,14 @@ part of 'monitor_order_model.dart';
 
 MonitorOrderModel _$MonitorOrderModelFromJson(Map<String, dynamic> json) =>
     MonitorOrderModel(
-      allocCnt: json['allocCnt'] as int?,
-      preOrder: json['preOrder'] as int?,
-      todayOrder: json['todayOrder'] as int?,
-      todayFinish: json['todayFinish'] as int?,
-      tomorrowFinish: json['tomorrowFinish'] as int?,
-      allocDelay: json['allocDelay'] as int?,
-      enterDelay: json['enterDelay'] as int?,
-      finishDelay: json['finishDelay'] as int?,
+      allocCnt: (json['allocCnt'] as num?)?.toInt(),
+      preOrder: (json['preOrder'] as num?)?.toInt(),
+      todayOrder: (json['todayOrder'] as num?)?.toInt(),
+      todayFinish: (json['todayFinish'] as num?)?.toInt(),
+      tomorrowFinish: (json['tomorrowFinish'] as num?)?.toInt(),
+      allocDelay: (json['allocDelay'] as num?)?.toInt(),
+      enterDelay: (json['enterDelay'] as num?)?.toInt(),
+      finishDelay: (json['finishDelay'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$MonitorOrderModelToJson(MonitorOrderModel instance) =>

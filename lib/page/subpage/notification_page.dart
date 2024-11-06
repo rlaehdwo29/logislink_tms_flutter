@@ -94,9 +94,9 @@ class _NotificationPageState extends State<NotificationPage> {
         backgroundColor: Colors.white,
         appBar: AppBar(
               centerTitle: true,
-              title:Text("알림",
-                  style: CustomStyle.appBarTitleFont(
-                      styleFontSize18, styleWhiteCol)
+              title:Text(
+                    "알림",
+                    style: CustomStyle.appBarTitleFont(styleFontSize18, Colors.black)
                   ),
                 toolbarHeight: 50.h,
               leading: IconButton(
@@ -105,7 +105,7 @@ class _NotificationPageState extends State<NotificationPage> {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
               ),
             ),
         body: SafeArea(

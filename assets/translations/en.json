@@ -367,6 +367,7 @@
   "order_trans_info_regit_explain" : "※산재보험 적용 시 \n\t 주민번호 입력",
 
   "order_customer_title" : "거래처 선택",
+  "order_customer_dept_title" : "부서 선택",
   "order_customer_new" : "신규 등록",
 
   "stop_point_title" : "경유지 목록",

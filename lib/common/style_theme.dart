@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 const bool screenUtilUse = true;
 
 const Color main_color = Color(0xff191962);
+const Color renew_main_color2 = Color(0xff3A6EFE);
+const Color renew_main_color2_sub = Color(0xff3EA0F2);
 const Color sub_color = Color(0xffF6F6FF);
 const Color sub_color2 = Color(0xffD5C6BB);
 const Color main_btn = Color(0xff191962);

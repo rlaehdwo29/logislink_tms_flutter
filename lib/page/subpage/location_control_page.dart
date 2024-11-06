@@ -154,20 +154,6 @@ class _LocationControlPageState extends State<LocationControlPage>{
                 markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/blue_b.png',
                 latLng: LatLng(mData.value.sLat!, mData.value.sLon!),
                 infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${mData.value.sComName??"상차지"}</div>',
-                /*'<div class="wrap">' +
-                                      '    <div class="info">' +
-                                      '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
-                                      '            ${widget.order_vo.sComName ?? "상차지"}' +
-                                      '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' +
-                                      '        </div>' +
-                                      '        <div class="body">' +
-                                      '            <div class="desc">' +
-                                      '                <div class="ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.sAddr}</div>' +
-                                      '                <div class="jibun ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.sAddrDetail}</div>' +
-                                      '            </div>' +
-                                      '        </div>' +
-                                      '    </div>' +
-                                      '</div>'*/
               ));
             }
 
@@ -178,21 +164,6 @@ class _LocationControlPageState extends State<LocationControlPage>{
                 markerImageSrc: 'https://t1.daumcdn.net/localimg/localimages/07/2018/pc/flagImg/red_b.png',
                 latLng: LatLng(mData.value.eLat!, mData.value.eLon!),
                 infoWindowContent: '<div style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">${mData.value.eComName??"하차지"}</div>',
-                /*
-                                * '<div class="wrap">' +
-                                    '    <div class="info">' +
-                                    '        <div class="title" style="float:center; margin:5px; font: bold normal 0.7em 돋움체;">' +
-                                    '            ${widget.order_vo.eComName ?? "하차지"}' +
-                                    '            <div class="close" onclick="closeOverlay()" title="닫기"></div>' +
-                                    '        </div>' +
-                                    '        <div class="body">' +
-                                    '            <div class="desc">' +
-                                    '                <div class="ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.eAddr}</div>' +
-                                    '                <div class="jibun ellipsis" style="float:center; margin:5px; font: normal 0.7em 돋움체;">${widget.order_vo.eAddrDetail}</div>' +
-                                    '            </div>' +
-                                    '        </div>' +
-                                    '    </div>' +
-                                    '</div>'*/
               ));
             }
 
@@ -205,20 +176,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                 latLng: LatLng(mList.value[mList.length - 1].lat, mList.value[mList.length - 1].lon),
               ));
             }
-            // 이동 경로 표시
-            /*polylines.add(
-              Polyline(
-                polylineId: 'polyline_${polylines.length}',
-                points: [
-                  LatLng(widget.order_vo.sLat!, widget.order_vo.sLon!),
-                  LatLng(widget.order_vo.eLat!, widget.order_vo.eLon!),
-                ],
-                strokeColor: Colors.red,
-              ),
-            );*/
-
             mapController = controller;
-            //mapController?.addOverlayMapTypeId(MapType.traffic); //교통정보
             mapController?.fitBounds(bounds);
             mapController?.setBounds();
           });
@@ -256,7 +214,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                 title: Text(
                     Strings.of(context)?.get("location_control_title")??"위치관제_",
                     style: CustomStyle.appBarTitleFont(
-                        styleFontSize16, styleWhiteCol)
+                        styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 leading: IconButton(
@@ -265,7 +223,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                     Navigator.of(context).pop();
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -288,7 +246,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                                 child: Container(
                               padding: EdgeInsets.all(10.w),
                               decoration: const BoxDecoration(
-                                color: main_btn,
+                                color: renew_main_color2,
                                 shape: BoxShape.circle,
                               ),
                                 child: Icon(

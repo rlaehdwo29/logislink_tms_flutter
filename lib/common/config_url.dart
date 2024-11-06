@@ -4,12 +4,11 @@
 //public static String SERVER_URL = "https://app.logis-link.co.kr";   // PRO URL
 
 const String m_ServerRelease = "https://app.logis-link.co.kr";    // 운영서버
-//const String m_ServerDebug = "http://192.168.53.51:8080";         // Local
-const String m_ServerDebug = "http://192.168.68.64:8080";         // Local
-//const String m_ServerDebug = "http://192.168.0.2:8080";
+const String m_ServerDebug = "http://192.168.53.51:9080";         // Local
+//const String m_ServerDebug = "http://172.30.1.67:9080";         // Local2
 const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
-const String SERVER_URL = m_ServerRelease;
+const String SERVER_URL = m_ServerDebug;
 
 const String RECEIPT_PATH = "/files/receipt/";
 
@@ -44,8 +43,20 @@ const String URL_KAKAO_ADDRESS = "/v2/local/search/address.json";
 const String URL_USER_INFO = "/cust/user/info";
 // 사용자 정보 수정
 const String URL_USER_UPDATE = "/cust/user/update";
+// 사용자 RPA 정보 수정
+const String URL_USER_RPA_UPDATE = "/cust/user/rpa/update";
 // 기기 정보 업데이트
 const String URL_DEVICE_UPDATE = "/cust/device/update";
+// 사용자 탬플릿 등록
+const String URL_USER_TEMPLATE_REG = "/cust/user/write/template";
+// 사용자 탬플릿 조회
+const String URL_USER_TEMPLATE_LIST = "/cust/user/templateList";
+// 사용자 탬플릿 상세조회
+const String URL_USER_TEMPLATE_DETAIL = "/cust/user/templateDetail";
+// 사용자 탬플릿 경유지 조회
+const String URL_USER_TEMPLATE_STOP_LIST = "/cust/user/templateStopList";
+// 사용자 탬플릿 삭제
+const String URL_USER_TEMPLATE_DEL = "/cust/user/delete/template";
 // 로그인시 카카오톡 알람 확인
 const String URL_LOGIN_ALARM = "/notice/talk/smsSendLoginService";
 
@@ -110,6 +121,8 @@ const String URL_LINK_RPA_CANCEL = "/cust/order/cancelLink";
 const String URL_LINK_RPA_CURRENT= "/cust/order/linkCurrent";
 // New : 정보망 현황 : 기본 데이터
 const String URL_LINK_RPA_STATUS = "/cust/order/linkStatus";
+// New : 정보망 계정 정보
+const String URL_LINK_USER_INFO = "/cust/linkInfo";
 // New : 정보망 현황 : 정보망 각 상태 및 금액 얼마 있는지 만 추출 - orderId 위주
 const String URL_LINK_RPA_STATUS_SUB = "/cust/order/rpa/getOrderStatusSub";
 // New : 정보망 현황 : 정보망 각 상태 및 금액 얼마 있는지 만 추출 - allocId 위주
@@ -124,6 +137,8 @@ const String URL_RPA_USE_YN = "/cust/rpa/useYn";
 const String URL_SIDO_AREA = "/cmm/area/list";
 // 부서 목록
 const String URL_DEPT_LIST = "/cust/dept/list";
+// 커스텀 부서 목록
+const String URL_CUSTOM_DEPT_LIST = "/cust/custdept/list";
 // 오더&배차현황
 const String URL_MONITOR_ORDER = "/cust/monitor/arrangeOrder/v1";
 // 실적현황(부서별)

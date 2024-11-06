@@ -230,7 +230,9 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
         ),
         builder: (context, snapshot) {
           if(snapshot.connectionState != ConnectionState.done) {
-            return Expanded(child: Container(
+            return Expanded(
+                child: Container(
+
                 alignment: Alignment.center,
                 child: const Center(child: CircularProgressIndicator())
             ));
@@ -512,24 +514,24 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
-            title: Obx(() {
-              return Text(
-                  mTitle.value,
-                  style: CustomStyle.appBarTitleFont(
-                      styleFontSize16, styleWhiteCol)
-              );
-            }),
-            toolbarHeight: 50.h,
-            centerTitle: true,
-            automaticallyImplyLeading: false,
-            leading: IconButton(
-              onPressed: () async {
-                Navigator.of(context).pop({'code':100});
-              },
-              color: styleWhiteCol,
-              icon: Icon(Icons.arrow_back,size: 24.h, color: styleWhiteCol),
-            ),
-          ),
+                title: Obx(() {
+                  return Text(
+                      mTitle.value,
+                      style: CustomStyle.appBarTitleFont(
+                          styleFontSize16, Colors.black)
+                  );
+                }),
+                toolbarHeight: 50.h,
+                centerTitle: true,
+                automaticallyImplyLeading: false,
+                leading: IconButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop({'code':100});
+                  },
+                  color: styleWhiteCol,
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
+                ),
+              ),
           body: SafeArea(
               child: Obx((){
                 return SizedBox(

@@ -26,6 +26,7 @@ import 'package:dio/dio.dart';
 
 class Util {
 
+
   static String booleanToYn(bool value) {
     if (value) {
       return "Y";
@@ -90,6 +91,7 @@ class Util {
   }
 
   static snackbar(BuildContext context, String msg){
+    final controller = Get.find<App>();
     return ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           duration: const Duration(milliseconds: 1500),
@@ -105,7 +107,7 @@ class Util {
             top: CustomStyle.getHeight(14.0),
             bottom: CustomStyle.getHeight(14.0),
           ),
-          backgroundColor: main_color,
+          backgroundColor: controller.renew_value.value ? renew_main_color2 : main_color,
           content: SizedBox(
             child: Text(
               msg,
@@ -279,7 +281,7 @@ class Util {
   }
 
   static String getInCodeCommaWon(String? won) {
-    if (won == null || won.isEmpty || won.length > 8) return "0";
+    if (won == null || won == "" || won.length > 8) return "0";
     double inValues = double.parse(won);
     NumberFormat Commas = NumberFormat("#,###");
     return Commas.format(inValues);

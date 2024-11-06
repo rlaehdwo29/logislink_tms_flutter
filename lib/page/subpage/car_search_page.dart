@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
@@ -71,7 +72,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
               child: TextField(
                 style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                 textAlign: TextAlign.start,
-                keyboardType: TextInputType.number,
+                keyboardType: TextInputType.text,
                 onChanged: (value) async {
                   search_text.value = value;
                   await searchCar();
@@ -80,7 +81,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                   counterText: '',
                   hintText: Strings.of(context)?.get("car_search_hint")??"Not Found",
                   hintStyle:CustomStyle.greyDefFont(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                   enabledBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
@@ -112,8 +113,8 @@ class _CarSearchPageState extends State<CarSearchPage> {
         },
         child: Container(
             padding: EdgeInsets.symmetric(
-                vertical: CustomStyle.getHeight(5.h),
-                horizontal: CustomStyle.getWidth(15.w)),
+                vertical: CustomStyle.getHeight(5),
+                horizontal: CustomStyle.getWidth(15)),
             decoration: BoxDecoration(
                 border: Border(
                     bottom: BorderSide(
@@ -136,15 +137,26 @@ class _CarSearchPageState extends State<CarSearchPage> {
     return Container(
       child: mList.isNotEmpty
           ? Expanded(
-          child: ListView.builder(
+          child: AnimationLimiter(
+            child: ListView.builder(
             scrollDirection: Axis.vertical,
             shrinkWrap: true,
             itemCount: mList.length,
             itemBuilder: (context, index) {
               var item = mList[index];
-              return getListItemView(item);
+              return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(milliseconds: 375),
+                child: SlideAnimation(
+                  verticalOffset: 50.0,
+                  child: FadeInAnimation(
+                    child: getListItemView(item)
+                  )
+                )
+              );
             },
           )
+        )
       ):Expanded(
           child: Container(
               alignment: Alignment.center,
@@ -163,7 +175,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
           Navigator.of(context).pop({'code':200,'car':item});
         },
         child: Container(
-            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h), horizontal: CustomStyle.getWidth(20.w)),
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10), horizontal: CustomStyle.getWidth(20)),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -189,7 +201,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                           style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
                         ),
                         Container(
-                          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w)),
+                          padding: EdgeInsets.only(left: CustomStyle.getWidth(5)),
                           child: Text(
                             Util.makePhoneNumber(item.mobile),
                             style: CustomStyle.CustomFont(styleFontSize12, text_color_03),
@@ -282,7 +294,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                         borderRadius: BorderRadius.all(Radius.circular(0.0))
                     ),
                     title: Container(
-                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5)),
                         decoration: CustomStyle.customBoxDeco(main_color,radius: 0),
                         child: Text(
                           '${Strings.of(context)?.get("order_detail_vehicle_dispatch")}',
@@ -298,7 +310,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                               children: [
                                 // 차량번호(필수)
                                 Container(
-                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h),top: CustomStyle.getHeight(10.h),left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w)),
+                                    padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5),top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5)),
                                     child: Row(
                                       children: [
                                         Container(
@@ -776,7 +788,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
             appBar: AppBar(
                   title: Text(
                       Strings.of(context)?.get("car_search_title")??"Not Found",
-                      style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                      style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
                   ),
                   toolbarHeight: 50.h,
                   centerTitle: true,
@@ -786,7 +798,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       Navigator.of(context).pop({'code':100});
                     },
                     color: styleWhiteCol,
-                    icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
+                    icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
                   ),
                 ),
             body: SafeArea(

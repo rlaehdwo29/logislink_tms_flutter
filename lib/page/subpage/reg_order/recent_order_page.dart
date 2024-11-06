@@ -298,6 +298,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                     rowHeight: MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio > 1500 ? CustomStyle.getHeight(30.h) :CustomStyle.getHeight(45.h) ,
                                     firstDay: DateTime.utc(2010, 1, 1),
                                     lastDay: DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day),
+                                    daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
                                     headerStyle: HeaderStyle(
                                       // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
                                       formatButtonVisible: false,
@@ -389,7 +390,6 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                                       }
                                     },
                                     onRangeSelected: (start, end, focusedDay) {
-                                      //print("onRangeSelected => ${start} // $end // ${focusedDay}");
                                       setState(() {
                                         _tempSelectedDay = start;
                                         _focusedDay = focusedDay;
@@ -583,7 +583,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
           appBar: AppBar(
                 title: Text(
                     Strings.of(context)?.get("order_recent_order_title")??"Not Found",
-                    style: CustomStyle.appBarTitleFont(styleFontSize16,styleWhiteCol)
+                    style: CustomStyle.appBarTitleFont(styleFontSize16,Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -593,7 +593,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(

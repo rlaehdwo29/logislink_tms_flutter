@@ -62,7 +62,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
 
   Widget headerWidget() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
+      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10)),
       child: Row(
         children: [
           Expanded(
@@ -118,7 +118,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
   Widget bodyWidget() {
     return Expanded(
         child: Container(
-        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10)),
         child: Column(
           children: [
             Column(
@@ -144,16 +144,16 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_reg_staff_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
                             borderRadius: BorderRadius.circular(10.h)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                         ),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
                             borderRadius: BorderRadius.circular(10.h)
                         ),
                         suffixIcon: IconButton(
@@ -171,16 +171,16 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_reg_staff_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
                             borderRadius: BorderRadius.circular(10.h)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                         ),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
                             borderRadius: BorderRadius.circular(10.h)
                         ),
                       ),
@@ -211,16 +211,16 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_reg_tel_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
                             borderRadius: BorderRadius.circular(10.h)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                         ),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
                             borderRadius: BorderRadius.circular(10.h)
                         ),
                         suffixIcon: IconButton(
@@ -240,15 +240,15 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         hintStyle:CustomStyle.greyDefFont(),
                         contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15.0)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(10.h)
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
+                            borderRadius: BorderRadius.circular(10)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                         ),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(10.h)
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
+                            borderRadius: BorderRadius.circular(10)
                         ),
                       ),
                       onChanged: (value){
@@ -278,17 +278,17 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_confirm_memo_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(10.h)
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
+                            borderRadius: BorderRadius.circular(10)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                         ),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(10.h)
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
+                            borderRadius: BorderRadius.circular(10)
                         ),
                         suffixIcon: IconButton(
                           onPressed: () {
@@ -305,17 +305,17 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                         counterText: '',
                         hintText: Strings.of(context)?.get("order_addr_confirm_memo_hint")??"Not Found",
                         hintStyle:CustomStyle.greyDefFont(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(10.h)),
+                        contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5),vertical: CustomStyle.getHeight(10)),
                         enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(10.h)
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
+                            borderRadius: BorderRadius.circular(10)
                         ),
                         disabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                         ),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0.w)),
-                            borderRadius: BorderRadius.circular(10.h)
+                            borderSide: BorderSide(color: text_box_color_02, width: CustomStyle.getWidth(1.0)),
+                            borderRadius: BorderRadius.circular(10)
                         ),
                       ),
                       onChanged: (value){
@@ -349,7 +349,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
           appBar: AppBar(
                 title: Text(
                       Strings.of(context)?.get("order_addr_confirm_title")??"Not Found",
-                      style: CustomStyle.appBarTitleFont(styleFontSize16, styleWhiteCol)
+                      style: CustomStyle.appBarTitleFont(styleFontSize16, Colors.black)
                   ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -359,7 +359,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h,color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
                 ),
               ),
           body: SafeArea(

@@ -139,6 +139,8 @@ class OrderModel extends ResultModel {
   String? startDate;           // 출발일
   String? finishDate;          // 도착일
   String? enterDate;           // 입차일
+  String? sTimeFreeYN;        // 상차 시간무관 유무
+  String? eTimeFreeYN;        // 하자 시간무관 유무
 
   String? payDate;             // 결제일
 
@@ -308,6 +310,9 @@ class OrderModel extends ResultModel {
     this.startDate,           // 출발일
     this.finishDate,          // 도착일
     this.enterDate,           // 입차일
+
+    this.sTimeFreeYN,        // 상차 시간무관 유무
+    this.eTimeFreeYN,        // 하자 시간무관 유무
 
     this.payDate,             // 결제일
 
@@ -582,6 +587,10 @@ class OrderModel extends ResultModel {
         enterDate: json['enterDate'],
         // 입차일
 
+        sTimeFreeYN : json['sTimeFreeYN'],
+        // 상차 시간무관 유무
+        eTimeFreeYN : json['eTimeFreeYn'],        // 하자 시간무관 유무
+
         payDate: json['payDate'],
         // 결제일
 
@@ -774,6 +783,8 @@ class OrderModel extends ResultModel {
       "startDate": startDate,
       "finishDate": finishDate,
       "enterDate": enterDate,
+      "sTimeFreeYN" : sTimeFreeYN,
+      "eTimeFreeYN" : eTimeFreeYN,
       "payDate": payDate,
       "linkCode": linkCode,
       "linkCodeName": linkCodeName,
@@ -799,7 +810,7 @@ class OrderModel extends ResultModel {
       "reqPayYN": reqPayYN,
       "reqPayDate": reqPayDate,
       "talkYn": talkYn,
-      "orderStopList": jsonEncode(orderStopList),
+      "orderStopList": jsonEncode(orderStopList??List.empty(growable: true)),
       "reqStaffName":reqStaffName,
       "call24Cargo": call24Cargo,
       "manCargo": manCargo,

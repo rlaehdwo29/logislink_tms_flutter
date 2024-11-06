@@ -696,14 +696,16 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       mData.value.sSido,
       mData.value.sGungu,
       mData.value.sDong,
+      mData.value.sComName,
       mData.value.eSido,
       mData.value.eGungu,
       mData.value.eDong,
       orderCarTonCode.value,
       orderCarTypeCode.value,
       mData.value.sDate,
-      mData.value.eDate
-
+      mData.value.eDate,
+      mData.value.eComName,
+      mData.value.unitPriceType
     ).then((it) async {
       try {
         ReturnMap _response = DioService.dioResponse(it);
@@ -801,7 +803,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
       await DioService.dioClient(header: true).orderAlloc(
           user.authorization,
           mData.value.orderId,
-          mData.value.custId, mData.value.deptId, user.userId, user.mobile,
+          mData.value.custId,mData.value.deptId, user.userId, user.mobile,
           "", "", "", "", mData.value.buyCharge, mData.value.buyFee,
           mData.value.vehicId, mData.value.driverId, mData.value.carNum, mData.value.carTonCode,
           mData.value.carTypeCode,mData.value.driverName,mData.value.driverTel,mData.value.driverMemo,
@@ -2647,7 +2649,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                 title: Text(
                     Strings.of(context)?.get("order_trans_info_title")??"Not Found",
                     style: CustomStyle.appBarTitleFont(
-                        styleFontSize16, styleWhiteCol)
+                        styleFontSize16, Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
@@ -2657,7 +2659,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(

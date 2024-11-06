@@ -269,7 +269,11 @@ Widget tabBarValueWidget(String? tabValue) {
   Future<void> getMonitorDeptList() async {
     Logger logger = Logger();
     await pr?.show();
-    await DioService.dioClient(header: true).getDeptList(mUser.value.authorization).then((it) async {
+    UserModel? user = await controller.getUserInfo();
+    await DioService.dioClient(header: true).getDeptList(
+        mUser.value.authorization,
+        user.custId
+    ).then((it) async {
       await pr?.hide();
       ReturnMap response = DioService.dioResponse(it);
       logger.d("getMonitorDeptList() _response -> ${response.status} // ${response.resultMap}");
@@ -474,7 +478,7 @@ Widget tabBarValueWidget(String? tabValue) {
       // 구분 / 오더 현황
       Container(
         padding: EdgeInsets.all(10.w),
-        color: main_color,
+        color: renew_main_color2,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -778,7 +782,7 @@ Widget tabBarValueWidget(String? tabValue) {
         // 구분 / 배차 KPI
         Container(
           padding: EdgeInsets.all(10.w),
-          color: main_color,
+          color: renew_main_color2,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1037,7 +1041,7 @@ Widget orderFragment(String? code) {
         children: [
           Container(
             padding: EdgeInsets.all(10.w),
-            color: main_color,
+            color: renew_main_color2,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -1236,7 +1240,7 @@ Widget custProfitWidget() {
     children: [
       Container(
         padding: EdgeInsets.all(10.w),
-        color: main_color,
+        color: renew_main_color2,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -1504,13 +1508,13 @@ Widget build(BuildContext context) {
         });
       } ,
       child: Scaffold(
-          backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       appBar: AppBar(
               centerTitle: true,
               toolbarHeight: 50.h,
               title: Text(
                   Strings.of(context)?.get("monitor_title")??"Not Found",
-                  style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
+                  style: CustomStyle.appBarTitleFont(styleFontSize18,Colors.black)
               ),
               leading: IconButton(
                 onPressed: () async {
@@ -1518,7 +1522,7 @@ Widget build(BuildContext context) {
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.close,size: 24.h,color: styleWhiteCol),
+                icon: Icon(Icons.close,size: 24.h,color: Colors.black),
               )
           ),
       body: SafeArea(

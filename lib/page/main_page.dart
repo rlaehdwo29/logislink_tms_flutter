@@ -336,7 +336,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             ),
 
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "내정보",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -347,7 +347,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "실적현황",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -357,7 +357,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "공지사항",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -367,7 +367,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               },
             ),
             ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "설정",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -376,7 +376,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarSettingPage()));
               },
             ),ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "도움말",
                 style: CustomStyle.CustomFont(styleFontSize14, styleBlackCol1),
@@ -388,7 +388,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 }
               },
             ),ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
               title: Text(
                 "로그아웃",
                 style: CustomStyle.CustomFont(styleFontSize14, order_state_09),
@@ -396,6 +396,31 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               onTap: () async {
                 await goToExit();
               },
+            ),ListTile(
+              contentPadding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(5)),
+              title: Row(
+                  children:[
+                    Container(
+                        margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
+                        child: Text(
+                            "신버전",
+                            style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w600)
+                        )
+                    ),
+                    Obx(() =>
+                        Transform.scale(
+                            scale: 0.7,
+                            child: CupertinoSwitch(
+                              value:  controller.renew_value.value,
+                              activeColor: renew_main_color2,
+                              onChanged: (bool? value){
+                                controller.setRenewValue(value ?? false);
+                              },
+                            )
+                        )
+                    )
+                  ]
+              ),
             )
           ],
         )
@@ -429,7 +454,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Widget getListCardView(OrderModel item,int item_index) {
 
     return Container(
-        padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w),top: CustomStyle.getHeight(10.0.h)),
+        padding: EdgeInsets.only(left: CustomStyle.getWidth(5),right: CustomStyle.getWidth(5),top: CustomStyle.getHeight(10)),
         child: InkWell(
             onTap: () async {
               await goToOrderDetail(item,item_index);
@@ -438,7 +463,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                 elevation: 2.0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
                 color: styleWhiteCol,
-                child: Column(children: [
+                child: Column(
+                    children: [
                   Container(
                       padding: EdgeInsets.all(10.0.h),
                       color: Colors.white,
@@ -449,32 +475,34 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                           children: [
                             Flexible(
                                 flex: 3,
-                                child: Row(children: [
-                                  item.orderState == "09" ?
-                                  Container(
-                                      decoration: CustomStyle.baseBoxDecoWhite(),
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: CustomStyle.getHeight(5.0.h),
-                                          horizontal: CustomStyle.getWidth(10.0.w)),
-                                      child: Text(
-                                        item.orderStateName??"",
-                                        style: CustomStyle.CustomFont(
-                                            styleFontSize12,
-                                            Util.getOrderStateColor(item.orderStateName)),
-                                      )) : const SizedBox(),
-                                  Container(
-                                      child: Text(
+                                child: Row(
+                                    children: [
+                                      item.orderState == "09" ?
+                                      Container(
+                                          decoration: CustomStyle.baseBoxDecoWhite(),
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: CustomStyle.getHeight(5.0.h),
+                                              horizontal: CustomStyle.getWidth(10.0.w)),
+                                          child: Text(
+                                            item.orderStateName??"",
+                                            style: CustomStyle.CustomFont(
+                                                styleFontSize12,
+                                                Util.getOrderStateColor(item.orderStateName)),
+                                          )
+                                      ) : const SizedBox(),
+                                      Text(
                                         item.sellCustName??"",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             main_color),
-                                      )),
-                                  Text(
-                                    item.sellDeptName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize10, main_color),
+                                      ),
+                                      Text(
+                                        item.sellDeptName??"",
+                                        style: CustomStyle.CustomFont(styleFontSize10, main_color),
+                                      )
+                                    ]
                                   )
-                                ])),
+                              ),
                             Flexible(
                                 flex: 1,
                                 child: Container(
@@ -487,7 +515,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         text_color_01,
                                         font_weight: FontWeight.w700),
                                   ),
-                                ))
+                                )
+                            )
                           ],
                         ),
                         Row(
@@ -505,23 +534,22 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         CustomStyle.getHeight(5.0.h),),
                                       child: Text(
                                         "${item.allocStateName}",
-                                        style: CustomStyle.CustomFont(
-                                            styleFontSize14,
-                                            order_state_01),
-                                      )) : const SizedBox(),
+                                        style: CustomStyle.CustomFont(styleFontSize14, order_state_01),
+                                      )
+                                  ) : const SizedBox(),
                                   item.linkName?.isEmpty == false && item.linkName != "" ?
                                   (item.call24Cargo == null || item.call24Cargo?.isEmpty == true)
                                       && (item.manCargo == null || item.manCargo?.isEmpty == true)
                                       && (item.oneCargo == null || item.oneCargo?.isEmpty == true) ?
                                   Container(
-                                      padding: EdgeInsets.only(
-                                          right: CustomStyle.getWidth(5.0.w)),
+                                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5)),
                                       child: Text(
                                         "지불운임",
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             text_color_01),
-                                      )) :
+                                      )
+                                  ) :
                                   Container(
                                       padding: EdgeInsets.only(
                                           right: CustomStyle.getWidth(5.0.w)),
@@ -530,21 +558,21 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                         style: CustomStyle.CustomFont(
                                             styleFontSize12,
                                             text_color_01),
-                                      ))
-                                      : const SizedBox(),
+                                      )
+                                  ) : const SizedBox(),
                                   item.buyCustName?.isEmpty == false && item.buyCustName != "" ?
                                   Text(
                                     item.buyCustName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize12, text_color_01),
+                                    style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                                   ) : const SizedBox(),
                                   item.buyDeptName?.isEmpty == false && item.buyDeptName != "" ?
                                   Text(
                                     item.buyDeptName??"",
-                                    style: CustomStyle.CustomFont(
-                                        styleFontSize10, text_color_01),
+                                    style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
                                   ) : const SizedBox()
-                                ])),
+                                ]
+                                )
+                            ),
                             Flexible(
                                 flex: 1,
                                 child: (item.call24Cargo != "" && item.call24Cargo != null) ||
@@ -860,6 +888,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                                     locale: 'ko_KR',
                                     firstDay: DateTime.utc(2010, 1, 1),
                                     lastDay: DateTime.utc(DateTime.now().year+10, DateTime.now().month, DateTime.now().day),
+                                    daysOfWeekHeight: 32 * MediaQuery.of(context).textScaleFactor,
                                     headerStyle: HeaderStyle(
                                       // default로 설정 돼 있는 2 weeks 버튼을 없애줌 (아마 2주단위로 보기 버튼인듯?)
                                       formatButtonVisible: false,
@@ -1378,7 +1407,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
             context,
             Util.getTextDate(mCalendarStartDate.value),
             Util.getTextDate(mCalendarEndDate.value),
+            "0",
             categoryOrderCode.value,
+            "",
             categoryVehicCode.value,
             myOrderSelect.value == true? "Y":"N",
             page.value,
@@ -1409,7 +1440,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   preferPosition: AutoScrollPosition.begin,
                 );
               }
-
+              print("dddddddddddd=> ${mUser.value}");
               return Obx(()=> orderListWidget());
             } else if (snapshot.hasError) {
               return Container(
@@ -1743,7 +1774,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
   Future<void> showOrderTrans(String allocId) async {
     openCommonConfirmBox(
         context,
-        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까??",
+        "오더가 등록되었습니다.\n바로 이어서 배차를 진행하시겠습니까?",
         Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
@@ -3503,7 +3534,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                               }else{
                                 cd = "";
                               }
-                              if(int.parse(SelectNumber.value) > 20000){
+                              if(int.parse(SelectNumber.value) >= 20000){
                                 if(flag == "D") {
                                   await registRpa(item,link_type,SelectNumber.value,item_index);
                                 }else {

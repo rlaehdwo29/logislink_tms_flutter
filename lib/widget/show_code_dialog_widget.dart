@@ -185,7 +185,7 @@ class ShowCodeDialogWidget {
           appBar: AppBar(
             title: Text(
               mTitle,
-              style: CustomStyle.CustomFont(styleFontSize18, Colors.white),
+              style: CustomStyle.CustomFont(styleFontSize18, Colors.black),
             ),
             centerTitle: true,
             actions: [
@@ -196,7 +196,7 @@ class ShowCodeDialogWidget {
                       //SystemNavigator.pop();
                     });
                   },
-                  icon: Icon(Icons.close, size: 28.h)
+                  icon: Icon(Icons.close, size: 28.h,color: Colors.black)
               )
             ],
             automaticallyImplyLeading: false,

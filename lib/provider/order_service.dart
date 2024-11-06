@@ -80,16 +80,15 @@ class OrderService with ChangeNotifier {
     return stopPointList;
   }
 
-  Future getOrder(context, String? startDate, String? endDate, String? orderState, String? allocState, String? myOrder,int? page, String? searchColumn, String? searchValue ) async {
+  Future getOrder(context, String? startDate, String? endDate,String? dayOption, String? orderState, String? deptState, String? rpaState, String? staffName,int? page, String? searchColumn, String? searchValue ) async {
     Logger logger = Logger();
     UserModel? user = await App().getUserInfo();
     orderList.value = List.empty(growable: true);
     Map<String,dynamic> api24Data  = Map<String,dynamic>();
     int totalPage = 1;
-    await DioService.dioClient(header: true).getOrder(user.authorization, startDate, endDate, orderState, allocState, myOrder, page, searchColumn, searchValue ).then((it) async {
+    await DioService.dioClient(header: true).getOrder(user.authorization, startDate, endDate, dayOption, orderState, deptState, rpaState,staffName, page, searchColumn, searchValue ).then((it) async {
       ReturnMap _response = DioService.dioResponse(it);
       logger.d("orderService.dartgetOrder() _response -> ${_response.status} // ${_response.resultMap}");
-      //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       if(_response.status == "200") {
         if(_response.resultMap?["result"] == true) {
           if(_response.resultMap?["api24Data"] != null) api24Data = _response.resultMap?["api24Data"];
