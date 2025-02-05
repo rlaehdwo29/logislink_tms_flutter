@@ -458,7 +458,6 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                                               style: CustomStyle.CustomFont(styleFontSize16, mData.value.sellCustId == null || mData.value.sellCustId?.isEmpty == true ? styleGreyCol1 : Colors.black, font_weight: mData.value.sellCustId == null || mData.value.sellCustId?.isEmpty == true ? FontWeight.w600 : FontWeight.w800),
                                             )
                                         )
-
                                     ),
                                   )
                               ),
@@ -1403,7 +1402,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                           child: Container(
                               height: CustomStyle.getHeight(50),
                               alignment: Alignment.center,
-                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5), horizontal: CustomStyle.getWidth(2)),
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                               child: TextField(
                                 style: CustomStyle.CustomFont(styleFontSize18, light_gray21, font_weight: FontWeight.w800),
                                 textAlign: TextAlign.right,
@@ -1559,7 +1558,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                     width: double.infinity,
                     height: CustomStyle.getHeight(50),
                     alignment: Alignment.center,
-                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5), horizontal: CustomStyle.getWidth(2)),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                     child: TextField(
                       style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                       textAlign: TextAlign.left,
@@ -1738,7 +1737,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                       child: Container(
                           height: CustomStyle.getHeight(50),
                           alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5), horizontal: CustomStyle.getWidth(2)),
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
                           child: TextField(
                             style: CustomStyle.CustomFont(styleFontSize18, light_gray21, font_weight: FontWeight.w800),
                             textAlign: TextAlign.right,
@@ -1756,7 +1755,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                               suffixText: mData.value.unitPriceType == UNIT_PRICE_TYPE_01 ? ",000원" : "원",
                               suffixStyle: CustomStyle.CustomFont(styleFontSize18, light_gray21, font_weight: FontWeight.w800),
                               prefixStyle: CustomStyle.CustomFont(styleFontSize12, Colors.black, font_weight: FontWeight.w800),
-                              prefixText: "총운임",
+                              prefixText: "청구운임",
                               contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
                               enabledBorder: const OutlineInputBorder(
                                 borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
@@ -1854,57 +1853,52 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                 ],
               )
           ),
-          // 수수료 / 차주운임
+          // 추가운임 / 차주운임
            Row(
                 children: [
                   Expanded(
                       flex: 1,
-                      child: Container(
-                          height: CustomStyle.getHeight(50),
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5), horizontal: CustomStyle.getWidth(2)),
-                          child: TextField(
-                            style: CustomStyle.CustomFont(styleFontSize18, rpa_btn_cancle, font_weight: FontWeight.w800),
-                            textAlign: TextAlign.right,
-                            keyboardType: TextInputType.number,
-                            readOnly: mData.value.chargeType == CHARGE_TYPE_01 ? true : false,
-                            controller: sellFeeController,
-                            onTap: (){
-                              sellFeeController.selection = TextSelection.fromPosition(TextPosition(offset: sellFeeController.text.length));
-                            },
-                            maxLines: 1,
-                            decoration: InputDecoration(
-                              counterText: '',
-                              filled: true,
-                              fillColor: mData.value.chargeType == CHARGE_TYPE_01 ? light_gray19 : Colors.white,
-                              suffixText: "원",
-                              suffixStyle: CustomStyle.CustomFont(styleFontSize18, rpa_btn_cancle, font_weight: FontWeight.w800),
-                              prefixStyle: CustomStyle.CustomFont(styleFontSize12, Colors.black, font_weight: FontWeight.w800),
-                              prefixText: "수수료",
-                              contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
-                                borderRadius: BorderRadius.all(Radius.zero),
+                      child: InkWell(
+                          onTap: (){
+                            openAddChargeDialog(context);
+                          },
+                          child: Container(
+                              height: CustomStyle.getHeight(40),
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5), horizontal: CustomStyle.getWidth(2)),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: const Color(0xff1AB2D4), width: 1)
                               ),
-                              disabledBorder: const UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
-                                  borderRadius: BorderRadius.all(Radius.zero)
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
-                                  borderRadius: BorderRadius.all(Radius.zero)
-                              ),
-                            ),
-                            onChanged: (value) async {
-                              sellFeeController.text = value == "" ? "0" : Util.getInCodeCommaWon(int.parse(value.replaceAll(',','')).toString());
-                              mData.value.sellFee = value.replaceAll(',','');
-                              setState(() {
-                                setTotalCharge();
-                              });
-                            },
-                            maxLength: 200,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "추가운임",
+                                    textAlign: TextAlign.left,
+                                    style: CustomStyle.CustomFont(styleFontSize12, Colors.black, font_weight: FontWeight.w800),
+                                  ),
+                                  Row(
+                                    children: [
+                                      InkWell(
+                                        child: Text(
+                                          "${Util.getInCodeCommaWon(tvAddTotal.value.toString())} 원",
+                                          textAlign: TextAlign.left,
+                                          style: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w800),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios_outlined,
+                                        color: styleGreyCol1,
+                                        size: 18.h,
+                                      )
+                                    ],
+                                  )
+                                ],
+                              )
                           )
-                      )
+                      ),
                   ),
                   Expanded(
                       flex: 1,
@@ -1922,7 +1916,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "차주운임",
+                                    "청구(소계)",
                                     textAlign: TextAlign.center,
                                     style: CustomStyle.CustomFont(styleFontSize12, Colors.black,font_weight: FontWeight.w800),
                                   ),
@@ -1940,7 +1934,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                 ],
               ),
           // 산재(지불액), 화주부담
-          Container(
+          /*Container(
               width: double.infinity,
               margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
               padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(8), horizontal: CustomStyle.getWidth(5)),
@@ -1982,7 +1976,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                           )
                         ],
                       )
-          ),
+          ),*/
           // 정보망전송
           InkWell(
             onTap: (){
@@ -2085,48 +2079,52 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                 )
             )
           ),
-          // 추가운임
-          InkWell(
-            onTap: (){
-              openAddChargeDialog(context);
-            },
-            child: Container(
+          // 수수료
+          Container(
               width: double.infinity,
               margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(8), horizontal: CustomStyle.getWidth(5)),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: const Color(0xff1AB2D4), width: 1)
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "추가운임",
-                    textAlign: TextAlign.left,
-                    style: CustomStyle.CustomFont(styleFontSize12, Colors.black, font_weight: FontWeight.w800),
+              child: TextField(
+                style: CustomStyle.CustomFont(styleFontSize18, rpa_btn_cancle, font_weight: FontWeight.w800),
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.number,
+                readOnly: mData.value.chargeType == CHARGE_TYPE_01 ? true : false,
+                controller: sellFeeController,
+                onTap: (){
+                  sellFeeController.selection = TextSelection.fromPosition(TextPosition(offset: sellFeeController.text.length));
+                },
+                maxLines: 1,
+                decoration: InputDecoration(
+                  counterText: '',
+                  filled: true,
+                  fillColor: mData.value.chargeType == CHARGE_TYPE_01 ? light_gray19 : Colors.white,
+                  suffixText: "원",
+                  suffixStyle: CustomStyle.CustomFont(styleFontSize18, rpa_btn_cancle, font_weight: FontWeight.w800),
+                  prefixStyle: CustomStyle.CustomFont(styleFontSize12, Colors.black, font_weight: FontWeight.w800),
+                  prefixText: "수수료",
+                  contentPadding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5)),
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
+                    borderRadius: BorderRadius.all(Radius.zero),
                   ),
-                  Row(
-                    children: [
-                      InkWell(
-                        child: Text(
-                          "${Util.getInCodeCommaWon(tvAddTotal.value.toString())} 원",
-                          textAlign: TextAlign.left,
-                          style: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w800),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios_outlined,
-                        color: styleGreyCol1,
-                        size: 18.h,
-                      )
-                    ],
-                  )
-                ],
+                  disabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
+                      borderRadius: BorderRadius.all(Radius.zero)
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Color(0xff1AB2D4), width: 1),
+                      borderRadius: BorderRadius.all(Radius.zero)
+                  ),
+                ),
+                onChanged: (value) async {
+                  sellFeeController.text = value == "" ? "0" : Util.getInCodeCommaWon(int.parse(value.replaceAll(',','')).toString());
+                  mData.value.sellFee = value.replaceAll(',','');
+                  setState(() {
+                    setTotalCharge();
+                  });
+                },
+                maxLength: 200,
               )
-            )
-          ),
+          )
         ],
       )
     );
@@ -3858,13 +3856,16 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
         sellCharge = (result).toInt();
       }
     }
-    if(sellFeeController.text != "" && sellFeeController.text != " " && sellFeeController.text != "0") {
+    tvAddTotal.value = await setAddTotal();
+    buyAmt.value = (sellCharge + tvAddTotal.value).toString();
+
+    /*if(sellFeeController.text != "" && sellFeeController.text != " " && sellFeeController.text != "0") {
       sellFee = int.parse(sellFeeController.text.replaceAll(',', ''));
     }
     tvAddTotal.value = await setAddTotal();
     buyAmt.value = (sellCharge - sellFee + tvAddTotal.value).toString();
     await getInsure();
-    insure_total_charge.value = (int.parse(buyAmt.value) - int.parse(insure_charge.value)).toString();
+    insure_total_charge.value = (int.parse(buyAmt.value) - int.parse(insure_charge.value)).toString();*/
   }
 
   Future<int> setAddTotal() async {
@@ -4635,9 +4636,6 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
   }
 
   Future<bool> chargeValidation() async {
-    /*if(int.parse(buyAmt.value) < 20000) {
-      return false;
-    }*/
     if(mData.value.call24Cargo == "Y" || mData.value.manCargo == "Y" || mData.value.oneCargo == "Y") {
       if(int.parse(mRpaSalary.value) < 20000) {
         return false;
