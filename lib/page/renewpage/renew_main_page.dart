@@ -4794,7 +4794,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Flexible(
+                            Expanded(
                                 flex: 3,
                                 child: Row(children: [
                                   item.orderState == "09" ?
@@ -4809,15 +4809,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                   ) : const SizedBox(),
                                   Container(
                                     margin: EdgeInsets.only(right:CustomStyle.getWidth(3.w)),
-                                      child: Flexible(
-                                          child: RichText(
-                                              overflow: TextOverflow.visible,
-                                              text: TextSpan(
-                                                text: item.sellCustName??"",
-                                                style: CustomStyle.CustomFont(styleFontSize16, main_color,font_weight: FontWeight.w700),
-                                              )
-                                          )
-                                      ),
+                                      child: Text(
+                                        item.sellCustName??"",
+                                        style: CustomStyle.CustomFont(styleFontSize16, main_color,font_weight: FontWeight.w700),
+                                      )
                                   ),
                                   Flexible(
                                       child: RichText(
@@ -4829,7 +4824,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                       )
                                   ),
                                 ])),
-                            Flexible(
+                            Expanded(
                                 flex: 1,
                                 child: Container(
                                   alignment:
