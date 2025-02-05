@@ -1,3 +1,4 @@
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
@@ -11,6 +12,7 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
+import 'package:logislink_tms_flutter/utils/speech_controller.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
@@ -27,9 +29,10 @@ class OrderCustomerPage extends StatefulWidget {
 
 class _OrderCustomerPageState extends State<OrderCustomerPage> {
   final controller = Get.find<App>();
+  final SpeechController speechController = Get.put(SpeechController());
+  TextEditingController searchController = TextEditingController();
   ProgressDialog? pr;
 
-  final search_text = "".obs;
   final mList = List.empty(growable: true).obs;
   final arrayList = List.empty(growable: true).obs;
   final bottom_btn = "신규 거래처로 등록".obs;
@@ -48,6 +51,131 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
 
   Future<void> initView() async {
     await getCustomer();
+  }
+
+  Future<void> setChange() async {
+    if(size.value != 0) {
+      await getFilter(searchController.text);
+      bottom_btn.value = "\"${searchController.text}\" 를 신규 거래처로 등록";
+    }
+
+    String mResult = searchController.text.trim();
+    for(int i = 0; i < mList.length; i++) {
+      if((mResult == mList[i].custName && "물류팀(임시)" == mList[i].deptName)) {
+        mFlag.value = true;
+      }
+    }
+    if(mFlag.value){
+      btn_visable.value = false;
+    }else{
+      if(Const.RESULT_SETTING_REQUEST == widget.code) {
+        btn_visable.value = false;
+      }else{
+        btn_visable.value = true;
+      }
+    }
+  }
+
+  Future<void> speechDialog() async {
+    speechController.initSpeech();
+    await Navigator.of(context).push(
+        DialogRoute(
+            context: context,
+            builder: (_context) =>
+                AlertDialog(
+                  backgroundColor: Colors.black,
+                  contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+                  titlePadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0)
+                  ),
+                  insetPadding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 0,
+                  ),
+                  content: Container(
+                      width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+                      height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height * 0.4,
+                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+                      alignment: Alignment.center,
+                      color: Colors.black,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "음성 검색",
+                            style: CustomStyle.CustomFont(styleFontSize20, Colors.white, font_weight: FontWeight.w800),
+                          ),
+                          Obx(() =>
+                              AvatarGlow(
+                                  endRadius: 75.0,
+                                  animate: speechController.isListening.value,
+                                  duration: const Duration(milliseconds: 2000),
+                                  glowColor: const Color(0xff00A67E),
+                                  repeat: true,
+                                  repeatPauseDuration: const Duration(milliseconds: 100),
+                                  showTwoGlows: true,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await speechController.startListening();
+                                    },
+                                    child: CircleAvatar(
+                                      backgroundColor: const Color(0xff00A67E),
+                                      radius: 30,
+                                      child: Icon(
+                                        speechController.isListening.value ? Icons.mic : Icons.mic_off,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                              )
+                          ),
+                          Obx(() =>
+                              Text(
+                                speechController.speechText.value == "0200" ? "듣고있어요.."
+                                    : speechController.speechText.value == "0300" ? "다시 말씀해주세요.."
+                                    : speechController.speechText.value,
+                                style: CustomStyle.CustomFont(styleFontSize16, styleGreyCol1),
+                              )
+                          ),
+                          Obx(() =>
+                              InkWell(
+                                onTap: (){
+                                  if(speechController.speechText.value == "0200") {
+                                    searchController.text = "";
+                                    setChange();
+                                    Navigator.of(context).pop();
+                                  }else if(speechController.speechText.value == "0300"){
+                                    speechController.startListening();
+                                  }else{
+                                    searchController.text = speechController.speechText.value;
+                                    setChange();
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(5)),
+                                  margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: styleGreyCol1,width: 1)
+                                  ),
+                                  child: Text(
+                                    speechController.speechText.value == "0200" ? "확인"
+                                        : speechController.speechText.value == "0300" ? "다시 시도"
+                                        : "로 검색",
+                                    style: CustomStyle.CustomFont(styleFontSize15, Colors.blueAccent),
+                                  ),
+                                ),
+                              )
+                          )
+                        ],
+                      )
+                  ),
+                )
+        )
+    );
+
   }
 
   Future<void> getCustomer() async {
@@ -159,7 +287,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
 
   Future<void> onNoneCustomer() async {
     CustomerModel value = CustomerModel();
-    String result = search_text.value.trim();
+    String result = searchController.text.trim();
 
     if(result != "" && result != null) {
       value.bizName = result;
@@ -180,29 +308,10 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
               child: TextField(
                 style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                 textAlign: TextAlign.start,
+                controller: searchController,
                 keyboardType: TextInputType.text,
                 onChanged: (value) async {
-                  search_text.value = value;
-                  if(size.value != 0) {
-                    await getFilter(search_text.value);
-                    bottom_btn.value = "\"${search_text.value}\" 를 신규 거래처로 등록";
-                  }
-                  mFlag.value = false;
-                  String mResult = search_text.value.trim();
-                  for(int i = 0; i < mList.length; i++) {
-                    if((mResult == mList[i].custName && "물류팀(임시)" == mList[i].deptName)) {
-                      mFlag.value = true;
-                    }
-                  }
-                  if(mFlag.value){
-                    btn_visable.value = false;
-                  }else{
-                    if(Const.RESULT_SETTING_REQUEST == widget.code) {
-                      btn_visable.value = false;
-                    }else{
-                      btn_visable.value = true;
-                    }
-                  }
+                  await setChange();
                 },
                 decoration: InputDecoration(
                   counterText: '',
@@ -218,13 +327,11 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
-                  suffixIcon: GestureDetector(
-                    child: Icon(
-                      Icons.search, size: 20.h, color: Colors.black,
-                    ),
-                    onTap: (){
-
+                  suffixIcon: IconButton(
+                    onPressed: (){
+                      speechDialog();
                     },
+                    icon: const Icon(Icons.mic),
                   ),
                 ),
               )

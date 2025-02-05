@@ -197,8 +197,7 @@ class _ReceiptPageState extends State<ReceiptPage>{
   }
 
   Widget getReceipt() {
-    return Expanded(
-        child: receiptList.isNotEmpty ? Container(
+    return receiptList.isNotEmpty ? Container(
             padding: const EdgeInsets.all(5.0),
             color: main_background,
             child: GridView.builder(
@@ -212,8 +211,7 @@ class _ReceiptPageState extends State<ReceiptPage>{
                 crossAxisSpacing: 8, //수직 Padding
               ),
               itemBuilder: (BuildContext context, int index) {
-                var filename =
-                    SERVER_URL + RECEIPT_PATH + receiptList?[index].fileName;
+                var filename = SERVER_URL + RECEIPT_PATH + receiptList?[index].fileName;
                 return InkWell(
                           onTap: (){
                             Navigator.of(context).push(MaterialPageRoute(
@@ -226,8 +224,7 @@ class _ReceiptPageState extends State<ReceiptPage>{
                           )
                       );
               },
-            )) : const SizedBox()
-    );
+            )) : const SizedBox();
   }
 
   Widget getReceiptFuture() {
@@ -271,7 +268,7 @@ class _ReceiptPageState extends State<ReceiptPage>{
                 centerTitle: true,
                 title: Text(
                     "인수증",
-                    style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
+                    style: CustomStyle.appBarTitleFont(styleFontSize18,Colors.black)
                 ),
                 toolbarHeight: 50.h,
                 leading: IconButton(
@@ -279,7 +276,7 @@ class _ReceiptPageState extends State<ReceiptPage>{
                     Navigator.of(context).pop({'code':200});
                   },
                   color: styleWhiteCol,
-                  icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
+                  icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(

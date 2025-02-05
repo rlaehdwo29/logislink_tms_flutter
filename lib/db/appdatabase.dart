@@ -74,6 +74,8 @@ const String carTypeName = "carTypeName";
 const String chargeType = "chargeType";            //운임구분코드(인수증.선착불)
 const String chargeTypeName = "chargeTypeName";
 const String distance = "distance";
+const String sTimeFreeYN = "sTimeFreeYN";
+const String eTimeFreeYN = "eTimeFreeYN";
 const String time = "time";
 const String reqMemo = "reqMemo";                //화주 요청사항 (주선사/운송사 확인)
 const String driverMemo = "driverMemo";            //차주 확인사항
@@ -202,10 +204,16 @@ class AppDataBase {
     String path = join(await getDatabasesPath(), 'logislink_db.db');
     return await openDatabase(
         path,
-        version: 1,
+        version: 2,
         onCreate: (db, version) async {
-          await db.execute("CREATE TABLE IF NOT EXISTS $orderTable($orderId text primary key,$reqCustId text,$reqCustName text, $reqDeptId text,$reqDeptName text,$reqStaff text,$reqTel text,$reqAddr text,$reqAddrDetail text,$custId text,$custName text,$deptId text,$deptName text,$inOutSctn text,$inOutSctnName text,$truckTypeCode text,$truckTypeName text,$sComName text,$sSido text,$sGungu text,$sDong text,$sAddr text,$sAddrDetail text,$sDate text,$sStaff text,$sTel text,$sMemo text,$eComName text,$eSido text,$eGungu text,$eDong text,$eAddr text,$eAddrDetail text,$eDate text,$eStaff text,$eTel text,$eMemo text,$sLat text NOT NULL,$sLon text NOT NULL,$eLat text NOT NULL,$eLon text NOT NULL,$goodsName text,$goodsWeight text,$weightUnitCode text,$weightUnitName text,$goodsQty text,$qtyUnitCode text,$qtyUnitName text,$sWayCode text,$sWayName text,$eWayCode text,$eWayName text,$mixYn text,$mixSize text,$returnYn text,$carTonCode text,$carTonName text,$carTypeCode text,$carTypeName text,$chargeType text,$chargeTypeName text,$distance text NOT NULL,$time integer NOT NULL,$reqMemo text,$driverMemo text,$itemCode text,$itemName text,$orderState text,$orderStateName text,$regid text,$regdate text,$stopCount integer,$sellAllocId text,$sellCustId text,$sellDeptId text,$sellStaff text,$sellStaffName text,$sellStaffTel text,$sellCustName text,$sellDeptName text,$sellCharge text,$sellFee text,$sellWeight text,$sellWayPointMemo text,$sellWayPointCharge text,$sellStayMemo text,$sellStayCharge text,$sellHandWorkMemo text,$sellHandWorkCharge text,$sellRoundMemo text,$sellRoundCharge text,$sellOtherAddMemo text,$sellOtherAddCharge text,$custPayType text,$allocId text,$allocState text,$allocStateName text,$buyCustId text,$buyDeptId text,$buyCustName text,$buyDeptName text,$buyStaff text,$buyStaffName text,$buyStaffTel text,$buyCharge text,$buyFee text,$allocDate text,$driverState text,$vehicId text,$driverId text,$carNum text,$driverName text,$driverTel text,$driverStateName text,$carMngName text,$carMngMemo text,$receiptYn text,$receiptPath text,$receiptDate text,$charge text,$startDate text,$finishDate text,$enterDate text,$payDate text,$linkCode text,$linkCodeName text,$linkType text,$buyLinkYn text,$linkName text,$wayPointMemo text,$wayPointCharge text,$stayMemo text,$stayCharge text,$handWorkMemo text,$handWorkCharge text,$roundMemo text,$roundCharge text,$otherAddMemo text,$otherAddCharge text,$unitPrice text,$unitPriceType text,$unitPriceTypeName text,$custMngName text,$custMngMemo text,$payType text,$reqPayYN text,$reqPayDate text,$talkYn text,$orderStopList text,$reqStaffName text,$call24Cargo text,$manCargo text,$oneCargo text, $call24Charge text, $manCharge text, $oneCharge text)");
-        }
+          await db.execute("CREATE TABLE IF NOT EXISTS $orderTable($orderId text primary key,$reqCustId text,$reqCustName text, $reqDeptId text,$reqDeptName text,$reqStaff text,$reqTel text,$reqAddr text,$reqAddrDetail text,$custId text,$custName text,$deptId text,$deptName text,$inOutSctn text,$inOutSctnName text,$truckTypeCode text,$truckTypeName text,$sComName text,$sSido text,$sGungu text,$sDong text,$sAddr text,$sAddrDetail text,$sDate text,$sStaff text,$sTel text,$sMemo text,$eComName text,$eSido text,$eGungu text,$eDong text,$eAddr text,$eAddrDetail text,$eDate text,$eStaff text,$eTel text,$eMemo text,$sLat text NOT NULL,$sLon text NOT NULL,$eLat text NOT NULL,$eLon text NOT NULL,$goodsName text,$goodsWeight text,$weightUnitCode text,$weightUnitName text,$goodsQty text,$qtyUnitCode text,$qtyUnitName text,$sWayCode text,$sWayName text,$eWayCode text,$eWayName text,$mixYn text,$mixSize text,$returnYn text,$carTonCode text,$carTonName text,$carTypeCode text,$carTypeName text,$chargeType text,$chargeTypeName text,$distance text NOT NULL,$sTimeFreeYN text,$eTimeFreeYN text,$time integer NOT NULL,$reqMemo text,$driverMemo text,$itemCode text,$itemName text,$orderState text,$orderStateName text,$regid text,$regdate text,$stopCount integer,$sellAllocId text,$sellCustId text,$sellDeptId text,$sellStaff text,$sellStaffName text,$sellStaffTel text,$sellCustName text,$sellDeptName text,$sellCharge text,$sellFee text,$sellWeight text,$sellWayPointMemo text,$sellWayPointCharge text,$sellStayMemo text,$sellStayCharge text,$sellHandWorkMemo text,$sellHandWorkCharge text,$sellRoundMemo text,$sellRoundCharge text,$sellOtherAddMemo text,$sellOtherAddCharge text,$custPayType text,$allocId text,$allocState text,$allocStateName text,$buyCustId text,$buyDeptId text,$buyCustName text,$buyDeptName text,$buyStaff text,$buyStaffName text,$buyStaffTel text,$buyCharge text,$buyFee text,$allocDate text,$driverState text,$vehicId text,$driverId text,$carNum text,$driverName text,$driverTel text,$driverStateName text,$carMngName text,$carMngMemo text,$receiptYn text,$receiptPath text,$receiptDate text,$charge text,$startDate text,$finishDate text,$enterDate text,$payDate text,$linkCode text,$linkCodeName text,$linkType text,$buyLinkYn text,$linkName text,$wayPointMemo text,$wayPointCharge text,$stayMemo text,$stayCharge text,$handWorkMemo text,$handWorkCharge text,$roundMemo text,$roundCharge text,$otherAddMemo text,$otherAddCharge text,$unitPrice text,$unitPriceType text,$unitPriceTypeName text,$custMngName text,$custMngMemo text,$payType text,$reqPayYN text,$reqPayDate text,$talkYn text,$orderStopList text,$reqStaffName text,$call24Cargo text,$manCargo text,$oneCargo text, $call24Charge text, $manCharge text, $oneCharge text)");
+        },
+        onUpgrade: (db, oldVersion, newVersion) {
+          if (oldVersion < newVersion) {
+            db.execute('ALTER TABLE $orderTable ADD COLUMN $sTimeFreeYN TEXT');
+            db.execute('ALTER TABLE $orderTable ADD COLUMN $eTimeFreeYN TEXT');
+          }
+      }
     );
   }
 
@@ -279,6 +287,8 @@ class AppDataBase {
         "$chargeType": order.chargeType,
         "$chargeTypeName": order.chargeTypeName,
         "$distance": order.distance,
+        "$sTimeFreeYN": order.sTimeFreeYN,
+        "$eTimeFreeYN": order.eTimeFreeYN,
         "$time": order.time,
         "$reqMemo": order.reqMemo,
         "$driverMemo": order.driverMemo,
@@ -399,7 +409,6 @@ class AppDataBase {
     try{
       for(var item in orders) {
         var maps = await db?.query('$orderTable',where: '$orderId = ?', whereArgs: [item.orderId]);
-
         if (maps?.length == 0) {
           await db?.insert(orderTable, <String, dynamic>{
             "$orderId": item.orderId,
@@ -464,6 +473,8 @@ class AppDataBase {
             "$chargeType": item.chargeType,
             "$chargeTypeName": item.chargeTypeName,
             "$distance": item.distance,
+            "$sTimeFreeYN": item.sTimeFreeYN,
+            "$eTimeFreeYN": item.eTimeFreeYN,
             "$time": item.time,
             "$reqMemo": item.reqMemo,
             "$driverMemo": item.driverMemo,
@@ -622,6 +633,8 @@ class AppDataBase {
             "$chargeType": item.chargeType,
             "$chargeTypeName": item.chargeTypeName,
             "$distance": item.distance,
+            "$sTimeFreeYN": item.sTimeFreeYN,
+            "$eTimeFreeYN": item.eTimeFreeYN,
             "$time": item.time,
             "$reqMemo": item.reqMemo,
             "$driverMemo": item.driverMemo,

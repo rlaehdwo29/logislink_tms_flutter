@@ -25,7 +25,7 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
               centerTitle: true,
               title: Text(
                   "${widget.item.regdate}",
-                  style: CustomStyle.appBarTitleFont(styleFontSize18,styleWhiteCol)
+                  style: CustomStyle.appBarTitleFont(styleFontSize18,Colors.black)
               ),
               toolbarHeight: 50.h,
               leading: IconButton(
@@ -33,7 +33,7 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
                   Navigator.of(context).pop();
                 },
                 color: styleWhiteCol,
-                icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.white),
+                icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
               ),
             ),
     body: SafeArea(

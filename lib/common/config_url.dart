@@ -4,8 +4,8 @@
 //public static String SERVER_URL = "https://app.logis-link.co.kr";   // PRO URL
 
 const String m_ServerRelease = "https://app.logis-link.co.kr";    // 운영서버
-const String m_ServerDebug = "http://192.168.53.51:9080";         // Local
-//const String m_ServerDebug = "http://172.30.1.67:9080";         // Local2
+const String m_ServerDebug = "http://192.168.53.51:9080";         // Local LAN
+//const String m_ServerDebug = "http://192.168.68.82:9080";         // Local WIFI
 const String m_ServerTest = "http://211.252.86.30:806";           // 테스트서버
 //const String m_ServerTest = "http://211.252.86.30:8005";
 const String SERVER_URL = m_ServerDebug;
@@ -25,6 +25,9 @@ const String KAKAO_URL = "https://dapi.kakao.com";
 
 // 내부 지번 주소 검색
 const String URL_JIBUN = "/cmm/jibunlist/v1";
+
+// 산재(차주) 금액 조회
+const String URL_INSURE = "/cmm/insure/v1";
 
 // 공통코드
 const String URL_CODE_LIST = "/cmm/code/list";

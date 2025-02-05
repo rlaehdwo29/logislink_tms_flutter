@@ -21,6 +21,7 @@ import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/main.dart';
+import 'package:logislink_tms_flutter/page/renewpage/renew_general_regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/link_page.dart';
@@ -419,7 +420,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               Expanded(
                   flex: 3,
                   child: Text(
-                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellRoundCharge??"0" : mData.value.roundCharge??"0")} 원",
+                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellOtherAddCharge??"0" : mData.value.otherAddCharge??"0")} 원",
                     textAlign: TextAlign.right,
                     style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   )
@@ -3028,7 +3029,8 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
   }
 
   Future goToModifyOrder() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewRegistOrderPage(order_vo: mData.value,flag: "M")));
+    //Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewRegistOrderPage(order_vo: mData.value,flag: "M")));
+    Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewGeneralRegistOrderPage(order_vo: mData.value, flag: "M"), pageAnimationType: LeftToRightTransition()));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {

@@ -1,4 +1,7 @@
 
+import 'dart:math';
+
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -17,6 +20,7 @@ import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_reg_page
 import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_confirm_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/provider/order_service.dart';
+import 'package:logislink_tms_flutter/utils/speech_controller.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
@@ -36,7 +40,9 @@ class OrderAddrPage extends StatefulWidget {
 
 class _OrderAddrPageState extends State<OrderAddrPage> {
   final controller = Get.find<App>();
+  final SpeechController speechController = Get.put(SpeechController());
   ProgressDialog? pr;
+  late TextEditingController searchController;
 
   final mData = OrderModel().obs;
   final mList = List.empty(growable: true).obs;
@@ -51,7 +57,10 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
   void initState() {
     super.initState();
 
+    searchController = TextEditingController();
+
     Future.delayed(Duration.zero, () async {
+
       if(widget.order_vo != null) {
         mData.value = widget.order_vo!;
       }
@@ -161,6 +170,7 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
               child: TextField(
                 style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
                 textAlign: TextAlign.start,
+                controller: searchController,
                 keyboardType: TextInputType.text,
                 onChanged: (value) async {
                   search_text.value = value;
@@ -179,19 +189,119 @@ class _OrderAddrPageState extends State<OrderAddrPage> {
                   focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: line, width: CustomStyle.getWidth(0.5))
                   ),
-                  suffixIcon: GestureDetector(
-                    child: Icon(
-                      Icons.search, size: 24.h, color: Colors.black,
-                    ),
-                    onTap: (){
-
+                  suffixIcon: IconButton(
+                    onPressed: (){
+                      speechDialog();
                     },
+                    icon: const Icon(Icons.mic),
                   ),
                 ),
               )
           ),
         ]
     );
+  }
+
+  Future<void> speechDialog() async {
+    speechController.initSpeech();
+    await Navigator.of(context).push(
+        DialogRoute(
+          context: context,
+          builder: (_context) =>
+            AlertDialog(
+              backgroundColor: Colors.black,
+              contentPadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+              titlePadding: EdgeInsets.all(CustomStyle.getWidth(0.0)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0)
+              ),
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 0,
+              ),
+            content: Container(
+                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
+                  height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height * 0.4,
+                  padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+                  alignment: Alignment.center,
+                  color: Colors.black,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "음성 검색",
+                        style: CustomStyle.CustomFont(styleFontSize20, Colors.white, font_weight: FontWeight.w800),
+                      ),
+                      Obx(() =>
+                        AvatarGlow(
+                          endRadius: 75.0,
+                          animate: speechController.isListening.value,
+                          duration: const Duration(milliseconds: 2000),
+                          glowColor: const Color(0xff00A67E),
+                          repeat: true,
+                          repeatPauseDuration: const Duration(milliseconds: 100),
+                          showTwoGlows: true,
+                          child: GestureDetector(
+                            onTap: () async {
+                              await speechController.startListening();
+                            },
+                            child: CircleAvatar(
+                              backgroundColor: const Color(0xff00A67E),
+                              radius: 30,
+                              child: Icon(
+                                speechController.isListening.value ? Icons.mic : Icons.mic_off,
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                        )
+                      ),
+                      Obx(() =>
+                        Text(
+                          speechController.speechText.value == "0200" ? "듣고있어요.."
+                          : speechController.speechText.value == "0300" ? "다시 말씀해주세요.."
+                          : speechController.speechText.value,
+                          style: CustomStyle.CustomFont(styleFontSize16, styleGreyCol1),
+                        )
+                      ),
+                      Obx(() =>
+                        InkWell(
+                          onTap: (){
+                            if(speechController.speechText.value == "0200") {
+                              searchController.text = "";
+                              search_text.value = "";
+                              Navigator.of(context).pop();
+                            }else if(speechController.speechText.value == "0300"){
+                              speechController.startListening();
+                            }else{
+                              searchController.text = speechController.speechText.value;
+                              search_text.value = speechController.speechText.value;
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(5)),
+                            margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: styleGreyCol1,width: 1)
+                            ),
+                            child: Text(
+                              speechController.speechText.value == "0200" ? "확인"
+                              : speechController.speechText.value == "0300" ? "다시 시도"
+                              : "로 검색",
+                              style: CustomStyle.CustomFont(styleFontSize15, Colors.blueAccent),
+                            ),
+                          ),
+                        )
+                      )
+                    ],
+                  )
+              ),
+           )
+        )
+    );
+
   }
 
   Widget selfInputWidget() {

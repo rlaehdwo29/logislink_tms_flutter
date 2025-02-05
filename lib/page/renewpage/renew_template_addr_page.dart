@@ -39,7 +39,6 @@ class _RenewTemplateAddrPageState extends State<RenewTemplateAddrPage> {
 
   final mData = OrderModel().obs;
   final mList = List.empty(growable: true).obs;
-  final tempList = List.empty(growable: true).obs;
 
   final mTitle = "".obs;
   final llBottom = false.obs;
@@ -54,6 +53,11 @@ class _RenewTemplateAddrPageState extends State<RenewTemplateAddrPage> {
         mTitle.value = "경유지 선택";
         await initView();
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> initView() async {
@@ -188,7 +192,7 @@ class _RenewTemplateAddrPageState extends State<RenewTemplateAddrPage> {
           }else {
             if (snapshot.hasData) {
               if (mList.isNotEmpty) mList.clear();
-              mList.value.addAll(snapshot.data);
+              mList.addAll(snapshot.data);
               return searchListWidget();
             } else if (snapshot.hasError) {
               return Container(

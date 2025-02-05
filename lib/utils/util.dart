@@ -336,6 +336,20 @@ class Util {
     }
   }
 
+  static String splitSDateType2(String? date) {
+    DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    DateTime? d;
+    if(date == null) {
+      return "00:00:00";
+    }
+    try{
+      d = dateFormat.parse(date!);
+    }catch(e) {
+      print(e);
+    }
+      return DateFormat("MM-dd HH:mm").format(d!);
+  }
+
   static String splitEDate(String? date) {
     DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
     DateTime? d;
@@ -353,6 +367,21 @@ class Util {
     }else{
       return DateFormat("MM.dd HH:mm").format(d!);
     }
+  }
+
+  static String splitEDateType2(String? date) {
+    DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+    DateTime? d;
+    if(date == null) {
+      return "00:00:00";
+    }
+    try{
+      d = dateFormat.parse(date!);
+    }catch(e) {
+      print(e);
+    }
+
+      return DateFormat("MM-dd HH:mm").format(d!);
   }
 
   static String splitDate(String date) {
@@ -409,11 +438,21 @@ class Util {
     return dateFormat.format(calendar);
   }
 
+  static String getAllDate1(DateTime calendar) {
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
+    return dateFormat.format(calendar);
+  }
+
   static String getAllDate2(String? date) {
     DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm:ss",'ko');
     DateTime dateTime = DateTime.parse(date!);
     String d = dateFormat.format(dateTime);
     return DateFormat("yyyy-MM-dd E",'ko').format(DateTime.parse(d));
+  }
+
+  static String getAllDate3(DateTime calendar) {
+    DateFormat dateFormat = DateFormat("MM-dd HH:mm");
+    return dateFormat.format(calendar);
   }
 
   static int getTotalPage(int total) {

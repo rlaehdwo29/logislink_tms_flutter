@@ -1077,7 +1077,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
           mData.value.eTel,mData.value.eMemo,mData.value.sLat,mData.value.sLon,mData.value.eLat,mData.value.eLon,mData.value.orderState,
           mData.value.goodsName,double.parse(mData.value.goodsWeight??"0.0"),mData.value.weightUnitCode,mData.value.goodsQty,mData.value.qtyUnitCode,
           mData.value.sWayCode,mData.value.eWayCode,mData.value.mixYn,mData.value.mixSize,mData.value.returnYn,
-          mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.unitPriceType,int.parse(mData.value.unitPrice??"0"), mData.value.distance,mData.value.time,
+          mData.value.carTonCode,mData.value.carTypeCode,mData.value.chargeType,mData.value.unitPriceType,int.parse(mData.value.unitPrice??"0"), mData.value.distance,"N","N",mData.value.time,
           mData.value.reqMemo, mData.value.driverMemo,mData.value.itemCode,int.parse(mData.value.sellCharge??"0"),int.parse(mData.value.sellFee??"0"),
           mData.value.orderStopList != null && mData.value.orderStopList?.isNotEmpty == true ? jsonEncode(mData.value.orderStopList?.map((e) => e.toJson()).toList()):null,user.userId,user.mobile,
           mData.value.sellWayPointMemo,mData.value.sellWayPointCharge,mData.value.sellStayMemo,mData.value.sellStayCharge,

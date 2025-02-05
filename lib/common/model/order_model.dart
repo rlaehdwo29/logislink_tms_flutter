@@ -69,6 +69,8 @@ class OrderModel extends ResultModel {
   String? chargeType;            //운임구분코드(인수증.선착불)
   String? chargeTypeName;
   double? distance;
+  String? sTimeFreeYN;        // 상차 시간무관 유무
+  String? eTimeFreeYN;        // 하자 시간무관 유무
   int? time;
   String? reqMemo;                //화주 요청사항 (주선사/운송사 확인)
   String? driverMemo;            //차주 확인사항
@@ -139,8 +141,6 @@ class OrderModel extends ResultModel {
   String? startDate;           // 출발일
   String? finishDate;          // 도착일
   String? enterDate;           // 입차일
-  String? sTimeFreeYN;        // 상차 시간무관 유무
-  String? eTimeFreeYN;        // 하자 시간무관 유무
 
   String? payDate;             // 결제일
 
@@ -246,6 +246,8 @@ class OrderModel extends ResultModel {
     this.chargeType,            //운임구분코드(인수증.선착불)
     this.chargeTypeName,
     this.distance,
+    this.sTimeFreeYN,        // 상차 시간무관 유무
+    this.eTimeFreeYN,        // 하자 시간무관 유무
     this.time,
     this.reqMemo,                //화주 요청사항 (주선사/운송사 확인)
     this.driverMemo,            //차주 확인사항
@@ -310,9 +312,6 @@ class OrderModel extends ResultModel {
     this.startDate,           // 출발일
     this.finishDate,          // 도착일
     this.enterDate,           // 입차일
-
-    this.sTimeFreeYN,        // 상차 시간무관 유무
-    this.eTimeFreeYN,        // 하자 시간무관 유무
 
     this.payDate,             // 결제일
 
@@ -464,6 +463,8 @@ class OrderModel extends ResultModel {
         //운임구분코드(인수증.선착불)
         chargeTypeName: json['chargeTypeName'],
         distance: double.parse((json['distance'] ?? 0.0).toString()),
+        sTimeFreeYN: json['sTimeFreeYN'],
+        eTimeFreeYN: json['eTimeFreeYN'],
         time: json['time'],
         reqMemo: json['reqMemo'],
         //화주 요청사항 (주선사/운송사 확인)
@@ -586,10 +587,6 @@ class OrderModel extends ResultModel {
         // 도착일
         enterDate: json['enterDate'],
         // 입차일
-
-        sTimeFreeYN : json['sTimeFreeYN'],
-        // 상차 시간무관 유무
-        eTimeFreeYN : json['eTimeFreeYn'],        // 하자 시간무관 유무
 
         payDate: json['payDate'],
         // 결제일
@@ -722,6 +719,8 @@ class OrderModel extends ResultModel {
       "chargeType": chargeType,
       "chargeTypeName": chargeTypeName,
       "distance": distance,
+      "sTimeFreeYN" : sTimeFreeYN,
+      "eTimeFreeYn" : eTimeFreeYN,
       "time": time,
       "reqMemo": reqMemo,
       "driverMemo": driverMemo,
@@ -783,8 +782,6 @@ class OrderModel extends ResultModel {
       "startDate": startDate,
       "finishDate": finishDate,
       "enterDate": enterDate,
-      "sTimeFreeYN" : sTimeFreeYN,
-      "eTimeFreeYN" : eTimeFreeYN,
       "payDate": payDate,
       "linkCode": linkCode,
       "linkCodeName": linkCodeName,

@@ -33,13 +33,13 @@ import 'package:logislink_tms_flutter/db/appdatabase.dart';
 import 'package:logislink_tms_flutter/page/renewpage/create_template_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_mypage.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_appbar_setting_page.dart';
+import 'package:logislink_tms_flutter/page/renewpage/renew_general_regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_detail_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/template_manage_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_monitor_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/appbar_notice_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/notification_page.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/point_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
@@ -452,15 +452,10 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     "시작 날짜 또는 종료 날짜를 선택해주세요.");
                                               }
                                             } else if (diffDay! > 30) {
-                                              return Util.toast(
-                                                  Strings.of(context)?.get(
-                                                      "dateOver") ??
-                                                      "Not Found");
+                                              return Util.toast(Strings.of(context)?.get("dateOver") ?? "Not Found");
                                             }
-                                            mCalendarStartDate.value =
-                                            tempRangeStart!;
-                                            mCalendarEndDate.value =
-                                            tempRangeEnd!;
+                                            mCalendarStartDate.value = tempRangeStart!;
+                                            mCalendarEndDate.value = tempRangeEnd!;
                                             Navigator.of(context).pop(false);
                                           },
                                           child: Center(
@@ -1554,10 +1549,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
     final SelectNumber = "0".obs;
     if(flag != "D") {
-      SelectNumber.value =
-      Const.CALL_24_KEY_NAME == linkType ? item.call24Charge ?? "0" : Const
-          .HWA_MULL_KEY_NAME == linkType ? item.manCharge ?? "0" : item
-          .oneCharge ?? "0";
+      SelectNumber.value = Const.CALL_24_KEY_NAME == linkType ? item.call24Charge ?? "0" : Const.HWA_MULL_KEY_NAME == linkType ? item.manCharge ?? "0" : item.oneCharge ?? "0";
     }
 
     showModalBottomSheet(
@@ -3341,7 +3333,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     );
 
     Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewOrderDetailPage(order_vo: item), pageAnimationType: LeftToRightTransition()));
-    //Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: OrderDetailPage(order_vo: item), pageAnimationType: LeftToRightTransition()));
 
     if(results.containsKey("code")){
       if(results["code"] == 200) {
@@ -4760,7 +4751,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
             child: Card(
                 elevation: 2.0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                color: styleWhiteCol,
+                color: item.orderState == "09" ? const Color(0xffE6A9A9) : styleWhiteCol,
                 child: Column(
                     children: [
                   Container(
@@ -4809,23 +4800,34 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                   item.orderState == "09" ?
                                   Container(
                                       decoration: CustomStyle.baseBoxDecoWhite(),
-                                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.0.h), horizontal: CustomStyle.getWidth(10.0.w)),
+                                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3), horizontal: CustomStyle.getWidth(7)),
+                                      margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
                                       child: Text(
                                         item.orderStateName??"",
-                                        style: CustomStyle.CustomFont(styleFontSize12, Util.getOrderStateColor(item.orderStateName)),
+                                        style: CustomStyle.CustomFont(styleFontSize12, Util.getOrderStateColor(item.orderState),font_weight: FontWeight.w800),
                                       )
                                   ) : const SizedBox(),
                                   Container(
                                     margin: EdgeInsets.only(right:CustomStyle.getWidth(3.w)),
-                                      child: Text(
-                                        item.sellCustName??"",
-                                        style: CustomStyle.CustomFont(styleFontSize16, main_color,font_weight: FontWeight.w700),
+                                      child: Flexible(
+                                          child: RichText(
+                                              overflow: TextOverflow.visible,
+                                              text: TextSpan(
+                                                text: item.sellCustName??"",
+                                                style: CustomStyle.CustomFont(styleFontSize16, main_color,font_weight: FontWeight.w700),
+                                              )
+                                          )
+                                      ),
+                                  ),
+                                  Flexible(
+                                      child: RichText(
+                                          overflow: TextOverflow.visible,
+                                          text: TextSpan(
+                                            text: item.sellDeptName??"",
+                                            style: CustomStyle.CustomFont(styleFontSize11, main_color,font_weight: FontWeight.w400),
+                                          )
                                       )
                                   ),
-                                  Text(
-                                    item.sellDeptName??"",
-                                    style: CustomStyle.CustomFont(styleFontSize11, main_color,font_weight: FontWeight.w400),
-                                  )
                                 ])),
                             Flexible(
                                 flex: 1,
@@ -4851,7 +4853,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                             decoration: CustomStyle.baseBoxDecoWhite(),
                                             padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
                                             child: Text(
-                                              "${item.allocStateName}  ",
+                                              "${item.allocStateName} ",
                                               overflow: TextOverflow.ellipsis,
                                               style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
                                             )
@@ -5307,8 +5309,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                                     ),
                                                     Text(
                                                       "${Util.getInCodeCommaWon(item.call24Charge)}원",
-                                                      style: statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat) == ""
-                                                          ?  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
+                                                      style: statMsg(call24LinkModel.value.linkStat, call24LinkModel.value.jobStat) == "" ?  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800)
                                                           : call24LinkModel.value.linkStat == "D" && call24LinkModel.value.jobStat == "F"
                                                           ?   TextStyle(decoration: TextDecoration.lineThrough, fontSize: styleFontSize13)
                                                           :  CustomStyle.CustomFont(styleFontSize13, text_color_06, font_weight: FontWeight.w800),
@@ -5990,7 +5991,8 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
     if(type == "01") {
       openRegOrderTemplateSheet(context, "등록할\n탬플릿을 선택해주세요.");
     }else{
-      Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RegistOrderPage(flag: "R"), pageAnimationType: LeftToRightTransition()));
+      //Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RegistOrderPage(flag: "R"), pageAnimationType: LeftToRightTransition()));
+      Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewGeneralRegistOrderPage(flag: "R"), pageAnimationType: LeftToRightTransition()));
 
       if(results.containsKey("code")){
         if(results["code"] == 200) {

@@ -411,6 +411,7 @@ abstract class Rest {
       @Field("unitPriceType") String? unitPriceType,
       @Field('unitCharge') int? unitCharge,
       @Field("distance") double? distance,
+      @Field("sTimeFreeYN") String? sTimeFreeYN, @Field("eTimeFreeYN") String? eTimeFreeYN,
       @Field("time") int? time, @Field("reqMemo") String? reqMemo,
       @Field("driverMemo") String? driverMemo, @Field("itemCode") String? itemCode,
       @Field("sellCharge") int? sellCharge, @Field("sellFee") int? sellFee,
@@ -1106,5 +1107,11 @@ abstract class Rest {
   @POST(URL_JIBUN)
   Future<HttpResponse> getJibun(@Field("fullAddr") String? fullAddr);
 
+  @FormUrlEncoded()
+  @POST(URL_INSURE)
+  Future<HttpResponse> getInsure(
+        @Field("buyAmt") int? buyAmt,
+        @Field("sDate") String? sDate,
+      );
 
 }
