@@ -11,7 +11,6 @@ import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/car_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
-import 'package:logislink_tms_flutter/common/model/order_link_status_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_status_sub_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
@@ -20,25 +19,17 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/main.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_general_regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
-import 'package:logislink_tms_flutter/page/renewpage/renew_regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/link_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/location_control_page.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/receipt_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
-import 'package:page_animation_transition/animations/fade_animation_transition.dart';
-import 'package:page_animation_transition/animations/left_to_right_faded_transition.dart';
 import 'package:page_animation_transition/animations/left_to_right_transition.dart';
-import 'package:page_animation_transition/animations/right_to_left_faded_transition.dart';
-import 'package:page_animation_transition/animations/rotate_animation_transition.dart';
-import 'package:page_animation_transition/animations/scale_animation_transition.dart';
 import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:phone_call/phone_call.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -1209,6 +1200,8 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                   Navigator.of(context).pop(false);
                 });
           }
+        }else{
+          Util.toast(_response.message);
         }
       }catch(e) {
         print("_setAllocState() Exeption =>$e");

@@ -130,15 +130,15 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
     etCarNumController = TextEditingController();
 
     //추가 운임 EditText
-    etWayPointController = TextEditingController(text: mData.value.wayPointCharge??"");
+    etWayPointController = TextEditingController();
     etWayPointMemoController = TextEditingController();
-    etStayChargeController = TextEditingController(text: mData.value.stayCharge??"");
+    etStayChargeController = TextEditingController();
     etStayChargeMemoController = TextEditingController();
-    etHandWorkChargeController = TextEditingController(text: mData.value.handWorkCharge??"");
+    etHandWorkChargeController = TextEditingController();
     ethandWorkMemoController = TextEditingController();
-    etRoundChargeController = TextEditingController(text:  mData.value.roundCharge??"",);
+    etRoundChargeController = TextEditingController();
     etRoundMemoController = TextEditingController();
-    etOtherAddChargeController = TextEditingController(text: mData.value.otherAddCharge??"");
+    etOtherAddChargeController = TextEditingController();
     etOtherAddMemoController = TextEditingController();
 
     etDriverMemoController = TextEditingController();
@@ -2011,16 +2011,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
                             onPressed: () async {
                               if(SelectNumber.value == null || SelectNumber.value.isEmpty == true) SelectNumber.value = "0";
 
-                              if(int.parse(SelectNumber.value) >= 20000){
                                 mData.value.buyCharge = SelectNumber.value;
                                 setState(() {
                                   mData.value.buyCharge = SelectNumber.value;
                                 });
                                 await setTotal();
                                 Navigator.of(context).pop();
-                              }else{
-                                Util.toast("지불운임은 20,000원이상입니다.");
-                              }
                             },
                             child: Text(
                               "등록",
@@ -2192,6 +2188,12 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
   // Function Start
 
   Future<void> initView() async {
+
+    etWayPointController.text = Util.getInCodeCommaWon(mData.value.wayPointCharge??"");
+    etStayChargeController.text = Util.getInCodeCommaWon(mData.value.stayCharge??"");
+    etHandWorkChargeController.text = Util.getInCodeCommaWon(mData.value.handWorkCharge??"");
+    etRoundChargeController.text = Util.getInCodeCommaWon(mData.value.roundCharge??"");
+    etOtherAddChargeController.text = Util.getInCodeCommaWon(mData.value.otherAddCharge??"");
 
     //추가 운임 EditText
     etWayPointMemoController.text = mData.value.wayPointMemo??"";
@@ -2583,6 +2585,16 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
       Util.snackbar(context,Strings.of(context)?.get("order_trans_info_charge_hint")??"운임비를 입력해주세요._");
       return false;
     }
+
+    if(mData.value.call24Cargo == "I" || mData.value.call24Cargo == "U" ||  mData.value.call24Cargo == "Y"
+        || mData.value.manCargo == "I" || mData.value.manCargo == "U" || mData.value.manCargo == "Y"
+        || mData.value.oneCargo == "I" || mData.value.oneCargo == "U" || mData.value.oneCargo == "Y") {
+      if(tvTotal.value < 20000) {
+        Util.toast("지불운임은 20,000원이상입니다.");
+        return false;
+      }
+    }
+
     return true;
   }
 

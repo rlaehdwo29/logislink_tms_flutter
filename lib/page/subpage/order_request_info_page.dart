@@ -43,6 +43,7 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
   final code = "".obs;
 
   final mUserList = List.empty(growable: true).obs;
+  late TextEditingController custMngMemoController;
 
   final ChargeCheck = "".obs;
 
@@ -52,6 +53,8 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
   @override
   void initState() {
     super.initState();
+
+    custMngMemoController = TextEditingController();           // 요청사항 TextField
 
     Future.delayed(Duration.zero, () async {
       if(widget.order_vo == null) {
@@ -74,6 +77,7 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
 
   Future<void> initView() async {
     isOption.value = !(widget.code?.isEmpty??true);
+    custMngMemoController.text = mData.value.custMngMemo??"";
   }
 
   Future<void> goToCustomer() async {
@@ -122,6 +126,7 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
 
     mData.value.custMngName = data.custMngName;
     mData.value.custMngMemo = data.custMngMemo;
+    custMngMemoController.text = mData.value.custMngMemo??"";
 
     mData.value.reqAddr = data.bizAddr;
     mData.value.reqAddrDetail = data.bizAddrDetail;
@@ -129,7 +134,6 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
     await getCustUser();
     await getUnitChargeCnt();
     await getUnitChargeData();
-
   }
 
   Future<void> setCustomerDept(DeptModel data) async {
@@ -375,10 +379,10 @@ Future<void> getCustUser() async {
     mData.value.sellStaff = data.userId;
     mData.value.sellStaffTel = data.mobile;
     mData.value.sellStaffName = data.userName;
+    setState(() {});
   }
 
   void selectItem(CodeModel? codeModel,String? codeType) {
-    print("dddddddd=>${codeModel?.code} // ${codeModel?.codeName} // $codeType");
     if(codeType != "") {
       switch (codeType) {
         case 'CAR_TON_CD' :
@@ -536,8 +540,8 @@ Future<void> getCustUser() async {
                                     child: Container(
                                         padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
                                         child: Text(
-                                          "담당자 지정",
-                                          style: CustomStyle.CustomFont(styleFontSize12, text_color_04),
+                                          mData.value.sellStaffName == null || mData.value.sellStaffName?.isEmpty == true ? "담당자 지정" : mData.value.sellStaffName??"",
+                                          style: CustomStyle.CustomFont(styleFontSize12,  mData.value.sellStaffName == null || mData.value.sellStaffName?.isEmpty == true ? text_color_04 : Colors.black),
                                         )
                                     )
                                 ),
@@ -781,6 +785,7 @@ Future<void> getCustUser() async {
           child: TextField(
             style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
             textAlign: TextAlign.start,
+            controller: custMngMemoController,
             keyboardType: TextInputType.text,
             onChanged: (value){
               etRegMemo.value = value;

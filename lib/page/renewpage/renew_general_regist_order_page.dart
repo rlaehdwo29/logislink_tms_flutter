@@ -315,10 +315,11 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
         mData.value = OrderModel();
         await getOption();
       }
-
-      cargoWGTController.text = mData.value.goodsWeight??"";
+      if(mData.value.goodsWeight == "null") mData.value.goodsWeight = null;
+      cargoWGTController.text = mData.value.goodsWeight??"0";
       cargoQTYController.text = mData.value.goodsQty??"0";
-      cargoGoodsController.text = mData.value.goodsName??".";
+      if(mData.value.goodsName == null || mData.value.goodsName?.isEmpty == true || mData.value.goodsName == "null") mData.value.goodsName = ".";
+      cargoGoodsController.text = mData.value.goodsName??"";
       unitPriceController.text = mData.value.unitPriceType == UNIT_PRICE_TYPE_02 ? Util.getInCodeCommaWon(mData.value.unitPrice??"0") : "0";
       if(mData.value.sellCharge != null && mData.value.sellCharge?.isEmpty == false) {
         if(mData.value.unitPriceType == UNIT_PRICE_TYPE_01) {
@@ -378,16 +379,13 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
       if (mData.value.unitPriceType == "01") {
         mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
         mData.value.unitPriceTypeName = "대당단가";
-        //etSellFee.value = false;
         mData.value.sellFee = "0";
       } else if (mData.value.unitPriceType == "02") {
         mData.value.unitPriceType = UNIT_PRICE_TYPE_02;
         mData.value.unitPriceTypeName = "톤당단가";
-        //etSellFee.value = true;
       } else {
         mData.value.unitPriceType = UNIT_PRICE_TYPE_01;
         mData.value.unitPriceTypeName = "대당단가";
-        //etSellFee.value = true;
       }
 
     });
@@ -599,7 +597,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                       text: TextSpan(
-                                        text:llSAddr.value ? mData.value.sComName == null ? "${mData.value.sAddr} ${mData.value.sAddrDetail}" : "${mData.value.sComName}(${mData.value.sAddr})" : Strings.of(context)?.get("order_reg_s_addr_hint")??"Not Found",
+                                        text:llSAddr.value ? mData.value.sComName == null ? "${mData.value.sAddr??""} ${mData.value.sAddrDetail??""}" : "${mData.value.sComName??""}(${mData.value.sAddr??""})" : Strings.of(context)?.get("order_reg_s_addr_hint")??"Not Found",
                                       style: CustomStyle.CustomFont(styleFontSize14, llSAddr.value ? Colors.black : styleGreyCol1, font_weight: FontWeight.w800),
                                       )
                                     ),
@@ -879,7 +877,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                         text: TextSpan(
-                                          text:llEAddr.value ? mData.value.eComName == null ? "${mData.value.eAddr} ${mData.value.eAddrDetail}" : "${mData.value.eComName}(${mData.value.eAddr})" : Strings.of(context)?.get("order_reg_e_addr_hint")??"Not Found",
+                                          text:llEAddr.value ? mData.value.eComName == null ? "${mData.value.eAddr??""} ${mData.value.eAddrDetail??""}" : "${mData.value.eComName??""}(${mData.value.eAddr??""})" : Strings.of(context)?.get("order_reg_e_addr_hint")??"Not Found",
                                         style: CustomStyle.CustomFont(styleFontSize14, llEAddr.value ? Colors.black : styleGreyCol1,font_weight: FontWeight.w800),
                                         )
                                       ),
@@ -1092,7 +1090,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                     Expanded(
                         flex: 1,
                         child: Text(
-                                  mData.value.carTypeCode == null || mData.value.carTypeCode?.isEmpty == true ? "차종" : mData.value.carTypeName ?? "${mData.value.carTypeCode}",
+                                  mData.value.carTypeCode == null || mData.value.carTypeCode?.isEmpty == true ? "차종" : mData.value.carTypeName??"" ?? "${mData.value.carTypeCode??""}",
                                   textAlign: TextAlign.center,
                                   style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800),
                                 )
@@ -1586,7 +1584,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                         ),
                       ),
                       onChanged: (value) async {
-
+                        mData.value.goodsName = value;
                       },
                       maxLength: 200,
                     )
@@ -2739,7 +2737,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
             child: SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
                 child: Container(
-                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(10)),
+                padding: EdgeInsets.only(left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10), top: CustomStyle.getHeight(10), bottom: MediaQuery.of(context).viewInsets.bottom),
                 decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10))
@@ -2748,7 +2746,6 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-
                       Container(
                         margin: EdgeInsets.only(bottom: CustomStyle.getHeight(10)),
                         padding: EdgeInsets.only(bottom: CustomStyle.getHeight(10)),
@@ -4204,12 +4201,12 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
 
   Future<void> setOption() async {
 
-    if(!(mData.value.sellCustId?.isEmpty == true)){
+    if(!(mData.value.sellCustId?.isEmpty == true || mData.value.sellCustId == null)){
       llNonRequestInfo.value = false;
       llRequestInfo.value = true;
       isRequest.value = true;
     }
-    if(!(mData.value.sComName?.isEmpty == true)) {
+    if(!(mData.value.sComName?.isEmpty == true || mData.value.sComName == null)) {
       llNonSAddr.value = false;
       llSAddr.value = true;
       isSAddr.value = true;
@@ -4721,11 +4718,15 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                         return Util.toast(result["msg"]);
                       }
                     }
-                    var numberString = mData.value.carTonName?.replaceAll(new RegExp(r'[^0-9.]'),'');
-                    var numberParse = double.parse(numberString!);
-                    var maxWeight = numberParse + (numberParse*0.1);
-                    if(double.parse(mData.value.goodsWeight??"0.0") > maxWeight) {
-                      return Util.toast("입력하신 \"화물중량이 최대 화물중량을 넘을 수 없습니다.\"");
+                    if(mData.value.carTonName == null || mData.value.carTonName == ""){
+                      return Util.toast("톤수를 입력해주세요.");
+                    }else{
+                      var numberString = mData.value.carTonName?.replaceAll(new RegExp(r'[^0-9.]'),'');
+                      var numberParse = double.parse(numberString!);
+                      var maxWeight = numberParse + (numberParse*0.1);
+                      if(double.parse(mData.value.goodsWeight??"0.0") > maxWeight) {
+                        return Util.toast("입력하신 \"화물중량이 최대 화물중량을 넘을 수 없습니다.\"");
+                      }
                     }
                     if(widget.flag == "M") {
                       await showModiOrder();

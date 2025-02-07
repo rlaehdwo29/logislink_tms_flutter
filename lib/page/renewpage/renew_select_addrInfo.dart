@@ -434,7 +434,7 @@ class _RenewSelectAddrinfoState extends State<RenewSelectAddrinfo> {
                 onTap: () {
                   if(mData.value.orderStopList != null && mData.value.orderStopList!.length > 0) mData.value.orderStopList = List.empty(growable: true);
                   List<StopPointModel> stopList = mDataOrderStopList.value.cast<StopPointModel>();
-                  mData.value.orderStopList?.addAll(stopList);
+                  mData.value.orderStopList = stopList;
                   Navigator.of(context).pop({'code': 200, Const.RESULT_WORK: Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
                 },
                 child: Container(
