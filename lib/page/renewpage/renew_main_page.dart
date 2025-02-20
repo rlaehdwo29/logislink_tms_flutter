@@ -944,7 +944,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
 
                             InkWell(
                                   onTap: () async {
-                                    Navigator.of(context).pop();
                                     await getTemplateStopList(templateItem);
                                     DateTime? sDateTime = DateTime(tempStartSelectedDay!.year,tempStartSelectedDay!.month,tempStartSelectedDay!.day,!startTimeChk.value ? sTime.value.hour : 0,!startTimeChk.value ? sTime.value.minute : 0 ,0);
                                     DateTime? eDateTime = DateTime(tempEndSelectedDay!.year,tempEndSelectedDay!.month,tempEndSelectedDay!.day, !endTimeChk.value ? eTime.value.hour : 23, !endTimeChk.value ? eTime.value.minute : 59, 0);
@@ -952,7 +951,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                                     templateItem.eDate = Util.getAllDate(eDateTime);
 
                                     Map<String,dynamic> results  = await Navigator.of(context).push(PageAnimationTransition(page: CreateTemplatePage(flag: "D",tModel: templateItem, sTimeFreeYn: startTimeChk.value, eTimeFreeYn: endTimeChk.value), pageAnimationType: LeftToRightTransition()));
-
+                                    Navigator.of(context).pop();
                                     if(results != null && results.containsKey("code")){
                                       if(results["code"] == 200) {
                                         Util.toast("오더가 정상적으로 등록되었습니다.");

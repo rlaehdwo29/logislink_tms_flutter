@@ -4689,33 +4689,42 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
                 child: InkWell(
                   onTap: () async {
                     if(mData.value.call24Cargo == "Y") {
-                      Map<String,dynamic> result = await siGunGuValidation();
+                      /*Map<String,dynamic> result = await siGunGuValidation();
                       if(result["result"]) {
                         if (int.parse(mData.value.call24Charge ?? "0") < 20000) {
                           return Util.toast("정보망 전송(24시콜) 시 지불운임은 20,000원이상입니다.");
                         }
                       }else{
                         return Util.toast(result["msg"]);
+                      }*/
+                      if (int.parse(mData.value.call24Charge ?? "0") < 20000) {
+                        return Util.toast("정보망 전송(24시콜) 시 지불운임은 20,000원이상입니다.");
                       }
                     }
                     if(mData.value.oneCargo == "Y") {
-                      Map<String,dynamic> result = await siGunGuValidation();
+                      /*Map<String,dynamic> result = await siGunGuValidation();
                       if(result["result"]) {
                         if(int.parse(mData.value.oneCharge??"0") < 20000){
                           return Util.toast("정보망 전송(원콜) 시 지불운임은 20,000원이상입니다.");
                         }
                       }else{
                         return Util.toast(result["msg"]);
+                      }*/
+                      if(int.parse(mData.value.oneCharge??"0") < 20000){
+                        return Util.toast("정보망 전송(원콜) 시 지불운임은 20,000원이상입니다.");
                       }
                     }
                     if(mData.value.manCargo == "Y") {
-                      Map<String,dynamic> result = await siGunGuValidation();
+                      /*Map<String,dynamic> result = await siGunGuValidation();
                       if(result["result"]) {
                         if (int.parse(mData.value.manCharge ?? "0") < 20000) {
                           return Util.toast("정보망 전송(화물맨) 시 지불운임은 20,000원이상입니다.");
                         }
                       } else {
                         return Util.toast(result["msg"]);
+                      }*/
+                      if (int.parse(mData.value.manCharge ?? "0") < 20000) {
+                        return Util.toast("정보망 전송(화물맨) 시 지불운임은 20,000원이상입니다.");
                       }
                     }
                     if(mData.value.carTonName == null || mData.value.carTonName == ""){

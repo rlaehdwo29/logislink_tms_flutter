@@ -1289,7 +1289,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
       return false;
     }
     if(etDriverNameController.text.trim().isEmpty) {
-      Util.toast("파주성명을 입력해 주세요.");
+      Util.toast("차주성명을 입력해 주세요.");
       return false;
     }
     if(etTelController.text.trim().isEmpty) {
