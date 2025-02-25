@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/car_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_status_sub_model.dart';
@@ -1011,6 +1012,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
 
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
+        await Util.setEventLog(URL_ORDER_ALLOC_REG, "배차하기_M${Platform.isAndroid ? "A" : "I"}");
         Util.toast("배차가 완료되었습니다.");
         await getOrderDetail(mData.value.sellAllocId);
       }
@@ -1070,6 +1072,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             Util.snackbar(context, "오더가 접수되었습니다.");
+            await Util.setEventLog(URL_ORDER_STATE, "오더접수_M${Platform.isAndroid ? "A" : "I"}");
             await getOrderDetail(mData.value.sellAllocId);
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1143,6 +1146,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                   Navigator.of(context).pop(false);
                 });
           }
+          await Util.setEventLog(URL_ORDER_CANCEL, "오더 취소_M${Platform.isAndroid ? "A" : "I"}");
         }
       }catch(e) {
         print("setOrderCancel() Exeption =>$e");
@@ -1193,6 +1197,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         logger.d("_setAllocState() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
+            await Util.setEventLog(URL_ORDER_ALLOC_STATE, "배차취소_M${Platform.isAndroid ? "A" : "I"}");
             await getOrderDetail(mData.value.sellAllocId);
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1279,6 +1284,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             Util.toast("정보망 배차가 취소되었습니다.");
+            await Util.setEventLog(URL_SEND_LINK, "(정보망) 배차취소_M${Platform.isAndroid ? "A" : "I"}");
             await getOrderDetail(mData.value.sellAllocId??"");
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",

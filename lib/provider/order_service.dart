@@ -107,6 +107,7 @@ class OrderService with ChangeNotifier {
               var reposi_order = await db.getOrderList(context);
               orderList?.addAll(reposi_order);
               totalPage = Util.getTotalPage(int.parse(_response.resultMap?["total"]));
+              await Util.setEventLog("", "", loginYn: "Y");
             } catch (e) {
               print(e);
             }

@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/kakao_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
@@ -4481,6 +4482,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
               );
             }
 
+            await Util.setEventLog(URL_ORDER_REG, "(일반)오더등록_M${Platform.isAndroid ? "A" : "I"}");
             Navigator.of(context).pop({'code': 200, 'allocId': _response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
@@ -4541,6 +4543,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
         logger.d("modOrder() _response -> ${_response.status} // ${_response.resultMap}");
         if(_response.status == "200") {
           if(_response.resultMap?["result"] == true) {
+            await Util.setEventLog(URL_ORDER_MOD, "오더수정_M${Platform.isAndroid ? "A" : "I"}");
             Navigator.of(context).pop({'code':200,'allocId':_response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});

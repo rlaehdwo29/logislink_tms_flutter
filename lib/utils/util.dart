@@ -13,6 +13,7 @@ import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/notice_model.dart';
+import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
@@ -54,6 +55,40 @@ class Util {
     } catch (e) {
     return Const.APP_VERSION;
     }
+  }
+
+  static Future<void> setEventLog(String menuUrl, String menuName, {String? loginYn}) async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    var app_version = await Util.getVersionName();
+    await DioService.dioClient(header: true).setEventLog(
+        user.authorization,
+        menuUrl,
+        menuName,
+        app_version,
+        loginYn??"N"
+    ).then((it) async {
+      ReturnMap response = DioService.dioResponse(it);
+      logger.d("setEventLog() _response -> ${response.status} // ${response.resultMap}");
+      if(response.status == "200") {
+        if(response.resultMap?["result"] == true) {
+
+        }else{
+          toast(response.resultMap?["msg"]);
+        }
+      }
+    }).catchError((Object obj) async {
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("setEventLog() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("setEventLog() Error Default => ");
+          break;
+      }
+    });
   }
 
   static ProgressDialog? networkProgress(BuildContext context) {

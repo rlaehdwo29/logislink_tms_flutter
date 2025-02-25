@@ -33,6 +33,8 @@ const String URL_INSURE = "/cmm/insure/v1";
 const String URL_CODE_LIST = "/cmm/code/list";
 // 버전코드
 const String URL_VERSION_CODE = "/cmm/version/list";
+// 로그 저장
+const String URL_EVENT_LOG = "/cust/insert/eventLog";
 
 // 로그인
 const String URL_MEMBER_LOGIN = "/cust/login/A";

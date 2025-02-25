@@ -365,6 +365,7 @@ class _ReNewLoginPageState extends State<ReNewLoginPage> with CommonMainWidget {
                         Navigator.of(context).pop(false);
                       });
                 }
+                await Util.setEventLog(URL_MEMBER_LOGIN, "모바일로그인", loginYn: "Y");
               }
             }else{
               openOkBox(context, _response.resultMap?["msg"],

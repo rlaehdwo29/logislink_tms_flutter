@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/addr_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
 import 'package:logislink_tms_flutter/common/model/cust_user_model.dart';
@@ -5192,7 +5193,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
                 },
               );
             }
-
+            await Util.setEventLog(URL_ORDER_REG, "(스마트)오더등록_M${Platform.isAndroid ? "A" : "I"}");
             Navigator.of(context).pop({'code': 200});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});

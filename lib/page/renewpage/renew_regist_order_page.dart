@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
+import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/stop_point_model.dart';
 import 'package:logislink_tms_flutter/common/model/user_model.dart';
@@ -765,7 +766,8 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
           onTap: () async {
             await goToChargeInfo();
           },
-          child: Row(children: [
+          child: Row(
+           children: [
             Expanded(
             flex: 1,
             child: Column(
@@ -809,7 +811,8 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                   ),
                 ),
               ])),
-            llRpaInfo.value? Expanded(
+            llRpaInfo.value?
+            Expanded(
               flex: 1,
                 child: Container(
                   color: Colors.white,
@@ -820,7 +823,7 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                     textAlign: TextAlign.center,
                   )
                 )
-            ):const SizedBox()
+            ) : const SizedBox()
           ])
         )
       ],
@@ -1035,6 +1038,7 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                 );
               }
 
+              await Util.setEventLog(URL_ORDER_REG, "(일반)오더등록_M${Platform.isAndroid ? "A" : "I"}");
               Navigator.of(context).pop({'code': 200, 'allocId': _response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
