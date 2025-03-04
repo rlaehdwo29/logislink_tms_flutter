@@ -1038,7 +1038,7 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
                 );
               }
 
-              await Util.setEventLog(URL_ORDER_REG, "(일반)오더등록_M${Platform.isAndroid ? "A" : "I"}");
+              await Util.setEventLog(URL_ORDER_REG, "(일반)오더등록");
               Navigator.of(context).pop({'code': 200, 'allocId': _response.resultMap?["msg"]});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});

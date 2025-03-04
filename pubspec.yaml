@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.1.65+89
+version: 1.1.68+92
 
 environment:
   sdk: '>=3.0.3 <4.0.0'
@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   get: ^4.6.5
   file: ^6.1.4
-  http: ^1.1.0
+  http: ^1.1.2
   platform: ^3.1.0
   crypto: ^3.0.3
   cupertino_icons: ^1.0.2
@@ -56,16 +56,16 @@ dependencies:
   encrypt: ^5.0.1
   flutter_screenutil: ^5.8.4
   progress_dialog_null_safe: ^1.0.7
-  flutter_app_badger: ^1.3.0
-  permission_handler: ^10.3.0
-  fluttertoast: ^8.2.2
+  flutter_app_badge: ^2.0.2
+  permission_handler: ^11.0.1
+  fluttertoast: ^8.2.12
   package_info_plus: ^4.0.2
   flutter_native_splash: ^2.3.1
   url_launcher: ^6.2.1
   path_provider: ^2.0.15
   fbroadcast: ^2.0.0
   flutter_local_notifications: ^17.2.2
-  flutter_inappwebview: ^5.8.0
+  flutter_inappwebview: ^6.1.5
   firebase_analytics: ^11.2.1
   firebase_dynamic_links: ^6.0.4
   table_calendar: ^3.0.9
@@ -73,11 +73,14 @@ dependencies:
   firebase_core: ^3.3.0
   firebase_messaging: ^15.0.4
   floor: ^1.4.2
-  time_picker_sheet: ^0.0.2+1
-  phone_call: ^0.0.1
+  time_picker_sheet:
+    git:
+      url: https://github.com/TomKaminski/time-picker-sheet.git
+      ref: 546a27f
+  flutter_direct_caller_plugin: ^0.0.4
   flutter_slidable: ^3.0.0
   wakelock_plus: ^1.1.1
-  kakao_map_plugin: ^0.1.8
+  kakao_map_plugin: ^0.3.5
   flutter_dotenv: ^5.0.2
   image_picker: ^1.0.0
   photo_view: ^0.14.0
@@ -158,6 +161,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_native_splash:
+  color: "#eeeeee"
+  image: assets/image/ic_icon.png
+
 
 android_12:
   # The image parameter sets the splash screen icon image.  If this parameter is not specified,

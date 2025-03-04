@@ -332,31 +332,22 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
             try {
               ReturnMap _response = DioService.dioResponse(it);
               logger.i(
-                  "userLogin() _response -> ${_response.status} // ${_response
-                      .resultMap}");
+                  "userLogin() _response -> ${_response.status} // ${_response.resultMap}");
               if (_response.status == "200") {
                 if (_response.resultMap?["result"] == true) {
                   if (_response.resultMap?["data"] != null) {
-                    UserModel userInfo = UserModel.fromJSON(
-                        it.response.data["data"]);
+                    UserModel userInfo = UserModel.fromJSON(it.response.data["data"]);
                     if (userInfo != null) {
-                      userInfo.authorization =
-                      it.response.headers["authorization"]?[0];
+                      userInfo.authorization = it.response.headers["authorization"]?[0];
                       await controller.setUserInfo(userInfo);
-                      if (m_TermsCheck == false &&
-                          m_TermsMode == TERMS.INSERT) {
-                        var results = await Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (
-                                    BuildContext context) => const TermsPage())
-                        );
+                      if (m_TermsCheck == false && m_TermsMode == TERMS.INSERT) {
+                        var results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const TermsPage()));
 
                         if (results != null && results.containsKey("code")) {
                           if (results["code"] == 200) {
                             Navigator.of(context).pushAndRemoveUntil(
                                 MaterialPageRoute(
-                                    builder: (
-                                        BuildContext context) => const LoginPage()),
+                                    builder: (BuildContext context) => const LoginPage()),
                                     (route) => false);
                           }
                         }

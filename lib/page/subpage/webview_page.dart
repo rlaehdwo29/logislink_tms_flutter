@@ -22,7 +22,7 @@ class _WebViewPageState extends State<WebViewPage> {
   late final InAppWebViewController webViewController;
   late final PullToRefreshController pullToRefreshController;
   ProgressDialog? pr;
-  late Uri myUrl;
+  late String myUrl;
   double progress = 0;
 
   @override
@@ -41,7 +41,7 @@ class _WebViewPageState extends State<WebViewPage> {
       },
     ))!;
 
-    myUrl = Uri.parse(widget.url);
+    myUrl = widget.url;
 
   }
 
@@ -88,7 +88,7 @@ class _WebViewPageState extends State<WebViewPage> {
                       children: [
                         InAppWebView(
                           key: webViewKey,
-                          initialUrlRequest: URLRequest(url: myUrl),
+                          initialUrlRequest: URLRequest(url: WebUri(myUrl)),
                           initialOptions: InAppWebViewGroupOptions(
                             crossPlatform: InAppWebViewOptions(
                                 javaScriptCanOpenWindowsAutomatically: true,
@@ -117,10 +117,10 @@ class _WebViewPageState extends State<WebViewPage> {
                           ),
                           pullToRefreshController: pullToRefreshController,
                           onLoadStart: (InAppWebViewController controller, uri) {
-                            setState(() {myUrl = uri!;});
+                            setState(() {myUrl = uri.toString();});
                           },
                           onLoadStop: (InAppWebViewController controller, uri) {
-                            setState(() {myUrl = uri!;});
+                            setState(() {myUrl = uri.toString();});
                           },
                           onProgressChanged: (controller, progress) {
                             if (progress == 100) {pullToRefreshController.endRefreshing();}

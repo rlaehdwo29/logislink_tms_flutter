@@ -14,6 +14,7 @@ import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:path/path.dart';
 
+import '../common/config_url.dart';
 import '../common/model/order_link_current_model.dart';
 
 class OrderService with ChangeNotifier {
@@ -105,9 +106,9 @@ class OrderService with ChangeNotifier {
               }
               if(orderList.isNotEmpty) orderList.clear();
               var reposi_order = await db.getOrderList(context);
-              orderList?.addAll(reposi_order);
+              orderList.addAll(reposi_order);
               totalPage = Util.getTotalPage(int.parse(_response.resultMap?["total"]));
-              await Util.setEventLog("", "", loginYn: "Y");
+              await Util.setEventLog(URL_MEMBER_LOGIN, "", loginYn: "Y");
             } catch (e) {
               print(e);
             }

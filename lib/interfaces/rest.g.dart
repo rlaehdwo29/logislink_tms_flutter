@@ -108,6 +108,47 @@ class _Rest implements Rest {
   }
 
   @override
+  Future<HttpResponse<dynamic>> setEventLog(
+    userId,
+    menu_url,
+    menu_name,
+    mobile_type,
+    app_version,
+    loginYn,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'userId': userId,
+      'menu_url': menu_url,
+      'menu_name': menu_name,
+      'mobile_type': mobile_type,
+      'app_version': app_version,
+      'loginYn': loginYn,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cmm/insert/eventLog',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
   Future<HttpResponse<dynamic>> login(
     userId,
     passwd,
@@ -232,6 +273,51 @@ class _Rest implements Rest {
   }
 
   @override
+  Future<HttpResponse<dynamic>> userRpaInfoUpdate(
+    Authorization,
+    call24Yn,
+    link24Id,
+    link24Pass,
+    man24Id,
+    man24Pass,
+    one24Id,
+    one24Pass,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': Authorization};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = {
+      'call24Yn': call24Yn,
+      'link24Id': link24Id,
+      'link24Pass': link24Pass,
+      'man24Id': man24Id,
+      'man24Pass': man24Pass,
+      'one24Id': one24Id,
+      'one24Pass': one24Pass,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cust/user/rpa/update',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
   Future<HttpResponse<dynamic>> deviceUpdate(
     Authorization,
     pushYn,
@@ -321,9 +407,11 @@ class _Rest implements Rest {
     Authorization,
     fromDate,
     toDate,
+    dayOption,
     orderState,
-    allocState,
-    myOrder,
+    deptState,
+    rpaState,
+    staffName,
     pageNo,
     searchColumn,
     searchValue,
@@ -336,9 +424,11 @@ class _Rest implements Rest {
     final _data = {
       'fromDate': fromDate,
       'toDate': toDate,
+      'dayOption': dayOption,
       'orderState': orderState,
-      'allocState': allocState,
-      'myOrder': myOrder,
+      'deptState': deptState,
+      'rpaState': rpaState,
+      'staffName': staffName,
       'pageNo': pageNo,
       'searchColumn': searchColumn,
       'searchValue': searchValue,
@@ -426,6 +516,95 @@ class _Rest implements Rest {
             .compose(
               _dio.options,
               '/cust/order/list/A/v2',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getTemplateList(Authorization) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': Authorization};
+    _headers.removeWhere((k, v) => v == null);
+    final Map<String, dynamic>? _data = null;
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cust/user/templateList',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getTemplateDetail(
+    Authorization,
+    templateId,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': Authorization};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = {'templateId': templateId};
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cust/user/templateList',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getTemplateStopList(
+    Authorization,
+    templateId,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': Authorization};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = {'templateId': templateId};
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cust/user/templateStopList',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -586,6 +765,8 @@ class _Rest implements Rest {
     unitPriceType,
     unitCharge,
     distance,
+    sTimeFreeYN,
+    eTimeFreeYN,
     time,
     reqMemo,
     driverMemo,
@@ -671,6 +852,8 @@ class _Rest implements Rest {
       'unitPriceType': unitPriceType,
       'unitCharge': unitCharge,
       'distance': distance,
+      'sTimeFreeYN': sTimeFreeYN,
+      'eTimeFreeYN': eTimeFreeYN,
       'time': time,
       'reqMemo': reqMemo,
       'driverMemo': driverMemo,
@@ -728,6 +911,7 @@ class _Rest implements Rest {
     reqDeptName,
     reqDeptId,
     reqStaff,
+    sellStaffName,
     reqTel,
     reqAddr,
     reqAddrDetail,
@@ -789,9 +973,10 @@ class _Rest implements Rest {
     reqMemo,
     driverMemo,
     itemCode,
+    itemName,
     sellCharge,
     sellFee,
-    orderStopList,
+    templateStopList,
     buyStaff,
     buyStaffTel,
     sellWayPointMemo,
@@ -825,6 +1010,7 @@ class _Rest implements Rest {
       'reqDeptName': reqDeptName,
       'reqDeptId': reqDeptId,
       'reqStaff': reqStaff,
+      'sellStaffName': sellStaffName,
       'reqTel': reqTel,
       'reqAddr': reqAddr,
       'reqAddrDetail': reqAddrDetail,
@@ -886,9 +1072,10 @@ class _Rest implements Rest {
       'reqMemo': reqMemo,
       'driverMemo': driverMemo,
       'itemCode': itemCode,
+      'itemName': itemName,
       'sellCharge': sellCharge,
       'sellFee': sellFee,
-      'orderStopList': orderStopList,
+      'templateStopList': templateStopList,
       'buyStaff': buyStaff,
       'buyStaffTel': buyStaffTel,
       'sellWayPointMemo': sellWayPointMemo,
@@ -921,6 +1108,252 @@ class _Rest implements Rest {
             .compose(
               _dio.options,
               '/cust/user/write/template',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> templateMod(
+    Authorization,
+    templateId,
+    reqCustName,
+    reqCustId,
+    reqDeptName,
+    reqDeptId,
+    reqStaff,
+    sellStaffName,
+    reqTel,
+    reqAddr,
+    reqAddrDetail,
+    custId,
+    deptId,
+    inOutSctn,
+    inOutSctnName,
+    truckTypeCode,
+    truckTypeName,
+    sComName,
+    sSido,
+    sGungu,
+    sDong,
+    sAddr,
+    sAddrDetail,
+    sDate,
+    sStaff,
+    sTel,
+    sMemo,
+    eComName,
+    eSido,
+    eGungu,
+    eDong,
+    eAddr,
+    eAddrDetail,
+    eDate,
+    eStaff,
+    eTel,
+    eMemo,
+    sLat,
+    sLon,
+    eLat,
+    eLon,
+    goodsName,
+    goodsWeight,
+    weightUnitCode,
+    weightUnitName,
+    goodsQty,
+    qtyUnitCode,
+    qtyUnitName,
+    sWayCode,
+    sWayName,
+    eWayCode,
+    eWayName,
+    mixYn,
+    mixSize,
+    returnYn,
+    carTonCode,
+    carTonName,
+    carTypeCode,
+    carTypeName,
+    chargeType,
+    chargeTypeName,
+    unitPriceType,
+    unitCharge,
+    unitPriceTypeName,
+    distance,
+    time,
+    reqMemo,
+    driverMemo,
+    itemCode,
+    itemName,
+    sellCharge,
+    sellFee,
+    templateStopList,
+    buyStaff,
+    buyStaffTel,
+    sellWayPointMemo,
+    sellWayPointCharge,
+    sellStayMemo,
+    sellStayCharge,
+    sellHandWorkMemo,
+    sellHandWorkCharge,
+    sellRoundMemo,
+    sellRoundCharge,
+    sellOtherAddMemo,
+    sellOtherAddCharge,
+    sellWeight,
+    talkYn,
+    call24Cargo,
+    manCargo,
+    oneCargo,
+    call24Charge,
+    manCharge,
+    oneCharge,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': Authorization};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = {
+      'templateId': templateId,
+      'reqCustName': reqCustName,
+      'reqCustId': reqCustId,
+      'reqDeptName': reqDeptName,
+      'reqDeptId': reqDeptId,
+      'reqStaff': reqStaff,
+      'sellStaffName': sellStaffName,
+      'reqTel': reqTel,
+      'reqAddr': reqAddr,
+      'reqAddrDetail': reqAddrDetail,
+      'custId': custId,
+      'deptId': deptId,
+      'inOutSctn': inOutSctn,
+      'inOutSctnName': inOutSctnName,
+      'truckTypeCode': truckTypeCode,
+      'truckTypeName': truckTypeName,
+      'sComName': sComName,
+      'sSido': sSido,
+      'sGungu': sGungu,
+      'sDong': sDong,
+      'sAddr': sAddr,
+      'sAddrDetail': sAddrDetail,
+      'sDate': sDate,
+      'sStaff': sStaff,
+      'sTel': sTel,
+      'sMemo': sMemo,
+      'eComName': eComName,
+      'eSido': eSido,
+      'eGungu': eGungu,
+      'eDong': eDong,
+      'eAddr': eAddr,
+      'eAddrDetail': eAddrDetail,
+      'eDate': eDate,
+      'eStaff': eStaff,
+      'eTel': eTel,
+      'eMemo': eMemo,
+      'sLat': sLat,
+      'sLon': sLon,
+      'eLat': eLat,
+      'eLon': eLon,
+      'goodsName': goodsName,
+      'goodsWeight': goodsWeight,
+      'weightUnitCode': weightUnitCode,
+      'weightUnitName': weightUnitName,
+      'goodsQty': goodsQty,
+      'qtyUnitCode': qtyUnitCode,
+      'qtyUnitName': qtyUnitName,
+      'sWayCode': sWayCode,
+      'sWayName': sWayName,
+      'eWayCode': eWayCode,
+      'eWayName': eWayName,
+      'mixYn': mixYn,
+      'mixSize': mixSize,
+      'returnYn': returnYn,
+      'carTonCode': carTonCode,
+      'carTonName': carTonName,
+      'carTypeCode': carTypeCode,
+      'carTypeName': carTypeName,
+      'chargeType': chargeType,
+      'chargeTypeName': chargeTypeName,
+      'unitPriceType': unitPriceType,
+      'unitCharge': unitCharge,
+      'unitPriceTypeName': unitPriceTypeName,
+      'distance': distance,
+      'time': time,
+      'reqMemo': reqMemo,
+      'driverMemo': driverMemo,
+      'itemCode': itemCode,
+      'itemName': itemName,
+      'sellCharge': sellCharge,
+      'sellFee': sellFee,
+      'templateStopList': templateStopList,
+      'buyStaff': buyStaff,
+      'buyStaffTel': buyStaffTel,
+      'sellWayPointMemo': sellWayPointMemo,
+      'sellWayPointCharge': sellWayPointCharge,
+      'sellStayMemo': sellStayMemo,
+      'sellStayCharge': sellStayCharge,
+      'sellHandWorkMemo': sellHandWorkMemo,
+      'sellHandWorkCharge': sellHandWorkCharge,
+      'sellRoundMemo': sellRoundMemo,
+      'sellRoundCharge': sellRoundCharge,
+      'sellOtherAddMemo': sellOtherAddMemo,
+      'sellOtherAddCharge': sellOtherAddCharge,
+      'sellWeight': sellWeight,
+      'talkYn': talkYn,
+      'call24Cargo': call24Cargo,
+      'manCargo': manCargo,
+      'oneCargo': oneCargo,
+      'call24Charge': call24Charge,
+      'manCharge': manCharge,
+      'oneCharge': oneCharge,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cust/user/write/template',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> templateDel(
+    Authorization,
+    templateDelList,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{r'Authorization': Authorization};
+    _headers.removeWhere((k, v) => v == null);
+    final _data = {'templateDelList': templateDelList};
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cust/user/delete/template',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -986,6 +1419,8 @@ class _Rest implements Rest {
     unitPriceType,
     unitCharge,
     distance,
+    sTimeFreeYN,
+    eTimeFreeYN,
     time,
     reqMemo,
     driverMemo,
@@ -1073,6 +1508,8 @@ class _Rest implements Rest {
       'unitPriceType': unitPriceType,
       'unitCharge': unitCharge,
       'distance': distance,
+      'sTimeFreeYN': sTimeFreeYN,
+      'eTimeFreeYN': eTimeFreeYN,
       'time': time,
       'reqMemo': reqMemo,
       'driverMemo': driverMemo,
@@ -2226,13 +2663,17 @@ class _Rest implements Rest {
   }
 
   @override
-  Future<HttpResponse<dynamic>> getDeptList(Authorization) async {
+  Future<HttpResponse<dynamic>> getDeptList(
+    Authorization,
+    sellCustId,
+  ) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{r'Authorization': Authorization};
     _headers.removeWhere((k, v) => v == null);
-    final Map<String, dynamic>? _data = null;
+    final _data = {'sellCustId': sellCustId};
+    _data.removeWhere((k, v) => v == null);
     final _result =
         await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
       method: 'POST',
@@ -2687,6 +3128,7 @@ class _Rest implements Rest {
     sSido,
     sGungu,
     sDong,
+    sComName,
     eSido,
     eGungu,
     eDong,
@@ -2694,6 +3136,8 @@ class _Rest implements Rest {
     carTypeCode,
     sDate,
     eDate,
+    eComName,
+    unitPriceType,
   ) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
@@ -2709,6 +3153,7 @@ class _Rest implements Rest {
       'sSido': sSido,
       'sGungu': sGungu,
       'sDong': sDong,
+      'sComName': sComName,
       'eSido': eSido,
       'eGungu': eGungu,
       'eDong': eDong,
@@ -2716,6 +3161,8 @@ class _Rest implements Rest {
       'carTypeCode': carTypeCode,
       'sDate': sDate,
       'eDate': eDate,
+      'eComName': eComName,
+      'unitPriceType': unitPriceType,
     };
     _data.removeWhere((k, v) => v == null);
     final _result =
@@ -3289,6 +3736,39 @@ class _Rest implements Rest {
             .compose(
               _dio.options,
               '/cmm/jibunlist/v1',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = _result.data;
+    final httpResponse = HttpResponse(value, _result);
+    return httpResponse;
+  }
+
+  @override
+  Future<HttpResponse<dynamic>> getInsure(
+    buyAmt,
+    sDate,
+  ) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'buyAmt': buyAmt,
+      'sDate': sDate,
+    };
+    _data.removeWhere((k, v) => v == null);
+    final _result =
+        await _dio.fetch(_setStreamType<HttpResponse<dynamic>>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+      contentType: 'application/x-www-form-urlencoded',
+    )
+            .compose(
+              _dio.options,
+              '/cmm/insure/v1',
               queryParameters: queryParameters,
               data: _data,
             )

@@ -38,9 +38,10 @@ abstract class Rest {
   @FormUrlEncoded()
   @POST(URL_EVENT_LOG)
   Future<HttpResponse> setEventLog(
-        @Header("Authorization") String? Authorization,
+        @Field("userId") String? userId,
         @Field("menu_url") String? menu_url,
         @Field("menu_name") String? menu_name,
+        @Field("mobile_type") String? mobile_type,
         @Field("app_version") String? app_version,
         @Field("loginYn") String? loginYn
       );

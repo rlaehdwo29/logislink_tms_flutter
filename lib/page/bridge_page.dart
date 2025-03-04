@@ -116,8 +116,7 @@ class _BridgePageState extends State<BridgePage> {
                 }
               }else{
                 if (shareVersion != codeVersion.versionCode) {
-                  await SP.putString(
-                      Const.CD_VERSION, codeVersion.versionCode ?? "");
+                  await SP.putString(Const.CD_VERSION, codeVersion.versionCode ?? "");
                   await GetCodeTask();
                 }
                 await checkLogin();

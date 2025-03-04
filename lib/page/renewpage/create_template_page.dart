@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:get/get.dart';
@@ -39,7 +40,6 @@ import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:motion_tab_bar/MotionBadgeWidget.dart';
 import 'package:motion_tab_bar/MotionTabBar.dart';
 import 'package:motion_tab_bar/MotionTabBarController.dart';
-import 'package:phone_call/phone_call.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -5193,7 +5193,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
                 },
               );
             }
-            await Util.setEventLog(URL_ORDER_REG, "(스마트)오더등록_M${Platform.isAndroid ? "A" : "I"}");
+            await Util.setEventLog(URL_ORDER_REG, "(스마트)오더등록");
             Navigator.of(context).pop({'code': 200});
           }else{
             openOkBox(context,"${_response.resultMap?["msg"]}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
@@ -6091,7 +6091,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
                               DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
                               AndroidDeviceInfo info = await deviceInfo.androidInfo;
                               if (info.version.sdkInt >= 23) {
-                                await PhoneCall.calling("${mStopList.value[index].eTel}");
+                                await FlutterDirectCallerPlugin.callNumber("${mStopList.value[index].eTel}");
                               }else{
                                 await launch("tel://${mStopList.value[index].eTel}");
                               }

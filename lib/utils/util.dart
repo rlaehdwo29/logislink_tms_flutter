@@ -62,9 +62,10 @@ class Util {
     UserModel? user = await App().getUserInfo();
     var app_version = await Util.getVersionName();
     await DioService.dioClient(header: true).setEventLog(
-        user.authorization,
+        user.userId,
         menuUrl,
         menuName,
+        "T${Platform.isAndroid ? "A" : "I"}",
         app_version,
         loginYn??"N"
     ).then((it) async {
@@ -613,7 +614,7 @@ class Util {
           webViewController?.loadUrl(urlRequest: URLRequest(url: await webViewController?.getUrl()));}
       },
     ))!;
-    Uri myUrl = Uri.parse(SERVER_URL + URL_NOTICE_DETAIL + seq.toString());
+    String myUrl = SERVER_URL + URL_NOTICE_DETAIL + seq.toString();
 
     return showDialog(
         context: context,
@@ -638,7 +639,7 @@ class Util {
                             children: [
                               InAppWebView(
                                 key: webviewKey,
-                                initialUrlRequest: URLRequest(url: myUrl),
+                                initialUrlRequest: URLRequest(url: WebUri(myUrl)),
                                 initialOptions: InAppWebViewGroupOptions(
                                   crossPlatform: InAppWebViewOptions(
                                       javaScriptCanOpenWindowsAutomatically: true,
@@ -667,10 +668,10 @@ class Util {
                                 ),
                                 pullToRefreshController: pullToRefreshController,
                                 onLoadStart: (InAppWebViewController controller, uri) {
-                                  setState(() {myUrl = uri!;});
+                                  setState(() {myUrl = uri.toString();});
                                 },
                                 onLoadStop: (InAppWebViewController controller, uri) {
-                                  setState(() {myUrl = uri!;});
+                                  setState(() {myUrl = uri.toString();});
                                 },
                                 onProgressChanged: (controller, progress) {
                                   if (progress == 100) {pullToRefreshController?.endRefreshing();}

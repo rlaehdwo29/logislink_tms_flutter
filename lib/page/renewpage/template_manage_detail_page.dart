@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_direct_caller_plugin/flutter_direct_caller_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -18,7 +19,6 @@ import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:page_animation_transition/animations/left_to_right_transition.dart';
 import 'package:page_animation_transition/page_animation_transition.dart';
-import 'package:phone_call/phone_call.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
 
@@ -637,7 +637,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                               DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
                               AndroidDeviceInfo info = await deviceInfo.androidInfo;
                               if (info.version.sdkInt >= 23) {
-                                await PhoneCall.calling("${mStopList.value[index].eTel}");
+                                await FlutterDirectCallerPlugin.callNumber("${mStopList.value[index].eTel}");
                               }else{
                                 await launch("tel://${mStopList.value[index].eTel}");
                               }

@@ -4509,7 +4509,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                           showGuestDialog();
                             return;
                         }
-                        //await goToRegOrder();
                         openSelectRegOrderDialog(context);
                       },
                       child: Container(
