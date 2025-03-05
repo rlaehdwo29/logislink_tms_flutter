@@ -3378,7 +3378,6 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
       await pr?.hide();
       ReturnMap response = DioService.dioResponse(it);
       logger.d("getOrderDetail() _response -> ${response.status} | ${response.resultMap}");
-      //openOkBox(context,"${_response.resultMap}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
       if(response.status == "200") {
         if(response.resultMap?["result"] == true) {
           if (response.resultMap?["data"] != null) {

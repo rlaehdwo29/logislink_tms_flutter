@@ -29,6 +29,8 @@ import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 
+import '../../common/config_url.dart';
+
 class RenewOrderTransInfoPage extends StatefulWidget {
 
   OrderModel order_vo;
@@ -2828,6 +2830,7 @@ class _RenewOrderTransInfoPageState extends State<RenewOrderTransInfoPage> with 
         logger.d("save() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
+            await Util.setEventLog(URL_ORDER_ALLOC_REG, "배차하기");
             Navigator.of(context).pop({'code': 200,Const.RESULT_WORK_STOP_POINT:Const.RESULT_SETTING_TRANS});
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
