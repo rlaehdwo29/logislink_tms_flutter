@@ -300,7 +300,7 @@ Widget tabBarValueWidget(String? tabValue) {
           await SP.putCodeList(Const.DEPT, jsonString);
 
           await getMonitorOrder();
-          await Util.setEventLog(URL_MONITOR_ORDER, "포인트조회 - 오더&배차");
+          await Util.setEventLog(URL_MONITOR_ORDER, "실적현황 - 오더&배차");
         }else{
           mDeptList.value = List.empty(growable: true);
         }
@@ -401,7 +401,7 @@ Widget tabBarValueWidget(String? tabValue) {
             double profitPercentTotal = Util.getInCodePercent(int.parse(tvProfitTotal.value), int.parse(tvSellTotal.value));
             tvProfitPercentTotal.value = profitPercentTotal.toString();
             adapter04.value = {"deptList": deptList, "userList": mUserList.value, "code": "04"};
-            await Util.setEventLog(URL_MONITOR_DEPT_PROFIT, "포인트조회 - 부서별손익");
+            await Util.setEventLog(URL_MONITOR_DEPT_PROFIT, "실적현황 - 부서별손익");
         }
       }
     }).catchError((Object obj) async {
@@ -1315,7 +1315,7 @@ Future<void> getMonitorCustProfit() async {
           data = MonitorProfitModel(custName: Strings.of(context)?.get("total"),profitPercent: profitPercent, buyAmt: buyAmt, sellAmt: sellAmt, profitAmt: profitAmt);
         }
         mList.value.insert(0, data);
-        await Util.setEventLog(URL_MONITOR_CUST_PROFIT, "포인트조회 - 거래처별손익");
+        await Util.setEventLog(URL_MONITOR_CUST_PROFIT, "실적현황 - 거래처별손익");
       }else{
         mDeptList.value = List.empty(growable: true);
       }
