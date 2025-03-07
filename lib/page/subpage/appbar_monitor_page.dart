@@ -24,6 +24,8 @@ import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 
+import '../../common/config_url.dart';
+
 class AppBarMonitorPage extends StatefulWidget {
   AppBarMonitorPage({Key? key}):super(key: key);
 
@@ -298,6 +300,7 @@ Widget tabBarValueWidget(String? tabValue) {
           await SP.putCodeList(Const.DEPT, jsonString);
 
           await getMonitorOrder();
+          await Util.setEventLog(URL_MONITOR_ORDER, "포인트조회 - 오더&배차");
         }else{
           mDeptList.value = List.empty(growable: true);
         }
@@ -335,8 +338,7 @@ Widget tabBarValueWidget(String? tabValue) {
         if (response.resultMap?["data"] != null) {
             var list = response.resultMap?["data"] as List;
             if (list != null && list.length > 0) {
-              MonitorOrderModel? monitorOrder = MonitorOrderModel.fromJSON(
-                  list[0]);
+              MonitorOrderModel? monitorOrder = MonitorOrderModel.fromJSON(list[0]);
               mMonitor.value = monitorOrder;
             }
         }
@@ -399,7 +401,7 @@ Widget tabBarValueWidget(String? tabValue) {
             double profitPercentTotal = Util.getInCodePercent(int.parse(tvProfitTotal.value), int.parse(tvSellTotal.value));
             tvProfitPercentTotal.value = profitPercentTotal.toString();
             adapter04.value = {"deptList": deptList, "userList": mUserList.value, "code": "04"};
-
+            await Util.setEventLog(URL_MONITOR_DEPT_PROFIT, "포인트조회 - 부서별손익");
         }
       }
     }).catchError((Object obj) async {
@@ -1313,6 +1315,7 @@ Future<void> getMonitorCustProfit() async {
           data = MonitorProfitModel(custName: Strings.of(context)?.get("total"),profitPercent: profitPercent, buyAmt: buyAmt, sellAmt: sellAmt, profitAmt: profitAmt);
         }
         mList.value.insert(0, data);
+        await Util.setEventLog(URL_MONITOR_CUST_PROFIT, "포인트조회 - 거래처별손익");
       }else{
         mDeptList.value = List.empty(growable: true);
       }

@@ -65,7 +65,8 @@ class Util {
         user.userId,
         menuUrl,
         menuName,
-        "T${Platform.isAndroid ? "A" : "I"}",
+        "주선/운송사",
+        Platform.isAndroid ? "Android" : "IOS",
         app_version,
         loginYn??"N"
     ).then((it) async {
@@ -577,6 +578,7 @@ class Util {
                 openNotiDialog(context,pageName,webviewKey,data.boardSeq);
               }
             }
+            await Util.setEventLog(URL_NOTICE, "공지사항");
           }catch(e) {
             print("Util getNotice() Error => $e");
             Util.toast("데이터를 가져오는 중 오류가 발생하였습니다.");

@@ -1146,7 +1146,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                   Navigator.of(context).pop(false);
                 });
           }
-          await Util.setEventLog(URL_ORDER_CANCEL, "오더 취소");
+          await Util.setEventLog(URL_ORDER_CANCEL, "오더취소");
         }
       }catch(e) {
         print("setOrderCancel() Exeption =>$e");

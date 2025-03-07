@@ -12,6 +12,8 @@ import 'package:logislink_tms_flutter/constants/const.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 
+import '../common/config_url.dart';
+
 class AppbarService with ChangeNotifier {
   final addrList = List.empty(growable: true).obs;
   final jibunList = List.empty(growable: true).obs;
@@ -88,7 +90,7 @@ class AppbarService with ChangeNotifier {
     Logger logger = Logger();
     var app = await App().getUserInfo();
     noticeList.value = List.empty(growable: true);
-    await DioService.dioClient(header: true).getNotice(app.authorization).then((it) {
+    await DioService.dioClient(header: true).getNotice(app.authorization).then((it) async {
       if (noticeList.isNotEmpty == true) noticeList.value = List.empty(growable: true);
       ReturnMap _response = DioService.dioResponse(it);
       logger.d("getNotice() _response -> ${_response.status} // ${_response.resultMap}");
@@ -97,7 +99,8 @@ class AppbarService with ChangeNotifier {
           try {
             var list = _response.resultMap?["data"] as List;
             List<NoticeModel> itemsList = list.map((i) => NoticeModel.fromJSON(i)).toList();
-            noticeList?.addAll(itemsList);
+            noticeList.addAll(itemsList);
+            await Util.setEventLog(URL_NOTICE, "공지사항");
           }catch(e) {
             print("getNotice() Error => $e");
             Util.toast("데이터를 가져오는 중 오류가 발생하였습니다.");
@@ -126,7 +129,7 @@ class AppbarService with ChangeNotifier {
     var app = await App().getUserInfo();
     pointList.value = List.empty(growable: true);
     int totalPage = 1;
-    await DioService.dioClient(header: true).getTmsUserPointList(app.authorization,page).then((it) {
+    await DioService.dioClient(header: true).getTmsUserPointList(app.authorization,page).then((it) async {
       ReturnMap _response = DioService.dioResponse(it);
       logger.d("appbar_service.dart getUserPoint() _response -> ${_response.status} // ${_response.resultMap}");
       if(_response.status == "200") {
@@ -134,7 +137,7 @@ class AppbarService with ChangeNotifier {
           try {
             var list = _response.resultMap?["data"] as List;
             List<PointModel> itemsList = list.map((i) => PointModel.fromJSON(i)).toList();
-            pointList?.addAll(itemsList);
+            pointList.addAll(itemsList);
             int total = 0;
             if(_response.resultMap?["total"].runtimeType.toString() == "String") {
               total = int.parse(_response.resultMap?["total"]);
@@ -142,6 +145,7 @@ class AppbarService with ChangeNotifier {
               total = _response.resultMap?["total"];
             }
             totalPage = Util.getTotalPage(total);
+            await Util.setEventLog(URL_TMS_POINT_USER_LIST, "포인트조회");
           }catch(e) {
             print("appbar_service.dart getUserPoint() Error => $e");
           }

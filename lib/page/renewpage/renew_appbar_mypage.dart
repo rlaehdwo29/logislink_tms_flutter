@@ -19,6 +19,8 @@ import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 
+import '../../common/config_url.dart';
+
 class RenewAppBarMyPage extends StatefulWidget {
   final void Function(bool?)? onCallback;
   String? code;
@@ -86,6 +88,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
     Future.delayed(Duration.zero, () async {
       mData.value = await App().getUserInfo();
       await getUserRpa();
+      await Util.setEventLog("MyPage", "마이페이지");
     });
 
     if(widget.code != null) {
@@ -167,6 +170,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
 
     if(etPasswordController.text == '' || etPasswordController.text == null) {
       if(validationRpaEdit()) {
+        await Util.setEventLog(URL_USER_UPDATE, "정보수정");
         await updateRpaInfo();
       }else{
         Util.toast("변경할 사항이 없습니다.");
@@ -181,6 +185,7 @@ class _RenewAppBarMyPageState extends State<RenewAppBarMyPage> {
           ReturnMap _response = DioService.dioResponse(it);
           logger.d("editMyInfo() _response -> ${_response.status} // ${_response.resultMap}");
           if (_response.status == "200") {
+            await Util.setEventLog(URL_USER_UPDATE, "정보수정");
             if (_response.resultMap?["result"] == true) {
               etPasswordController.text = "";
               etPasswordConfirmController.text = "";

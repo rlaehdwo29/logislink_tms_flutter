@@ -18,6 +18,8 @@ import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 
+import '../../common/config_url.dart';
+
 class AppBarMyPage extends StatefulWidget {
   final void Function(bool?)? onCallback;
   String? code;
@@ -116,6 +118,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
         logger.d("getRpaLinkFlag() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
+            await Util.setEventLog(URL_USER_UPDATE, "비밀번호변경");
             Util.toast("비밀번호가 변경되었습니다.");
             etPasswordController.text = "";
             etPasswordConfirmController.text = "";

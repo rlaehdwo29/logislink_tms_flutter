@@ -7,6 +7,9 @@ import 'package:logislink_tms_flutter/common/common_util.dart';
 import 'package:logislink_tms_flutter/common/model/notification_model.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 
+import '../common/config_url.dart';
+import '../utils/util.dart';
+
 class NotificationService with ChangeNotifier {
   final notificationList = List.empty(growable: true).obs;
 
@@ -22,7 +25,7 @@ class NotificationService with ChangeNotifier {
     Logger logger = Logger();
     notificationList.value = List.empty(growable: true);
     var app = await App().getUserInfo();
-    await DioService.dioClient(header: true).getNotification(app.authorization).then((it) {
+    await DioService.dioClient(header: true).getNotification(app.authorization).then((it) async {
       ReturnMap _response = DioService.dioResponse(it);
       logger.d("getNotification() _response -> ${_response.status} // ${_response.resultMap}");
       if(_response.status == "200") {
@@ -31,6 +34,7 @@ class NotificationService with ChangeNotifier {
           List<NotificationModel> itemsList = list.map((i) => NotificationModel.fromJSON(i)).toList();
           if (notificationList.isNotEmpty == true) notificationList.value = List.empty(growable: true);
           notificationList.value?.addAll(itemsList);
+          await Util.setEventLog(URL_NOTIFICATION, "알림");
         }else{
           notificationList.value = List.empty(growable: true);
         }

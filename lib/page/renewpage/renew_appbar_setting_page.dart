@@ -51,6 +51,7 @@ class _ReNewAppBarSettingPageState extends State<ReNewAppBarSettingPage> {
     super.initState();
 
     Future.delayed(Duration.zero, () async {
+      await Util.setEventLog("Settings", "설정");
       await initView();
     });
 

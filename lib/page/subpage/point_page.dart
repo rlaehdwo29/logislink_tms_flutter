@@ -22,6 +22,8 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
+import '../../common/config_url.dart';
+
 class PointPage extends StatefulWidget {
 
   PointPage({Key? key}):super(key: key);
@@ -62,7 +64,7 @@ class _PointPageState extends State<PointPage> {
     Logger logger = Logger();
     var app = await App().getUserInfo();
     mList.value = List.empty(growable: true);
-    await DioService.dioClient(header: true).getTmsUserPointList(app.authorization,page.value).then((it) {
+    await DioService.dioClient(header: true).getTmsUserPointList(app.authorization,page.value).then((it) async {
       ReturnMap _response = DioService.dioResponse(it);
       logger.d("point_page.dart getUserPoint() _response -> ${_response.status} // ${_response.resultMap}");
       if(_response.status == "200") {
@@ -139,7 +141,7 @@ class _PointPageState extends State<PointPage> {
 
   Widget getPointListWidget() {
     return mList.isNotEmpty ?
-    Expanded(
+    SizedBox(
       child: ListView.builder(
       scrollDirection: Axis.vertical,
       controller: scrollController,
@@ -257,7 +259,7 @@ class _PointPageState extends State<PointPage> {
         }else {
           if (snapshot.hasData) {
             if (mList.isNotEmpty) mList.clear();
-            mList.value.addAll(snapshot.data['list']);
+            mList.addAll(snapshot.data['list']);
             return getPointListWidget();
           } else if (snapshot.hasError) {
             return Container(

@@ -4019,6 +4019,7 @@ class _RenewMainPageState extends State<RenewMainPage> with CommonMainWidget, Wi
                     onTap: () async {
                       var url = Uri.parse(URL_MANUAL);
                       if (await canLaunchUrl(url)) {
+                        await Util.setEventLog(URL_MANUAL, "도움말");
                         launchUrl(url);
                       }
                     },

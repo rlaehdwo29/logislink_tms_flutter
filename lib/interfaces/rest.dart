@@ -41,7 +41,8 @@ abstract class Rest {
         @Field("userId") String? userId,
         @Field("menu_url") String? menu_url,
         @Field("menu_name") String? menu_name,
-        @Field("mobile_type") String? mobile_type,
+        @Field("app_type") String? app_type,
+        @Field("device_os") String? device_os,
         @Field("app_version") String? app_version,
         @Field("loginYn") String? loginYn
       );

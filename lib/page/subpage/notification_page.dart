@@ -20,6 +20,8 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
+import '../../common/config_url.dart';
+
 class NotificationPage extends StatefulWidget {
 
   NotificationPage({Key? key}):super(key: key);

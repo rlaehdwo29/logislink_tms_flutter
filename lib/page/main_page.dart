@@ -384,6 +384,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
               onTap: () async {
                 var url = Uri.parse(URL_MANUAL);
                 if (await canLaunchUrl(url)) {
+                  await Util.setEventLog(URL_MANUAL, "도움말");
                   launchUrl(url);
                 }
               },
@@ -1440,7 +1441,6 @@ class _MainPageState extends State<MainPage> with CommonMainWidget,WidgetsBindin
                   preferPosition: AutoScrollPosition.begin,
                 );
               }
-              print("dddddddddddd=> ${mUser.value}");
               return Obx(()=> orderListWidget());
             } else if (snapshot.hasError) {
               return Container(

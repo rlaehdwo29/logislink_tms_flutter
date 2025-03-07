@@ -53,7 +53,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
     mList.value = List.empty(growable: true);
     await DioService.jusoDioClient(header: false).getJuso(Const.JUSU_KEY,"1","20",searchController.text,"json").then((it) {
       if (mList.isNotEmpty == true) mList.value = List.empty(growable: true);
-      mList.value.addAll(DioService.jusoDioResponse(it));
+      mList.addAll(DioService.jusoDioResponse(it));
     }).catchError((Object obj){
       switch (obj.runtimeType) {
         case DioError:
