@@ -10,9 +10,9 @@ import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
-import 'package:logislink_tms_flutter/common/config_url.dart';
 import 'package:logislink_tms_flutter/common/model/car_model.dart';
 import 'package:logislink_tms_flutter/common/model/code_model.dart';
+import 'package:logislink_tms_flutter/common/model/order_link_status_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_link_status_sub_model.dart';
 import 'package:logislink_tms_flutter/common/model/order_model.dart';
 import 'package:logislink_tms_flutter/common/model/rpa_flag_model.dart';
@@ -21,37 +21,34 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/page/renewpage/renew_general_regist_order_page.dart';
-import 'package:logislink_tms_flutter/page/renewpage/renew_order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/link_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/location_control_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/old_order_trans_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/receipt_page.dart';
-import 'package:logislink_tms_flutter/page/subpage/reg_order/regist_order_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/reg_order/old_regist_order_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/stop_point_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:logislink_tms_flutter/widget/show_code_dialog_widget.dart';
-import 'package:page_animation_transition/animations/left_to_right_transition.dart';
-import 'package:page_animation_transition/page_animation_transition.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 
-class RenewOrderDetailPage extends StatefulWidget {
+class OldOrderDetailPage extends StatefulWidget {
 
   OrderModel? order_vo;
   String? code;
   int? position;
   String? allocId;
 
-  RenewOrderDetailPage({Key? key,this.order_vo, this.code, this.position, this.allocId}):super(key:key);
+  OldOrderDetailPage({Key? key,this.order_vo, this.code, this.position, this.allocId}):super(key:key);
 
-  _RenewOrderDetailPageState createState() => _RenewOrderDetailPageState();
+  _OldOrderDetailPageState createState() => _OldOrderDetailPageState();
 }
 
 
-class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
+class _OldOrderDetailPageState extends State<OldOrderDetailPage> {
 
   ProgressDialog? pr;
 
@@ -186,452 +183,6 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
     etCarTonController.dispose();
   }
 
-  // Function Start
-
-  int chargeTotal(String? chargeFlag) {
-    int total = 0;
-    if(chargeFlag == "S") {
-      total = int.parse(mData.value.sellCharge ?? "0") +
-          int.parse(mData.value.sellWayPointCharge ?? "0") +
-          int.parse(mData.value.sellStayCharge ?? "0") +
-          int.parse(mData.value.sellHandWorkCharge ?? "0") +
-          int.parse(mData.value.sellRoundCharge ?? "0") +
-          int.parse(mData.value.sellOtherAddCharge ?? "0");
-    }else {
-      total = int.parse(mData.value.buyCharge ?? "0") +
-          int.parse(mData.value.wayPointCharge ?? "0") +
-          int.parse(mData.value.stayCharge ?? "0") +
-          int.parse(mData.value.handWorkCharge ?? "0") +
-          int.parse(mData.value.roundCharge ?? "0") +
-          int.parse(mData.value.otherAddCharge ?? "0") -
-          int.parse(mData.value.sellFee ?? "0");
-    }
-    return total;
-  }
-
-
-  // Function End
-
-
-  // Widget Start
-
-  Widget HorizontalDashedDivider() {
-    final DividerThemeData dividerTheme = DividerTheme.of(context);
-
-    return Padding(
-        padding: EdgeInsets.only(top: CustomStyle.getHeight(0),bottom: CustomStyle.getHeight(0)),
-        child: Container(
-            child: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final dashCount = App().isTablet(context) ? (constraints.constrainWidth().toInt() / 15.0).floor() : (constraints.constrainWidth().toInt() / 8.0).floor();
-                return Flex(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  direction: Axis.horizontal,
-                  children: List.generate(dashCount, (_) {
-                    return SizedBox(
-                        width: CustomStyle.getWidth(3),
-                        height:  CustomStyle.getHeight(1),
-                        child: const DecoratedBox(
-                            decoration: BoxDecoration(color: light_gray18)
-                        )
-                    );
-                  }),
-                );
-              },
-            )
-        )
-    );
-  }
-
-  Widget orderEtcChargeWidget(String chargeFlag) {
-    return Column(
-      children: [
-        //수수료
-        Util.equalsCharge(chargeFlag == "S" ? mData.value.buyFee??"0" : mData.value.sellFee??"0") ?
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        textAlign: TextAlign.left,
-                        Strings.of(context)?.get("order_charge_info_sell_fee")??"수수료_()" ,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    " - ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.buyFee??"0": mData.value.sellFee??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ):const SizedBox(),
-        // 경유비(지불)
-        Util.equalsCharge(chargeFlag == "S" ? mData.value.sellWayPointCharge??"0" : mData.value.wayPointCharge??"0") ?
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        textAlign: TextAlign.left,
-                          Strings.of(context)?.get(chargeFlag == "S" ? "order_charge_info_way_point_charge" : "order_trans_info_way_point_charge")??"경유지_()" ,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellWayPointCharge??"0": mData.value.wayPointCharge??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ):const SizedBox(),
-        // 대기료(지불)
-        Util.equalsCharge(chargeFlag == "S" ? mData.value.sellStayCharge??"0" : mData.value.stayCharge??"0") ?
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        Strings.of(context)?.get(chargeFlag == "S" ? "order_charge_info_stay_charge" : "order_trans_info_stay_charge")??"대기료_()" ,
-                        textAlign: TextAlign.left,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellStayCharge??"0" : mData.value.stayCharge??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ) : const SizedBox(),
-        // 수작업비(지불)
-        Util.equalsCharge(chargeFlag == "S" ? mData.value.sellHandWorkCharge??"0" : mData.value.handWorkCharge??"0") ?
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 4,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5)),
-                      child: Text(
-                        Strings.of(context)?.get(chargeFlag == "S" ? "order_charge_info_hand_work_charge" : "order_trans_info_hand_work_charge")??"수작업비_()",
-                        textAlign: TextAlign.left,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 4,
-                  child: Text(
-                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellHandWorkCharge??"0" : mData.value.handWorkCharge??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ) : const SizedBox(),
-        // 회차료(지불)
-        Util.equalsCharge(chargeFlag == "S" ? mData.value.sellRoundCharge??"0" : mData.value.roundCharge ?? "0") ?
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        Strings.of(context)?.get(chargeFlag == "S" ? "order_charge_info_round_charge" : "order_trans_info_round_charge")??"회차료_()",
-                        textAlign: TextAlign.left,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellRoundCharge??"0" : mData.value.roundCharge??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ) : const SizedBox(),
-        // 기타추가비(지불)
-        Util.equalsCharge(chargeFlag == "S" ? mData.value.sellOtherAddCharge??"0" : mData.value.otherAddCharge??"0") ?
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 4,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        Strings.of(context)?.get(chargeFlag == "S" ? "order_charge_info_other_add_charge" : "order_trans_info_other_add_charge")??"기타추가비_()",
-                        textAlign: TextAlign.left,
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    " + ${Util.getInCodeCommaWon(chargeFlag == "S" ? mData.value.sellOtherAddCharge??"0" : mData.value.otherAddCharge??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ) : const SizedBox(),
-        Container(
-            width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-            margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10)),
-            height: CustomStyle.getHeight(1),
-            color: light_gray19
-        ),
-      ]
-    );
-  }
-
-  Widget cargoInfoPannel() {
-    return Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              Strings.of(context)?.get("order_cargo_info_in_out_sctn")??"수출입구분_",
-              style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-            ),
-            Text(
-              mData.value.inOutSctnName??"",
-              style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-            )
-          ]
-        ),
-        Container(
-          margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-          child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  Strings.of(context)?.get("order_cargo_info_truck_type")??"운송유형_",
-                  style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                ),
-                Text(
-                  mData.value.truckTypeName??"",
-                  style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                )
-              ]
-          )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_car_ton")??"톤수_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.carTonName??"",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_car_type")??"차종_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.carTypeName??"",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    alignment: Alignment.topCenter,
-                    margin: EdgeInsets.only(right: CustomStyle.getWidth(15)),
-                    child: Text(
-                      Strings.of(context)?.get("order_cargo_info_cargo")??"화물정보_",
-                      style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                    )
-                  ),
-                  Flexible(
-                      child: RichText(
-                          overflow: TextOverflow.visible,
-                          text: TextSpan(
-                            text: "${mData.value.goodsName}",
-                            style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                          )
-                      )
-                  ),
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_item_lvl_1")??"운송품목_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.itemName??"-",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_wgt")??"적재중량_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    "${mData.value.goodsWeight} ${mData.value.weightUnitCode}",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_way_on")??"상차방법_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.sWayName??"",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_way_off")??"하차방법_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.eWayName??"",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_mix_type")??"혼적여부_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.mixYn == "Y"?"${Strings.of(context)?.get("order_cargo_info_mix_y")}":"${Strings.of(context)?.get("order_cargo_info_mix_n")}",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-        Container(
-            margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Strings.of(context)?.get("order_cargo_info_return_type")??"왕복여부_",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w500),
-                  ),
-                  Text(
-                    mData.value.returnYn == "Y"?"${Strings.of(context)?.get("order_cargo_info_return_y")}":"${Strings.of(context)?.get("order_cargo_info_return_n")}",
-                    style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
-                  )
-                ]
-            )
-        ),
-      ],
-    );
-  }
-
-  // Widget End
-
   Future<void> goToLocationControl() async {
     await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo:mData.value)));
   }
@@ -645,7 +196,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
   }
 
   Future<void> copyOrder() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RegistOrderPage(order_vo:mData.value,flag: "CR",)));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldRegistOrderPage(order_vo:mData.value,flag: "CR",)));
 
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
@@ -1008,11 +559,10 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
   }
 
   Future<void> goToAlloc() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewOrderTransInfoPage(order_vo: mData.value), pageAnimationType: LeftToRightTransition()));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldOrderTransInfoPage(order_vo: mData.value)));
 
     if(results != null && results.containsKey("code")) {
       if (results["code"] == 200) {
-        await Util.setEventLog(URL_ORDER_ALLOC_REG, "배차하기");
         Util.toast("배차가 완료되었습니다.");
         await getOrderDetail(mData.value.sellAllocId);
       }
@@ -1023,7 +573,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
     openCommonConfirmBox(
         context,
         "오더를 취소하시겠습니까?",
-        "닫기",
+        Strings.of(context)?.get("cancel")??"Not Found",
         Strings.of(context)?.get("confirm")??"Not Found",
             () {Navigator.of(context).pop(false);},
             () async {
@@ -1071,8 +621,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
       try {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.snackbar(context, "오더가 접수되었습니다.");
-            await Util.setEventLog(URL_ORDER_STATE, "오더접수");
+            Util.toast("오더가 접수되었습니다.");
             await getOrderDetail(mData.value.sellAllocId);
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1118,7 +667,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         logger.d("setOrderCancel() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            Util.snackbar(context,"오더가 취소되었습니다.");
+            Util.toast("오더가 취소되었습니다.");
             await getOrderDetail(mData.value.sellAllocId);
 
             if(mLinkStatusSub != null) {
@@ -1146,7 +695,6 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                   Navigator.of(context).pop(false);
                 });
           }
-          await Util.setEventLog(URL_ORDER_CANCEL, "오더취소");
         }
       }catch(e) {
         print("setOrderCancel() Exeption =>$e");
@@ -1197,7 +745,6 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         logger.d("_setAllocState() _response -> ${_response.status} // ${_response.resultMap}");
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
-            await Util.setEventLog(URL_ORDER_ALLOC_STATE, "배차취소");
             await getOrderDetail(mData.value.sellAllocId);
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1205,8 +752,6 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                   Navigator.of(context).pop(false);
                 });
           }
-        }else{
-          Util.toast(_response.message);
         }
       }catch(e) {
         print("_setAllocState() Exeption =>$e");
@@ -1284,7 +829,6 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         if (_response.status == "200") {
           if (_response.resultMap?["result"] == true) {
             Util.toast("정보망 배차가 취소되었습니다.");
-            await Util.setEventLog(URL_SEND_LINK, "(정보망) 배차취소");
             await getOrderDetail(mData.value.sellAllocId??"");
           } else {
             openOkBox(context, "${_response.resultMap?["msg"]}",
@@ -1745,7 +1289,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
       return false;
     }
     if(etDriverNameController.text.trim().isEmpty) {
-      Util.toast("파주성명을 입력해 주세요.");
+      Util.toast("차주성명을 입력해 주세요.");
       return false;
     }
     if(etTelController.text.trim().isEmpty) {
@@ -1894,6 +1438,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         // 정보망접수, 정보망접수 완료, 배차실패(화물맨), 배차대기(화물맨), 정보망오류
       if(mData.value.orderState == "00" || mData.value.orderState =="01"){
         tvReOrder.value = false;
+        tvOrderCancel.value  = false;
         tvAlloc.value = true;
         tvModify.value = true;
         tvAllocCancel.value = false;
@@ -2000,194 +1545,76 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
     });
   }
 
-  Widget orderSellWidget() {
-    return Container(
-        decoration: const BoxDecoration(
-            color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10))
-        ),
-        margin: const EdgeInsets.all(10),
-        child: Column(
+  Widget topWidget() {
+    return Column(
       children: [
+        // 접수
         Container(
-          padding:  tvAllocState.value ? EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(15), right: CustomStyle.getWidth(15)) : EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10),horizontal: CustomStyle.getWidth(15)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(10.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
+                  tvOrderState.value ?
+                  Container(
+                          padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                          child: Text(
+                            mData.value.orderStateName??"접수_",
+                            style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
+                          )
+                      ) : const SizedBox(),
                   mData.value.sellCustName?.isNotEmpty == true?
                   Container(
-                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                         child: Text(
                           mData.value.sellCustName??"",
-                          style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w800),
+                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                         ),
                       ) : const SizedBox(),
                   mData.value.sellDeptName?.isNotEmpty == true?
                   Container(
-                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                        padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                         child: Text(
                           mData.value.sellDeptName??"",
-                          style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                          style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                         ),
                       ) : const SizedBox(),
                 ],
               ),
-              tvOrderState.value ?
-              Container(
-                  padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
-                  child: Text(
-                    mData.value.orderStateName??"접수_",
-                    style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
-                  )
-              ) : const SizedBox(),
+              Text(
+                "${Util.getInCodeCommaWon(mData.value.sellCharge??"0")}원",
+                textAlign: TextAlign.right,
+                style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w700),
+              )
             ],
           ),
         ) ,
         // 운송사 접수
-        tvAllocState.value ?
         Container(
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(15), right: CustomStyle.getWidth(15), top: CustomStyle.getHeight(5),bottom: CustomStyle.getHeight(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
-                      child: Text(
-                        mData.value.allocStateName??"운송사접수",
-                        style: CustomStyle.CustomFont(styleFontSize15, order_state_01,font_weight: FontWeight.w700),
-                      )
-                  )
-              ),
-              mData.value.linkName?.isNotEmpty == true ?
-              Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
-                    child: Text(
-                      mData.value.linkName??"",
-                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                    ),
-                  )
-              ) : const SizedBox(),
-              mData.value.buyCustName?.isNotEmpty == true ?
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
-                    child: Text(
-                      mData.value.buyCustName??"",
-                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                    ),
-                  )
-              ) : const SizedBox(),
-              mData.value.buyDeptName?.isNotEmpty == true ?
-              Expanded(
-                  flex: 2,
-                  child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
-                    child: Text(
-                      mData.value.buyDeptName??"",
-                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
-                    ),
-                  )
-              ) : const SizedBox(),
-            ],
-          ),
-        ) : const SizedBox(),
-        HorizontalDashedDivider(),
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(top: CustomStyle.getHeight(10), right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        textAlign: TextAlign.left,
-                        "청구운임",
-                        style: CustomStyle.CustomFont(styleFontSize14, Colors.black),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    "${Util.getInCodeCommaWon(mData.value.sellCharge??"0")} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                  )
-              ),
-            ],
-          ),
-        ),
-        orderEtcChargeWidget("S"),
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(5), right: CustomStyle.getWidth(5),bottom: CustomStyle.getHeight(10)),
-          child: Row(
-            children: [
-              Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
-                      child: Text(
-                        textAlign: TextAlign.left,
-                        "청구운임(소계)",
-                        style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w800),
-                      )
-                  )
-              ),
-              Expanded(
-                  flex: 3,
-                  child: Text(
-                    "${Util.getInCodeCommaWon(chargeTotal("S").toString())} 원",
-                    textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w800),
-                  )
-              ),
-            ],
-          ),
-        ),
-        HorizontalDashedDivider(),
-        Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(top: CustomStyle.getHeight(10), right: CustomStyle.getWidth(5),left: CustomStyle.getWidth(5)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               tvAllocState.value ?
               Expanded(
                   flex: 3,
                   child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                       child: Text(
                         mData.value.allocStateName??"운송사접수",
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                        style: CustomStyle.CustomFont(styleFontSize14, order_state_01,font_weight: FontWeight.w700),
                       )
                   )
-              ) : Expanded(
-                  flex: 3,
-                  child: Container(
-                      padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
-                      child: Text(
-                        "지불운임",
-                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
-                      )
-                  )
-              ) ,
+              ) : const SizedBox(),
               mData.value.linkName?.isNotEmpty == true ?
               Expanded(
                   flex: 2,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.linkName??"",
-                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
               ) : const SizedBox(),
@@ -2195,10 +1622,10 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               Expanded(
                   flex: 3,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.buyCustName??"",
-                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
               ) : const SizedBox(),
@@ -2206,28 +1633,28 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               Expanded(
                   flex: 2,
                   child: Container(
-                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
                     child: Text(
                       mData.value.buyDeptName??"",
-                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                      style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                     ),
                   )
               ) : const SizedBox(),
               Expanded(
                   flex: 2,
                   child: Text(
-                    "${Util.getInCodeCommaWon(mData.value.buyCharge??"0")} 원",
+                    "${Util.getInCodeCommaWon(mData.value.buyCharge??"0")}원",
                     textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w700),
                   )
               ),
             ],
           ),
         ),
-        orderEtcChargeWidget("T"),
+        // 경유비(지불)
+        Util.equalsCharge(mData.value.wayPointCharge??"0")?
         Container(
-          width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width * 0.8,
-          padding: EdgeInsets.only(left: CustomStyle.getWidth(5), right: CustomStyle.getWidth(5),bottom: CustomStyle.getHeight(10)),
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
           child: Row(
             children: [
               Expanded(
@@ -2235,85 +1662,274 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                   child: Container(
                       padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
                       child: Text(
-                        textAlign: TextAlign.left,
-                        "지불운임(소계)",
-                        style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w800),
+                        Strings.of(context)?.get("order_trans_info_way_point_charge")??"경유지_(지불)",
+                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
                       )
+                  )
+              ),
+              Expanded(
+                  flex: 7,
+                  child: Container(
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                    child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        text: TextSpan(
+                          text: mData.value.wayPointMemo??"경유지 메모",
+                          style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
+                        )
+                    ),
                   )
               ),
               Expanded(
                   flex: 3,
                   child: Text(
-                    "${Util.getInCodeCommaWon(chargeTotal("T").toString())} 원",
+                    " + ${Util.getInCodeCommaWon(mData.value.wayPointCharge??"0")}원",
                     textAlign: TextAlign.right,
-                    style: CustomStyle.CustomFont(styleFontSize18, Colors.black,font_weight: FontWeight.w800),
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                   )
               ),
             ],
           ),
-        ),
+        ):const SizedBox(),
+        // 대기료(지불)
+        Util.equalsCharge(mData.value.stayCharge??"0") ?
+        Container(
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 3,
+                  child: Container(
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                      child: Text(
+                        Strings.of(context)?.get("order_trans_info_stay_charge")??"대기료_(지불)",
+                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                      )
+                  )
+              ),
+              Expanded(
+                  flex: 7,
+                  child: Container(
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                    child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        text: TextSpan(
+                          text: mData.value.stayMemo??"대기료 메모",
+                          style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
+                        )
+                    ),
+                  )
+              ),
+              Expanded(
+                  flex: 3,
+                  child: Text(
+                    " + ${Util.getInCodeCommaWon(mData.value.wayPointCharge??"0")}원",
+                    textAlign: TextAlign.right,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                  )
+              ),
+            ],
+          ),
+        ) : const SizedBox(),
+        // 수작업비(지불)
+        Util.equalsCharge(mData.value.handWorkCharge??"0") ?
+        Container(
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(10.w), right: CustomStyle.getWidth(10.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 4,
+                  child: Container(
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                      child: Text(
+                        Strings.of(context)?.get("order_trans_info_hand_work_charge")??"수작업비_(지불)",
+                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                      )
+                  )
+              ),
+              Expanded(
+                  flex: 7,
+                  child: Container(
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                    child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        text: TextSpan(
+                          text: mData.value.handWorkMemo??"수작업비 메모",
+                          style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
+                        )
+                    ),
+                  )
+              ),
+              Expanded(
+                  flex: 3,
+                  child: Text(
+                    " + ${Util.getInCodeCommaWon(mData.value.handWorkCharge??"0")}원",
+                    textAlign: TextAlign.right,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                  )
+              ),
+            ],
+          ),
+        ) : const SizedBox(),
+        // 회차료(지불)
+        Util.equalsCharge(mData.value.roundCharge ?? "0") ?
+        Container(
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 3,
+                  child: Container(
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                      child: Text(
+                        Strings.of(context)?.get("order_trans_info_round_charge")??"회차료_(지불)",
+                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                      )
+                  )
+              ),
+              Expanded(
+                  flex: 7,
+                  child: Container(
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                    child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        text: TextSpan(
+                          text: mData.value.roundMemo??"회차료 메모",
+                          style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
+                        )
+                    ),
+                  )
+              ),
+              Expanded(
+                  flex: 3,
+                  child: Text(
+                    " + ${Util.getInCodeCommaWon(mData.value.roundCharge??"0")}원",
+                    textAlign: TextAlign.right,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                  )
+              ),
+            ],
+          ),
+        ) : const SizedBox(),
+        // 기타추가비(지불)
+        Util.equalsCharge(mData.value.otherAddCharge??"0") ?
+        Container(
+          padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), top: CustomStyle.getHeight(5.h),bottom: CustomStyle.getHeight(5.h)),
+          child: Row(
+            children: [
+              Expanded(
+                  flex: 4,
+                  child: Container(
+                      padding: EdgeInsets.only(right: CustomStyle.getWidth(5.w)),
+                      child: Text(
+                        Strings.of(context)?.get("order_trans_info_other_add_charge")??"기타추가비_(지불)",
+                        style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                      )
+                  )
+              ),
+              Expanded(
+                  flex: 7,
+                  child: Container(
+                    padding: EdgeInsets.only(right: CustomStyle.getWidth(3.w)),
+                    child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        text: TextSpan(
+                          text: mData.value.otherAddMemo??"기타추가비 메모",
+                          style: CustomStyle.CustomFont(styleFontSize10, text_color_01),
+                        )
+                    ),
+                  )
+              ),
+              Expanded(
+                  flex: 3,
+                  child: Text(
+                    " + ${Util.getInCodeCommaWon(mData.value.roundCharge??"0")}원",
+                    textAlign: TextAlign.right,
+                    style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
+                  )
+              ),
+            ],
+          ),
+        ) : const SizedBox(),
+        Container(
+          height: CustomStyle.getHeight(5.h),
+          color: line,
+        )
       ],
-    )
     );
   }
 
   Widget driverInfoWidget() {
-    return Container(
-        margin: const EdgeInsets.all(10),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        color: Colors.white
-      ),
-      child: Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10)),
-          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.all(10.w),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                child: Text(
-                  mData.value.driverStateName??"출발",
-                  style: CustomStyle.CustomFont(styleFontSize18, order_state_01, font_weight: FontWeight.w700),
-                )
+              Text(
+                Strings.of(context)?.get("order_detail_sub_title_05")?? "차주_정보",
+                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
               ),
-              Container(
-                padding: EdgeInsets.all(10.w),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    tvReceipt.value?
-                    InkWell(
-                        onTap: () async {
-                          await goToReceipt();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
-                          decoration: BoxDecoration(
-                              border: Border.all(color: order_state_01,width: 1.w),
-                              borderRadius: BorderRadius.all(Radius.circular(5.w))
-                          ),
-                          child: Text(
-                            "인수증 확인",
-                            style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
-                          ),
-                        )
-                    ) :const SizedBox()
-                  ],
-                ),
-              ),
+              tvReceipt.value?
+              InkWell(
+                  onTap: () async {
+                    await goToReceipt();
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: order_state_01,width: 1.w),
+                        borderRadius: BorderRadius.all(Radius.circular(5.w))
+                    ),
+                    child: Text(
+                      "인수증 확인",
+                      style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
+                    ),
+                  )
+              ):const SizedBox()
             ],
           ),
         ),
-        HorizontalDashedDivider(),
+        CustomStyle.getDivider1(),
         Container(
-          margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(5)),
+          padding: EdgeInsets.all(10.w),
+          alignment: Alignment.centerLeft,
+          child: Column(
+            children: [
+              InkWell(
+                  onTap: (){
+
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: order_state_01,
+                            width: 1.w
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(5.w))
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(10.w)),
+                    child: Text(
+                      mData.value.driverStateName??"출발",
+                      style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
+                    ),
+                  )
+              )
+            ],
+          ),
+        ),
+        CustomStyle.getDivider1(),
+        Container(
+          padding: EdgeInsets.all(5.w),
           child: Row(
               children: [
                 Expanded(
@@ -2325,87 +1941,65 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                       Container(
                           padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h)),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
-                                mData.value.driverName == null ? "" : "${mData.value.driverName}",
-                                style: CustomStyle.CustomFont(styleFontSize18, Colors.black, font_weight: FontWeight.w700),
+                                mData.value.driverName == null ?"" : "${mData.value.driverName} 차주님",
+                                style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
                               ),
-                              Text(
-                                " 차주님",
-                                style: CustomStyle.CustomFont(styleFontSize18, text_color_01),
-                              ),
+                              InkWell(
+                                  onTap: () async {
+                                    if(Platform.isAndroid) {
+                                      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                      AndroidDeviceInfo info = await deviceInfo.androidInfo;
+                                      if (info.version.sdkInt >= 23) {
+                                        await FlutterDirectCallerPlugin.callNumber("${mData.value.driverTel}");
+                                      }else{
+                                        await launch("tel://${mData.value.driverTel}");
+                                      }
+                                    }else{
+                                      await launch("tel://${mData.value.driverTel}");
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
+                                    child: Text(
+                                      Util.makePhoneNumber(mData.value.driverTel),
+                                      style: CustomStyle.CustomFont(styleFontSize14, addr_type_text),
+                                    ),
+                                  )
+                              )
                             ],
                           )
                       ),
                       Text(
                         mData.value.carNum??"",
-                        style: CustomStyle.CustomFont(styleFontSize18, text_color_01,font_weight: FontWeight.w500),
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                     ],
                   )
                 ),
                 Expanded(
-                        flex: 4,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                          InkWell(
-                              onTap: () async {
-                                if (Platform.isAndroid) {
-                                  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-                                  AndroidDeviceInfo info = await deviceInfo.androidInfo;
-                                  if (info.version.sdkInt >= 23) {
-                                    await FlutterDirectCallerPlugin.callNumber("${mData.value.driverTel}");
-                                  } else {
-                                    await launch("tel://${mData.value.driverTel}");
-                                  }
-                                } else {
-                                  await launch("tel://${mData.value.driverTel}");
-                                }
-                              },
-                              child: Container(
-                                width: CustomStyle.getWidth(40),
-                                height: CustomStyle.getHeight(40),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadiusDirectional.circular(50),
-                                  color: renew_main_color2
-                                ),
-                                child:  const Icon(Icons.call,size: 28,color: Colors.white)
-                              )
-
-                          ),
-                          InkWell(
-                              onTap:(){
-                                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo: mData.value)));
-                              } ,
-                              child:  Container(
-                                  width: CustomStyle.getWidth(40),
-                                  height: CustomStyle.getHeight(40),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadiusDirectional.circular(50),
-                                      color: renew_main_color2
-                                  ),
-                                  child:  const Icon(Icons.location_on_outlined,size: 28,color: Colors.white)
-                              )
-                          ),
-                        ]
-                      )
-                    )
-                  ],
+                  flex: 2,
+                  child: InkWell(
+                    onTap:(){
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => LocationControlPage(order_vo: mData.value)));
+                    } ,
+                    child: Icon(Icons.location_on,size: 35.h,color: swipe_edit_btn)
+                  ),
+                )
+              ],
             )
         ),
-        HorizontalDashedDivider(),
+        CustomStyle.getDivider1(),
               //입차
               mData.value.enterDate != null ?
               Container(
-                padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5), top: CustomStyle.getHeight(10), right: CustomStyle.getWidth(10), left: CustomStyle.getWidth(10)),
+                padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h), top: CustomStyle.getHeight(10.h), right: CustomStyle.getWidth(5.w), left: CustomStyle.getWidth(5.w)),
                 child:  Row(
                   children: [
                     Text(
                       Strings.of(context)?.get("order_reg_enter")??"입차",
-                      style: CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w700),
+                      style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                     ),
                     Container(
                         padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
@@ -2420,12 +2014,12 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               // 출발
               mData.value.startDate != null ?
               Container(
-                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5), top: CustomStyle.getHeight(5), right: CustomStyle.getWidth(10), left: CustomStyle.getWidth(10)),
+                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(5.h), top: CustomStyle.getHeight(5.h), right: CustomStyle.getWidth(5.w), left: CustomStyle.getWidth(5.w)),
                   child:  Row(
                     children: [
                       Text(
                         Strings.of(context)?.get("order_reg_start")??"출발",
-                        style: CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w700),
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                       Container(
                           padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
@@ -2440,12 +2034,12 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               // 도착
               mData.value.finishDate != null ?
               Container(
-                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(10), top: CustomStyle.getHeight(5), right: CustomStyle.getWidth(10), left: CustomStyle.getWidth(10)),
+                  padding: EdgeInsets.only(bottom: CustomStyle.getHeight(10.h), top: CustomStyle.getHeight(5.h), right: CustomStyle.getWidth(5.w), left: CustomStyle.getWidth(5.w)),
                   child:  Row(
                     children: [
                       Text(
                         Strings.of(context)?.get("order_reg_end")??"도착",
-                        style: CustomStyle.CustomFont(styleFontSize16, Colors.black,font_weight: FontWeight.w700),
+                        style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                       ),
                       Container(
                           padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
@@ -2457,243 +2051,295 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                     ],
                   )
               ) : const SizedBox(),
+        Container(
+          height: CustomStyle.getHeight(5.h),
+          color: line,
+        )
       ],
-    )
     );
   }
 
   Widget transInfoWidget() {
     return Container(
       alignment: Alignment.centerLeft,
-        margin: const EdgeInsets.all(10),
-        padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(15),horizontal: CustomStyle.getWidth(5)),
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-          color: Colors.white
-        ),
         child: Column(
-            children:[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 4,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h), horizontal: CustomStyle.getWidth(5.w)),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  Strings.of(context)?.get("order_detail_sub_title_01")??"",
+                  style: CustomStyle.CustomFont(styleFontSize16, text_color_01),
+                ),
+                tvSendLink.value ?
+                InkWell(
+                    onTap: () async {
+                      await goToSendLink();
+                    },
                     child: Container(
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Container(
-                                        padding: App().isTablet(context) ? const EdgeInsets.all(10) : const EdgeInsets.all(3),
-                                        margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
-                                        decoration: const BoxDecoration(
-                                            color: renew_main_color2,
-                                            shape: BoxShape.circle
-                                        ),
-                                        child: Text("상",style: CustomStyle.CustomFont(styleFontSize14, Colors.white,font_weight: FontWeight.w600),)
-                                    ),
-                                    Text(
-                                      "${Util.splitSDate(mData.value.sDate)}",
-                                      style: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w400),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ]
-                              ),
-                              Flexible(
-                                  child: RichText(
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 2,
-                                      textAlign:TextAlign.center,
-                                      text: TextSpan(
-                                        text: mData.value.sComName??"",
-                                        style:  CustomStyle.CustomFont(styleFontSize18, main_color, font_weight: FontWeight.w800),
-                                      )
-                                  )
-                              ),
-                              CustomStyle.sizedBoxHeight(5.0.h),
-                              Flexible(
-                                  child: RichText(
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 5,
-                                      textAlign:TextAlign.center,
-                                      text: TextSpan(
-                                        text: mData.value.sAddr??"",
-                                        style: CustomStyle.CustomFont(styleFontSize14, main_color),
-                                      )
-                                  )
-                              ),
-                            ]
-                        )
+                      width: CustomStyle.getWidth(70),
+                      padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h),horizontal: CustomStyle.getWidth(5.w)),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: order_state_01,width: 1.w),
+                          borderRadius: BorderRadius.all(Radius.circular(5.w))
+                      ),
+                      child: Text(
+                        "정보망",
+                        style: CustomStyle.CustomFont(styleFontSize12, order_state_01),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                ) : const SizedBox()
+              ],
+            )
+          ),
+          CustomStyle.getDivider1(),
+          Container(
+            padding: EdgeInsets.all(5.w),
+            child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 4,
+                child: Container(
+                    height: CustomStyle.getHeight(180.h),
+                    margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
+                    padding: EdgeInsets.all(5.0.h),
+                    decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        color: light_gray1
                     ),
-                  ),
-                  Expanded(
-                      flex: 2,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${Util.splitSDate(mData.value.sDate)} 상차",
+                            style: CustomStyle.CustomFont(styleFontSize13, text_box_color_01),
+                          ),
+                          Container(
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                            alignment: Alignment.center,
+                            child: Text(
+                              mData.value.sComName??"",
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize14, text_color_01,
+                                  font_weight: FontWeight.w700),
+                              textAlign: TextAlign.center,
+                            )
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              mData.value.sStaff??"",
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize13, text_color_02,
+                                  font_weight: FontWeight.w400),
+                              textAlign: TextAlign.center,
+                            )
+                          ),
+                          Container(
+                            padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
+                            alignment: Alignment.centerLeft,
+                          child: !(mData.value.sStaff?.isEmpty == true) || !(mData.value.sTel?.isEmpty == true)?
+                          InkWell(
+                            onTap: () async {
+                              if(Platform.isAndroid) {
+                                DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                AndroidDeviceInfo info = await deviceInfo.androidInfo;
+                                if (info.version.sdkInt >= 23) {
+                                  await FlutterDirectCallerPlugin.callNumber("${mData.value.sTel}");
+                                }else{
+                                  await launch("tel://${mData.value.sTel}");
+                                }
+                              }else{
+                                await launch("tel://${mData.value.sTel}");
+                              }
+                            },
+                              child: Text(
+                              Util.makePhoneNumber(mData.value.sTel),
+                              style: CustomStyle.CustomFont(styleFontSize12, addr_type_text)
+                          )) : const SizedBox()),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(3.w)),
+                            child: Text(
+                              mData.value.sAddr??"",
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize13, text_color_02,
+                                  font_weight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            )
+                          ),
+                          !(mData.value.sAddrDetail?.isEmpty == true) ?
+                          Container(
+                            alignment: Alignment.centerLeft,
+                              padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                            child: Text(
+                              mData.value.sAddrDetail??"",
+                              style: CustomStyle.CustomFont(
+                                  styleFontSize13, text_color_02,
+                                  font_weight: FontWeight.w600),
+                              textAlign: TextAlign.center,
+                            )
+                          ) : const SizedBox(),
+                          Flexible(
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                  alignment: Alignment.centerLeft,
+                                  child: RichText(
+                                    overflow: TextOverflow.ellipsis,
+                                    textAlign: TextAlign.left,
+                                    text: TextSpan(
+                                      text: !(mData.value.sMemo?.isEmpty == true) ? mData.value.sMemo??"-" : "-",
+                                      style: CustomStyle.CustomFont(styleFontSize13, text_color_01),
+                                    ),
+                                  )
+                              )
+                          )
+                        ])),
+              ),
+              Expanded(
+                flex: 1,
+                child: Icon(Icons.arrow_right_alt,size: 21.h,color: const Color(0xff6d7780)),
+              ),
+              Expanded(
+                  flex: 4,
+                  child: Container(
+                    height: CustomStyle.getHeight(180.h),
+                      margin: EdgeInsets.only(top: CustomStyle.getHeight(5.0.h)),
+                      padding: EdgeInsets.all(5.0.h),
+                      decoration: const BoxDecoration(
+                          borderRadius:  BorderRadius.all(Radius.circular(10)),
+                          color: light_gray1
+                      ),
                       child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image.asset(
-                              "assets/image/ic_arrow.png",
-                              width: CustomStyle.getWidth(38.0),
-                              height: CustomStyle.getHeight(38.0),
-                              color: const Color(0xffC7CBDE),
-                            ),
                             Text(
-                              "${Util.makeDistance(mData.value.distance)}",
-                              style: CustomStyle.CustomFont(styleFontSize13, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
+                              "${Util.splitEDate(mData.value.eDate)} 하차",
+                              textAlign: TextAlign.center,
+                              style: CustomStyle.CustomFont(styleFontSize13, text_box_color_01),
                             ),
-                            Text(
-                              "${Util.makeTime(mData.value.time??0)}",
-                              style: CustomStyle.CustomFont(styleFontSize13, const Color(0xffC7CBDE),font_weight: FontWeight.w700),
+                            Container(
+                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5.h)),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  mData.value.eComName??"",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize14, text_color_01,
+                                      font_weight: FontWeight.w700),
+                                  textAlign: TextAlign.center,
+                                )
+                            ),
+                            Container(
+                                padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  mData.value.eStaff??"",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize13, text_color_02,
+                                      font_weight: FontWeight.w400),
+                                  textAlign: TextAlign.center,
+                                )
+                            ),
+                            Container(
+                                 padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w),right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.h)),
+                                alignment: Alignment.centerLeft,
+                                child: !(mData.value.eStaff?.isEmpty == true) || !(mData.value.eTel?.isEmpty == true)?
+                                InkWell(
+                                    onTap: () async {
+                                      if(Platform.isAndroid) {
+                                        DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+                                        AndroidDeviceInfo info = await deviceInfo.androidInfo;
+                                        if (info.version.sdkInt >= 23) {
+                                          await FlutterDirectCallerPlugin.callNumber("${mData.value.eTel}");
+                                        }else{
+                                          await launch("tel://${mData.value.eTel}");
+                                        }
+                                      }else{
+                                        await launch("tel://${mData.value.eTel}");
+                                      }
+                                    },
+                                    child: Text(
+                                        Util.makePhoneNumber(mData.value.eTel),
+                                        style: CustomStyle.CustomFont(styleFontSize12, addr_type_text)
+                                    )) : const SizedBox()),
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                child: Text(
+                                  mData.value.eAddr??"",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize13, text_color_02,
+                                      font_weight: FontWeight.w600),
+                                  textAlign: TextAlign.center,
+                                )
+                            ),
+                            !(mData.value.eAddrDetail?.isEmpty == true) ?
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                child: Text(
+                                  mData.value.eAddrDetail??"",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize13, text_color_02,
+                                      font_weight: FontWeight.w600),
+                                  textAlign: TextAlign.center,
+                                )
+                            ) : const SizedBox(),
+                            Flexible(
+                                child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                                    alignment: Alignment.centerLeft,
+                                    child: RichText(
+                                      overflow: TextOverflow.ellipsis,
+                                      textAlign: TextAlign.left,
+                                      text: TextSpan(
+                                        text: !(mData.value.eMemo?.isEmpty == true) ? mData.value.eMemo ?? "-" : "-",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize13,
+                                            text_color_01),
+                                      ),
+                                    )
+                                )
                             )
                           ]
                       )
+                  )
+                )
+              ],
+            )
+          ),
+          Container(
+            padding: EdgeInsets.all(10.w),
+            child: Row(
+              children: [
+                Icon(Icons.more_vert, size: 24.h, color: text_color_02),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w)),
+                  child: Text(
+                    Util.makeDistance(mData.value.distance),
+                    style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
                   ),
-                  Expanded(
-                      flex: 4,
-                      child: Container(
-                          decoration: const BoxDecoration(
-                            borderRadius:  BorderRadius.all(Radius.circular(10)),
-                          ),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                          padding: App().isTablet(context) ? const EdgeInsets.all(10) : const EdgeInsets.all(3),
-                                          margin: EdgeInsets.only(right: CustomStyle.getWidth(5)),
-                                          decoration: const BoxDecoration(
-                                              color: rpa_btn_cancle,
-                                              shape: BoxShape.circle
-                                          ),
-                                          child: Text("하",style: CustomStyle.CustomFont(styleFontSize14, Colors.white,font_weight: FontWeight.w600),)
-                                      ),
-                                      Text(
-                                        "${Util.splitSDate(mData.value.eDate)}",
-                                        style: CustomStyle.CustomFont(styleFontSize16, Colors.black, font_weight: FontWeight.w400),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ]
-                                ),
-                                Flexible(
-                                    child: RichText(
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 2,
-                                        textAlign: TextAlign.center,
-                                        text: TextSpan(
-                                          text:
-                                          mData.value.eComName ?? "",
-                                          style: CustomStyle.CustomFont(styleFontSize18, main_color, font_weight: FontWeight.w800),
-                                        )
-                                    )
-                                ),
-                                CustomStyle.sizedBoxHeight(5.h),
-                                Flexible(
-                                    child: RichText(
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 5,
-                                        textAlign: TextAlign.center,
-                                        text: TextSpan(
-                                            text: mData.value.eAddr??"",
-                                            style:CustomStyle.CustomFont(styleFontSize14, main_color)
-                                        )
-                                    )
-                                ),
-                              ]
-                          )
-                      )
-                  )
-                ],
-              ) ,
-              Container(
-                  padding: EdgeInsets.only(left: CustomStyle.getWidth(5.w), right: CustomStyle.getWidth(5.w), bottom: CustomStyle.getHeight(5.0.h),top: CustomStyle.getHeight(15.h)),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                          children:[
-                            Container(
-                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(10)),
-                                margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffC7CBDE),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
-                                child: Text(
-                                  "${mData.value.carTonName}",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02,font_weight: FontWeight.w600),
-                                )
-                            ),
-                            Container(
-                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(10)),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffC7CBDE),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
-                                child: Text(
-                                  "${mData.value.carTypeName}",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02,font_weight: FontWeight.w600),
-                                )
-                            ),
-                          ]
-                      ),
-                      Row(
-                          children: [
-                            mData.value.truckTypeName != null || mData.value.truckTypeName?.isNotEmpty == true?
-                            Container(
-                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(10)),
-                                margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffC7CBDE),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
-                                child: Text(
-                                  "${mData.value.truckTypeName}",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02,font_weight: FontWeight.w600),
-                                )
-                            ) : const SizedBox(),
-                            Container(
-                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(10)),
-                                margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffC7CBDE),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
-                                child: Text(
-                                  "${mData.value.mixYn == "Y" ? "혼적" : "독차"}",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02,font_weight: FontWeight.w600),
-                                )
-                            ),
-                            Container(
-                                padding:EdgeInsets.symmetric(vertical: CustomStyle.getHeight(3),horizontal: CustomStyle.getWidth(10)),
-                                margin: EdgeInsets.only(right:CustomStyle.getWidth(5)),
-                                decoration: BoxDecoration(
-                                    color: const Color(0xffC7CBDE),
-                                    borderRadius: BorderRadius.circular(10)
-                                ),
-                                child: Text(
-                                  mData.value.returnYn == "Y" ? "왕복" : "편도",
-                                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02,font_weight: FontWeight.w600),
-                                )
-                            ),
-                          ])
-                    ],
-                  )
-              )
-            ]
-        )
+                ),
+                Text(
+                  Util.makeTime(mData.value.time??0),
+                  style: CustomStyle.CustomFont(styleFontSize12, text_color_02),
+                )
+              ],
+            )
+          ),
+          Container(
+            height: CustomStyle.getHeight(5.h),
+            color: line,
+          )
+        ],
+      )
     );
   }
 
@@ -2872,14 +2518,10 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
 
   Widget cargoInfoWidget() {
     isCargoExpanded.value = List.filled(1, false);
-    return Container(
-      margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(10), top: CustomStyle.getHeight(10)),
-        child: Flex(
+    return Flex(
       direction: Axis.vertical,
       children: List.generate(1, (index) {
-        return ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-          child: ExpansionPanelList.radio(
+        return ExpansionPanelList.radio(
           animationDuration: const Duration(milliseconds: 500),
           expandedHeaderPadding: EdgeInsets.zero,
           elevation: 0,
@@ -2889,18 +2531,14 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               backgroundColor: Colors.white,
               headerBuilder: (BuildContext context, bool isExpanded) {
                 return Container(
-                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(10),vertical: CustomStyle.getHeight(5)),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(10))
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(5.w),vertical: CustomStyle.getHeight(5.h)),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(isExpanded ? "접기" : "펼치기",style: CustomStyle.CustomFont(styleFontSize16, text_color_01,font_weight: FontWeight.w700))
+                        Text("화물 정보",style: CustomStyle.CustomFont(styleFontSize16, text_color_01))
                       ],
-                    )
-                );
+                    ));
               },
               body: Obx((){
               return Container(
@@ -2913,7 +2551,508 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                     )
                   )
                 ),
-                child: cargoInfoPannel()
+                child: Column(
+                  children: [
+                    // 첫번째줄
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Container(
+                            alignment: Alignment.center,
+                            padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(2.w)),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: line, width: 1.w)
+                            ),
+                            child: Text(
+                                Strings.of(context)?.get("order_cargo_info_in_out_sctn")??"수출입구분_",
+                              style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                            ),
+                          )
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                          decoration: BoxDecoration(
+                              border: Border(
+                                bottom: BorderSide(
+                                    color: line, width: 1.w
+                                ),
+                                right: BorderSide(
+                                    color: line, width: 1.w
+                                ),
+                                top: BorderSide(
+                                    color: line, width: 1.w
+                                ),
+                              )
+                          ),
+                          child: Text(
+                              mData.value.inOutSctnName??"",
+                            style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                          ),
+                        )
+                      ),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    top: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_truck_type")??"운송유형_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    top: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.truckTypeName??"",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    // 두번째줄
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    left: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_car_ton")??"톤수_",
+                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.carTonName??"",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_car_type")??"차종_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.carTypeName??"",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    // 세번째줄
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    left: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_cargo")??"화물정보_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 8,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.goodsName??"",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    // 네번째줄
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    left: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_item_lvl_1")??"운송품목_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.itemName??"-",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_wgt")??"적재중량_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                "${mData.value.goodsWeight} ${mData.value.weightUnitCode}",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    // 다섯번째줄
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    left: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_way_on")??"상차방법_",
+                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.sWayName??"",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_way_off")??"하차방법_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.eWayName??"",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        )
+                      ],
+                    ),
+                    // 여섯번째줄
+                    Row(
+                      children: [
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    left: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_mix_type")??"혼적여부_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.mixYn == "Y"?"${Strings.of(context)?.get("order_cargo_info_mix_y")}":"${Strings.of(context)?.get("order_cargo_info_mix_n")}",
+                                style: CustomStyle.CustomFont(styleFontSize12, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                Strings.of(context)?.get("order_cargo_info_return_type")??"왕복여부_",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(5.w)),
+                              decoration: BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                    right: BorderSide(
+                                        color: line, width: 1.w
+                                    ),
+                                  )
+                              ),
+                              child: Text(
+                                mData.value.returnYn == "Y"?"${Strings.of(context)?.get("order_cargo_info_return_y")}":"${Strings.of(context)?.get("order_cargo_info_return_n")}",
+                                style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
+                              ),
+                            )
+                        )
+                      ],
+                    )
+                  ],
+                )
               );
               }),
               canTapOnHeader: true,
@@ -2922,23 +3061,18 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
           expansionCallback: (int _index, bool status) {
             isCargoExpanded[index] = !isCargoExpanded[index];
           },
-        )
         );
       }),
-    ));
+    );
   }
 
   Widget etcPannelWidget() {
 
     isEtcExpanded.value = List.filled(1, false);
-    return Container(
-        margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(10), top: CustomStyle.getHeight(10),bottom: CustomStyle.getHeight(10)),
-        child: Flex(
+    return Flex(
       direction: Axis.vertical,
       children: List.generate(1, (index) {
-        return ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: ExpansionPanelList.radio(
+        return ExpansionPanelList.radio(
           animationDuration: const Duration(milliseconds: 500),
           expandedHeaderPadding: EdgeInsets.zero,
           elevation: 0,
@@ -2953,10 +3087,9 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(isExpanded ? "접기" : "펼치기",style: CustomStyle.CustomFont(styleFontSize16, text_color_01,font_weight: FontWeight.w700))
+                        Text("기타",style: CustomStyle.CustomFont(styleFontSize16, text_color_01))
                       ],
-                    )
-                );
+                    ));
               },
               body: Obx((){
                 return Container(
@@ -2977,31 +3110,41 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                             children: [
                               Text(
                                 Strings.of(context)?.get("order_trans_info_driver_memo")??"차주확인사항_",
-                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w500),
+                                style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                               ),
                               Container(
-                                width: App().isTablet(context) ? MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(80) : MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(50),
-                                padding: const EdgeInsets.all(10),
-                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
+                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - 50.w,
+                                height: CustomStyle.getHeight(80.h),
+                                padding: EdgeInsets.all(10.w),
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: line, width: 1.w),
+                                  borderRadius: const BorderRadius.all(Radius.circular(5.0))
+                                ),
                                 child: Text(
                                   !(mData.value.driverMemo?.isEmpty == true) ? mData.value.driverMemo??"-" : "-",
-                                  style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
+                                  style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                                 ),
                               ),
                               Container(
                                 margin: EdgeInsets.only(top: CustomStyle.getHeight(10.h)),
                                 child: Text(
                                   Strings.of(context)?.get("order_request_info_reg_memo")??"요청사항_",
-                                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01,font_weight: FontWeight.w500),
+                                  style: CustomStyle.CustomFont(styleFontSize14, text_color_01),
                                 )
                               ),
                               Container(
-                                width: App().isTablet(context) ? MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(80) : MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - CustomStyle.getWidth(50),
-                                padding: const EdgeInsets.all(10),
-                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5)),
+                                width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width - 50.w,
+                                height: CustomStyle.getHeight(80.h),
+                                padding: EdgeInsets.all(10.w),
+                                margin: EdgeInsets.only(top: CustomStyle.getHeight(5.h)),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: line, width: 1.w),
+                                    borderRadius: const BorderRadius.all(Radius.circular(5.0))
+                                ),
                                 child: Text(
                                   !(mData.value.reqMemo?.isEmpty == true) ? mData.value.reqMemo??"-" : "-",
-                                  style: CustomStyle.CustomFont(styleFontSize13, text_color_01,font_weight: FontWeight.w300),
+                                  style: CustomStyle.CustomFont(styleFontSize11, text_color_01),
                                 ),
                               )
                             ],
@@ -3016,10 +3159,8 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
           expansionCallback: (int _index, bool status) {
             isEtcExpanded[index] = !isEtcExpanded[index];
           },
-        )
         );
       }),
-    )
     );
   }
 
@@ -3028,8 +3169,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
   }
 
   Future goToModifyOrder() async {
-    //Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => RenewRegistOrderPage(order_vo: mData.value,flag: "M")));
-    Map<String,dynamic> results = await Navigator.of(context).push(PageAnimationTransition(page: RenewGeneralRegistOrderPage(order_vo: mData.value, flag: "M"), pageAnimationType: LeftToRightTransition()));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldRegistOrderPage(order_vo: mData.value,flag: "M")));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
@@ -3059,59 +3199,13 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
         } ,
         child: Scaffold(
           resizeToAvoidBottomInset: false,
-          backgroundColor: light_gray24,
+          backgroundColor: sub_color,
           appBar: AppBar(
-
-                actions: [
-                  tvModify.value ?
-                  InkWell(
-                      onTap: () async {
-                        var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
-                        if(guest) {
-                          showGuestDialog();
-                          return;
-                        }
-                        await goToModifyOrder();
-                      },
-                      child: Container(
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(10),bottom: CustomStyle.getHeight(10), right: CustomStyle.getWidth(10)),
-                          width: CustomStyle.getWidth(70),
-                          decoration: const BoxDecoration(
-                              color: rpa_btn_modify,
-                              borderRadius: BorderRadius.all(Radius.circular(5))
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            Strings.of(context)?.get("order_detail_order_modify")??"오더 수정_",
-                            style: CustomStyle.CustomFont(styleFontSize11, Colors.white),
-                          )
-                      )
-                  ) : const SizedBox(),
-                  tvOrderCancel.value ?
-                  InkWell(
-                      onTap: () async {
-                        var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
-                        if(guest) {
-                          showGuestDialog();
-                          return;
-                        }
-                        await showOrderCancel();
-                      },
-                      child: Container(
-                          margin: EdgeInsets.only(top: CustomStyle.getHeight(10),bottom: CustomStyle.getHeight(10), right: CustomStyle.getWidth(10)),
-                          width: CustomStyle.getWidth(70),
-                          decoration: const BoxDecoration(
-                              color: rpa_btn_cancle,
-                              borderRadius: BorderRadius.all(Radius.circular(5))
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            Strings.of(context)?.get("order_detail_order_cancel")??"오더 취소_",
-                            style: CustomStyle.CustomFont(styleFontSize11, Colors.white),
-                          )
-                      )
-                  ) : const SizedBox()
-                ],
+                title: Text(
+                      Strings.of(context)?.get("order_detail_title")??"Not Found",
+                      style: CustomStyle.appBarTitleFont(
+                          styleFontSize16, Colors.black)
+                ),
                 toolbarHeight: 50.h,
                 centerTitle: true,
                 automaticallyImplyLeading: false,
@@ -3121,12 +3215,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                     Navigator.of(context).pop({'code':100});
                   },
                   color: styleWhiteCol,
-                  icon: Image.asset(
-                    "assets/image/ic_arrow_left.png",
-                    width: CustomStyle.getWidth(28.0),
-                    height: CustomStyle.getHeight(28.0),
-                    color: Colors.black,
-                  ),
+                  icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
           body: SafeArea(
@@ -3139,50 +3228,14 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                     SingleChildScrollView(
                       child: Column(
                         children: [
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
-                              child: Text(
-                                "운임 정보",
-                                style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
-                              )
-                          ),
-                          orderSellWidget(),
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
-                              child: Text(
-                                "배차 정보",
-                                style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
-                              )
-                          ),
-                          transInfoWidget(), // 배차 정보
-                          llDriverInfo.value ?  Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
-                              child: Text(
-                                Strings.of(context)?.get("order_detail_sub_title_05")?? "차주 정보_",
-                                style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
-                              )
-                          ) : const SizedBox(),
+                          topWidget(),
                           llDriverInfo.value ? driverInfoWidget() : const SizedBox(),
+                          transInfoWidget(), // 배차 정보
                           llStopPointHeader.value ? stopPointPannelWidget() : const SizedBox(),
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
-                              child: Text(
-                                "화물 정보",
-                                style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
-                              )
-                          ),
                           cargoInfoWidget(), // 화물 정보
                           Container(
-                              alignment: Alignment.centerLeft,
-                              margin: EdgeInsets.only(top: CustomStyle.getHeight(10),left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10)),
-                              child: Text(
-                                "기타",
-                                style: CustomStyle.CustomFont(styleFontSize22, Colors.black,font_weight: FontWeight.w800),
-                              )
+                            height: 5.h,
+                            color: line,
                           ),
                           etcPannelWidget()
                         ],
@@ -3199,7 +3252,7 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                           padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(7.h),horizontal: CustomStyle.getWidth(10.w)),
                           decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
-                              borderRadius: BorderRadius.circular(30),
+                              borderRadius: BorderRadius.circular(30.w),
                               color: copy_btn
                           ),
                           child: Row(
@@ -3222,13 +3275,37 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
               })
           ),
           bottomNavigationBar: Obx((){
-            return Container(
-                height: CustomStyle.getHeight(50),
-                margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+            return SizedBox(
+                height: CustomStyle.getHeight(60.0.h),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // 오더 취소 Button
+                    tvOrderCancel.value ? Expanded(
+                        flex: 1,
+                        child: InkWell(
+                            onTap: () async {
+                              var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                                }
+                              await showOrderCancel();
+                            },
+                            child: Container(
+                                height: CustomStyle.getHeight(60.0.h),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(color: sub_btn),
+                                child: Text(
+                                        textAlign: TextAlign.center,
+                                        Strings.of(context)?.get("order_detail_order_cancel")??"Not Found",
+                                        style: CustomStyle.CustomFont(
+                                            styleFontSize16, styleWhiteCol),
+                                      )
+                            )
+                        )
+                    ):const SizedBox(),
                     // 오더 접수 Button
                     tvReOrder.value ? Expanded(
                         flex: 1,
@@ -3242,16 +3319,38 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                               await showReOrder();
                             },
                             child: Container(
-                              margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(40)),
+                                height: CustomStyle.getHeight(60.0.h),
+                                alignment: Alignment.center,
+                                decoration: const BoxDecoration(color: main_color),
+                                child: Text(
+                                  textAlign: TextAlign.center,
+                                  Strings.of(context)?.get("order_detail_re_order")??"Not Found",
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize16, styleWhiteCol),
+                                ),
+                            )
+                        )
+                    ) : const SizedBox(),
+                    // 오더수정 Button
+                    tvModify.value ? Expanded(
+                        flex: 1,
+                        child: InkWell(
+                            onTap: () async {
+                              var guest = await SP.getBoolean(Const.KEY_GUEST_MODE);
+                              if(guest) {
+                                showGuestDialog();
+                                return;
+                              }
+                              await goToModifyOrder();
+                            },
+                            child: Container(
+                              height: CustomStyle.getHeight(60.0.h),
                               alignment: Alignment.center,
-                              decoration: const BoxDecoration(
-                                  color: renew_main_color2,
-                                  borderRadius: BorderRadius.all(Radius.circular(5))
-                              ),
-                              child: Text(
+                              decoration: const BoxDecoration(color: swipe_edit_btn),
+                              child:Text(
                                 textAlign: TextAlign.center,
-                                Strings.of(context)?.get("order_detail_re_order")??"Not Found",
-                                style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol, font_weight: FontWeight.w700),
+                                Strings.of(context)?.get("order_detail_order_modify")??"Not Found",
+                                style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol),
                               ),
                             )
                         )
@@ -3270,16 +3369,14 @@ class _RenewOrderDetailPageState extends State<RenewOrderDetailPage> {
                               await goToAlloc();
                             },
                             child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(40)),
+                                height: CustomStyle.getHeight(60.0.h),
                                 alignment: Alignment.center,
-                                decoration: const BoxDecoration(
-                                    color: renew_main_color2,
-                                  borderRadius: BorderRadius.all(Radius.circular(5))
-                                ),
+                                decoration: const BoxDecoration(color: main_color),
                                 child: Text(
                                   textAlign: TextAlign.center,
                                   Strings.of(context)?.get("order_detail_alloc")??"Not Found",
-                                  style: CustomStyle.CustomFont(styleFontSize16, styleWhiteCol, font_weight: FontWeight.w700),
+                                  style: CustomStyle.CustomFont(
+                                      styleFontSize16, styleWhiteCol),
                                 ),
                             )
                         )

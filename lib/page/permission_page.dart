@@ -1,10 +1,6 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
-import 'package:logislink_tms_flutter/utils/util.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PermissionPage extends StatefulWidget {

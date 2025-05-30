@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
@@ -12,7 +11,6 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/provider/notification_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
@@ -20,7 +18,7 @@ import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 import 'package:provider/provider.dart';
 
-import '../../common/config_url.dart';
+import 'order_detail_page.dart';
 
 class NotificationPage extends StatefulWidget {
 

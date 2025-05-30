@@ -18,7 +18,7 @@ class DioService {
 
   static Rest dioClient({header = false, image_option = false}) {
     Logger logger = Logger();
-    logger.i("login_page.dart userLogin() => ${header}");
+    logger.i("old_login_page.dart userLogin() => ${header}");
     Dio dio = Dio()..interceptors.add(CustomLogInterceptor());
     if(header) dio.options.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(image_option) dio.options.contentType = 'multipart/form-data';
@@ -28,7 +28,7 @@ class DioService {
 
   static JusoRest jusoDioClient({header = false, image_option = false}) {
     Logger logger = Logger();
-    logger.i("login_page.dart userLogin() => ${header}");
+    logger.i("old_login_page.dart userLogin() => ${header}");
     Dio dio = Dio()..interceptors.add(CustomLogInterceptor());
     if(header) dio.options.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(image_option) dio.options.contentType = 'multipart/form-data';
@@ -38,7 +38,7 @@ class DioService {
 
   static KakaoRest kakaoClient({header = false, image_option = false}) {
     Logger logger = Logger();
-    logger.i("login_page.dart userLogin() => ${header}");
+    logger.i("old_login_page.dart userLogin() => ${header}");
     Dio dio = Dio()..interceptors.add(CustomLogInterceptor());
     if(header) dio.options.headers["Content-Type"] = "application/x-www-form-urlencoded";
     if(image_option) dio.options.contentType = 'multipart/form-data';

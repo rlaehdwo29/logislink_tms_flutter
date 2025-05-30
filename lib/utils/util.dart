@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:introduction_screen/introduction_screen.dart';
 import 'package:logger/logger.dart';
 import 'package:logislink_tms_flutter/common/app.dart';
 import 'package:logislink_tms_flutter/common/common_util.dart';
@@ -88,6 +89,40 @@ class Util {
           break;
         default:
           print("setEventLog() Error Default => ");
+          break;
+      }
+    });
+  }
+
+  static Future<void> setDriverLocationLog(String? orderId) async {
+    Logger logger = Logger();
+    UserModel? user = await App().getUserInfo();
+    var app_version = await Util.getVersionName();
+    await DioService.dioClient(header: true).setDriverLocationLog(
+        orderId,
+        "주선운송사APP > 배차관리(배차이후) >위치관제",
+        "",
+        user.userId,
+        Platform.isAndroid ? "Android" : "IOS"
+    ).then((it) async {
+      ReturnMap response = DioService.dioResponse(it);
+      logger.d("setDriverLocationLog() _response -> ${response.status} // ${response.resultMap}");
+      if(response.status == "200") {
+        if(response.resultMap?["result"] == true) {
+
+        }else{
+          toast(response.resultMap?["msg"]);
+        }
+      }
+    }).catchError((Object obj) async {
+      switch (obj.runtimeType) {
+        case DioError:
+        // Here's the sample to get the failed response error code and message
+          final res = (obj as DioError).response;
+          print("setDriverLocationLog() Error => ${res?.statusCode} // ${res?.statusMessage}");
+          break;
+        default:
+          print("setDriverLocationLog() Error Default => ");
           break;
       }
     });
@@ -766,5 +801,4 @@ class Util {
         }
     );
   }
-
 }

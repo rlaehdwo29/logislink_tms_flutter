@@ -13,7 +13,7 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_detail_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/old_order_detail_page.dart';
 import 'package:logislink_tms_flutter/provider/appbar_service.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/provider/notification_service.dart';

@@ -11,11 +11,11 @@ import 'package:logislink_tms_flutter/common/model/version_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
+import 'package:logislink_tms_flutter/page/old_login_page.dart';
+import 'package:logislink_tms_flutter/page/old_main_page.dart';
+import 'package:logislink_tms_flutter/page/permission_page.dart';
 import 'package:logislink_tms_flutter/page/login_page.dart';
 import 'package:logislink_tms_flutter/page/main_page.dart';
-import 'package:logislink_tms_flutter/page/permission_page.dart';
-import 'package:logislink_tms_flutter/page/renewpage/renew_login_page.dart';
-import 'package:logislink_tms_flutter/page/renewpage/renew_main_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
@@ -258,22 +258,22 @@ class _BridgePageState extends State<BridgePage> {
         case DioError:
         // Here's the sample to get the failed response error code and message
           final res = (obj as DioError).response;
-          logger.e("login_page.dart sendDeviceInfo() error : ${res?.statusCode} -> ${res?.statusMessage}");
+          logger.e("old_login_page.dart sendDeviceInfo() error : ${res?.statusCode} -> ${res?.statusMessage}");
           openOkBox(context,"${res?.statusCode} / ${res?.statusMessage}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
           break;
         default:
-          logger.e("login_page.dart sendDeviceInfo() error2222 =>");
+          logger.e("old_login_page.dart sendDeviceInfo() error2222 =>");
           break;
       }
     });
   }
 
   void goToMain() {
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const RenewMainPage()), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const MainPage()), (route) => false);
   }
 
   Future<void> goToLogin() async {
-    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const ReNewLoginPage()), (route) => false);
+    Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()), (route) => false);
   }
 
   @override

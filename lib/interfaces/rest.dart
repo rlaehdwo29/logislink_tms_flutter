@@ -48,6 +48,20 @@ abstract class Rest {
       );
 
   /**
+   * 차주 위치 관제 로그 저장
+   */
+  @FormUrlEncoded()
+  @POST(URL_DRIVER_LOCATION_LOG)
+  Future<HttpResponse> setDriverLocationLog(
+      @Field("orderId") String? orderId,
+      @Field("eventDesc") String? eventDesc,
+      @Field("eventUrl") String? eventUrl,
+      @Field("loginId") String? loginId,
+      @Field("deviceOs") String? deviceOs,
+      );
+
+
+  /**
    * 로그인
    */
   @FormUrlEncoded()

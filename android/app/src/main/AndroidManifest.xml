@@ -54,7 +54,9 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/LaunchTheme"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true"
+        android:allowBackup="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

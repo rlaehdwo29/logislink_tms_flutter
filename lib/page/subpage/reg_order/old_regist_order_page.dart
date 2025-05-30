@@ -15,7 +15,7 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_request_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/old_order_request_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cargo_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_charge_info_page.dart';
@@ -27,17 +27,17 @@ import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
 
-class RegistOrderPage extends StatefulWidget {
+class OldRegistOrderPage extends StatefulWidget {
 
   OrderModel? order_vo;
   String? flag; // R: 오더 등록, CR:오더 복사, M: 오더 수정
 
-  RegistOrderPage({Key? key, this.order_vo, this.flag}):super(key:key);
+  OldRegistOrderPage({Key? key, this.order_vo, this.flag}):super(key:key);
 
-  _RegistOrderPageState createState() => _RegistOrderPageState();
+  _OldRegistOrderPageState createState() => _OldRegistOrderPageState();
 }
 
-class _RegistOrderPageState extends State<RegistOrderPage> {
+class _OldRegistOrderPageState extends State<OldRegistOrderPage> {
 
   ProgressDialog? pr;
 
@@ -230,7 +230,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
   }
 
   Future<void> goToRequestInfo() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderRequestInfoPage(order_vo:mData.value,)));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldOrderRequestInfoPage(order_vo:mData.value,)));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {

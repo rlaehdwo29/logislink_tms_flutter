@@ -61,11 +61,11 @@ class _FindUserPageState extends State<FindUserPage> {
         case DioError:
         // Here's the sample to get the failed response error code and message
           final res = (obj as DioError).response;
-          logger.e("login_page.dart CheckTermsAgree() error : ${res?.statusCode} -> ${res?.statusMessage}");
+          logger.e("old_login_page.dart CheckTermsAgree() error : ${res?.statusCode} -> ${res?.statusMessage}");
           openOkBox(context,"${res?.statusCode} / ${res?.statusMessage}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
           break;
         default:
-          logger.e("login_page.dart CheckTermsAgree() error2222 :");
+          logger.e("old_login_page.dart CheckTermsAgree() error2222 :");
           break;
       }
     });
@@ -106,11 +106,11 @@ class _FindUserPageState extends State<FindUserPage> {
     case DioError:
     // Here's the sample to get the failed response error code and message
     final res = (obj as DioError).response;
-    logger.e("login_page.dart CheckTermsAgree() error : ${res?.statusCode} -> ${res?.statusMessage}");
+    logger.e("old_login_page.dart CheckTermsAgree() error : ${res?.statusCode} -> ${res?.statusMessage}");
     openOkBox(context,"${res?.statusCode} / ${res?.statusMessage}",Strings.of(context)?.get("confirm")??"Error!!",() {Navigator.of(context).pop(false);});
     break;
     default:
-    logger.e("login_page.dart CheckTermsAgree() error2222 :");
+    logger.e("old_login_page.dart CheckTermsAgree() error2222 :");
     break;
     }
     });

@@ -16,7 +16,7 @@ import 'package:logislink_tms_flutter/common/model/user_model.dart';
 import 'package:logislink_tms_flutter/common/strings.dart';
 import 'package:logislink_tms_flutter/common/style_theme.dart';
 import 'package:logislink_tms_flutter/constants/const.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_request_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/old_order_request_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_cargo_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_charge_info_page.dart';
@@ -27,6 +27,8 @@ import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/util.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:dio/dio.dart';
+
+import '../subpage/order_request_info_page.dart';
 
 class RenewRegistOrderPage extends StatefulWidget {
 

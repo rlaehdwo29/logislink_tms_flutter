@@ -24,7 +24,7 @@ import 'package:logislink_tms_flutter/db/appdatabase.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_nomal_addr_page.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_select_addrInfo.dart';
 import 'package:logislink_tms_flutter/page/renewpage/renew_select_cargoInfo.dart';
-import 'package:logislink_tms_flutter/page/subpage/order_request_info_page.dart';
+import 'package:logislink_tms_flutter/page/subpage/old_order_request_info_page.dart';
 import 'package:logislink_tms_flutter/page/subpage/reg_order/order_addr_page.dart';
 import 'package:logislink_tms_flutter/provider/dio_service.dart';
 import 'package:logislink_tms_flutter/utils/sp.dart';
@@ -37,17 +37,17 @@ import 'package:table_calendar/table_calendar.dart';
 
 enum Days {TODAY, TOMORROW, CUSTOM}
 
-class RenewGeneralRegistOrderPage extends StatefulWidget {
+class RegistOrderPage extends StatefulWidget {
   OrderModel? order_vo;
   String? flag; // R: 오더 등록, CR:오더 복사, M: 오더 수정
 
-  RenewGeneralRegistOrderPage({Key? key, this.order_vo, this.flag}):super(key:key);
+  RegistOrderPage({Key? key, this.order_vo, this.flag}):super(key:key);
 
   @override
-  _RenewGeneralRegistOrderPageState createState() => _RenewGeneralRegistOrderPageState();
+  _RegistOrderPageState createState() => _RegistOrderPageState();
 }
 
-class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPage> {
+class _RegistOrderPageState extends State<RegistOrderPage> {
 
   ProgressDialog? pr;
   final controller = Get.find<App>();
@@ -3799,7 +3799,7 @@ class _RenewGeneralRegistOrderPageState extends State<RenewGeneralRegistOrderPag
   }
 
   Future goToRequestPage() async {
-    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OrderRequestInfoPage(order_vo:mData.value)));
+    Map<String,dynamic> results = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldOrderRequestInfoPage(order_vo:mData.value)));
 
     if(results != null && results.containsKey("code")){
       if(results["code"] == 200) {
