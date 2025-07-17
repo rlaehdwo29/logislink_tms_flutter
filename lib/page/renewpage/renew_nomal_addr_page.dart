@@ -884,7 +884,8 @@ class _RenewNomalAddrPageState extends State<RenewNomalAddrPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -915,8 +916,7 @@ class _RenewNomalAddrPageState extends State<RenewNomalAddrPage> {
                 )
               ],
             ),
-        body: SafeArea(
-          child: Obx(() {
+        body:Obx(() {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
@@ -1080,8 +1080,7 @@ class _RenewNomalAddrPageState extends State<RenewNomalAddrPage> {
               ],
             );
           })
-        )
-    );
+    ));
   }
 
 }

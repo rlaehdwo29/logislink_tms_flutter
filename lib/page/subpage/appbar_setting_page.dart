@@ -125,7 +125,8 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
       builder: (context) {
         return FractionallySizedBox(
             heightFactor: App().isTablet(context) ? 0.5 :  0.35,
-            child: Container(
+            child: SafeArea(
+                child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -207,7 +208,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
                       )
                     ]
                 )
-            )
+            ))
         );
       },
     );
@@ -916,6 +917,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
             return true;
           });
         },
+        child: SafeArea(
         child: Scaffold(
       backgroundColor: light_gray24,
       appBar: AppBar(
@@ -935,8 +937,7 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
               icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
             ),
           ),
-        body: SafeArea(
-          child: Obx(() {
+        body: Obx(() {
             return SingleChildScrollView(
               child: Column(
                 children: [
@@ -948,8 +949,8 @@ class _AppBarSettingPageState extends State<AppBarSettingPage> {
               ),
             );
           }),
-        ))
-    );
+        )
+    ));
   }
 
 }

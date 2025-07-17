@@ -494,7 +494,8 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: sub_color,
           resizeToAvoidBottomInset:false,
           appBar: AppBar(
@@ -513,8 +514,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
                   icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SizedBox(
                   width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                   height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
@@ -537,8 +537,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
                     )
                   )
                 );
-              })
-          ),
+              }),
           bottomNavigationBar: SizedBox(
               height: CustomStyle.getHeight(60.0.h),
               child: Row(
@@ -572,7 +571,7 @@ class _OrderRegDayPageState extends State<OrderRegDayPage> with TickerProviderSt
                                   ])))),
                 ],
               )),
-        )
+        ))
     );
   }
 }

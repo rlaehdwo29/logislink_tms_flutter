@@ -404,10 +404,10 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
     final width = MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width;
     return mainWidget(
         context,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Container(
+          body: Container(
                 width:width,
                 height:height,
                 color:const Color(0xff3D4656),
@@ -521,8 +521,7 @@ class _LoginPageState extends State<LoginPage> with CommonMainWidget {
                   },
                 )
             ),
-          ),
-        )
+        ))
     );
   }
 }

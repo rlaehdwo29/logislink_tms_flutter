@@ -942,7 +942,8 @@ class _LinkPageState extends State<LinkPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar:AppBar(
@@ -962,8 +963,7 @@ class _LinkPageState extends State<LinkPage> {
                   icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body:  Obx((){
            return SingleChildScrollView(
                     child: Column(
                       children: [

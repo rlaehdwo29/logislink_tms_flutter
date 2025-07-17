@@ -462,6 +462,7 @@ class _RegistSmartOrderPageState extends State<RegistSmartOrderPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
+        child: SafeArea(
         child: Stack(
             children : [
               Scaffold(
@@ -477,8 +478,7 @@ class _RegistSmartOrderPageState extends State<RegistSmartOrderPage> {
                     icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                   ),
                 ),
-            body: SafeArea(
-                child: Obx(() {
+            body: Obx(() {
                   return Container(
                   color: Colors.white,
                   width: MediaQuery.of(context).size.width,
@@ -495,7 +495,6 @@ class _RegistSmartOrderPageState extends State<RegistSmartOrderPage> {
                   );
               })
             ),
-          ),
               SlidingUpPanelWidget(
                 controlHeight: CustomStyle.getHeight(35),
                 anchor: 0.4,
@@ -589,6 +588,7 @@ class _RegistSmartOrderPageState extends State<RegistSmartOrderPage> {
                 ),
               ),
         ])
+        )
     );
   }
 

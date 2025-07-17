@@ -122,7 +122,8 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
             return true;
           });
     } ,
-      child: Scaffold(
+      child: SafeArea(
+          child: Scaffold(
         backgroundColor: styleWhiteCol,
         appBar: AppBar(
               centerTitle: true,
@@ -140,15 +141,13 @@ class _AppBarNoticePageState extends State<AppBarNoticePage> {
                 icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
               ),
           ),
-        body: SafeArea(
-            child: SingleChildScrollView(
+        body: SingleChildScrollView(
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: getNoticeFuture(),
                   )
               )
-        ),
-      )
+        )),
     );
 
 

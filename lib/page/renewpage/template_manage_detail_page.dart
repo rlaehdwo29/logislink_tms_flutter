@@ -1288,7 +1288,8 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
             return true;
           });
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: light_gray24,
           appBar: AppBar(
@@ -1343,8 +1344,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
             centerTitle: true,
             automaticallyImplyLeading: false,
           ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SizedBox(
                     width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                     height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
@@ -1403,8 +1403,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                         ),
                       ],
                     ));
-              })
-          ),
+              }),
           bottomNavigationBar: Container(
                 height: CustomStyle.getHeight(50),
                 margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
@@ -1443,7 +1442,7 @@ class _TemplateManageDetailPageState extends State<TemplateManageDetailPage> {
                     )
                   ],
                 ))
-        )
+        ))
     );
   }
 

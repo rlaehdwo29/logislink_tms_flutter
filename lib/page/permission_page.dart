@@ -19,9 +19,9 @@ class _PermissionPageState extends State<PermissionPage>{
         onWillPop: () {
           return Future(() => false);
         },
-        child: Scaffold(
-        body: SafeArea(
-            child: Container(
+        child: SafeArea(
+            child: Scaffold(
+        body: Container(
                 alignment: Alignment.center,
                 padding: const EdgeInsets.all(10.0),
                 color: Colors.white,
@@ -91,7 +91,7 @@ class _PermissionPageState extends State<PermissionPage>{
                           CustomStyle.sizedBoxHeight(10.0),
                         ]),
                   ],
-                ))),
+                )),
         bottomNavigationBar: InkWell(
           onTap: () async {
             Navigator.of(context).pop({'code': 200});
@@ -108,7 +108,7 @@ class _PermissionPageState extends State<PermissionPage>{
             ),
           ),
         )
-    )
+    ))
     );
   }
 }

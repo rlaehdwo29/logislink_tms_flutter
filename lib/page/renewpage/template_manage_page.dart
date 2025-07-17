@@ -573,7 +573,8 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
           Navigator.of(context).pop({'code': 100});
           return true;
         },
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: const Color(0xffECECEC),
           appBar: AppBar(
             title: Obx(() => Row(
@@ -618,8 +619,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
             ),
           ),
 
-          body: SafeArea(
-            child: Obx((){
+          body: Obx((){
               return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -627,8 +627,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                     templateListWidget()
                   ]
               );
-            })
-          ),
+            }),
           bottomNavigationBar: Obx(() =>
                 selectMode.value ?
                InkWell(
@@ -704,7 +703,7 @@ class _TemplateManagePageState extends State<TemplateManagePage> {
                     )
                 )
           ),
-        )
+        ))
     );
   }
 

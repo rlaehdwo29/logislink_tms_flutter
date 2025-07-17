@@ -572,7 +572,8 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
@@ -591,8 +592,7 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                   icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                  return SizedBox(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -603,9 +603,8 @@ class _RecentOrderPageState extends State<RecentOrderPage> {
                       ],
                     )
                 );
-              })
-          ),
-        )
+              }),
+        ))
     );
   }
 

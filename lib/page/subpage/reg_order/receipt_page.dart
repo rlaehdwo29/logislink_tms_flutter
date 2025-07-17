@@ -262,7 +262,8 @@ class _ReceiptPageState extends State<ReceiptPage>{
           Navigator.of(context).pop({'code':200});
           return false;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
                 centerTitle: true,
@@ -279,14 +280,12 @@ class _ReceiptPageState extends State<ReceiptPage>{
                   icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-             child: Container(
+          body: Container(
                  width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                  height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
               child: getReceiptFuture()
-             )
           ),
-        )
+        ))
     );
   }
 

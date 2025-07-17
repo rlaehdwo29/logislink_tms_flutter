@@ -249,6 +249,7 @@ class _StopPointPageState extends State<StopPointPage> {
           Navigator.of(context).pop({'code':200,Const.RESULT_WORK: Const.RESULT_WORK_STOP_POINT, Const.ORDER_VO: mData.value});
           return true;
         } ,
+        child: SafeArea(
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
@@ -268,8 +269,7 @@ class _StopPointPageState extends State<StopPointPage> {
                   icon: Icon(Icons.arrow_back, size: 24.h, color: styleWhiteCol),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                  return SizedBox(
                     width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                     height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
@@ -294,8 +294,7 @@ class _StopPointPageState extends State<StopPointPage> {
                         ),
                 );
               })
-          )
-        )
+        ))
     );
   }
 

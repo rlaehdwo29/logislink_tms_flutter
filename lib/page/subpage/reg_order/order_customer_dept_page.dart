@@ -229,6 +229,7 @@ class _OrderCustomerDeptPageState extends State<OrderCustomerDeptPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
+        child: SafeArea(
         child: Scaffold(
             resizeToAvoidBottomInset: false,
             backgroundColor: sub_color,
@@ -248,8 +249,7 @@ class _OrderCustomerDeptPageState extends State<OrderCustomerDeptPage> {
                 icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
               ),
             ),
-            body: SafeArea(
-                child: Obx((){
+            body:  Obx((){
                   return SizedBox(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,8 +261,7 @@ class _OrderCustomerDeptPageState extends State<OrderCustomerDeptPage> {
                       )
                   );
                 })
-            )
-        )
+        ))
     );
   }
 

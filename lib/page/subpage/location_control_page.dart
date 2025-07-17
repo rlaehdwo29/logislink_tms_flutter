@@ -207,6 +207,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
             return true;
           });
         } ,
+        child: SafeArea(
         child: Scaffold(
           backgroundColor: styleWhiteCol,
           appBar: AppBar(
@@ -226,8 +227,7 @@ class _LocationControlPageState extends State<LocationControlPage>{
                   icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: SingleChildScrollView(
+          body: SingleChildScrollView(
                   child: SizedBox(
                     width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                     height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
@@ -261,9 +261,8 @@ class _LocationControlPageState extends State<LocationControlPage>{
                     )
                   )
               )
-          ),
         )
-    );
+    ));
 
 
   }

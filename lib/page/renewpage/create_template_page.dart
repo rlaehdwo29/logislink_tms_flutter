@@ -289,7 +289,8 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
           Navigator.of(context).pop({'code': 100});
           return true;
         },
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: const Color(0xffECECEC),
           appBar: AppBar(
             title: Row(
@@ -401,7 +402,7 @@ class _CreateTemplatePageState extends State<CreateTemplatePage> with TickerProv
                   });
                 },
               ),
-          ),
+          )),
     );
   }
 
@@ -516,7 +517,8 @@ class _MainPageContentComponent1State extends State<MainPageContentComponent1> {
 
   @override
   Widget build(BuildContext context) {
-      return Container(
+      return SafeArea(
+          child: Container(
         padding:EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20), vertical: CustomStyle.getHeight(10)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -719,7 +721,7 @@ class _MainPageContentComponent1State extends State<MainPageContentComponent1> {
             )
           ],
         ),
-      );
+      ));
   }
 }
 
@@ -999,7 +1001,8 @@ class _MainPageContentComponent2State extends State<MainPageContentComponent2> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return SingleChildScrollView(
+      return SafeArea(
+          child: SingleChildScrollView(
         child: Container(
         padding:EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20), vertical: CustomStyle.getHeight(10)),
         child: Column(
@@ -1561,7 +1564,7 @@ class _MainPageContentComponent2State extends State<MainPageContentComponent2> {
             )
           ],
         ),
-      ));
+      )));
     });
   }
 }
@@ -1725,7 +1728,8 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
       builder: (context) {
         return FractionallySizedBox(
             heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.60 : mCodeList.length > 12 ? 0.5 : 0.4 :  mCodeList!.length > 16 ? 0.50 : mCodeList.length > 12 ? 0.4 : 0.3,
-            child: Container(
+            child: SafeArea(
+                child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1821,7 +1825,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                       )
                     ]
                 )
-            )
+            ))
         );
       },
     );
@@ -1830,7 +1834,8 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return SingleChildScrollView(
+      return SafeArea(
+          child: SingleChildScrollView(
           child: Container(
               margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5),
                   horizontal: CustomStyle.getWidth(10)),
@@ -2741,7 +2746,7 @@ class _MainPageContentComponent3State extends State<MainPageContentComponent3> {
                   ]
               )
           )
-      );
+      ));
     });
   }
 }
@@ -4941,7 +4946,8 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return SingleChildScrollView(
+      return SafeArea(
+          child: SingleChildScrollView(
         child: Container(
         padding:EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20), vertical: CustomStyle.getHeight(10)),
         child: Column(
@@ -4994,7 +5000,7 @@ class _MainPageContentComponent4State extends State<MainPageContentComponent4> w
           ],
         ),
       )
-      );
+      ));
     });
   }
 }
@@ -5677,7 +5683,8 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
   Widget etcPannelWidget() {
 
     isEtcExpanded.value = List.filled(1, true);
-    return Container(
+    return SafeArea(
+        child: Container(
         margin: EdgeInsets.only(left: CustomStyle.getWidth(10),right: CustomStyle.getWidth(10), top: CustomStyle.getHeight(10),bottom: CustomStyle.getHeight(10)),
         child: Flex(
           direction: Axis.vertical,
@@ -5763,7 +5770,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
             );
           }),
         )
-    );
+    ));
   }
 
   Widget cargoInfoPannel() {
@@ -6649,7 +6656,8 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      return  SingleChildScrollView(
+      return  SafeArea(
+          child: SingleChildScrollView(
           child: Container(
             padding:EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(20), vertical: CustomStyle.getHeight(10)),
             child: Column(
@@ -6707,7 +6715,7 @@ class _MainPageContentComponent5State extends State<MainPageContentComponent5> w
               ],
             ),
           )
-      );
+      ));
     });
   }
   

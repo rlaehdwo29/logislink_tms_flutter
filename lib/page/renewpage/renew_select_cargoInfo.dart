@@ -93,7 +93,8 @@ class _RenewSelectCargoinfoState extends State<RenewSelectCargoinfo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
       backgroundColor: sub_color,
       appBar: AppBar(
         title: Text(
@@ -133,8 +134,7 @@ class _RenewSelectCargoinfoState extends State<RenewSelectCargoinfo> {
           )
         ],
       ),
-      body: SafeArea(
-          child: Obx(() {
+      body: Obx(() {
             return SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
@@ -221,8 +221,7 @@ class _RenewSelectCargoinfoState extends State<RenewSelectCargoinfo> {
              ]),
           );
         }),
-      )
-    );
+    ));
   }
 
 }

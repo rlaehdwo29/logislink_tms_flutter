@@ -344,7 +344,8 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
@@ -363,8 +364,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                   icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
               return SingleChildScrollView(
                   child: SizedBox(
                   height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
@@ -380,8 +380,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                       )
                 )
               );
-              })
-          ),
+              }),
           bottomNavigationBar: SizedBox(
               height: CustomStyle.getHeight(60.0.h),
               child: Row(
@@ -418,7 +417,7 @@ class _OrderAddrConfirmPageState extends State<OrderAddrConfirmPage> {
                   ),
                 ],
               )),
-        )
+        ))
     );
   }
   

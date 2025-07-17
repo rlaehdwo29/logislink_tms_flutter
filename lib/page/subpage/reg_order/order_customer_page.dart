@@ -364,7 +364,8 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
             resizeToAvoidBottomInset: false,
             backgroundColor: sub_color,
             appBar: AppBar(
@@ -383,8 +384,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                 icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
               ),
             ),
-            body: SafeArea(
-                child: Obx((){
+            body: Obx((){
                   return SizedBox(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,8 +395,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                         ],
                       )
                   );
-                })
-            ),
+                }),
             bottomNavigationBar: Obx(() {
               return btn_visable.value
                   ? SizedBox(
@@ -428,7 +427,7 @@ class _OrderCustomerPageState extends State<OrderCustomerPage> {
                     ],
                   )
               ) : const SizedBox();
-            }))
+            })))
     );
   }
 

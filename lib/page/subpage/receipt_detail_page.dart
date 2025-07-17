@@ -19,7 +19,8 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
   @override
   Widget build(BuildContext context) {
     var filePath = "$SERVER_URL$RECEIPT_PATH${widget.item.fileName}";
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
               centerTitle: true,
@@ -36,8 +37,7 @@ class _ReceiptDetailPageState extends State<ReceiptDetailPage>{
                 icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
               ),
             ),
-    body: SafeArea(
-      child: Container(
+    body: Container(
         alignment: Alignment.center,
           child: PhotoView(
         imageProvider: NetworkImage(

@@ -26,7 +26,8 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
         onWillPop: () async {
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
             backgroundColor: sub_color,
             appBar: AppBar(
               title: Text(
@@ -55,8 +56,7 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
                 )
               ],
             ),
-            body: SafeArea(
-                child: //Obx(() {
+            body: //Obx(() {
                 SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -95,8 +95,7 @@ class _OrderRequestInfoPageState extends State<OrderRequestInfoPage> {
                       )
                   )
                 //})
-            )
-        )
+        ))
     );
   }
 

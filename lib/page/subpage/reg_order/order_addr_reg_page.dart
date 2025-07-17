@@ -665,7 +665,8 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
@@ -687,16 +688,14 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
               return SingleChildScrollView(
                 child: Container(
                   padding: EdgeInsets.all(20.w),
                   child: bodyWidget()
                 )
               );
-              })
-          ),
+              }),
           bottomNavigationBar: Obx((){
               return SizedBox(
                 height: CustomStyle.getHeight(60.0.h),
@@ -793,7 +792,7 @@ class _OrderAddrRegPageState extends State<OrderAddrRegPage> {
                   ],
                 ));
           }),
-        )
+        ))
     );
   }
 

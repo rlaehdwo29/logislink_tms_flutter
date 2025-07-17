@@ -290,7 +290,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
           return FractionallySizedBox(
               widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: 0.65,
-              child: Container(
+              child: SafeArea(
+                  child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -470,7 +471,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         )
                       ]
                   )
-              )
+              ))
           );
         });
       },
@@ -549,7 +550,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
             return FractionallySizedBox(
                 widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
                 heightFactor: 0.70,
-                child: Container(
+                child: SafeArea(
+                    child: Container(
                     width: double.infinity,
                     alignment: Alignment.topCenter,
                     margin: EdgeInsets.symmetric(
@@ -961,7 +963,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         ])
                       )
                     )
-                )
+                ))
             );
           });
         });
@@ -987,7 +989,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
         return FractionallySizedBox(
             widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
             heightFactor: 0.7,
-            child: Container(
+            child: SafeArea(
+                child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1065,7 +1068,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                       )
                     ]
                 )
-            )
+            ))
         );
       },
     );
@@ -1092,8 +1095,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
         builder: (context) {
           return FractionallySizedBox(
               widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
-              heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.6 : 0.5 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
-              child: Container(
+              heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.7 : 0.6 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
+              child: SafeArea(
+                  child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1116,7 +1120,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         Expanded(
                             child: AnimationLimiter(
                                 child: GridView.builder(
-                                itemCount: mCodeList.length,
+                                itemCount: mCodeList?.length,
                                 physics: const ScrollPhysics(),
                                 scrollDirection: Axis.vertical,
                                 shrinkWrap: true,
@@ -1135,21 +1139,21 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                                           child: FadeInAnimation(
                                               child: Obx(() =>  InkWell(
                                       onTap: () {
-                                        tempCodemodel.value = CodeModel(code: mCodeList[index].code,codeName: mCodeList[index].codeName);
+                                        tempCodemodel.value = CodeModel(code: mCodeList?[index].code,codeName: mCodeList?[index].codeName);
                                       },
                                       child: Container(
                                           height: CustomStyle.getHeight(70.0),
                                           decoration: BoxDecoration(
-                                              color: tempCodemodel.value.code  == mCodeList[index].code ? renew_main_color2 : light_gray24,
+                                              color: tempCodemodel.value.code  == mCodeList?[index].code ? renew_main_color2 : light_gray24,
                                               borderRadius: BorderRadius.circular(30)
                                           ),
                                           child: Center(
                                             child: Text(
-                                              "${mCodeList[index].codeName}",
+                                              "${mCodeList?[index].codeName}",
                                               textAlign: TextAlign.center,
                                               style: CustomStyle.CustomFont(
-                                                  styleFontSize12, tempCodemodel.value.code  == mCodeList[index].code ? Colors.white: text_color_01,
-                                                  font_weight: tempCodemodel.value.code  == mCodeList[index].code ? FontWeight.w800 : FontWeight.w600),
+                                                  styleFontSize12, tempCodemodel.value.code  == mCodeList?[index].code ? Colors.white: text_color_01,
+                                                  font_weight: tempCodemodel.value.code  == mCodeList?[index].code ? FontWeight.w800 : FontWeight.w600),
                                             ),
                                           )
                                       )
@@ -1181,7 +1185,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         )
                       ]
                   )
-              )
+              ))
           );
         },
       );
@@ -1205,7 +1209,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
           return FractionallySizedBox(
               widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.6 : 0.5 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
-              child: Container(
+              child: SafeArea(
+                  child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1293,7 +1298,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         )
                       ]
                   )
-              )
+              ))
           );
         },
       );
@@ -1321,7 +1326,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
           return FractionallySizedBox(
               widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: App().isTablet(context) ? mCodeList!.length > 16 ? 0.70 : mCodeList.length > 12 ? 0.6 : 0.5 :  mCodeList!.length > 16 ? 0.65 : mCodeList.length > 12 ? 0.55 : 0.45,
-              child: Container(
+              child: SafeArea(
+                  child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1409,7 +1415,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         )
                       ]
                   )
-              )
+              ))
           );
         },
       );
@@ -1432,7 +1438,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
           return FractionallySizedBox(
               widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
               heightFactor: mStaffList.length > 16 ? 0.50 : mStaffList.length > 12 ? 0.4 : 0.3,
-              child: Container(
+              child: SafeArea(
+                  child: Container(
                   width: double.infinity,
                   alignment: Alignment.centerLeft,
                   margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1520,7 +1527,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                         )
                       ]
                   )
-              )
+              ))
           );
         },
       );
@@ -1549,7 +1556,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
         return FractionallySizedBox(
             widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
             heightFactor: 0.70,
-            child: Container(
+            child: SafeArea(
+              child: Container(
               width: double.infinity,
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1696,7 +1704,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                     )
                   ]
               ),
-            ));
+            )));
       },
     );
   }
@@ -1704,7 +1712,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
   Future<void> openSelectRegOrderDialog(BuildContext context) async {
 
     final selectRegOrder = "01".obs;
-      showModalBottomSheet(
+    showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
@@ -1718,8 +1726,9 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
       builder: (context) {
         return FractionallySizedBox(
             widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
-            heightFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height > 1000 ? 0.9 : 0.7,
-            child: Container(
+            heightFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height > 1000 ? 0.9 : 0.75,
+            child: SafeArea(
+                child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
                 margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -1729,189 +1738,190 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                     color: Colors.white
                 ),
                 child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Container(
                           margin: EdgeInsets.only(bottom: CustomStyle.getHeight(15)),
+                          alignment: Alignment.centerLeft,
                           child: Text(
                               "어떤 방법으로\n오더를 등록하시겠어요?",
                               style: CustomStyle.CustomFont(styleFontSize20, Colors.black, font_weight: FontWeight.w800)
                           )
                       ),
-                       Row(
-                         crossAxisAlignment: CrossAxisAlignment.center,
-                           mainAxisAlignment:  MainAxisAlignment.spaceBetween,
-                           children: [
-                             Obx(() => InkWell(
-                               onTap: (){
-                                 selectRegOrder.value = "01";
-                               },
-                               child: Container(
-                                  width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
-                                  height: CustomStyle.getHeight(180),
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: selectRegOrder.value == "01" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
-                                  borderRadius: const BorderRadius.all(Radius.circular(10))
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      flex: 1,
-                                        child: Container(
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(
-                                            border: Border.all(color: const Color(0xffD9D9D9),width: 1),
-                                            borderRadius: const BorderRadius.all(Radius.circular(5))
-                                        ),
-                                        child: Image.asset(
-                                          "assets/image/ic_smart_order.png",
-                                          width: CustomStyle.getWidth(25.0),
-                                          height: CustomStyle.getHeight(25.0),
-                                          color: selectRegOrder.value == "01" ? renew_main_color2 : const Color(0xffC8C8C8),
-                                        )
-                                      )
+                      Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment:  MainAxisAlignment.spaceBetween,
+                          children: [
+                            Obx(() => InkWell(
+                                onTap: (){
+                                  selectRegOrder.value = "01";
+                                },
+                                child: Container(
+                                    width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
+                                    height: CustomStyle.getHeight(180),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: selectRegOrder.value == "01" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
+                                        borderRadius: const BorderRadius.all(Radius.circular(10))
                                     ),
-                                    Expanded(
-                                      flex: 1,
-                                      child: Container(
-                                          alignment: Alignment.center,
-                                          padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                                          child: Column(
-                                                children: [
-                                                  Row(
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    children: [
-                                                      selectRegOrder.value == "01" ?
-                                                      Container(
-                                                        margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
-                                                        child: const Icon(
-                                                            Icons.check_circle_outline_rounded,
-                                                          color: renew_main_color2,
-                                                          size: 18,
-                                                        )
-                                                      ) : const SizedBox(),
-                                                      Text(
-                                                          "스마트오더",
-                                                          style: CustomStyle.CustomFont(styleFontSize18, selectRegOrder.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
-                                                      ),
-                                                    ]
-                                                  ),
-                                                  Text(
-                                                      "등록된 탬플릿으로\n신속한 등록을 해요",
-                                                      textAlign: TextAlign.center,
-                                                      style: CustomStyle.CustomFont(styleFontSize13,selectRegOrder.value == "01" ? renew_main_color2 :  Colors.black,font_weight: FontWeight.w400)
-                                                  ),
-                                                ],
-                                          )
-                                      )
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                                padding: const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(color: const Color(0xffD9D9D9),width: 1),
+                                                    borderRadius: const BorderRadius.all(Radius.circular(5))
+                                                ),
+                                                child: Image.asset(
+                                                  "assets/image/ic_smart_order.png",
+                                                  width: CustomStyle.getWidth(25.0),
+                                                  height: CustomStyle.getHeight(25.0),
+                                                  color: selectRegOrder.value == "01" ? renew_main_color2 : const Color(0xffC8C8C8),
+                                                )
+                                            )
+                                        ),
+                                        Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                                alignment: Alignment.center,
+                                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          selectRegOrder.value == "01" ?
+                                                          Container(
+                                                              margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                                                              child: const Icon(
+                                                                Icons.check_circle_outline_rounded,
+                                                                color: renew_main_color2,
+                                                                size: 18,
+                                                              )
+                                                          ) : const SizedBox(),
+                                                          Text(
+                                                              "스마트오더",
+                                                              style: CustomStyle.CustomFont(styleFontSize18, selectRegOrder.value == "01" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                          ),
+                                                        ]
+                                                    ),
+                                                    Text(
+                                                        "등록된 탬플릿으로\n신속한 등록을 해요",
+                                                        textAlign: TextAlign.center,
+                                                        style: CustomStyle.CustomFont(styleFontSize13,selectRegOrder.value == "01" ? renew_main_color2 :  Colors.black,font_weight: FontWeight.w400)
+                                                    ),
+                                                  ],
+                                                )
+                                            )
+                                        )
+                                      ],
                                     )
-                                    ],
-                                  )
                                 )
-                             )) ,
-                             Obx(() => InkWell(
-                               onTap: (){
-                                 selectRegOrder.value = "02";
-                               },
-                               child: Container(
-                                   width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
-                                   height: MediaQueryData.fromView(WidgetsBinding.instance.window).size.height > 1000 ? CustomStyle.getHeight(250) : CustomStyle.getHeight(180),
-                                   padding: const EdgeInsets.all(10),
-                                   decoration: BoxDecoration(
-                                       border: Border.all(color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
-                                       borderRadius: const BorderRadius.all(Radius.circular(10))
-                                   ),
-                                   child: Column(
-                                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                                     mainAxisAlignment: MainAxisAlignment.center,
-                                     children: [
-                                       Expanded(
-                                           flex: 1,
-                                           child: Container(
-                                               padding: const EdgeInsets.all(10),
-                                               decoration: BoxDecoration(
-                                                   border: Border.all(color: const Color(0xffD9D9D9),width: 1),
-                                                   borderRadius: const BorderRadius.all(Radius.circular(5))
-                                               ),
-                                               child: Image.asset(
-                                                 "assets/image/ic_hwa.png",
-                                                 width: CustomStyle.getWidth(25.0),
-                                                 height: CustomStyle.getHeight(25.0),
-                                                 color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffC8C8C8),
-                                               )
-                                           )
-                                       ),
-                                       Expanded(
-                                           flex: 1,
-                                           child: Container(
-                                               alignment: Alignment.center,
-                                               padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
-                                               child: Column(
-                                                 children: [
-                                                   Row(
-                                                       crossAxisAlignment: CrossAxisAlignment.center,
-                                                       mainAxisAlignment: MainAxisAlignment.center,
-                                                       children: [
-                                                         selectRegOrder.value == "02" ?
-                                                         Container(
-                                                             margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
-                                                             child: const Icon(
-                                                               Icons.check_circle_outline_rounded,
-                                                               color: renew_main_color2,
-                                                               size: 18,
-                                                             )
-                                                         ) : const SizedBox(),
-                                                         Text(
-                                                             "일반오더",
-                                                             style: CustomStyle.CustomFont(styleFontSize18, selectRegOrder.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
-                                                         ),
-                                                       ]
-                                                   ),
-                                                   Text(
-                                                       "상세한 오더 등록이\n가능해요",
-                                                       textAlign: TextAlign.center,
-                                                       style: CustomStyle.CustomFont(styleFontSize13, selectRegOrder.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w400)
-                                                   ),
-                                                 ],
-                                               )
-                                           )
-                                       )
-                                     ],
-                                   )
+                            )) ,
+                            Obx(() => InkWell(
+                                onTap: (){
+                                  selectRegOrder.value = "02";
+                                },
+                                child: Container(
+                                    width: MediaQueryData.fromView(WidgetsBinding.instance.window).size.width * 0.4,
+                                    height: MediaQueryData.fromView(WidgetsBinding.instance.window).size.height > 1000 ? CustomStyle.getHeight(250) : CustomStyle.getHeight(180),
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffD9D9D9),width: 1),
+                                        borderRadius: const BorderRadius.all(Radius.circular(10))
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                                padding: const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(color: const Color(0xffD9D9D9),width: 1),
+                                                    borderRadius: const BorderRadius.all(Radius.circular(5))
+                                                ),
+                                                child: Image.asset(
+                                                  "assets/image/ic_hwa.png",
+                                                  width: CustomStyle.getWidth(25.0),
+                                                  height: CustomStyle.getHeight(25.0),
+                                                  color: selectRegOrder.value == "02" ? renew_main_color2 : const Color(0xffC8C8C8),
+                                                )
+                                            )
+                                        ),
+                                        Expanded(
+                                            flex: 1,
+                                            child: Container(
+                                                alignment: Alignment.center,
+                                                padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(5)),
+                                                child: Column(
+                                                  children: [
+                                                    Row(
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          selectRegOrder.value == "02" ?
+                                                          Container(
+                                                              margin: EdgeInsets.only(right: CustomStyle.getWidth(3)),
+                                                              child: const Icon(
+                                                                Icons.check_circle_outline_rounded,
+                                                                color: renew_main_color2,
+                                                                size: 18,
+                                                              )
+                                                          ) : const SizedBox(),
+                                                          Text(
+                                                              "일반오더",
+                                                              style: CustomStyle.CustomFont(styleFontSize18, selectRegOrder.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w700)
+                                                          ),
+                                                        ]
+                                                    ),
+                                                    Text(
+                                                        "상세한 오더 등록이\n가능해요",
+                                                        textAlign: TextAlign.center,
+                                                        style: CustomStyle.CustomFont(styleFontSize13, selectRegOrder.value == "02" ? renew_main_color2 : Colors.black,font_weight: FontWeight.w400)
+                                                    ),
+                                                  ],
+                                                )
+                                            )
+                                        )
+                                      ],
+                                    )
                                 )
-                              )),
-                            ]
-                       ),
-                       Container(
-                         margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(20)),
-                         child: AnimationLimiter(
-                             child: Column(
-                             crossAxisAlignment: CrossAxisAlignment.start ,
-                             mainAxisAlignment: MainAxisAlignment.center,
-                              children: AnimationConfiguration.toStaggeredList(
-                              duration: const Duration(milliseconds: 600),
-                              childAnimationBuilder: (widget) => SlideAnimation(
-                              horizontalOffset: 50.0,
-                              child: FadeInAnimation(
-                              child: widget,
-                              ),
-                              ),
-                           children:[
-                             Container(
-                               margin: EdgeInsets.only(bottom: CustomStyle.getHeight(10)),
-                               child: //Obx(() =>
-                                   Row(
-                                   children:[
-                                     Text(
-                                         "이런 분들께 추천해요",
-                                         style:CustomStyle.CustomFont(styleFontSize20, Colors.black,font_weight: FontWeight.w500)
-                                     ),
-                                     /*selectRegOrder.value == "01" ?
+                            )),
+                          ]
+                      ),
+                      Container(
+                          margin: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(20)),
+                          child: AnimationLimiter(
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start ,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: AnimationConfiguration.toStaggeredList(
+                                      duration: const Duration(milliseconds: 600),
+                                      childAnimationBuilder: (widget) => SlideAnimation(
+                                        horizontalOffset: 50.0,
+                                        child: FadeInAnimation(
+                                          child: widget,
+                                        ),
+                                      ),
+                                      children:[
+                                        Container(
+                                            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(10)),
+                                            child: //Obx(() =>
+                                            Row(
+                                                children:[
+                                                  Text(
+                                                      "이런 분들께 추천해요",
+                                                      style:CustomStyle.CustomFont(styleFontSize20, Colors.black,font_weight: FontWeight.w500)
+                                                  ),
+                                                  /*selectRegOrder.value == "01" ?
                                      InkWell(
                                        onTap:() {
                                          Navigator.of(context).pushReplacement(
@@ -1931,93 +1941,93 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                                          )
                                        )
                                      ) : */const SizedBox()
-                                   ]
-                               )
-                               //)
-                             ),
-                             Container(
-                                 margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
-                                 child: Row(
-                                   crossAxisAlignment: CrossAxisAlignment.center,
-                                     mainAxisAlignment: MainAxisAlignment.start,
-                                children :[
-                                  Container(
-                                     margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
-                                      child: Image.asset(
-                                        "assets/image/ic_info1.png",
-                                        width: CustomStyle.getWidth(15.0),
-                                        height: CustomStyle.getHeight(15.0),
-                                      )
-                                  ),
-                                  Obx(() =>
-                                    Text(
-                                        selectRegOrder.value == "01" ? "많은 정보 입력은 귀찮아요" : "디테일한 오더 등록이 필요해요",
-                                        style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
-                                      )
-                                  )
-                                  ]
-                                )
-                             ),
-                             Container(
-                                 margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
-                                 child: Row(
-                                     crossAxisAlignment: CrossAxisAlignment.center,
-                                     mainAxisAlignment: MainAxisAlignment.start,
-                                     children :[
-                                       Container(
-                                           margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
-                                           child: Image.asset(
-                                             "assets/image/ic_info2.png",
-                                             width: CustomStyle.getWidth(15.0),
-                                             height: CustomStyle.getHeight(15.0),
-                                           )
-                                       ),
-                                       Obx(() =>
-                                         Text(
-                                             selectRegOrder.value == "01"? "중요하지 않은 조건은, 알아서 넣어주세요" : "내 손으로 차근차근 정보를 입력할래요",
-                                             style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
-                                         )
-                                       ),
-                                     ]
-                                 )
-                             ),
-                             Container(
-                                 margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
-                                 child: Obx(() => Row(
-                                     crossAxisAlignment: CrossAxisAlignment.center,
-                                     mainAxisAlignment: MainAxisAlignment.start,
-                                     children :[
-                                       Container(
-                                           margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
-                                           child: Image.asset(
-                                             "assets/image/ic_info3.png",
-                                             width: CustomStyle.getWidth(15.0),
-                                             height: CustomStyle.getHeight(15.0),
-                                           )
-                                       ),
-                                       selectRegOrder.value == "01" ?
-                                        Text(
-                                          "최소한의 조건",
-                                            style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
-                                        ) : Text(
-                                           "신속한 등록",
-                                           style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
-                                       ),
-                                       selectRegOrder.value == "01" ?
-                                       Text(
-                                           "으로 빠르게 오더를 등록하고 싶어요",
-                                           style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
-                                       ) : Text(
-                                           "보다는 꼼꼼한 오더 등록을하고 싶어요",
-                                           style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
-                                       )
-                                     ]
-                                 ))
-                             )
-                           ]
-                         )))
-                       ),
-                       Obx(() => InkWell(
+                                                ]
+                                            )
+                                          //)
+                                        ),
+                                        Container(
+                                            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
+                                            child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children :[
+                                                  Container(
+                                                      margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                                                      child: Image.asset(
+                                                        "assets/image/ic_info1.png",
+                                                        width: CustomStyle.getWidth(15.0),
+                                                        height: CustomStyle.getHeight(15.0),
+                                                      )
+                                                  ),
+                                                  Obx(() =>
+                                                      Text(
+                                                          selectRegOrder.value == "01" ? "많은 정보 입력은 귀찮아요" : "디테일한 오더 등록이 필요해요",
+                                                          style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                                      )
+                                                  )
+                                                ]
+                                            )
+                                        ),
+                                        Container(
+                                            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
+                                            child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children :[
+                                                  Container(
+                                                      margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                                                      child: Image.asset(
+                                                        "assets/image/ic_info2.png",
+                                                        width: CustomStyle.getWidth(15.0),
+                                                        height: CustomStyle.getHeight(15.0),
+                                                      )
+                                                  ),
+                                                  Obx(() =>
+                                                      Text(
+                                                          selectRegOrder.value == "01"? "중요하지 않은 조건은, 알아서 넣어주세요" : "내 손으로 차근차근 정보를 입력할래요",
+                                                          style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                                      )
+                                                  ),
+                                                ]
+                                            )
+                                        ),
+                                        Container(
+                                            margin: EdgeInsets.only(bottom: CustomStyle.getHeight(6)),
+                                            child: Obx(() => Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children :[
+                                                  Container(
+                                                      margin: EdgeInsets.only(right: CustomStyle.getWidth(10)),
+                                                      child: Image.asset(
+                                                        "assets/image/ic_info3.png",
+                                                        width: CustomStyle.getWidth(15.0),
+                                                        height: CustomStyle.getHeight(15.0),
+                                                      )
+                                                  ),
+                                                  selectRegOrder.value == "01" ?
+                                                  Text(
+                                                      "최소한의 조건",
+                                                      style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
+                                                  ) : Text(
+                                                      "신속한 등록",
+                                                      style:CustomStyle.CustomFont(styleFontSize14, renew_main_color2,font_weight: FontWeight.w500)
+                                                  ),
+                                                  selectRegOrder.value == "01" ?
+                                                  Text(
+                                                      "으로 빠르게 오더를 등록하고 싶어요",
+                                                      style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                                  ) : Text(
+                                                      "보다는 꼼꼼한 오더 등록을하고 싶어요",
+                                                      style:CustomStyle.CustomFont(styleFontSize14, Colors.black,font_weight: FontWeight.w400)
+                                                  )
+                                                ]
+                                            ))
+                                        )
+                                      ]
+                                  )))
+                      ),
+                      Obx(() => InkWell(
                           onTap: () async {
                             Future.delayed(const Duration(milliseconds: 300), () {
                               if(selectRegOrder.value == "") {
@@ -2045,7 +2055,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                       ))
                     ]
                 )
-            )
+            ))
         );
       },
     );
@@ -2820,7 +2830,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
         return FractionallySizedBox(
             widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
             heightFactor: 0.9,
-            child: SingleChildScrollView(
+            child: SafeArea(
+                child: SingleChildScrollView(
                 child: Container(
                 width: double.infinity,
                 alignment: Alignment.centerLeft,
@@ -3264,7 +3275,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                     ]
                 )
               )
-            )
+            ))
         );
       },
     );
@@ -3669,7 +3680,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
 
   @override
   Widget build(BuildContext mContext) {
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
       key: _scaffoldKey,
       backgroundColor: light_gray24,
       resizeToAvoidBottomInset: true,
@@ -3704,8 +3716,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
         ),
       ),
       endDrawer: getAppBarMenu(),
-        body: SafeArea(
-            child: Obx((){
+        body: Obx((){
               return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -3715,8 +3726,7 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                   ]
               );
             })
-        ),
-    );
+    ));
   }
 
   Drawer getAppBarMenu() {
@@ -3760,7 +3770,8 @@ class _MainPageState extends State<MainPage> with CommonMainWidget, WidgetsBindi
                                           height: App().isTablet(context) ? CustomStyle.getHeight(25.h) : CustomStyle.getHeight(50),
                                           child: IconButton(
                                               onPressed: (){
-                                                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldAppBarSettingPage()));
+                                                //Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => OldAppBarSettingPage()));
+                                                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => AppBarSettingPage()));
                                               },
                                               icon: Icon(Icons.settings,size: App().isTablet(context) ? 38.h : 28.h ,color: Colors.white)
                                           )

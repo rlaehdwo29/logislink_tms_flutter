@@ -321,7 +321,8 @@ class _FindUserPageState extends State<FindUserPage> {
   @override
   Widget build(BuildContext context) {
     pr = Util.networkProgress(context);
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
       backgroundColor: styleWhiteCol,
       appBar: AppBar(
             title: Text(
@@ -339,8 +340,7 @@ class _FindUserPageState extends State<FindUserPage> {
               icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.white),
             ),
           ),
-      body: SafeArea(
-        child: Container(
+      body:  Container(
           width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
           height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
           padding: const EdgeInsets.all(20),
@@ -355,8 +355,8 @@ class _FindUserPageState extends State<FindUserPage> {
               ],
             )
           )
-        )
-      ),
+        ),
+      )
     );
   }
   

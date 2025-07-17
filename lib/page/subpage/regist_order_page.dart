@@ -2152,7 +2152,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                 return FractionallySizedBox(
                     widthFactor: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width > 700 ? 1.5 : 1.0,
                     heightFactor: 0.70,
-                    child: Container(
+                    child: SafeArea(
+                        child: Container(
                         width: double.infinity,
                         alignment: Alignment.topCenter,
                         margin: EdgeInsets.symmetric(
@@ -2416,7 +2417,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                                 ])
                         )
                         )
-                    )
+                    ))
                 );
               });
         });
@@ -2443,7 +2444,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
       builder: (context) {
         return FractionallySizedBox(
             heightFactor: 0.80,
-            child: Container(
+            child: SafeArea(
+                child: Container(
               width: double.infinity,
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -2692,7 +2694,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                     )
                   ]
               ),
-            ));
+            )));
       },
     );
   }
@@ -2735,7 +2737,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
       builder: (context) {
         return FractionallySizedBox(
             heightFactor: 0.80,
-            child: SingleChildScrollView(
+            child: SafeArea(
+                child: SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
                 child: Container(
                 padding: EdgeInsets.only(left: CustomStyle.getWidth(10), right: CustomStyle.getWidth(10), top: CustomStyle.getHeight(10), bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -3762,7 +3765,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                       ),
                     ]
                 )
-            ))
+            )))
         );
       },
     );
@@ -4669,7 +4672,8 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
             return false;
           }
         },
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: sub_color,
           appBar: AppBar(
             title: Text(
@@ -4757,8 +4761,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
               )
             ],
           ),
-          body: SafeArea(
-              child: Obx(() {
+          body: Obx(() {
                 return SizedBox(
                     width: MediaQuery.of(context).size.width,
                     height: MediaQuery.of(context).size.height,
@@ -4775,8 +4778,7 @@ class _RegistOrderPageState extends State<RegistOrderPage> {
                     )
                 );
               })
-          )
-        )
+        ))
     );
   }
 

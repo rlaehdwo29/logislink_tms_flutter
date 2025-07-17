@@ -58,7 +58,8 @@ class _WebViewPageState extends State<WebViewPage> {
   Widget build(BuildContext context) {
 
     pr = Util.networkProgress(context);
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
         backgroundColor: styleWhiteCol,
         appBar: AppBar(
               centerTitle: true,
@@ -76,8 +77,7 @@ class _WebViewPageState extends State<WebViewPage> {
                 icon: Icon(Icons.arrow_back,size: 24.h,color: Colors.black),
               ),
             ),
-        body:  SafeArea(
-            child: WillPopScope(
+        body:   WillPopScope(
                 onWillPop: () => _goBack(context),
                 child: Column(children: <Widget>[
                   progress < 1.0
@@ -178,8 +178,8 @@ class _WebViewPageState extends State<WebViewPage> {
                     ),
                   ),
                 ])
-            ))
-    );
+            )
+    ));
   }
 
 }

@@ -2379,6 +2379,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
+        child: SafeArea(
         child: Scaffold(
           backgroundColor: sub_color,
           appBar: AppBar(
@@ -2397,8 +2398,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                   icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SingleChildScrollView(
                     child: Column(
                   children: [
@@ -2430,8 +2430,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                     bodyWidget()
                   ],
                 ));
-              })
-          ),
+              }),
             bottomNavigationBar: Obx((){
               return SizedBox(
                 height: CustomStyle.getHeight(60.0.h),
@@ -2530,7 +2529,7 @@ class _OrderChargeInfoPageState extends State<OrderChargeInfoPage> {
                   ],
                 ));
           })
-        )
+        ))
     );
   }
 

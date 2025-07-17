@@ -278,7 +278,8 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
@@ -297,8 +298,7 @@ class _OrderCustUserPageState extends State<OrderCustUserPage> {
                   icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SizedBox(
                   child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

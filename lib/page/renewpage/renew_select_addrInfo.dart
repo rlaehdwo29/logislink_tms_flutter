@@ -412,7 +412,8 @@ class _RenewSelectAddrinfoState extends State<RenewSelectAddrinfo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
         backgroundColor: sub_color,
         appBar: AppBar(
           title: Text(
@@ -1106,6 +1107,6 @@ class _RenewSelectAddrinfoState extends State<RenewSelectAddrinfo> {
                   ));
             })
         )
-    );
+    ));
     }
 }

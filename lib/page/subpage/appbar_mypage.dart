@@ -1299,6 +1299,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
             return true;
           });
         },
+        child: SafeArea(
         child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -1311,8 +1312,7 @@ class _AppBarMyPageState extends State<AppBarMyPage> {
                   icon: Icon(Icons.keyboard_arrow_left,size: 24.h,color: Colors.black),
                 ),
           ),
-      body: SafeArea(
-            child: Obx((){
+      body:Obx((){
               return SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

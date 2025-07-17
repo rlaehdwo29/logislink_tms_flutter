@@ -740,6 +740,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
+        child: SafeArea(
         child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
@@ -762,8 +763,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                   icon:  Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SizedBox(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -775,8 +775,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                       ],
                     )
                 );
-              })
-          ),
+              }),
           bottomNavigationBar: Obx((){
             return SizedBox(
               height: CustomStyle.getHeight(60.0.h),
@@ -813,7 +812,7 @@ class _StopPointConfirmPageState extends State<StopPointConfirmPage> {
                 ],
               ));
           }),
-        )
+        ))
     );
   }
 

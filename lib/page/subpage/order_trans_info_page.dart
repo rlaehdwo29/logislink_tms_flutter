@@ -1902,7 +1902,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
       builder: (context) {
         return FractionallySizedBox(
             heightFactor: 0.70,
-            child: Container(
+            child: SafeArea(
+                child: Container(
               width: double.infinity,
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -2028,7 +2029,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
                     )
                   ]
               ),
-            ));
+            )));
       },
     );
   }
@@ -2051,7 +2052,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
       builder: (context) {
         return FractionallySizedBox(
             heightFactor: 0.70,
-            child: Container(
+            child: SafeArea(
+                child: Container(
               width: double.infinity,
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.symmetric(horizontal: CustomStyle.getWidth(15)),
@@ -2179,7 +2181,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
                     )
                   ]
               ),
-            ));
+            )));
       },
     );
   }
@@ -2922,7 +2924,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           //resizeToAvoidBottomInset: false,
           backgroundColor: light_gray24,
           appBar: AppBar(
@@ -2941,8 +2944,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
                   icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: //Obx(() {
+          body://Obx(() {
                  SizedBox(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2953,9 +2955,8 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
                           //mainBodyWidget(),
                         ],
                    )
-                )
+                ),
              // })
-          ),
             bottomNavigationBar: Obx((){
               return SizedBox(
                 height: CustomStyle.getHeight(55),
@@ -3074,7 +3075,7 @@ class _OrderTransInfoPageState extends State<OrderTransInfoPage> with TickerProv
                   ],
                 ));
           })
-        )
+        ))
     );
   }
 

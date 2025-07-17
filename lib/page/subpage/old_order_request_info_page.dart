@@ -908,7 +908,8 @@ Future<void> getCustUser() async {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           backgroundColor: sub_color,
             resizeToAvoidBottomInset:false,
           appBar: AppBar(
@@ -927,8 +928,7 @@ Future<void> getCustUser() async {
                   icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SizedBox(
                     child: SingleChildScrollView(
                         child: Column(
@@ -953,8 +953,7 @@ Future<void> getCustUser() async {
                         )
                     )
                 );
-              })
-          ),
+              }),
           bottomNavigationBar: Obx((){
             return SizedBox(
               height: CustomStyle.getHeight(60.0.h),
@@ -1063,7 +1062,7 @@ Future<void> getCustUser() async {
                 ],
               ));
           }),
-        )
+        ))
     );
   }
   

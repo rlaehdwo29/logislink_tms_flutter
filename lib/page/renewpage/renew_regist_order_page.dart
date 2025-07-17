@@ -1227,7 +1227,8 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
             return false;
           }
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
       backgroundColor: sub_color,
       appBar: AppBar(
             title: Text(
@@ -1320,7 +1321,7 @@ class _RenewRegistOrderPageState extends State<RenewRegistOrderPage> {
               ),
             ],
           )),
-    )
+    ))
     );
   }
 

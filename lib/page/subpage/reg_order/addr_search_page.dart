@@ -609,7 +609,8 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+        child: Scaffold(
         backgroundColor: Colors.white,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -629,8 +630,7 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                     Icons.keyboard_arrow_left, size: 24.h, color: Colors.black),
               ),
             ),
-        body: SafeArea(
-            child: Column(
+        body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -662,9 +662,8 @@ class _AddrSearchPageState extends State<AddrSearchPage> {
                 )
                 )
               ],
-            )
         )
-    );
+    ));
   }
 
 }

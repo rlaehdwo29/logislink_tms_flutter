@@ -625,7 +625,8 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
           Navigator.of(context).pop({'code':100});
           return true;
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: sub_color,
           appBar: AppBar(
@@ -645,8 +646,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                   icon: Icon(Icons.arrow_back, size: 24.h, color: Colors.black),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                  return SingleChildScrollView(
                      child:Container(
                    padding: EdgeInsets.symmetric(vertical: CustomStyle.getHeight(10.h),horizontal: CustomStyle.getWidth(10.w)),
@@ -1433,8 +1433,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                       ],
                     )
                 ));
-              })
-          ),
+              }),
             bottomNavigationBar: Obx((){
               return SizedBox(
                 height: CustomStyle.getHeight(60.0.h),
@@ -1533,7 +1532,7 @@ class _OrderCargoInfoPageState extends State<OrderCargoInfoPage> {
                   ],
                 ));
           })
-        )
+        ))
     );
   }
 

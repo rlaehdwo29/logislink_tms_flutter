@@ -111,7 +111,8 @@ class _PointPageState extends State<PointPage> {
             return true;
           });
         },
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
             backgroundColor: Colors.white,
             appBar: AppBar(
                   centerTitle: true,
@@ -129,8 +130,7 @@ class _PointPageState extends State<PointPage> {
                     icon: Icon(Icons.arrow_back,size: 24.h, color: Colors.black),
                   ),
                 ),
-            body: SafeArea(
-                child: Container(
+            body:  Container(
                     //width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                     //height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
                     child: itemListFuture()

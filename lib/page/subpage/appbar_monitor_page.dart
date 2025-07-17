@@ -1510,6 +1510,7 @@ Widget build(BuildContext context) {
           return true;
         });
       } ,
+      child: SafeArea(
       child: Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -1528,8 +1529,7 @@ Widget build(BuildContext context) {
                 icon: Icon(Icons.close,size: 24.h,color: Colors.black),
               )
           ),
-      body: SafeArea(
-          child: Obx(() {
+      body: Obx(() {
           return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,

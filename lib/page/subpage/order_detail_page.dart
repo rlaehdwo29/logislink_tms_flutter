@@ -3057,7 +3057,8 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
             return true;
           });
         } ,
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           resizeToAvoidBottomInset: false,
           backgroundColor: light_gray24,
           appBar: AppBar(
@@ -3129,8 +3130,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   ),
                 ),
               ),
-          body: SafeArea(
-              child: Obx((){
+          body: Obx((){
                 return SizedBox(
                     width: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width,
                     height: MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.height,
@@ -3219,8 +3219,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                     )
                   ],
                 ));
-              })
-          ),
+              }),
           bottomNavigationBar: Obx((){
             return Container(
                 height: CustomStyle.getHeight(50),
@@ -3335,7 +3334,7 @@ class _OrderDetailPageState extends State<OrderDetailPage> {
                   ],
                 ));
           }),
-        )
+        ))
     );
   }
 
